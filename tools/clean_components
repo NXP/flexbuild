@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Copyright 2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+clean_bsp_components() {
+    rm -rf $FBOUTDIR/bsp
+    rm -rf $PKGDIR/bsp/atf/build
+
+    [ -d $PKGDIR/bsp/rcw ] && \
+    $MAKE clean -C $PKGDIR/bsp/rcw
+
+    [ -d $PKGDIR/bsp/mc_utils/config ] &&
+    $MAKE clean -C $PKGDIR/bsp/mc_utils/config
+}
+
+
+clean_linux_components() {
+    rm -rf $FBOUTDIR/linux
+}
+
+
+clean_apps_components() {
+    # staging build directory
+    rm -rf $FBOUTDIR/apps
+
+    # networking
+    rm -rf $PKGDIR/apps/networking/dpdk/build_arm64*
+    rm -rf $PKGDIR/apps/networking/pktgen_dpdk/build_arm64*
+
+    [ -d $PKGDIR/apps/networking/vpp/build-root ] && \
+    $MAKE distclean -C $PKGDIR/apps/networking/vpp/build-root
+
+    [ -d $PKGDIR/apps/networking/fmc/source ] && \
+    $MAKE clean -C $PKGDIR/apps/networking/fmc/source
+
+    # security
+    [ -d $PKGDIR/apps/security/optee_os ] && \
+    $MAKE clean -C $PKGDIR/apps/security/optee_os ARCH=arm
+
+    [ -d $PKGDIR/apps/security/optee_client ] && \
+    $MAKE clean -C $PKGDIR/apps/security/optee_client
+
+    [ -d $PKGDIR/apps/security/keyctl_caam ] && \
+    $MAKE clean -C $PKGDIR/apps/security/keyctl_caam
+
+    [ -d $PKGDIR/apps/security/libpkcs11 ] && \
+    $MAKE clean -C $PKGDIR/apps/security/libpkcs11
+
+    rm -rf $PKGDIR/apps/security/optee_test/out
+
+    # graphics
+    rm -rf $PKGDIR/apps/graphics/libdrm/build
+    rm -rf $PKGDIR/apps/graphics/weston/arm64_build
+
+    # multimedia
+    rm -rf $PKGDIR/apps/multimedia/gstreamer/build
+    rm -rf $PKGDIR/apps/multimedia/gst_plugins_base/build
+    rm -rf $PKGDIR/apps/multimedia/gst_plugins_good/build
+    rm -rf $PKGDIR/apps/multimedia/gst_plugins_bad/build
+    rm -rf $PKGDIR/apps/multimedia/gst_plugins_ugly/build
+}

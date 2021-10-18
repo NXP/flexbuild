@@ -1,0 +1,21 @@
+# sysvinit-inittab - postinst
+set -e
+# run this on host and on target
+SERIAL_PORTS="ttyS0 ttyS1 ttyAMA0 ttymxc0 ttymxc1 ttyLP0"
+
+if [ -n "$D" ]; then
+    $INTERCEPT_DIR/postinst_intercept delay_to_first_boot sysvinit-inittab mlprefix=
+    exit 0
+fi
+# run this on the target
+if [ -e /proc/consoles ]; then
+	for port in $SERIAL_PORTS
+	do
+		if [ -z "`grep ${port} /proc/consoles`" ]; then
+			sed -i -e /^.*${port}\ /d -e /^.*${port}$/d /etc/inittab
+		fi
+	done
+	kill -HUP 1
+else
+	exit 1
+fi

@@ -1,0 +1,117 @@
+/*
+ * Copyright 2018 NXP
+ *
+ */
+
+
+/dts-v1/;
+
+/ {
+	description = "Image file for the i.MX6 ARM 32b Linux Kernel";
+	#address-cells = <1>;
+
+	images {
+		kernel {
+			description = "ARM32 Linux kernel";
+			data = /incbin/("../../build/linux/kernel/arm32/IMX/zImage");
+			type = "kernel";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+                        load = <0x30000000>;
+                        entry = <0x30000000>;
+		};
+		kernel-1 {
+			description = "ARM32 Linux kernel";
+			data = /incbin/("../../build/linux/kernel/arm32/IMX/zImage");
+			type = "kernel";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+                        load = <0x80000000>;
+                        entry = <0x80000000>;
+		};
+
+		initrd {
+			description = "initrd for arm32";
+			data = /incbin/("../../build/images/rootfs_yocto_arm32_tiny.cpio.gz");
+			type = "ramdisk";
+			arch = "arm";
+			os = "linux";
+			compression = "gzip";
+                        load = <0x32800000>;
+                        entry = <0x32800000>;
+		};
+		initrd-imx7 {
+			description = "initrd for arm32";
+			data = /incbin/("../../build/images/rootfs_yocto_arm32_tiny.cpio.gz");
+			type = "ramdisk";
+			arch = "arm";
+			os = "linux";
+			compression = "gzip";
+                        load = <0x82800000>;
+                        entry = <0x82800000>;
+		};
+
+
+		imx6qsabresd-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm32/IMX/imx6q-sabresd.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			load = <0x38000000>;
+		};
+		imx6qpsabresd-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm32/IMX/imx6qp-sabresd.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			load = <0x38000000>;
+		};
+		imx7ulpevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm32/IMX/imx7ulp-evk.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			load = <0x88000000>;
+		};
+		imx6sllevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm32/IMX/imx6sll-evk.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			load = <0x88000000>;
+		};
+	};
+
+	configurations {
+		imx6qsabresd {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx6qsabresd-dtb";
+			ramdisk = "initrd";
+		};
+		imx6qpsabresd {
+		        description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx6qpsabresd-dtb";
+			ramdisk = "initrd";
+		};
+		imx6sllevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel-1";
+			fdt = "imx6sllevk-dtb";
+			ramdisk = "initrd-imx7";
+		};
+		imx7ulpevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel-1";
+			fdt = "imx7ulpevk-dtb";
+			ramdisk = "initrd-imx7";
+		};
+	};
+};

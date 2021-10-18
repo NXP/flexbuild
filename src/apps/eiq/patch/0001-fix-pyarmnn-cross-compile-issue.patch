@@ -1,0 +1,56 @@
+From 7de5b027d0ef9f649c4bae1a8649df8a93354fa6 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Thu, 29 Oct 2020 18:45:21 +0800
+Subject: [PATCH] fix pyarmnn cross compile issue
+
+Signed-off-by: Zongchun Yu <zongchun.yu@nxp.com>
+---
+ python/pyarmnn/setup.py | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/python/pyarmnn/setup.py b/python/pyarmnn/setup.py
+index ac6ee24b..49315548 100755
+--- a/python/pyarmnn/setup.py
++++ b/python/pyarmnn/setup.py
+@@ -12,6 +12,7 @@ __arm_ml_version__ = None
+ import logging
+ import os
+ import sys
++import sysconfig
+ import subprocess
+ from functools import lru_cache
+ from pathlib import Path
+@@ -61,17 +62,25 @@ class ArmnnVersionCheckerExtBuilder(build_ext):
+             self.failed_ext.append(ext)
+             logger.warning('Failed to build extension %s. \n %s', ext.name, str(err))
+ 
+-        if ext.name == 'pyarmnn._generated._pyarmnn_version':
+-            sys.path.append(os.path.abspath(os.path.join(self.build_lib, str(Path(ext._file_name).parent))))
+-            from _pyarmnn_version import GetVersion
+-            check_armnn_version(GetVersion(), __arm_ml_version__)
+-
+     def copy_extensions_to_source(self):
+ 
+         for ext in self.failed_ext:
+             self.extensions.remove(ext)
+         super().copy_extensions_to_source()
+ 
++    def get_ext_filename(self, ext):
++        filename = super().get_ext_filename(ext)
++        fname, fext = os.path.splitext(filename)
++        ext_suffix = sysconfig.get_config_var('EXT_SUFFIX')
++        if fext == ext_suffix:
++            return filename
++        ext_suffix = ext_suffix.replace(ext, '')
++        idx = filename.find(ext_suffix)
++        if idx == -1:
++            return filename
++        else:
++            return filename[:idx] + fext
++
+ 
+ def linux_gcc_name():
+     """Returns the name of the `gcc` compiler. Might happen that we are cross-compiling and the
+-- 
+2.17.1
+

@@ -1,0 +1,8 @@
+[Unit]
+Description=Configuration for NXP i.MX/LS GPU (Former rc_gpu.S)
+
+[Service]
+ExecStart=/etc/gpuconfig
+
+[Install]
+WantedBy=graphical.target

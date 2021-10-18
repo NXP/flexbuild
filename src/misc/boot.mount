@@ -1,0 +1,12 @@
+[Unit]
+Description=Boot Partition
+Before=systemd-modules-load.service
+
+[Mount]
+What=UUID=PARTUUID
+Where=/boot
+Type=ext4
+Options=defaults
+
+[Install]
+WantedBy=local-fs.target

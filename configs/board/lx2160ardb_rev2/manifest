@@ -1,0 +1,119 @@
+# [general]
+machine="lx2160ardb_rev2"
+
+# default RCW
+rcw_xspi="bsp/rcw/lx2160ardb_rev2/XGGFF_PP_HHHH_RR_19_5_2/rcw_2200_750_3200_19_5_2.bin"
+rcw_sd="bsp/rcw/lx2160ardb_rev2/XGGFF_PP_HHHH_RR_19_5_2/rcw_2200_750_3200_19_5_2.bin"
+rcw_emmc="bsp/rcw/lx2160ardb_rev2/XGGFF_PP_HHHH_RR_19_5_2/rcw_2200_750_3200_19_5_2.bin"
+
+uefi_xspi="bsp/uefi/lx2160ardb/LX2160ARDB_EFI_NORBOOT.fd"
+device_tree="linux/kernel/arm64/LS/fsl-lx2160a-rdb.dtb"
+
+BOOT_TYPE="sd xspi emmc"
+BOOTLOADER_TYPE="uboot uefi"
+
+UBOOT_CONFIG="lx2160ardb_tfa_defconfig lx2160ardb_tfa_SECURE_BOOT_defconfig"
+
+# RCW/PBL+BL2 image
+COMPOSITE_IMG1_FILE_sd="bsp/atf/lx2160ardb_rev2/bl2_sd.pbl"
+COMPOSITE_IMG1_FILE_sd_sec="bsp/atf/lx2160ardb_rev2/bl2_sd_sec.pbl"
+COMPOSITE_IMG1_FILE_xspi="bsp/atf/lx2160ardb_rev2/bl2_flexspi_nor.pbl"
+COMPOSITE_IMG1_FILE_xspi_sec="bsp/atf/lx2160ardb_rev2/bl2_flexspi_nor_sec.pbl"
+COMPOSITE_IMG1_FILE_emmc="bsp/atf/lx2160ardb_rev2/bl2_emmc.pbl"
+
+# BL33 fip image
+COMPOSITE_IMG2_FILE="bsp/atf/lx2160ardb_rev2/fip_uboot.bin"
+COMPOSITE_IMG2_FILE_sec="bsp/atf/lx2160ardb_rev2/fip_uboot_sec.bin"
+COMPOSITE_IMG2_FILE_uefi="bsp/atf/lx2160ardb_rev2/fip_uefi.bin"
+
+# UEFI environment variable
+COMPOSITE_IMG3_FILE_uefi="bsp/uefi/lx2160ardb/LX2160ARDBNV_EFI_NORBOOT.fd"
+
+# secure boot headers
+COMPOSITE_IMG4_FILE_sd_sec="bsp/secboot_hdrs/lx2160ardb/secboot_hdrs_sdboot.bin"
+COMPOSITE_IMG4_FILE_xspi_sec="bsp/secboot_hdrs/lx2160ardb/secboot_hdrs_xspiboot.bin"
+
+# DDR PHY firmware
+COMPOSITE_IMG5_FILE="bsp/ddr_phy_bin/fip_ddr_all.bin"
+COMPOSITE_IMG5_FILE_sec="bsp/atf/lx2160ardb_rev2/fip_ddr_sec.bin"
+
+# fuse provisioning image
+COMPOSITE_IMG6_FILE="bsp/atf/lx2160ardb_rev2/fuse_fip.bin"
+COMPOSITE_IMG6_FILE_sec="bsp/atf/lx2160ardb_rev2/fuse_fip_sec.bin"
+
+# Ethernet PHY image
+COMPOSITE_IMG9_FILE="bsp/phy_inphi/in112525-phy-ucode.txt"
+
+# script for flashing
+COMPOSITE_IMG10_FILE="images/flash_images.scr"
+
+# DPAA2-MC image
+COMPOSITE_IMG11_FILE="bsp/mc_bin/lx216xa/mc_lx2160a_${MC_FW_VERSION}.itb"
+
+# DPAA2 DPL image
+COMPOSITE_IMG12_FILE="bsp/mc_utils/config/lx2160a/LX2160A-RDB/dpl-eth.19.dtb"
+
+# DPAA2 DPC image
+COMPOSITE_IMG13_FILE="bsp/mc_utils/config/lx2160a/LX2160A-RDB/dpc-usxgmii.dtb"
+
+# DTB
+COMPOSITE_IMG14_FILE="${device_tree}"
+
+
+
+# [distro autoboot script]
+distro_bootscript="bsp/u-boot/lx2160ardb_rev2/lx2160ardb_boot.scr"
+bootscript_dec="bsp/u-boot/lx2160ardb_rev2/lx2160ardb_dec_boot.scr"
+bootscript_enforce="bsp/u-boot/lx2160ardb_rev2/lx2160ardb_enforce_boot.scr"
+
+
+distroboot=\
+'env exists dtb || setenv dtb fsl-lx2160a-rdb.dtb;'\
+'env exists kernel_image || setenv kernel_image Image;'\
+'env exists devpart_boot || setenv devpart_boot 1;'\
+'env exists devpart_root || setenv devpart_root 4;'\
+'part uuid $devtype $devnum:$devpart_root partuuidr;'\
+'setenv bootargs console=ttyAMA0,115200 earlycon=pl011,mmio32,0x21c0000 root=PARTUUID=$partuuidr rw rootwait pci=pcie_bus_perf $othbootargs;'\
+'load $devtype $devnum:$devpart_boot $kernel_addr_r $kernel_image;'\
+'load $devtype $devnum:$devpart_boot $fdt_addr_r $dtb;'\
+'env exists secureboot && echo validating secureboot && run secureboot_validate;'\
+'booti $kernel_addr_r - $fdt_addr_r'
+
+
+distroboot_ima=\
+'env exists dtb || setenv dtb fsl-lx2160a-rdb.dtb;'\
+'env exists kernel_image || setenv kernel_image Image;'\
+'env exists devpart_boot || setenv devpart_boot 1;'\
+'env exists devpart_root || setenv devpart_root 4;'\
+'part uuid $devtype $devnum:$devpart_root partuuidr;'\
+'load $devtype $devnum:$devpart_boot $kernel_addr_r $kernel_image;'\
+'load $devtype $devnum:$devpart_boot $fdt_addr_r $dtb;'\
+'setenv initramfs_addr_r 0xb0000000; setenv initramfsheader_addr_r 0x80300000;'\
+'load $devtype $devnum:$devpart_boot $initramfs_addr_r initramfs.img;'\
+'env exists secureboot && echo validating secureboot && run secureboot_validate;'\
+'setenv bootargs console=ttyAMA0,115200 earlycon=pl011,mmio32,0x21c0000 root=PARTUUID=$partuuidr rw rootwait pci=pcie_bus_perf $othbootargs;'\
+'booti $kernel_addr_r $initramfs_addr_r $fdt_addr_r'
+
+
+securevalidate="setenv secureboot_validate 'load \$devtype \$devnum:\$devpart_boot \$kernelheader_addr_r /secboot_hdrs/lx2160ardb/hdr_linux.out; load \$devtype \$devnum:\$devpart_boot \$fdtheader_addr_r /secboot_hdrs/lx2160ardb/hdr_dtb.out; esbc_validate \$kernelheader_addr_r; esbc_validate \$fdtheader_addr_r'"
+
+
+securevalidate_enc="setenv secureboot_validate 'load \$devtype \$devnum:\$devpart_boot \$kernelheader_addr_r /secboot_hdrs/lx2160ardb/hdr_linux.out; esbc_validate \$kernelheader_addr_r;load \$devtype \$devnum:\$devpart_boot \$fdtheader_addr_r /secboot_hdrs/lx2160ardb/hdr_dtb.out; esbc_validate \$fdtheader_addr_r; size \$devtype \$devnum:\$devpart_boot \$kernel_image; echo Encapsulating linux image;setenv key_addr 0x87000000; mw \$key_addr $key_id_1;setexpr key_addr \$key_addr + 0x4; mw \$key_addr $key_id_2;setexpr key_addr \$key_addr + 0x4; mw \$key_addr $key_id_3;setexpr key_addr \$key_addr + 0x4; mw \$key_addr $key_id_4;setenv key_addr 0x87000000; blob enc \$kernel_addr_r \$load_addr \$filesize \$key_addr; setexpr blobsize \$filesize + 0x30;echo Saving encrypted linux ;save \$devtype \$devnum:\$devpart_boot \$load_addr /\$kernel_image \$blobsize;size \$devtype \$devnum:\$devpart_boot \$dtb;echo Encapsulating dtb image; blob enc \$fdt_addr_r \$load_addr \$filesize \$key_addr; setexpr blobsize \$filesize + 0x30;echo Saving encrypted dtb; save \$devtype \$devnum:\$devpart_boot \$load_addr /\$dtb \$blobsize; size \$devtype \$devnum:\$devpart_boot /lx2160ardb_dec_boot.scr; load \$devtype \$devnum:\$devpart_boot \$load_addr /lx2160ardb_dec_boot.scr; echo replacing Bootscript; save \$devtype \$devnum:\$devpart_boot \$load_addr /lx2160ardb_boot.scr \$filesize;size \$devtype \$devnum:\$devpart_boot /secboot_hdrs/lx2160ardb/hdr_lx2160ardb_bs_dec.out; load \$devtype \$devnum:\$devpart_boot \$load_addr /secboot_hdrs/lx2160ardb/hdr_lx2160ardb_bs_dec.out ;echo Replacing bootscript header; save \$devtype \$devnum:\$devpart_boot \$load_addr /hdr_lx2160ardb_bs.out \$filesize;reset;'"
+
+
+securevalidate_dec="setenv secureboot_validate 'size \$devtype \$devnum:\$devpart_boot \$kernel_image;setexpr imgsize \$filesize - 0x30 ;echo Decapsulating linux image; setenv key_addr 0x87000000; mw \$key_addr $key_id_1;setexpr key_addr \$key_addr + 0x4; mw \$key_addr $key_id_2;setexpr key_addr \$key_addr + 0x4; mw \$key_addr $key_id_3;setexpr key_addr \$key_addr + 0x4; mw \$key_addr $key_id_4; setenv key_addr 0x87000000; blob dec \$kernel_addr_r \$load_addr \$imgsize \$key_addr; cp.b \$load_addr \$kernel_addr_r \$filesize ;size \$devtype \$devnum:\$devpart_boot \$dtb;setexpr imgsize \$filesize - 0x30 ;echo Decapsulating dtb kernel_image; blob dec \$fdt_addr_r \$load_addr \$imgsize \$key_addr; cp.b \$load_addr \$fdt_addr_r \$filesize ; '"
+
+
+securevalidate_fix="setenv secureboot_validate 'load \$devtype \$devnum:\$devpart_boot \$kernelheader_addr_r /secboot_hdrs/lx2160ardb/hdr_linux.out; esbc_validate \$kernelheader_addr_r;load \$devtype \$devnum:\$devpart_boot \$fdtheader_addr_r /secboot_hdrs/lx2160ardb/hdr_dtb.out; esbc_validate \$fdtheader_addr_r; load \$devtype \$devnum:\$devpart_boot \$initramfsheader_addr_r /secboot_hdrs/lx2160ardb/hdr_initramfs.out; esbc_validate \$initramfsheader_addr_r; size \$devtype \$devnum:\$devpart_boot /lx2160ardb_enforce_boot.scr; load \$devtype \$devnum:\$devpart_boot \$load_addr /lx2160ardb_enforce_boot.scr; echo Replacing Bootscript; save \$devtype \$devnum:\$devpart_boot \$load_addr /lx2160ardb_boot.scr \$filesize;size \$devtype \$devnum:\$devpart_boot /secboot_hdrs/lx2160ardb/hdr_lx2160ardb_bs_enf.out; load \$devtype \$devnum:\$devpart_boot \$load_addr /secboot_hdrs/lx2160ardb/hdr_lx2160ardb_bs_enf.out ;echo Replacing bootscript header; save \$devtype \$devnum:\$devpart_boot \$load_addr /hdr_lx2160ardb_bs.out \$filesize; ' setenv othbootargs 'ima_tcb ima_appraise=fix ima_appraise_tcb evm=fix enforcing=0 '"
+
+
+securevalidate_enforce="setenv secureboot_validate 'load \$devtype \$devnum:\$devpart_boot \$kernelheader_addr_r /secboot_hdrs/lx2160ardb/hdr_linux.out; esbc_validate \$kernelheader_addr_r;load \$devtype \$devnum:\$devpart_boot \$fdtheader_addr_r /secboot_hdrs/lx2160ardb/hdr_dtb.out; esbc_validate \$fdtheader_addr_r; load \$devtype \$devnum:\$devpart_boot \$initramfsheader_addr_r /secboot_hdrs/lx2160ardb/hdr_initramfs.out; esbc_validate \$initramfsheader_addr_r; ' setenv othbootargs 'ima_tcb ima_appraise=enforce ima_appraise_tcb enforcing=1 '"
+
+
+# [uefi grub config, updated by installer]
+uefi_grub_search="search --no-floppy --file /partuuid_boot --set root"
+uefi_grub_linux="linux  /Image console=ttyAMA0,115200 earlycon=pl011,mmio32,0x21c0000 root=PARTUUID=partuuid_root rw rootwait default_hugepagesz=2m hugepagesz=2m hugepages=1024 pci=pcie_bus_perf iommu.passthrough=1"
+
+# [secure boot scripts in cst]
+sd_script="scripts/platforms/lx2160_sd.sh"
+xspi_script="scripts/platforms/lx2160_xspi.sh"

@@ -1,0 +1,12 @@
+# Build products
+components
+build
+logs
+uuu
+configs/.sdk.cfg
+tools/bld
+.bash*
+*.tgz
+*.log
+*.o
+

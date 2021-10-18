@@ -1,0 +1,206 @@
+/*
+ * Copyright 2018-2021 NXP
+ *
+ */
+
+
+/dts-v1/;
+
+/ {
+	description = "Image file for i.MX ARM 64bit Linux Kernel";
+	#address-cells = <1>;
+
+	images {
+		kernel {
+			description = "ARM64 Linux kernel";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/Image.gz");
+			type = "kernel";
+			arch = "arm64";
+			os = "linux";
+			compression = "gzip";
+			load = <0x80280000>;
+			entry = <0x80280000>;
+		};
+
+		initrd {
+			description = "initrd for arm64";
+			data = /incbin/("../../build/images/rootfs_yocto_arm64_tiny.cpio.gz");
+			type = "ramdisk";
+			arch = "arm64";
+			os = "linux";
+			compression = "gzip";
+			load = <0x00000000>;
+			entry = <0x00000000>;
+		};
+
+
+		imx8mqevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mq-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mqevk-ddr4-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mq-ddr4-val.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mpevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mp-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mpevk-ddr4-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mp-ddr4-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8qmmek-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8qm-mek.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mmevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mm-evk-revb-qca-wifi.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mmevk-ddr4-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mm-ddr4-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mnevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mn-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mnevk-ddr4-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mn-ddr4-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8qxpmek-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8qxp-mek.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x83000000>;
+		};
+		imx8ulpevk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8ulp-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+	};
+
+	configurations {
+		imx8mqevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mqevk-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mqevk-ddr4 {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mqevk-ddr4-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mpevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mpevk-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mpevk-ddr4 {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mpevk-ddr4-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mmevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mmevk-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mmevk-ddr4 {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mmevk-ddr4-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mnevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mnevk-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mnevk-ddr4 {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mnevk-ddr4-dtb";
+			ramdisk = "initrd";
+		};
+		imx8qmmek {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8qmmek-dtb";
+			ramdisk = "initrd";
+		};
+		imx8qxpmek {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8qxpmek-dtb";
+			ramdisk = "initrd";
+		};
+		imx8ulpevk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8ulpevk-dtb";
+			ramdisk = "initrd";
+		};
+	};
+};

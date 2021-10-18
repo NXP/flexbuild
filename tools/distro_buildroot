@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# Copyright 2017-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+build_distro_rfs_buildroot() {
+    if [ ! -d $PKGDIR/rfs/buildroot ]; then
+	git clone $repo_buildroot_url $PKGDIR/rfs/buildroot && \
+	cd $PKGDIR/rfs/buildroot && git checkout $repo_buildroot_tag -b $repo_buildroot_tag && cd -
+    fi
+    export MAKE=make
+    sed -i '/have legacy configuration.*/d' $PKGDIR/rfs/buildroot/Makefile.legacy
+    if [ "$1" = toolchain ]; then
+	mkdir -p ${RFSDIR%/*}
+	cp -f $FBDIR/configs/buildroot/${2}_tiny_defconfig $PKGDIR/rfs/buildroot/configs
+	make -j $JOBS ${2}_tiny_defconfig O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot
+	make -j $JOBS toolchain O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot KERNEL_TREE=$KERNEL_TREE
+	return
+    fi
+    if [ $DISTROSCALE = tiny -a ! -f ${RFSDIR%/*}/.customdone ]; then
+	brconfig=${DESTARCH}_tiny_defconfig
+	cp -f $FBDIR/configs/buildroot/$brconfig $PKGDIR/rfs/buildroot/configs
+	make -j$JOBS O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot $brconfig
+    elif [ $DISTROSCALE = imaevm -a ! -f ${RFSDIR%/*}/.customdone ]; then
+	brconfig=${DESTARCH}_imaevm_defconfig
+	mkdir -p ${RFSDIR%/*}/overlay/{mnt/root,sys,proc/sys/kernel,root}
+	cp -f $FBDIR/configs/buildroot/sec_imaevm.sh ${RFSDIR%/*}/overlay/init
+	cp $FBDIR/configs/buildroot/$brconfig $PKGDIR/rfs/buildroot/configs
+	make -j $JOBS O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot $brconfig
+    elif [ $DISTROSCALE = devel -a ! -f ${RFSDIR%/*}/.customdone ]; then
+	brconfig=${DESTARCH}_devel_defconfig
+	cp $FBDIR/configs/buildroot/$brconfig $PKGDIR/rfs/buildroot/configs
+	make -j $JOBS O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot $brconfig
+    fi
+    if [ "$DISTROSCALEOPT" = custom ]; then
+	make -j $JOBS O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot menuconfig
+	fbprint_d "customized ${RFSDIR%/*}/.config"
+	touch ${RFSDIR%/*}/.customdone
+	echo then run bld -i mkrfs -r buildroot:$DISTROSCALE -a $DESTARCH to build target distro with the custom .config above.
+	exit
+    fi
+    make -j8 O=${RFSDIR%/*} -C $PKGDIR/rfs/buildroot KERNEL_TREE=$KERNEL_TREE
+    [ $DISTROSCALE = devel ] && mkdir -p $RFSDIR/etc/systemd/system && \
+    cp -f $FBDIR/src/misc/boot.mount $RFSDIR/etc/systemd/system/
+
+    if [ $DISTROSCALE = imaevm ]; then
+	mkimage -A arm -O linux -T ramdisk -n "initramfs imaevm" -d ${RFSDIR%/*}/images/rootfs.cpio.gz \
+		${RFSDIR%/*}/images/initramfs_imaevm_${DESTARCH}.img
+	cp -f ${RFSDIR%/*}/images/initramfs_imaevm_${DESTARCH}.img $FBOUTDIR/images
+	cp -f ${RFSDIR%/*}/images/rootfs.cpio.gz \
+	$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_buildroot_${DISTROSCALE}_${DESTARCH}.cpio.gz
+	fbprint_d ${RFSDIR%/*}/images/initramfs_imaevm_${DESTARCH}.img && exit 0
+    fi
+    ls -l $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_buildroot*
+    rm -f $RFSDIR/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
+    bld -i packrfs -r buildroot:$DISTROSCALE -a ${DESTARCH}$endianstr -f $CFGLISTYML
+}
+

@@ -1,0 +1,22 @@
+# [general]
+
+machine="imx8ulpevk"
+
+UBOOT_CONFIG="imx8ulp_evk_defconfig"
+
+COMPOSITE_IMG1_FILE_sd="bsp/imx-mkimage/imx8ulpevk/flash-singleboot-m33.bin"
+
+
+# distro boot script
+distro_bootscript="bsp/u-boot/imx8mpevk/imx8ulpevk_boot.scr"
+
+distroboot=\
+'env exists fdt_file || setenv fdt_file imx8ulp-evk.dtb;'\
+'env exists image || setenv image Image;'\
+'env exists devpart_boot || setenv devpart_boot 1;'\
+'env exists devpart_root || setenv devpart_root 4;'\
+'part uuid $devtype $devnum:$devpart_root partuuidr;'\
+'setenv bootargs console=ttyLP1,115200 earlycon root=PARTUUID=$partuuidr rw rootwait $othbootargs;'\
+'ext4load mmc $mmcdev:$mmcpart $fdt_addr $fdt_file;'\
+'ext4load mmc $mmcdev:$mmcpart $loadaddr $image;'\
+'booti $loadaddr - $fdt_addr'

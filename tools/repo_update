@@ -1,0 +1,100 @@
+#
+# Copyright 2019-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+git_repo_update() {
+    if [ -n "$COMPONENT" ]; then
+	check_component_valid $COMPONENT
+	reponame=$(echo $COMPONENT | sed 's/-/_/')
+	branch=$(eval echo '$'"repo_"$reponame"_branch")
+	commit=$(eval echo '$'"repo_"$reponame"_commit")
+	repourl=$(eval echo '$'"repo_"$reponame"_url")
+	tag=$(eval echo '$'"repo_"$reponame"_tag")
+    fi
+
+    [ "$CONFIG_EIQ" = y ] && eiqdir=apps/eiq
+    dirlist="bsp linux apps/generic apps/networking apps/graphics apps/multimedia apps/security apps/connectivity $eiqdir"
+    for pdn in $dirlist; do
+	rn=$(echo $pdn | xargs basename -s /)
+	[ $pdn = bsp -o $pdn = linux ] && obj=$FBDIR/src/$pdn || obj=$FBDIR/src/apps
+	if [ $1 = fetch ]; then
+	    if [ -n "$COMPONENT" ]; then
+		pkgdn=`echo $pdn | tr a-z A-Z`
+		[ ${pdn:0:4} = apps ] && repolist=$APPS_REPO_LIST || \
+		repolist=$(eval echo '${'"$pkgdn"'_REPO_LIST}')
+		if ! echo $repolist | grep -q $COMPONENT; then continue; fi
+		repolist=$(ls $FBDIR/src/$pdn/*.mk | xargs basename -s .mk | tr '\n' ' ')
+		if ! echo $repolist | grep -q $COMPONENT; then continue; fi
+		if [ -n "$tag" ]; then
+		    git_repo_checkout $PKGDIR/$pdn $COMPONENT tag $tag $repourl
+		elif [ -n "$commit" ]; then
+		    git_repo_checkout $PKGDIR/$pdn $COMPONENT commit $commit $repourl
+		elif [ -n "$branch" ]; then
+		    git_repo_checkout $PKGDIR/$pdn $COMPONENT branch $branch $repourl
+		fi
+		fbprint_n "$COMPONENT in $PKGDIR/$pdn"
+		break
+	    else
+		make -C $obj ${rn}_repo_fetch
+	    fi
+	elif [ $1 = latest ]; then
+	    if [ -n "$COMPONENT" -a -z "$branch" -a -n "$commit" ]; then
+		echo commit = $commit; break;
+	    elif [ -n "$COMPONENT" -a -z "$branch" ]; then
+		echo branch of $reponame repo is not specified in $CONFIGLIST!; exit
+	    elif [ -n "$COMPONENT" -a -n "$branch" ] && [ -d $PKGDIR/$pdn/$reponame ]; then
+		cd $PKGDIR/$pdn/$reponame && git pull origin $branch && git fetch --tags && cd -
+	    elif [ -n "$COMPONENT" ] && [ ! -d $PKGDIR/$pdn/$reponame ]; then
+		continue
+	    else
+		make -C $obj ${rn}_repo_update_latest
+	    fi
+        else
+            if [ -n "$COMPONENT" -a -z "$(eval echo '$'$1)" ]; then
+                echo $1 of $COMPONENT repo is not specified in $CONFIGLIST!; exit
+            elif [ -n "$COMPONENT" ] && [ ! -d $PKGDIR/$pdn/$COMPONENT ]; then
+                continue;
+            elif [ -n "$COMPONENT" -a -n "$(eval echo '$'$1)" ] && [ -d $PKGDIR/$pdn/$COMPONENT ]; then
+                git_repo_checkout $PKGDIR/$pdn $COMPONENT $1 $(eval echo '$'$1)
+            else
+                make -C $obj ${rn}_repo_update_$1
+            fi
+	fi
+    done
+}
+
+
+
+git_repo_checkout() {
+    # $1:pkgdir, $2:gittree, $3:type of branch/tag/commit
+    # $4:name of branch/tag/commit, $5:repo_url
+    repourl=`eval echo '${'"repo_""$2""_url"'}'`
+    [ -z "$repourl" ] && return
+    [ $2 = linux ] && tree=$KERNEL_TREE || tree=$2
+    cd $1
+    if [ ! -d $tree ]; then
+	if [ $3 = branch ]; then
+	    [ -n "$5" ] && git clone $5 $tree -b $4 || git clone $repourl -b $4
+	elif [ $3 = tag -o $3 = commit ]; then
+	    if [ -n "$5" ]; then
+		git clone $5 $tree && cd $tree && git checkout $4 -b $4
+	    else
+		git clone $repourl $tree && cd $tree && git checkout $4 -b $4
+	    fi
+	fi
+    else
+	cd $tree
+	if ! git show-ref --verify --quiet refs/heads/$4; then
+	    if [ $3 = branch ]; then
+		git checkout remotes/origin/$4 -b $4
+	    elif [ $3 = tag -o $3 = commit ]; then
+		git checkout $4 -b $4
+	    fi
+	else
+	    git checkout $4
+	fi
+    fi
+    cd $FBDIR
+}

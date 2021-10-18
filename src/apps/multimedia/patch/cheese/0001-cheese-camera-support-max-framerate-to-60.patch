@@ -1,0 +1,64 @@
+From 3cd1ec8c022fb8cda83e363a666802aad467d31c Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Wed, 7 Jul 2021 14:11:07 +0800
+Subject: [PATCH 1/2] cheese camera support max framerate to 60 add step detect
+ to fix isp camera cannot switch resolution
+
+Signed-off-by: Haihua Hu <jared.hu@nxp.com>
+---
+ libcheese/cheese-camera-device.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/libcheese/cheese-camera-device.c b/libcheese/cheese-camera-device.c
+index be85b2c5..c916258e 100644
+--- a/libcheese/cheese-camera-device.c
++++ b/libcheese/cheese-camera-device.c
+@@ -80,7 +80,7 @@ static const gchar * const supported_formats[] = {
+  *
+  * The maximum framerate, in frames per second.
+  */
+-static const guint CHEESE_MAXIMUM_RATE = 30;
++static const guint CHEESE_MAXIMUM_RATE = 60;
+ 
+ enum
+ {
+@@ -458,11 +458,14 @@ cheese_camera_device_update_format_table (CheeseCameraDevice *device)
+     {
+       gint min_width, max_width, min_height, max_height;
+       gint cur_width, cur_height;
++      gint step_width, step_height;
+ 
+       min_width  = gst_value_get_int_range_min (width);
+       max_width  = gst_value_get_int_range_max (width);
++      step_width = gst_value_get_int_range_step (width);
+       min_height = gst_value_get_int_range_min (height);
+       max_height = gst_value_get_int_range_max (height);
++      step_height = gst_value_get_int_range_step (height);
+ 
+       /* Some devices report a very small min_width / height down to reporting
+        * 0x0 as minimum resolution, which causes an infinte loop below, limit
+@@ -488,8 +491,8 @@ cheese_camera_device_update_format_table (CheeseCameraDevice *device)
+ 
+         /* Gstreamer wants resolutions for YUV formats where the width is
+          * a multiple of 8, and the height is a multiple of 2 */
+-        format->width  = cur_width & ~7;
+-        format->height = cur_height & ~1;
++        format->width  = cur_width & ~(step_width - 1);
++        format->height = cur_height & ~(step_height - 1);
+ 
+         cheese_camera_device_add_format (device, format, framerate);
+ 
+@@ -505,8 +508,8 @@ cheese_camera_device_update_format_table (CheeseCameraDevice *device)
+ 
+         /* Gstreamer wants resolutions for YUV formats where the width is
+          * a multiple of 8, and the height is a multiple of 2 */
+-        format->width  = cur_width & ~7;
+-        format->height = cur_height & ~1;
++        format->width  = cur_width & ~(step_width - 1);
++        format->height = cur_height & ~(step_height - 1);
+ 
+         cheese_camera_device_add_format (device, format, framerate);
+ 
+-- 
+2.17.1
+

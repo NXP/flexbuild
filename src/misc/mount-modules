@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# In case boot partition is installed on SD/USB device
+# TinyLinux automatically mounts /lib/modules to /boot/modules
+
+# default boot partition for LSDK
+if [ -n "$1" -a -b "$1" ]; then
+    bootdev=$1
+elif [ -b /dev/mmcblk0p2 ]; then
+    bootdev=/dev/mmcblk0p2
+elif [ -b /dev/sda2 ]; then
+    bootdev=/dev/sda2
+else
+    exit
+fi
+
+if ! `mount | grep -q 'on /boot'`; then
+    mount $bootdev /boot
+fi
+
+if [ ! -d /boot/modules ]; then
+    exit
+fi
+
+moduleversion=$(ls /boot/modules)
+kernelversion=$(uname -r)
+
+if [ "$moduleversion" != "$kernelversion" ]; then
+    echo "The kernel modules in $bootdev doesn't match the current kernel version!"
+    exit
+elif [ ! -L /lib/modules ]; then
+    ln -s /boot/modules /lib/modules
+fi

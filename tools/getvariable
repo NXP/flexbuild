@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Copyright 2017-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+BIN_FW="fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin uefi_bin mc_bin mc_utils ddr_phy_bin dp_firmware_cadence"
+
+LS_MACHINE_LIST=`grep CONFIG_MACHINE_L $FBDIR/configs/$CONFIGLIST | grep y|cut -b 16-|tr A-Z a-z|cut -d= -f1|tr '\n' ' '`
+
+IMX_MACHINE_LIST=`grep CONFIG_MACHINE_IMX $FBDIR/configs/$CONFIGLIST | grep y|cut -b 16-|tr A-Z a-z|cut -d= -f1|tr '\n' ' '`
+
+BSP_REPO_LIST=`find $FBDIR/src/bsp -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
+
+BSP_REPO_LIST="$BSP_REPO_LIST $BIN_FW"
+
+LINUX_REPO_LIST=`ls $FBDIR/src/linux/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+EIQ_REPO_LIST=`ls $FBDIR/src/apps/eiq/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+NETWORKING_REPO_LIST=`ls $FBDIR/src/apps/networking/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+GRAPHICS_REPO_LIST=`ls $FBDIR/src/apps/graphics/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+MULTIMEDIA_REPO_LIST=`ls $FBDIR/src/apps/multimedia/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+SECURITY_REPO_LIST=`ls $FBDIR/src/apps/security/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+CONNECTIVITY_REPO_LIST=`ls $FBDIR/src/apps/connectivity/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+GENERIC_REPO_LIST=`ls $FBDIR/src/apps/generic/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+APPS_REPO_LIST="$CONNECTIVITY_REPO_LIST $GENERIC_REPO_LIST $NETWORKING_REPO_LIST $GRAPHICS_REPO_LIST $MULTIMEDIA_REPO_LIST $SECURITY_REPO_LIST"
+
+export LS_MACHINE_LIST IMX_MACHINE_LIST BSP_REPO_LIST LINUX_REPO_LIST APPS_REPO_LIST EIQ_REPO_LIST \
+       GENERIC_REPO_LIST NETWORKING_REPO_LIST GRAPHICS_REPO_LIST MULTIMEDIA_REPO_LIST SECURITY_REPO_LIST \
+       CONNECTIVITY_REPO_LIST

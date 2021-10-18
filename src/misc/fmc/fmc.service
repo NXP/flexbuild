@@ -1,0 +1,10 @@
+[Unit]
+Description=NXP Frame Manager Configuration tool
+After=network.target
+
+[Service]
+ExecStart=/usr/local/fmc/init-ls104xa
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target

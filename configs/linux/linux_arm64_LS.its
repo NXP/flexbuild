@@ -1,0 +1,330 @@
+/*
+ * Copyright 2017 - 2021 NXP
+ *
+ */
+
+
+/dts-v1/;
+
+/ {
+	description = "arm64 kernel, ramdisk and FDT blob";
+	#address-cells = <1>;
+
+	images {
+		kernel {
+			description = "ARM64 Kernel";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/Image.gz");
+			type = "kernel";
+			arch = "arm64";
+			os = "linux";
+			compression = "gzip";
+			load = <0x84080000>;
+			entry = <0x84080000>;
+		};
+
+		initrd {
+			description = "initrd for arm64";
+			data = /incbin/("../../build/images/rootfs_yocto_arm64_tiny.cpio.gz");
+			type = "ramdisk";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x00000000>;
+			entry = <0x00000000>;
+		};
+
+		ls1012ardb-dtb {
+			description = "ls1012ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1012a-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1012aqds-dtb {
+			description = "ls1012aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1012a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1012afrwy-dtb {
+			description = "ls1012afrwy-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1012a-frwy.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1028ardb-dtb {
+			description = "ls1028ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1028a-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1028aqds-dtb {
+			description = "ls1028aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1028a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1043ardb-dtb {
+			description = "ls1043ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1043a-rdb-sdk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+
+		ls1043aqds-dtb {
+			description = "ls1043aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1043a-qds-sdk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1046ardb-dtb {
+			description = "ls1046ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1046a-rdb-sdk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1046aqds-dtb {
+			description = "ls1046aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1046a-qds-sdk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1046afrwy-dtb {
+
+			description = "ls1046afrwy-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1046a-frwy-sdk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1088ardb-dtb {
+			description = "ls1088ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1088a-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls1088aqds-dtb {
+			description = "ls1088aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls1088a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls2088ardb-dtb {
+			description = "ls2088ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls2088a-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		ls2088aqds-dtb {
+			description = "ls2088aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-ls2088a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		lx2160ardb-dtb {
+			description = "lx2160ardb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-lx2160a-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		lx2160aqds-dtb {
+			description = "lx2160aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-lx2160a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+
+		lx2162aqds-dtb {
+			description = "lx2162aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-lx2162a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+	};
+
+	configurations {
+		ls1012ardb {
+			description = "config for ls1012ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1012ardb-dtb";
+		};
+
+		ls1012aqds {
+			description = "config for ls1012aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1012aqds-dtb";
+		};
+
+		ls1012afrwy {
+			description = "config for ls1012afrwy";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1012afrwy-dtb";
+		};
+
+		ls1028ardb {
+			description = "config for ls1028ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1028ardb-dtb";
+		};
+
+		ls1028aqds {
+			description = "config for ls1028aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1028aqds-dtb";
+		};
+
+		ls1043ardb {
+			description = "config for ls1043ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1043ardb-dtb";
+		};
+
+		ls1043aqds {
+			description = "config for ls1043aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1043aqds-dtb";
+		};
+
+		ls1046ardb {
+			description = "config for ls1046ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1046ardb-dtb";
+		};
+
+		ls1046aqds {
+			description = "config for ls1046aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1046aqds-dtb";
+		};
+
+		ls1046afrwy {
+			description = "config for ls1046afrwy";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1046afrwy-dtb";
+		};
+
+		ls1088ardb {
+			description = "config for ls1088ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1088ardb-dtb";
+		};
+
+		ls1088aqds {
+			description = "config for ls1088aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls1088aqds-dtb";
+		};
+
+		ls2088ardb {
+			description = "config for ls2088ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls2088ardb-dtb";
+		};
+
+		ls2088aqds {
+			description = "config for ls2088aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "ls2088aqds-dtb";
+		};
+
+		lx2160ardb {
+			description = "config for lx2160ardb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "lx2160ardb-dtb";
+		};
+
+		lx2160aqds {
+			description = "config for lx2160aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "lx2160aqds-dtb";
+		};
+
+		lx2162aqds {
+			description = "config for lx2162aqds";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "lx2162aqds-dtb";
+		};
+	};
+};

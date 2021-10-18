@@ -1,0 +1,29 @@
+#!/bin/sh -e
+#
+# Copyright 2018 NXP
+#
+
+soc="`cat /proc/device-tree/model |cut -d' ' -f1,2`"
+echo "Configuring for $soc..."
+fmc_path=/etc/fmc/config/private
+if [ "LS1043A RDB" = "$soc" ];then
+    config=`ls $fmc_path/ls1043ardb/*/config.xml`
+    policy=`ls $fmc_path/ls1043ardb/*/policy_ipv4.xml`
+    if [ -n "$config" ] && [ -n "$policy" ];then
+        /usr/local/bin/fmc -c $config -p $policy -a
+    fi
+elif [ "LS1046A RDB" = "$soc" ];then
+    config=`ls $fmc_path/ls1046ardb/*/config.xml`
+    policy=`ls $fmc_path/ls1046ardb/*/policy_ipv4.xml`
+    if [ -n "$config" ] && [ -n "$policy" ];then
+        /usr/local/bin/fmc -c $config -p $policy -a
+    fi
+elif [ "LS1046A FRWY" = "$soc" ];then
+    config=`ls $fmc_path/ls1046afrwy/*/config.xml`
+    policy=`ls $fmc_path/ls1046afrwy/*/policy_ipv4.xml`
+    if [ -n "$config" ] && [ -n "$policy" ];then
+        /usr/local/bin/fmc -c $config -p $policy -a
+    fi
+fi
+echo "Finished."
+

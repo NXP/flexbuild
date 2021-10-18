@@ -1,0 +1,70 @@
+/*
+ * Copyright 2017 - 2020 NXP
+ *
+ */
+
+
+/dts-v1/;
+
+/ {
+	description = "Image file for the QorIQ ARM 32b Linux Kernel";
+	#address-cells = <1>;
+
+	images {
+		kernel-v7 {
+			description = "ARM32 Linux kernel";
+			data = /incbin/("../../build/linux/kernel/arm32/LS/zImage");
+			type = "kernel";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+			load = <0x80008000>;
+			entry = <0x80008000>;
+		};
+
+		initrd {
+			description = "initrd for arm32";
+			data = /incbin/("../../build/images/rootfs_yocto_arm32_tiny.cpio.gz");
+			type = "ramdisk";
+			arch = "arm";
+			os = "linux";
+			compression = "none";
+		};
+
+		ls1021atwr-dtb {
+			description = "ls1021atwr-dtb";
+			data = /incbin/("../../build/linux/kernel/arm32/LS/ls1021a-twr.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+
+		ls1021aqds-dtb {
+			description = "ls1021aqds-dtb";
+			data = /incbin/("../../build/linux/kernel/arm32/LS/ls1021a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+	};
+
+	configurations {
+		ls1021atwr {
+			description = "config for ls1021atwr";
+			kernel = "kernel-v7";
+			fdt = "ls1021atwr-dtb";
+			ramdisk = "initrd";
+		};
+
+		ls1021aqds {
+			description = "config for ls1021aqds";
+			kernel = "kernel-v7";
+			fdt = "ls1021aqds-dtb";
+			ramdisk = "initrd";
+		};
+	};
+};

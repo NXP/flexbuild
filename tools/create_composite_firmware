@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+# Copyright 2017-2021 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# A generic function to create NOR/QSPI/XSPI/NAND flash or SD/eMMC card composite firmware
+# which consists of customizable images separately.
+#
+# ${BOOTLOADER_TYPE} can be uboot, uefi
+#
+# ${BOOT_TYPE} can be sd, emmc, qspi, xspi, nor, nand, defined in configs/board/<brd>/manifest
+#
+# In case of SD/eMMC boot, the DISK_BOOTLOADER_OFFSET is 4k for QorIQ SoC or 1k/32k/33k for i.MX SoC
+#
+# Shengzhou Liu <shengzhou.liu@nxp.com>
+#
+# - docs/memory_layout.txt
+# - configs/board/common/layerscape_memorylayout.cfg
+# - configs/board/<machine>/manifest
+#
+# Usage: bld -i mkfw -m <machine>  [ -b <boottype> ]
+#
+
+
+
+create_composite_firmware() {
+    if [ -z "${BOOTTYPE}" -o "${BOOTTYPE}" = all ] && [ -n "$BOOT_TYPE" ]; then
+	BOOTTYPELIST=${BOOT_TYPE}
+    elif [ -n "${BOOTTYPE}" ]; then
+	BOOTTYPELIST=${BOOTTYPE}
+    else
+	BOOTTYPELIST=sd
+    fi
+
+    [ -z "${BOOTLOADER_TYPE}" ] && BOOTLOADER_TYPE=uboot
+
+    [ -z "${DISK_BOOTLOADER_OFFSET}" ] && DISK_BOOTLOADER_OFFSET=4096
+
+    for bootloader in ${BOOTLOADER_TYPE}; do
+	for boottype in ${BOOTTYPELIST}; do
+	    if [ "${MULTI_BOOTTYPE}" = "true" -a "${bootloader}" = "uefi" ]; then
+		uefi_file=$(eval echo '$'uefi_"$boottype")
+		[ -f $FBOUTDIR/$uefi_file ] || continue
+	    fi
+
+	    for sectype in $SECURE_TYPE; do
+		if [ "${sectype}" = "secure" ]; then
+		    secopt=_sec && secstr=_secure
+		    [ "$bootloader" = "uefi" ] && break
+		else
+		    secopt="" && secstr=""
+		fi
+
+		[ "${bootloader}" = "uefi" ] && blname="${boottype}boot_uefi" || blname="${boottype}boot${secstr}"
+		fw_img=$FBOUTDIR/images/firmware_${MACHINE}_${blname}.img
+		rm -f ${fw_img} && img_offset="" && img_file=""
+
+		[ -n "$BOARD_VARIANTS" ] && brdvariants=$BOARD_VARIANTS || brdvariants=brd
+
+		for brd in $brdvariants; do
+		    [ -z "$BOARD_VARIANTS" ] && brd_extname="" || brd_extname="_$brd"
+
+		    for i in $(seq 1 ${MAX_COMPOSITE_IMG_NUM}); do
+			img_offset=$(eval echo '$'COMPOSITE_IMG"$i"_OFFSET)
+
+			if [ "${MULTI_BOOTTYPE}" = "true" ]; then
+			    [ "${sectype}" != "secure" -a $i = $SECURE_HEADER_NUM ] && continue
+			    if [ $i = 1 -o $i = $SECURE_HEADER_NUM ]; then
+				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$secopt")
+			    elif [ "${bootloader}" = "uefi" ] && [ $i = 2 -o $i = 3 ]; then
+				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_uefi)
+			    else
+				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE"$secopt")
+			    fi
+
+			    [ $i = 1 -a -z "${img_file}" ] && rm -f ${fw_img} && break
+
+			    if [ -z "${img_file}" -a "${sectype}" = "secure" ] && [ $i = 1 -o $i = 2 -o $i = 5 ]; then
+				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_sec)
+			    fi
+			    [ -z "${img_file}" ] && img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE)
+			    [ -z "${img_file}" -a $i = 2 ] && img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$secopt")
+			else
+			    if [ $i = 1 -a -n "$brd_extname" ]; then
+				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$brd_extname")
+				fw_img=$FBOUTDIR/images/firmware_${MACHINE}_${blname}${brd_extname}.img && rm -f ${fw_img}
+			    else
+				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype")
+			    fi
+			fi
+
+			[ $i = $MAX_COMPOSITE_IMG_NUM -a "$COMPOSITE_FW_NO_ITB_TYPE" = "$boottype" ] && break
+
+			if [ -n "${img_file}" ]; then
+			    if [ -e "$FBOUTDIR/${img_file}" ]; then
+				echo " Writing ${img_offset} <---> ${img_file}"
+				if [ $i != 1 ] && [ "${boottype}" = "sd" -o "${boottype}" = "emmc" ]; then
+				    img_offset=`printf "%d - %d\n" ${img_offset} ${DISK_BOOTLOADER_OFFSET} | bc`
+				fi
+				offset=`printf "%d / 1024\n" ${img_offset} | bc`
+				dd if=$FBOUTDIR/${img_file} of=${fw_img} bs=1K seek=${offset} 2>/dev/null
+			    fi
+			fi
+		    done
+		    [ -f ${fw_img} ] && fbprint_d "${fw_img}"; echo
+		done
+	    done
+	done
+    done
+}

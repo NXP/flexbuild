@@ -1,0 +1,26 @@
+From d1861e17d4458599b473611e63b0287e214ce509 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Thu, 24 Sep 2020 21:40:17 +0800
+Subject: [PATCH] Fixed dependency download script
+
+Signed-off-by: Ladislav Vadkerti <ladislav.vadkerti@nxp.com>
+---
+ tensorflow/lite/tools/make/download_dependencies.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tensorflow/lite/tools/make/download_dependencies.sh b/tensorflow/lite/tools/make/download_dependencies.sh
+index 22ba383f68..861dd2d538 100755
+--- a/tensorflow/lite/tools/make/download_dependencies.sh
++++ b/tensorflow/lite/tools/make/download_dependencies.sh
+@@ -33,7 +33,7 @@ if [ ! -f $BZL_FILE_PATH ]; then
+   exit 1;
+ fi
+ 
+-EIGEN_URL="$(grep -o 'https.*gitlab.com/libeigen/eigen/-/archive/.*tar\.gz' "${BZL_FILE_PATH}" | grep -v mirror.tensorflow | head -n1)"
++EIGEN_URL="$(grep -o 'http.*gitlab.com/libeigen/eigen/-/archive/.*tar\.gz' "${BZL_FILE_PATH}" | grep -v mirror.tensorflow | head -n1)"
+ EIGEN_SHA="$(eval echo $(grep '# SHARED_EIGEN_SHA' "${BZL_FILE_PATH}" | grep -o '\".*\"'))"
+ GEMMLOWP_URL="$(grep -o 'https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/gemmlowp/.*zip' "${BZL_FILE_PATH}" | head -n1)"
+ GEMMLOWP_SHA="$(eval echo $(grep '# SHARED_GEMMLOWP_SHA' "${BZL_FILE_PATH}" | grep -o '\".*\"'))"
+-- 
+2.17.1
+

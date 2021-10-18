@@ -1,0 +1,375 @@
+From 992b8ff8ad34981a713b88beccb25b7b0ca367be Mon Sep 17 00:00:00 2001
+From: Shengzhou Liu <Shengzhou.Liu@nxp.com>
+Date: Mon, 4 Nov 2019 15:26:34 +0800
+Subject: [PATCH] Add cross build support for aarch64 in tensorflow
+
+---
+ WORKSPACE                                     |   6 +
+ aarch64_compiler.BUILD                        |  79 +++++++++++
+ .../contrib/lite/kernels/internal/BUILD       |   1 -
+ .../tools/pip_package/build_pip_package.sh    |  19 ++-
+ third_party/aws.BUILD                         |   4 +-
+ tools/aarch64_compiler/BUILD                  |  27 ++++
+ tools/aarch64_compiler/CROSSTOOL              | 124 ++++++++++++++++++
+ 7 files changed, 256 insertions(+), 4 deletions(-)
+ create mode 100644 aarch64_compiler.BUILD
+ create mode 100644 tools/aarch64_compiler/BUILD
+ create mode 100644 tools/aarch64_compiler/CROSSTOOL
+
+diff --git a/WORKSPACE b/WORKSPACE
+index 17961829a6..30841c4419 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -79,3 +79,9 @@ new_http_archive(
+         "http://download.tensorflow.org/models/speech_commands_v0.01.zip",
+     ],
+ )
++
++new_local_repository(
++    name = "aarch64_compiler",
++    path = "/",
++    build_file = "aarch64_compiler.BUILD",
++)
+diff --git a/aarch64_compiler.BUILD b/aarch64_compiler.BUILD
+new file mode 100644
+index 0000000000..b5c1cc827c
+--- /dev/null
++++ b/aarch64_compiler.BUILD
+@@ -0,0 +1,79 @@
++package(default_visibility = ['//visibility:public'])
++
++filegroup(
++  name = 'gcc',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-gcc',
++  ],
++)
++
++filegroup(
++  name = 'ar',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-ar',
++  ],
++)
++
++filegroup(
++  name = 'ld',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-ld',
++  ],
++)
++
++filegroup(
++  name = 'nm',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-nm',
++  ],
++)
++
++filegroup(
++  name = 'objcopy',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-objcopy',
++  ],
++)
++
++filegroup(
++  name = 'objdump',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-objdump',
++  ],
++)
++
++filegroup(
++  name = 'strip',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-strip',
++  ],
++)
++
++filegroup(
++  name = 'as',
++  srcs = [
++    'usr/bin/aarch64-linux-gnu-as',
++  ],
++)
++
++filegroup(
++  name = 'compiler_pieces',
++  srcs = glob([
++    'usr/lib/gcc-cross/aarch64-linux-gnu/7/**',
++    'usr/aarch64-linux-gnu/**',
++  ]),
++)
++
++filegroup(
++  name = 'compiler_components',
++  srcs = [
++    ':gcc',
++    ':ar',
++    ':ld',
++    ':nm',
++    ':objcopy',
++    ':objdump',
++    ':strip',
++    ':as',
++  ],
++)
+diff --git a/tensorflow/contrib/lite/kernels/internal/BUILD b/tensorflow/contrib/lite/kernels/internal/BUILD
+index afb5ec05df..4a45afe51a 100644
+--- a/tensorflow/contrib/lite/kernels/internal/BUILD
++++ b/tensorflow/contrib/lite/kernels/internal/BUILD
+@@ -21,7 +21,6 @@ HARD_FP_FLAGS_IF_APPLICABLE = select({
+ NEON_FLAGS_IF_APPLICABLE = select({
+     ":arm": [
+         "-O3",
+-        "-mfpu=neon",
+     ],
+     ":armeabi-v7a": [
+         "-O3",
+diff --git a/tensorflow/tools/pip_package/build_pip_package.sh b/tensorflow/tools/pip_package/build_pip_package.sh
+index c62271c5cb..a413c13ecc 100755
+--- a/tensorflow/tools/pip_package/build_pip_package.sh
++++ b/tensorflow/tools/pip_package/build_pip_package.sh
+@@ -149,6 +149,7 @@ function build_wheel() {
+   TMPDIR="$1"
+   DEST="$2"
+   PKG_NAME_FLAG="$3"
++  PLAT_NAME_FLAG="$4"
+ 
+   # Before we leave the top-level directory, make sure we know how to
+   # call python.
+@@ -159,7 +160,7 @@ function build_wheel() {
+   pushd ${TMPDIR} > /dev/null
+   rm -f MANIFEST
+   echo $(date) : "=== Building wheel"
+-  "${PYTHON_BIN_PATH:-python}" setup.py bdist_wheel ${PKG_NAME_FLAG} >/dev/null
++  "${PYTHON_BIN_PATH:-python}" setup.py bdist_wheel ${PKG_NAME_FLAG} ${PLAT_NAME_FLAG} >/dev/null
+   mkdir -p ${DEST}
+   cp dist/* ${DEST}
+   popd > /dev/null
+@@ -179,6 +180,7 @@ function usage() {
+   echo ""
+   echo "  Options:"
+   echo "    --project_name <name> set project name to name"
++  echo "    --plat_name <name>    set plantform name to name"
+   echo "    --gpu                 build tensorflow_gpu"
+   echo "    --gpudirect           build tensorflow_gpudirect"
+   echo "    --nightly_flag        build tensorflow nightly"
+@@ -194,6 +196,7 @@ function main() {
+   SRCDIR=""
+   DSTDIR=""
+   CLEANSRC=1
++  PLATFORM_NAME=""
+   while true; do
+     if [[ "$1" == "--help" ]]; then
+       usage
+@@ -210,6 +213,12 @@ function main() {
+         break
+       fi
+       PROJECT_NAME="$1"
++    elif [[ "$1" == "--plat_name" ]]; then
++      shift
++      if [[ -z "$1" ]]; then
++        break
++      fi
++      PLATFORM_NAME="$1"
+     elif [[ "$1" == "--src" ]]; then
+       shift
+       SRCDIR="$(real_path $1)"
+@@ -255,7 +264,13 @@ function main() {
+     PKG_NAME_FLAG="--project_name tensorflow_gpu"
+   fi
+ 
+-  build_wheel "$SRCDIR" "$DSTDIR" "$PKG_NAME_FLAG"
++  if [[ -n ${PLATFORM_NAME} ]]; then
++    PLAT_NAME_FLAG="--plat-name ${PLATFORM_NAME}"
++  else
++    PLAT_NAME_FLAG=""
++  fi
++
++  build_wheel "$SRCDIR" "$DSTDIR" "$PKG_NAME_FLAG" "$PLAT_NAME_FLAG"
+ 
+   if [[ $CLEANSRC -ne 0 ]]; then
+     rm -rf "${TMPDIR}"
+diff --git a/third_party/aws.BUILD b/third_party/aws.BUILD
+index 5426f79e46..e4fcbdd6c4 100644
+--- a/third_party/aws.BUILD
++++ b/third_party/aws.BUILD
+@@ -24,7 +24,9 @@ cc_library(
+         "@org_tensorflow//tensorflow:raspberry_pi_armeabi": glob([
+             "aws-cpp-sdk-core/source/platform/linux-shared/*.cpp",
+         ]),
+-        "//conditions:default": [],
++        "//conditions:default":  glob([
++            "aws-cpp-sdk-core/source/platform/linux-shared/*.cpp",
++        ]),
+     }) + glob([
+         "aws-cpp-sdk-core/include/**/*.h",
+         "aws-cpp-sdk-core/source/*.cpp",
+diff --git a/tools/aarch64_compiler/BUILD b/tools/aarch64_compiler/BUILD
+new file mode 100644
+index 0000000000..6911080170
+--- /dev/null
++++ b/tools/aarch64_compiler/BUILD
+@@ -0,0 +1,27 @@
++package(default_visibility = ["//visibility:public"])
++
++cc_toolchain_suite(
++  name = 'toolchain',
++  toolchains = {
++  'aarch64|compiler':':gcc-linux-aarch64',
++  },
++)
++
++filegroup(
++    name = "empty",
++    srcs = [],
++)
++
++cc_toolchain(
++  name = 'gcc-linux-aarch64',
++  all_files = ':empty',
++  compiler_files = ':empty',
++  cpu = 'aarch64',
++  dwp_files = ':empty',
++  dynamic_runtime_libs = [':empty'],
++  linker_files = ':empty',
++  objcopy_files = 'empty',
++  static_runtime_libs = [':empty'],
++  strip_files = 'empty',
++  supports_param_files = 1,
++)
+diff --git a/tools/aarch64_compiler/CROSSTOOL b/tools/aarch64_compiler/CROSSTOOL
+new file mode 100644
+index 0000000000..0681fbb87c
+--- /dev/null
++++ b/tools/aarch64_compiler/CROSSTOOL
+@@ -0,0 +1,124 @@
++major_version: "local"
++minor_version: ""
++default_target_cpu: "aarch64"
++
++default_toolchain {
++  cpu: "aarch64"
++  toolchain_identifier: "aarch64-linux-gnu"
++}
++
++toolchain {
++  abi_version: "aarch64"
++  abi_libc_version: "aarch64"
++  builtin_sysroot: ""
++  compiler: "compiler"
++  host_system_name: "aarch64"
++  needsPic: true
++  supports_gold_linker: true
++  supports_incremental_linker: false
++  supports_fission: false
++  supports_interface_shared_objects: false
++  supports_normalizing_ar: false
++  supports_start_end_lib: true
++  target_libc: "aarch64"
++  target_cpu: "aarch64"
++  target_system_name: "aarch64"
++  toolchain_identifier: "aarch64-linux-gnu"
++
++  cxx_flag: "-std=c++11"
++  linker_flag: "-lstdc++"
++  linker_flag: "-lm"
++  linker_flag: "-fuse-ld=gold"
++  linker_flag: "-Wl,-no-as-needed"
++  linker_flag: "-Wl,-z,relro,-z,now"
++  linker_flag: "-pass-exit-codes"
++
++  cxx_builtin_include_directory: "/usr/aarch64-linux-gnu/include/c++/7/"
++  cxx_builtin_include_directory: "/usr/aarch64-linux-gnu/include/c++/7/backward"
++  cxx_builtin_include_directory: "/usr/aarch64-linux-gnu/include/"
++  cxx_builtin_include_directory: "/usr/lib/gcc-cross/aarch64-linux-gnu/7/include"
++  cxx_builtin_include_directory: "/usr/lib/gcc-cross/aarch64-linux-gnu/7/include-fixed"
++
++  objcopy_embed_flag: "-I"
++  objcopy_embed_flag: "binary"
++
++  unfiltered_cxx_flag: "-fno-canonical-system-headers"
++  unfiltered_cxx_flag: "-Wno-builtin-macro-redefined"
++  unfiltered_cxx_flag: "-D__DATE__=\"redacted\""
++  unfiltered_cxx_flag: "-D__TIMESTAMP__=\"redacted\""
++  unfiltered_cxx_flag: "-D__TIME__=\"redacted\""
++  compiler_flag: "-U_FORTIFY_SOURCE"
++  compiler_flag: "-fstack-protector"
++  compiler_flag: "-Wall"
++  compiler_flag: "-Wunused-but-set-parameter"
++  compiler_flag: "-Wno-free-nonheap-object"
++  compiler_flag: "-fno-omit-frame-pointer"
++
++  tool_path { name: "ld" path: "/usr/bin/aarch64-linux-gnu-ld" }
++  tool_path { name: "cpp" path: "/usr/bin/aarch64-linux-gnu-cpp" }
++  tool_path { name: "dwp" path: "/usr/bin/aarch64-linux-gnu-dwp" }
++  tool_path { name: "gcov" path: "/usr/bin/aarch64-linux-gnu-gcov" }
++  tool_path { name: "nm" path: "/usr/bin/aarch64-linux-gnu-nm" }
++  tool_path { name: "objcopy" path: "/usr/bin/aarch64-linux-gnu-objcopy" }
++  tool_path { name: "objdump" path: "/usr/bin/aarch64-linux-gnu-objdump" }
++  tool_path { name: "strip" path: "/usr/bin/aarch64-linux-gnu-strip" }
++  tool_path { name: "gcc" path: "/usr/bin/aarch64-linux-gnu-gcc" }
++  tool_path { name: "ar" path: "/usr/bin/aarch64-linux-gnu-ar" }
++
++  compilation_mode_flags {
++    mode: DBG
++    # Enable debug symbols.
++    compiler_flag: "-g"
++  }
++  compilation_mode_flags {
++    mode: OPT
++
++    # No debug symbols.
++    # Maybe we should enable https://gcc.gnu.org/wiki/DebugFission for opt or
++    # even generally? However, that can't happen here, as it requires special
++    # handling in Bazel.
++    compiler_flag: "-g0"
++
++    # Conservative choice for -O
++    # -O3 can increase binary size and even slow down the resulting binaries.
++    # Profile first and / or use FDO if you need better performance than this.
++    compiler_flag: "-O2"
++    compiler_flag: "-D_FORTIFY_SOURCE=1"
++
++    # Disable assertions
++    compiler_flag: "-DNDEBUG"
++
++    # Removal of unused code and data at link time (can this increase binary size in some cases?).
++    compiler_flag: "-ffunction-sections"
++    compiler_flag: "-fdata-sections"
++    linker_flag: "-Wl,--gc-sections"
++  }
++  linking_mode_flags { mode: DYNAMIC }
++
++    feature {
++      name: 'coverage'
++      provides: 'profile'
++      flag_set {
++        action: 'preprocess-assemble'
++        action: 'c-compile'
++        action: 'c++-compile'
++        action: 'c++-header-parsing'
++        action: 'c++-header-preprocessing'
++        action: 'c++-module-compile'
++        flag_group {
++        flag: '-fprofile-arcs'
++        flag: '-ftest-coverage'
++        }
++      }
++
++      flag_set {
++        action: 'c++-link-interface-dynamic-library'
++        action: 'c++-link-dynamic-library'
++        action: 'c++-link-executable'
++        flag_group {
++        flag: '-lgcov'
++        }
++      }
++    }
++
++}
+-- 
+2.17.1
+

@@ -1,0 +1,697 @@
+# Copyright 2018-2021 NXP
+#
+# SPDX-License-Identifier:     BSD-3-Clause
+#
+# U-Boot script to flash image to 'current' or 'other' bank of NOR/QSPI flash device for Layerscape platforms
+#
+# Supported platforms:
+# LS1021ATWR, LS1012ARDB, LS1012AFRWY, LS1028ARDB, LS1043ARDB, LS1046ARDB, LS1046AFRWY
+# LS1088ARDB_PB, LS2088ARDB, LX2160ARDB, LX2160ARDB_REV2, LX2162AQDS
+#
+# mkimage -T script -C none -d flash_images.sh flash_images.scr
+# or
+# bld -i mkflashscr
+#
+# flash_images.scr is stored in offset 0x9C0000 of NOR/QSPI flash and in the boot partition of SD/USB/SATA disk
+#
+# Usage:
+#     load $bd_type $bd_part $load_addr flash_images.scr
+#     source $load_addr
+#     Example:
+#     load mmc 0:2 a0000000 flash_images.scr
+#     source a0000000
+#
+# Refer to docs/lsdk_build_install.txt for details
+#
+
+if test -z "$mc_version"; then
+    mc_version=mc_10.28.1
+fi
+
+if test -z "$board"; then
+    echo You must setenv board to board name, e.g. setenv board ls1043ardb
+    exit
+fi
+if test -z "$bd_type"; then
+    echo You must setenv bd_type to mmc, usb, or scsi
+    exit
+fi
+
+# Start USB if necessary
+test $bd_type = "usb" && usb start
+
+if test -z "$bd_part"; then
+    echo bd_part is not set, using default 0:2 for the partition number!
+    bd_part=0:2
+fi
+
+if test -z "$bank"; then
+    if test $board = ls1021atwr -o $board = ls1043ardb -o $board = ls2088ardb; then
+	echo You must setenv bank to current or other
+	echo WARNING: to avoid damaging the working image in current bank, prefer to setenv bank to other!
+	exit
+    fi
+fi
+
+if test -z "$img_load_addr"; then
+    img_load_addr=0xa1000000
+fi
+
+# user can set img variable to just flash single image
+if test -z "$img"; then
+    echo You must setenv img variable!
+    echo To flash single image: setenv img to bl2, fip, ddr, mcfw, mcdpc, mcdpl, fman, qe, dp, pfe, phy, dtb, linux_itb
+    echo To flash all images: setenv img to all
+    if load $bd_type $bd_part $img_load_addr flash_images.scr; then
+	echo You can load various image from the following directory in flash_images/$board:
+	ls $bd_type $bd_part flash_images/$board
+    fi
+    echo If necessary, you can override the default setting for variable: bd_part, flash_type, bl2_img,
+    echo fip_img, dtb_img, linux_itb_img, qe_img, dp_img, fman_img, phy_img, ddr_img, mcfw_img, mcdpl_img, mcdpc_img
+    exit
+fi
+
+# set default protect off command to "true"
+pt_off_cmd=true
+
+# Set default image file names which can be overrided in uboot prompt by users
+image_path=/flash_images/$board
+
+if test $board = ls1021atwr; then
+    if test -z "$qe_img"; then
+	qe_img=/flash_images/fsl_qe_ucode_1021_10_A.bin
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/ls1021a-twr.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=nor
+    fi
+    pt_off_cmd="protect off"
+    efs="+$filesize"
+    erase_cmd=erase
+    write_cmd=cp.b
+elif test $board = ls1012ardb; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_qspi.pbl
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$pfe_img"; then
+	pfe_img=/flash_images/pfe_fw_sbl.itb
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/fsl-ls1012a-rdb.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=qspi
+    fi
+    # currently qspi doesn't support sf protect lock/unlock feature, so just echo it.
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+elif test $board = ls1012afrwy; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_qspi.pbl
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$pfe_img"; then
+	pfe_img=/flash_images/pfe_fw_sbl.itb
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/fsl-ls1012a-frwy.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=qspi
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+elif test $board = ls1028ardb; then
+    if test -z "$bl2_img"; then
+        bl2_img=$image_path/bl2_flexspi_nor.pbl
+    fi
+    if test -z "$fip_img"; then
+        fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$dp_img"; then
+        dp_img=/flash_images/ls1028a-dp-fw.bin
+    fi
+    if test -z "$phy_img"; then
+        phy_img=/flash_images/in112525-phy-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+        dtb_img=/fsl-ls1028a-rdb.dtb
+    fi
+    if test -z "$flash_type"; then
+        flash_type=flexspi_nor
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+elif test $board = ls1043ardb; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_nor.pbl
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$fman_img"; then
+	fman_img=/flash_images/fsl_fman_ucode_ls1043_r1.1_106_4_18.bin
+    fi
+    if test -z "$qe_img"; then
+	qe_img=/flash_images/iram_Type_A_LS1021a_r1.0.bin
+    fi
+    if test -z "$phy_img"; then
+	phy_img=/flash_images/cs4315-cs4340-PHY-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/fsl-ls1043a-rdb-sdk.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=nor
+    fi
+    pt_off_cmd="protect off"
+    efs="+$filesize"
+    erase_cmd=erase
+    write_cmd=cp.b
+elif test $board = ls1046ardb -o $board = ls1046afrwy; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_qspi.pbl
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$fman_img"; then
+	fman_img=/flash_images/fsl_fman_ucode_ls1046_r1.0_106_4_18.bin
+    fi
+    if test -z "$qe_img"; then
+	qe_img=/flash_images/iram_Type_A_LS1021a_r1.0.bin
+    fi
+    if test -z "$phy_img"; then
+	phy_img=/flash_images/cs4315-cs4340-PHY-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+	if test $board = ls1046ardb; then
+	    dtb_img=/fsl-ls1046a-rdb-sdk.dtb
+	else
+	    dtb_img=/fsl-ls1046a-frwy-sdk.dtb
+	fi
+    fi
+    if test -z "$flash_type"; then
+	flash_type=qspi
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+elif test $board = ls1088ardb_pb; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_qspi.pbl
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$mcfw_img"; then
+	mcfw_img=$image_path/${mc_version}_ls1088a.itb
+    fi
+    if test -z "$mcdpc_img"; then
+	mcdpc_img=$image_path/dpc-bman-4M.0x1D-0x0D.dtb
+    fi
+    if test -z "$mcdpl_img"; then
+	mcdpl_img=$image_path/dpl-eth.0x1D_0x0D.dtb
+    fi
+    if test -z "$phy_img"; then
+	phy_img=/flash_images/cs4315-cs4340-PHY-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/fsl-ls1088a-rdb.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=qspi
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+elif test $board = ls2088ardb; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_nor.pbl
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$mcfw_img"; then
+	mcfw_img=$image_path/${mc_version}_ls2088a.itb
+    fi
+    if test -z "$mcdpc_img"; then
+	mcdpc_img=$image_path/dpc-bman-4M.0x2A_0x41.dtb
+    fi
+    if test -z "$mcdpl_img"; then
+	mcdpl_img=$image_path/dpl-eth.0x2A_0x41.dtb
+    fi
+    if test -z "$phy_img"; then
+	phy_img=/flash_images/cs4315-cs4340-PHY-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/fsl-ls2088a-rdb.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=nor
+    fi
+    pt_off_cmd="protect off"
+    efs="+$filesize"
+    erase_cmd=erase
+    write_cmd=cp.b
+elif test $board = lx2160ardb -o $board = lx2160ardb_rev2; then
+    if test -z "$bl2_img"; then
+	bl2_img=$image_path/bl2_flexspi_nor.pbl	
+    fi
+    if test -z "$fip_img"; then
+	fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$ddr_img"; then
+	ddr_img=$image_path/fip_ddr_all.bin
+    fi
+    if test -z "$mcfw_img"; then
+	mcfw_img=$image_path/${mc_version}_lx2160a.itb
+    fi
+    if test -z "$mcdpc_img"; then
+	mcdpc_img=$image_path/dpc-warn.dtb
+    fi
+    if test -z "$mcdpl_img"; then
+	mcdpl_img=$image_path/dpl-eth.19.dtb
+    fi
+    if test -z "$phy_img"; then
+        phy_img=/flash_images/in112525-phy-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+	dtb_img=/fsl-lx2160a-rdb.dtb
+    fi
+    if test -z "$flash_type"; then
+	flash_type=flexspi_nor
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+elif test $board = lx2162aqds; then
+    if test -z "$bl2_img"; then
+        bl2_img=$image_path/bl2_flexspi_nor.pbl
+    fi
+    if test -z "$fip_img"; then
+        fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$ddr_img"; then
+	ddr_img=$image_path/fip_ddr_all.bin
+    fi
+    if test -z "$mcfw_img"; then
+	mcfw_img=$image_path/${mc_version}_lx2160a.itb
+    fi
+    if test -z "$mcdpc_img"; then
+        mcdpc_img=$image_path/dpc_17_2.dtb
+    fi
+    if test -z "$mcdpl_img"; then
+        mcdpl_img=$image_path/dpl-18_5-17_2.dtb
+    fi
+    if test -z "$phy_img"; then
+        phy_img=/flash_images/in112525-phy-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+        dtb_img=/fsl-lx2162a-qds.dtb
+    fi
+    if test -z "$flash_type"; then
+        flash_type=flexspi_nor
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
+fi
+
+if test -z "$linux_itb_img"; then
+    if test $board = ls1021atwr; then
+	linux_itb_img=/lsdk2108_yocto_tiny_LS_arm32.itb
+    else
+	linux_itb_img=/lsdk2108_yocto_tiny_LS_arm64.itb
+    fi
+fi
+
+if test $board = ls1021atwr -o $board = ls1043ardb; then
+    # IFC-NOR flash on LS1021ATWR and LS1043ARDB
+    if test $bank = other; then
+	addr_bl2=0x64000000
+	addr_fip=0x64100000
+	addr_fman=0x64900000
+	addr_qe=0x64940000
+	addr_eth=0x64980000
+	addr_dtb=0x64f00000
+	addr_kernel=0x65000000
+    elif test $bank = current; then
+	addr_bl2=0x60000000
+	addr_fip=0x60100000
+	addr_fman=0x60900000
+	addr_qe=0x60940000
+	addr_eth=0x60980000
+	addr_dtb=0x60f00000
+	addr_kernel=0x61000000
+    else
+	echo Error: invalid $bank for bank!
+	exit
+    fi
+elif test $board = ls1012ardb -o $board = ls1028ardb -o $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb_pb -o $board = lx2160ardb -o $board = lx2160ardb_rev2 -o $board = lx2162aqds; then
+    # SPI flash on LS1012ARDB, LS1046ARDB,  LS1046AFRWY, LS1088ARDB_PB, LX2160ARDB, LX2162AQDS
+    addr_bl2=0x0
+    addr_fip=0x00100000
+    addr_ddr=0x00800000
+    addr_fman=0x00900000
+    addr_qe=0x00940000
+    addr_dp=0x00940000
+    addr_eth=0x00980000
+    addr_mcfw=0x00a00000
+    addr_mcdpl=0x00d00000
+    addr_mcdpc=0x00e00000
+    addr_dtb=0x00f00000
+    addr_kernel=0x01000000
+elif test $board = ls1012afrwy; then
+    # base firmware in 2MB QSPI-NOR flash on LS1012AFRWY
+    addr_bl2=0x0
+    addr_eth=0x00020000
+    addr_fip=0x00060000
+    # kernel+dtb+ramdisk itb in 128MB NAND flash
+    addr_kernel=0x0
+elif test $board = ls2088ardb; then
+    if test $bank = other; then
+	addr_bl2=0x584000000
+	addr_fip=0x584100000
+	addr_eth=0x584980000
+	addr_mcfw=0x584a00000
+	addr_mcdpl=0x584d00000
+	addr_mcdpc=0x584e00000
+	addr_dtb=0x584f00000
+	addr_kernel=0x585000000
+    elif test $bank = current; then
+	addr_bl2=0x580000000
+	addr_fip=0x580100000
+	addr_eth=0x580980000
+	addr_mcfw=0x580a00000
+	addr_mcdpl=0x580d00000
+	addr_mcdpc=0x580e00000
+	addr_dtb=0x580f00000
+	addr_kernel=0x581000000
+    else
+	echo Error: invalid $bank for bank!
+	exit
+    fi
+fi
+
+if test $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb_pb -o $board = lx2160ardb -o $board = lx2160ardb_rev2 -o $board = lx2162aqds; then
+    if test $bank = other; then
+	echo Selecting other bank
+	sf probe 0:1
+    elif test $bank = current; then
+	sf probe 0:0
+    else
+	echo Error: invalid $bank for bank.  Aborting
+	exit
+    fi
+elif test $board = ls1012ardb; then
+    if test $bank = bank2; then
+	echo Selecting bank2
+	i2c mw 0x24 0x7 0xfc; i2c mw 0x24 0x3 0xf5
+    elif test $bank = bank1; then
+	echo Selecting bank1
+	i2c mw 0x24 0x7 0xfc; i2c mw 0x24 0x3 0xf4
+    elif test $bank != current; then
+	echo Error: bank choices are bank1, bank2, or current for bank.  Aborting
+	exit
+    fi
+    sf probe
+elif test $board = ls1012afrwy; then
+    if test $bank != current; then
+	echo Only current bank is supported on ls1012afrwy.  Aborting
+	exit
+    fi
+    sf probe
+fi
+
+echo Starting to flash $bank bank of $flash_type flash according to LSDK standard flash layout:
+echo Using bd_type   = $bd_type
+echo Using bd_part   = $bd_part
+echo Using img       = $img
+
+if test "$img" = bl2; then
+    # RCW+PBL+BL2 in case of with TF-A
+    echo Using addr_bl2 $addr_bl2 for bl2_img $bl2_img
+    if load $bd_type $bd_part $img_load_addr $bl2_img && $pt_off_cmd $addr_bl2 $efs && $erase_cmd $addr_bl2 +$filesize && $write_cmd $img_load_addr $addr_bl2 $filesize; then
+	echo Success: flashed $bl2_img
+    else
+	echo Failed to flash $bl2_img
+    fi
+    exit
+elif test "$img" = fip; then
+    # TF-A fip image
+    echo Using addr_fip $addr_fip for fip_img $fip_img
+    if load $bd_type $bd_part $img_load_addr $fip_img && $pt_off_cmd $addr_fip $efs && $erase_cmd $addr_fip +$filesize && $write_cmd $img_load_addr $addr_fip $filesize; then
+	echo Success: flashed $fip_img
+    else
+	echo Failed to flash $fip_img
+    fi
+    exit
+elif test "$img" = ddr; then
+    # DDR PHY firmware on lx216x
+    echo Using addr_ddr $addr_ddr for ddr_img $ddr_img
+    if load $bd_type $bd_part $img_load_addr $ddr_img && $pt_off_cmd $addr_ddr $efs && $erase_cmd $addr_ddr +$filesize && $write_cmd $img_load_addr $addr_ddr $filesize; then
+        echo Success: flashed $ddr_img to $addr_ddr
+    else
+        echo Failed to flash $ddr_img
+    fi
+    exit
+elif test "$img" = mcfw; then
+    # DPAA2 MC firmware
+    echo Using addr_mcfw $addr_mcfw for mcfw_img $mcfw_img
+    if load $bd_type $bd_part $img_load_addr $mcfw_img && $pt_off_cmd $addr_mcfw $efs && $erase_cmd $addr_mcfw +$filesize && $write_cmd $img_load_addr $addr_mcfw $filesize; then
+	echo Success: flashed $mcfw_img to $addr_mcfw
+    else
+	echo Failed to flash $mcfw_img
+    fi
+    exit
+elif test "$img" = mcdpl; then
+    # DPAA2 MC DPL
+    echo Using addr_mcdpl $addr_mcdpl for mcdpl_img $mcdpl_img
+    if load $bd_type $bd_part $img_load_addr $mcdpl_img && $pt_off_cmd $addr_mcdpl $efs && $erase_cmd $addr_mcdpl +$filesize && $write_cmd $img_load_addr $addr_mcdpl $filesize; then
+	echo Success: flashed $mcdpl_img to $addr_mcdpl
+    else
+	echo Failed to flash $mcdpl_img
+    fi
+    exit
+elif test "$img" = mcdpc; then
+    # DPAA2 MC DPC
+    echo Using addr_mcdpc $addr_mcdpc for mcdpc_img $mcdpc_img
+    if load $bd_type $bd_part $img_load_addr $mcdpc_img && $pt_off_cmd $addr_mcdpc $efs && $erase_cmd $addr_mcdpc +$filesize && $write_cmd $img_load_addr $addr_mcdpc $filesize; then
+	echo Success: flashed $mcdpc_img to $addr_mcdpc
+    else
+	echo Failed to flash $mcdpc_img
+    fi
+    exit
+elif test "$img" = fman; then
+    # DPAA1 FMan ucode firmware
+    echo Using addr_fman $addr_fman for fman_img $fman_img
+    if load $bd_type $bd_part $img_load_addr $fman_img && $pt_off_cmd $addr_fman $efs && $erase_cmd $addr_fman +$filesize && $write_cmd $img_load_addr $addr_fman $filesize; then
+	echo Success: flashed $fman_img
+    else
+	echo Failed to flash $fman_img
+    fi
+    exit
+elif test "$img" = pfe; then
+    # PFE firmware on LS1012A
+    echo Using addr_eth $addr_eth for pfe_img $pfe_img
+    if load $bd_type $bd_part $img_load_addr $pfe_img && $pt_off_cmd $addr_eth $efs && $erase_cmd $addr_eth +$filesize && $write_cmd $img_load_addr $addr_eth $filesize; then
+	echo Success: flashed $pfe_img
+    else
+	echo Failed to flash $pfe_img
+    fi
+    exit
+elif test "$img" = phy; then
+    # Cortina PHY firmware
+    echo Using addr_eth $addr_eth for phy_img $phy_img
+    if load $bd_type $bd_part $img_load_addr $phy_img && $pt_off_cmd $addr_eth $efs && $erase_cmd $addr_eth +$filesize && $write_cmd $img_load_addr $addr_eth $filesize; then
+	echo Success: flashed $phy_img
+    else
+	echo Failed to flash $phy_img
+    fi
+    exit
+elif test "$img" = qe; then
+    # QE ucode firmware
+    echo Using addr_qe $addr_qe for qe_img $qe_img
+    if load $bd_type $bd_part $img_load_addr $qe_img && $pt_off_cmd $addr_qe $efs && $erase_cmd $addr_qe +$filesize && $write_cmd $img_load_addr $addr_qe $filesize; then
+	echo Success: flashed $qe_img
+    else
+	echo Failed to flash $qe_img
+    fi
+    exit
+elif test "$img" = dp; then
+    # DP firmware
+    echo Using addr_dp $addr_dp for dp_img $dp_img
+    if load $bd_type $bd_part $img_load_addr $dp_img && $pt_off_cmd $addr_dp $efs && $erase_cmd $addr_dp +$filesize && $write_cmd $img_load_addr $addr_dp $filesize; then
+        echo Success: flashed $dp_img
+    else
+        echo Failed to flash $dp_img
+    fi
+    exit
+elif test "$img" = dtb; then
+    # DTB image
+    echo Using addr_dtb $addr_dtb for dtb_img $dtb_img
+    echo "222 $pt_off_cmd $addr_dtb $efs $erase_cmd $addr_dtb +$filesize"
+    if load $bd_type $bd_part $img_load_addr $dtb_img && $pt_off_cmd $addr_dtb $efs && $erase_cmd $addr_dtb +$filesize && $write_cmd $img_load_addr $addr_dtb $filesize; then
+	echo Success: flashed $dtb_img
+    else
+	echo Failed to flash $dtb_img
+    fi
+    exit
+elif test "$img" = linux_itb; then
+    # linux itb image
+    echo Using addr_kernel $addr_kernel for linux_itb_img $linux_itb_img
+    if load $bd_type $bd_part $img_load_addr $linux_itb_img && $pt_off_cmd $addr_kernel $efs && $erase_cmd $addr_kernel +$filesize && $write_cmd $img_load_addr $addr_kernel $filesize; then
+	echo Success: flashed $linux_itb_img
+    else
+	echo Failed to flash $linux_itb_img
+    fi
+    exit
+elif test "$img" != all; then
+    echo ERROR: invalid $img for img!
+    exit
+fi
+
+
+# flash all images to the specified bank in case of img=all
+if test $board = ls1021atwr; then
+    echo ls1021atwr without ATF is not supported.
+    exit
+fi
+
+# ATF BL2: RCW+PBI+BL2
+if load $bd_type $bd_part $img_load_addr $bl2_img && $pt_off_cmd $addr_bl2 $efs && $erase_cmd $addr_bl2 +$filesize && $write_cmd $img_load_addr $addr_bl2 $filesize; then
+    echo Success: flashed $bl2_img to $addr_bl2
+else
+    echo Failed to flash $bl2_img
+fi
+
+# ATF FIP
+if load $bd_type $bd_part $img_load_addr $fip_img && $pt_off_cmd $addr_fip $efs && $erase_cmd $addr_fip +$filesize && $write_cmd $img_load_addr $addr_fip $filesize; then
+    echo Success: flashed $fip_img to $addr_fip
+else
+    echo Failed to flash $fip_img
+fi
+
+# DDR PHY firmware
+if test $board = lx2160ardb -o $board = lx2160ardb_rev2 -o $board = lx2162aqds; then
+    if load $bd_type $bd_part $img_load_addr $ddr_img && $pt_off_cmd $addr_ddr $efs && $erase_cmd $addr_ddr +$filesize && $write_cmd $img_load_addr $addr_ddr $filesize; then
+        echo Success: flashed $ddr_img to $addr_ddr
+    else
+        echo Failed to flash $ddr_img
+    fi
+fi
+
+# DPAA1 FMan ucode
+if test $board = ls1043ardb -o $board = ls1046ardb -o $board = ls1046afrwy; then
+    if load $bd_type $bd_part $img_load_addr $fman_img && $pt_off_cmd $addr_fman $efs && $erase_cmd $addr_fman +$filesize && $write_cmd $img_load_addr $addr_fman $filesize; then
+	echo Success: flashed $fman_img to $addr_fman
+    else
+	echo Failed to flash $fman_img
+    fi
+fi
+
+# QE ucode
+if test $board = ls1021atwr -o $board = ls1043ardb -o $board = ls1046ardb -o $board = ls1046afrwy; then
+    if load $bd_type $bd_part $img_load_addr $qe_img && $pt_off_cmd $addr_qe $efs && $erase_cmd $addr_qe +$filesize && $write_cmd $img_load_addr $addr_qe $filesize; then
+	echo Success: flashed $qe_img to $addr_qe
+    else
+	echo Failed to flash $qe_img
+    fi
+fi
+
+# DP firmware
+if test $board = ls1028ardb; then
+    if load $bd_type $bd_part $img_load_addr $dp_img && $pt_off_cmd $addr_dp $efs && $erase_cmd $addr_dp +$filesize && $write_cmd $img_load_addr $addr_dp $filesize; then
+	echo Success: flashed $dp_img to $addr_dp
+    else
+	echo Failed to flash $dp_img
+    fi
+fi
+
+# Ethernet PHY firmware
+if test $board = ls1043ardb -o $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb_pb -o $board = ls2088ardb; then
+    if load $bd_type $bd_part $img_load_addr $phy_img && $pt_off_cmd $addr_eth $efs && $erase_cmd $addr_eth +$filesize && $write_cmd $img_load_addr $addr_eth $filesize; then
+	echo Success: flashed $phy_img to $addr_eth
+    else
+	echo Failed to flash $phy_img
+    fi
+elif test $board = ls1012ardb -o $board = ls1012afrwy; then
+# PFE firmware
+    if load $bd_type $bd_part $img_load_addr $pfe_img && $pt_off_cmd $addr_eth $efs && $erase_cmd $addr_eth +$filesize && $write_cmd $img_load_addr $addr_eth $filesize; then
+	echo Success: flashed $pfe_img to $addr_eth
+    else
+	echo Failed to flash $pfe_img
+    fi
+fi
+
+# DPAA2 MC firmware
+if test $board = ls1088ardb_pb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2160ardb_rev2 -o $board = lx2162aqds; then
+    if load $bd_type $bd_part $img_load_addr $mcfw_img && $pt_off_cmd $addr_mcfw $efs && $erase_cmd $addr_mcfw +$filesize && $write_cmd $img_load_addr $addr_mcfw $filesize; then
+	echo Success: flashed $mcfw_img to $addr_mcfw
+    else
+	echo Failed to flash $mcfw_img
+    fi
+fi
+
+# DPAA2 DPL firmware
+if test $board = ls1088ardb_pb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2160ardb_rev2 -o $board = lx2162aqds; then
+    if load $bd_type $bd_part $img_load_addr $mcdpl_img && $pt_off_cmd $addr_mcdpl $efs && $erase_cmd $addr_mcdpl +$filesize && $write_cmd $img_load_addr $addr_mcdpl $filesize; then
+	echo Success: flashed $mcdpl_img to $addr_mcdpl
+    else
+	echo Failed to flash $mcdpl_img
+    fi
+fi
+
+# DPAA2 DPC firmware
+if test $board = ls1088ardb_pb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2160ardb_rev2 -o $board = lx2162aqds; then
+    if load $bd_type $bd_part $img_load_addr $mcdpc_img && $pt_off_cmd $addr_mcdpc $efs && $erase_cmd $addr_mcdpc +$filesize && $write_cmd $img_load_addr $addr_mcdpc $filesize; then
+	echo Success: flashed $mcdpc_img to $addr_mcdpc
+    else
+	echo Failed to flash $mcdpc_img
+    fi
+fi
+
+
+# DTB
+if test $board != ls1012afrwy; then
+    if load $bd_type $bd_part $img_load_addr $dtb_img && $pt_off_cmd $addr_dtb $efs && $erase_cmd $addr_dtb +$filesize && $write_cmd $img_load_addr $addr_dtb $filesize; then
+	echo Success: flashed $dtb_img to $addr_dtb
+    else
+	echo Failed to flash $dtb_img
+    fi
+fi
+
+# Kernel itb
+if test $board != ls1012afrwy; then
+    if load $bd_type $bd_part $img_load_addr $linux_itb_img && $pt_off_cmd $addr_kernel $efs && $erase_cmd $addr_kernel +$filesize && $write_cmd $img_load_addr $addr_kernel $filesize; then
+	echo Success: flashed $linux_itb_img to $addr_kernel
+    else
+	echo Failed to flash $linux_itb_img
+    fi
+fi
+
+echo Completed!
+
+if test $board = ls1043ardb -o $board = ls1046ardb -o $board = ls1046afrwy; then
+    echo run "cpld reset altbank" to boot U-Boot from other bank.
+elif test $board = ls1028ardb -o $board = ls1088ardb_pb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds; then
+    echo run "qixis_reset altbank" to boot U-Boot from other bank.
+fi

@@ -1,5 +1,7 @@
 /*
- * Copyright 2017 - 2021 NXP
+ * Copyright 2017-2023 NXP
+ *
+ * Shengzhou Liu <Shengzhou.Liu@nxp.com>
  *
  */
 
@@ -24,11 +26,10 @@
 
 		initrd {
 			description = "initrd for arm64";
-			data = /incbin/("../../build/images/rootfs_yocto_arm64_tiny.cpio.gz");
+			data = /incbin/("../../build/images/rootfs_poky_tiny_arm64.cpio.gz");
 			type = "ramdisk";
 			arch = "arm64";
 			os = "linux";
-			compression = "none";
 			load = <0x00000000>;
 			entry = <0x00000000>;
 		};

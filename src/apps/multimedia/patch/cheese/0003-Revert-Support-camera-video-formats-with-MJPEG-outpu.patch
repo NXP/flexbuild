@@ -1,0 +1,121 @@
+From 15cfaf1e59d4b780d831b68821d692bca84f5189 Mon Sep 17 00:00:00 2001
+From: Chao Guo <chao.guo@nxp.com>
+Date: Mon, 12 Dec 2022 22:15:31 +0800
+Subject: [PATCH 3/3] Revert "Support camera video formats with MJPEG output"
+
+This reverts commit 58de82b3d463b69f4c0bef75667e47020924e28b.
+---
+ libcheese/cheese-camera-device.c |  5 ++-
+ libcheese/cheese-camera.c        | 55 ++++++--------------------------
+ 2 files changed, 12 insertions(+), 48 deletions(-)
+
+diff --git a/libcheese/cheese-camera-device.c b/libcheese/cheese-camera-device.c
+index 8c7cedcf..18cf5374 100644
+--- a/libcheese/cheese-camera-device.c
++++ b/libcheese/cheese-camera-device.c
+@@ -70,9 +70,8 @@ GST_DEBUG_CATEGORY (cheese_camera_device_cat);
+ #define GST_CAT_DEFAULT cheese_camera_device_cat
+ 
+ static const gchar * const supported_formats[] = {
+-    "video/x-raw",
+-    "image/jpeg",
+-    NULL
++  "video/x-raw",
++  NULL
+ };
+ 
+ /* FIXME: make this configurable */
+diff --git a/libcheese/cheese-camera.c b/libcheese/cheese-camera.c
+index e123ff34..626fc1d6 100644
+--- a/libcheese/cheese-camera.c
++++ b/libcheese/cheese-camera.c
+@@ -350,25 +350,6 @@ cheese_camera_detect_camera_devices (CheeseCamera *camera)
+   cheese_camera_device_monitor_coldplug (priv->monitor);
+ }
+ 
+-/*
+- * cheese_camera_on_decodebin_pad_added:
+- * @camera: a #CheeseCamera
+- * @pad: new decode bin #GstPad
+- *
+- * A callback fired when a new source pad appears on the video source decodebin.
+- * Exposes the pad as the source pad of @video_source #GstBin.
+- */
+-static void
+-cheese_camera_on_decodebin_pad_added (CheeseCamera *camera, GstPad *pad)
+-{
+-    CheeseCameraPrivate *priv = cheese_camera_get_instance_private (camera);
+-    GstPad *ghostpad;
+-
+-    ghostpad = gst_element_get_static_pad (priv->video_source, "src");
+-    gst_ghost_pad_set_target (GST_GHOST_PAD (ghostpad), pad);
+-    gst_object_unref (ghostpad);
+-}
+-
+ /*
+  * cheese_camera_set_camera_source:
+  * @camera: a #CheeseCamera
+@@ -382,9 +363,11 @@ static gboolean
+ cheese_camera_set_camera_source (CheeseCamera *camera)
+ {
+     CheeseCameraPrivate *priv = cheese_camera_get_instance_private (camera);
+-    guint i;
+-    CheeseCameraDevice *selected_camera;
+-    GstElement *src, *filter, *decodebin;
++
++  guint i;
++  CheeseCameraDevice *selected_camera;
++  GstElement *src, *filter;
++  GstPad *srcpad;
+ 
+   if (priv->video_source)
+     gst_object_unref (priv->video_source);
+@@ -416,16 +399,12 @@ cheese_camera_set_camera_source (CheeseCamera *camera)
+   filter = gst_element_factory_make ("capsfilter", "video_source_filter");
+   gst_bin_add (GST_BIN (priv->video_source), filter);
+ 
+-    decodebin = gst_element_factory_make ("decodebin", NULL);
+-    g_signal_connect_swapped (decodebin, "pad-added",
+-                              G_CALLBACK (cheese_camera_on_decodebin_pad_added),
+-                              camera);
+-    gst_bin_add (GST_BIN (priv->video_source), decodebin);
+-
+-    gst_element_link_many (src, filter, decodebin, NULL);
++  gst_element_link (src, filter);
+ 
+-    gst_element_add_pad (priv->video_source,
+-                         gst_ghost_pad_new_no_target ("src", GST_PAD_SRC));
++  srcpad = gst_element_get_static_pad (filter, "src");
++  gst_element_add_pad (priv->video_source,
++                       gst_ghost_pad_new ("src", srcpad));
++  gst_object_unref (srcpad);
+ 
+   return TRUE;
+ }
+@@ -767,23 +746,9 @@ cheese_camera_set_new_caps (CheeseCamera *camera)
+ 
+   if (!gst_caps_is_empty (caps))
+   {
+-        guint i;
+-
+     GST_INFO_OBJECT (camera, "SETTING caps %" GST_PTR_FORMAT, caps);
+     g_object_set (gst_bin_get_by_name (GST_BIN (priv->video_source),
+                   "video_source_filter"), "caps", caps, NULL);
+-
+-        /* If the selected caps are image/jpeg, video_source will convert them
+-         * to raw video internally. Therefore, camerabin should always use
+-         * video/x-raw regardless of the caps passed to video_source_filter. */
+-        caps = gst_caps_make_writable (caps);
+-
+-        for (i = 0; i != gst_caps_get_size (caps); ++i)
+-        {
+-            gst_structure_set_name (gst_caps_get_structure (caps, i),
+-                                    "video/x-raw");
+-        }
+-
+     g_object_set (priv->camerabin, "viewfinder-caps", caps,
+                   "image-capture-caps", caps, NULL);
+ 
+-- 
+2.17.0
+

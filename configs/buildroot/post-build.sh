@@ -14,7 +14,7 @@ mkdir -p ${TARGET_DIR}/usr/{include,local}
 
 if [ $DESTARCH = arm64 ]; then
     if [ ! -f $DESTDIR/etc/buildinfo ]; then
-	bld -c apps -r buildroot:${DISTROSCALE} -f $CONFIGLIST && \
+	bld apps -r buildroot:${DISTROVARIANT} -f $CONFIGLIST && \
 	releasestamp="Built at: `date +'%Y-%m-%d %H:%M:%S'`" && \
 	echo $releasestamp > $DESTDIR/etc/buildinfo
     fi
@@ -27,7 +27,7 @@ curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2 && cd $FBDIR`
 libmodules=$FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/output/$curbrch/tmp/lib/modules
 modulename=$(echo `ls -t $libmodules` | cut -d' ' -f1)
 modulespath=$libmodules/$modulename
-if [ -n "$modulename" -a $DISTROSCALE = devel ]; then
+if [ -n "$modulename" -a $DISTROVARIANT = devel ]; then
     rm -rf ${TARGET_DIR}/lib/modules/*
     cp -rf $modulespath ${TARGET_DIR}/lib/modules
 fi

@@ -1,33 +1,34 @@
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 ovs_dpdk:
-ifeq ($(CONFIG_OVS_DPDK), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(SOCFAMILY) != LS -a $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != main ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = desktop -o \
+	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"ovs_dpdk") && \
 	 $(call repo-mngr,fetch,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld -i mkrfs -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
-	     bld -c dpdk -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY) -f $(CFGLISTYML); \
 	 fi && \
-         if [ ! -f $(RFSDIR)/usr/local/include/rte_config.h ]; then \
-	     sudo cp -af $(DESTDIR)/usr/local/include/rte_*.h $(RFSDIR)/usr/local/include/ && \
-             sudo cp -rf $(DESTDIR)/usr/local/include/generic $(RFSDIR)/usr/local/include/; \
+         if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then \
+	     sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/ && \
+             sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/; \
          fi && \
+	 \
 	 cd $(NETDIR)/ovs_dpdk && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 export LDFLAGS="-L$(RFSDIR)/lib/aarch64-linux-gnu -L$(RFSDIR)/lib -L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/local/lib/" && \
-	 export LIBS="$(shell PKG_CONFIG_PATH=$(DESTDIR)/usr/local/lib/pkgconfig $(CROSS)pkg-config --libs libdpdk)" && \
-	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/local/lib/pkgconfig && \
-	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \
+	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" && \
+	 export LIBS="$(shell PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig $(CROSS)pkg-config --libs libdpdk)" && \
 	 ./boot.sh && \
-	 ./configure --prefix=/usr/local --host=aarch64-linux-gnu --with-dpdk=static --disable-ssl --disable-libcapng && \
-	 $(MAKE) -j$(JOBS) 'CFLAGS=-g -Ofast' install && \
+	 ./configure --prefix=/usr \
+	   --host=aarch64-linux-gnu \
+	   --with-dpdk=static \
+	   --disable-ssl \
+	   --disable-libcapng && \
+	 $(MAKE) -j$(JOBS) --no-print-directory CFLAGS='-g -Ofast' install && \
+	 $(CROSS_COMPILE)strip $(DESTDIR)/usr/sbin/{ovs-vswitchd,ovsdb-server} && \
 	 $(call fbprint_d,"ovs_dpdk")
-endif
-endif

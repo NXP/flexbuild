@@ -1,0 +1,11 @@
+# repo configuration for Machine Learning on iMX & Layerscape MPU platforms
+
+
+# enable/disable ML
+PKG_GROUPS_ML: n
+
+
+# eIQ AI/ML component repositories
+repo:
+  armcl:
+    url:    https://github.com/nxp-imx/arm-computelibrary-imx.git

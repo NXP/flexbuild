@@ -1,13 +1,14 @@
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 # FMC (Frame Manager Configuration) tool is a software package for DPAA on QorIQ/Layerscape platform
 
+# depend on libtclap-dev for tclap/CmdLine.h
+
 fmc:
-ifeq ($(CONFIG_FMC), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(SOCFAMILY) != LS -o $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) = desktop -o $(DISTROSCALE) = tiny ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
+	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"fmc") && \
 	 $(call repo-mngr,fetch,fmc,apps/networking) && \
 	 $(call repo-mngr,fetch,eth_config,apps/networking) && \
@@ -15,30 +16,34 @@ ifeq ($(DESTARCH),arm64)
 	     mkdir -p $(DESTDIR)/etc/fmc/config && \
              cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config; \
 	 fi && \
-	 if [ $(DISTROTYPE) = ubuntu -o $(DISTROTYPE) = yocto -o $(DISTROTYPE) = debian ]; then \
+	 if [ $(DISTROTYPE) = debian -o $(DISTROTYPE) = ubuntu -o $(DISTROTYPE) = poky ]; then \
 	     xmlhdr=$(RFSDIR)/usr/include/libxml2; \
 	 elif [ $(DISTROTYPE) = buildroot ]; then \
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
-	 if [ ! -d $(NETDIR)/fmlib/include/fmd/Peripherals -o ! -f $(DESTDIR)/lib/libfm-arm.a ]; then \
-	     bld -c fmlib -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -p LS -f $(CFGLISTYML); \
+	 if [ ! -d $(NETDIR)/fmlib/include/fmd/Peripherals -o ! -f $(DESTDIR)/usr/lib/libfm-arm.a ]; then \
+	     bld fmlib -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS -f $(CFGLISTYML); \
 	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
-	     bld -i mkrfs -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -p LS -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS -f $(CFGLISTYML); \
 	 fi && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
-	     bld -c linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
 	 fi && \
-	 export LDFLAGS="-L$(RFSDIR)/usr/lib -Wl,-rpath=$(RFSDIR)/usr/lib:$(RFSDIR)/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
-	 export CFLAGS="-I$(RFSDIR)/usr/include/aarch64-linux-gnu -I$(NETDIR)/fmlib/include/fmd \
+	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/lib \
+	 	-Wl,-rpath=$(RFSDIR)/usr/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(DESTDIR)/usr/lib" && \
+	 export CFLAGS="-Wno-write-strings -I$(RFSDIR)/usr/include/aarch64-linux-gnu -I$(NETDIR)/fmlib/include/fmd \
 		-I$(NETDIR)/fmlib/include/fmd/Peripherals -I$(NETDIR)/fmlib/include/fmd/integrations" && \
+	 \
 	 cd $(NETDIR)/fmc && \
-	 $(MAKE) clean -C source && \
-	 $(MAKE) FMD_USPACE_HEADER_PATH=$(KERNEL_PATH)/include/uapi/linux/fmd \
+	 $(MAKE) -C source \
+	 	 FMD_USPACE_HEADER_PATH=$(KERNEL_PATH)/include/uapi/linux/fmd \
 		 FMLIB_HEADER_PATH=$(NETDIR)/fmlib/include \
 		 LIBXML2_HEADER_PATH=$$xmlhdr \
-		 FMD_USPACE_LIB_PATH=$(DESTDIR)/lib TCLAP_HEADER_PATH=$(RFSDIR)/usr/include \
-		 CXX=$(CROSS_COMPILE)g++ CC=$(CROSS_COMPILE)gcc -C source && \
+		 FMD_USPACE_LIB_PATH=$(DESTDIR)/usr/lib \
+		 TCLAP_HEADER_PATH=$(RFSDIR)/usr/include \
+		 CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" \
+		 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 install -d $(DESTDIR)/usr/local/bin && \
 	 install -m 755 source/fmc $(DESTDIR)/usr/local/bin/fmc && \
 	 install -d $(DESTDIR)/etc/fmc/config && \
@@ -50,10 +55,8 @@ ifeq ($(DESTARCH),arm64)
 	 install source/libfmc.a $(DESTDIR)/usr/local/lib/aarch64-linux-gnu && \
 	 install -d $(DESTDIR)/usr/local/fmc/ && \
 	 install -m 755 $(FBDIR)/src/misc/fmc/init-ls104xa $(DESTDIR)/usr/local/fmc && \
-	 install -d $(DESTDIR)/lib/systemd/system/ && \
+	 install -d $(DESTDIR)/usr/lib/systemd/system/ && \
 	 install -d $(DESTDIR)/etc/systemd/system/multi-user.target.wants/ && \
-	 install -m 644 $(FBDIR)/src/misc/fmc/fmc.service $(DESTDIR)/lib/systemd/system/ && \
+	 install -m 644 $(FBDIR)/src/misc/fmc/fmc.service $(DESTDIR)/usr/lib/systemd/system/ && \
 	 ln -sf /lib/systemd/system/fmc.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/fmc.service && \
 	 $(call fbprint_d,"fmc")
-endif
-endif

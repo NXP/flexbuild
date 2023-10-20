@@ -1,0 +1,28 @@
+From b6a53eaae906b45a33adb11eaff2c0aa891111d2 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Fri, 14 Jul 2023 19:10:44 +0900
+Subject: [PATCH] LF-9558 gtkgstbasewidget: default set ignore alpha to false
+
+ignore alpha equals to true will make gtkglsink set has alpha to false
+via gtk_gl_area_set_has_alpha, which will make gtkglarea rendering
+by cpu/cario. Need set has alpha to true to enable gpu drawing for video
+---
+ ext/gtk/gtkgstbasewidget.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/gtk/gtkgstbasewidget.c b/ext/gtk/gtkgstbasewidget.c
+index ed7cfa660..95fea458b 100644
+--- a/ext/gtk/gtkgstbasewidget.c
++++ b/ext/gtk/gtkgstbasewidget.c
+@@ -35,7 +35,7 @@ GST_DEBUG_CATEGORY (gst_debug_gtk_base_widget);
+ #define DEFAULT_DISPLAY_PAR_D       1
+ #define DEFAULT_VIDEO_PAR_N         0
+ #define DEFAULT_VIDEO_PAR_D         1
+-#define DEFAULT_IGNORE_ALPHA        TRUE
++#define DEFAULT_IGNORE_ALPHA        FALSE
+ 
+ enum
+ {
+-- 
+2.34.1
+

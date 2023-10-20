@@ -1,38 +1,60 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-# depend imx-codec imx-parser libdrm gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
+# Gstreamer iMX plugins
 
-PLATFORM ?= MX8
+# depends on imx-codec imx-parser libdrm gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
+
+ifeq ($(MACHINE),imx93evk)
+  SOCPLATFORM = MX9
+else
+  SOCPLATFORM = MX8
+endif
+
 
 
 imx_gst_plugin:
-ifeq ($(CONFIG_GSTREAMER), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_gst_plugin") && \
 	 $(call repo-mngr,fetch,imx_gst_plugin,apps/multimedia) && \
 	 cd $(MMDIR)/imx_gst_plugin && \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CROSS=$(CROSS_COMPILE) && \
-	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@TARGET_ARCH@%aarch64%g' \
-	     -e 's%@TARGET_CPU@%cortex-a53%g' -e 's%@TARGET_ENDIAN@%little%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     $(FBDIR)/src/misc/meson/cross-compilation.conf > cross-compilation.conf && \
-	 if [ ! -d $(RFSDIR)/usr/include/libdrm ]; then \
-	     bld -c libdrm -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
+	 sed -i "s/libfslaudiocodec', required: false/libfslaudiocodec', required: true/"  plugins/meson.build && \
+	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstv4l2codecs.so ]; then \
-             bld -c gst_plugins_bad -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 if [ ! -f $(DESTDIR)/usr/lib/pkgconfig/imx-parser.pc ]; then \
+	     bld imx_parser -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
-	 rm -rf build && mkdir -p build && \
-	 meson build \
-	      -Dplatform=$(PLATFORM) \
-	      -Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/imx -I$(RFSDIR)/usr/include/gstreamer-1.0" \
-	      -Dc_link_args="-L$(RFSDIR)/usr/lib" \
-	      --prefix=/usr --buildtype=release --cross-file cross-compilation.conf && \
-	 ninja -j $(JOBS) -C build install && \
+	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
+	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/hevcencapi.h ]; then \
+	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 if [ ! -f $(DESTDIR)/usr/lib/libfslvpuwrap.so ]; then \
+	     bld imx_vpuwrap -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 if [ ! -f $(DESTDIR)/usr/lib/pkgconfig/libfslaudiocodec.pc ]; then \
+	     bld imx_codec -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 if [ ! -f $(RFSDIR)/usr/include/imx-mm/audio-codec/fsl_unia.h ]; then \
+	     sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include; \
+	 fi && \
+	 \
+	 meson setup build_$(DISTROTYPE)_$(ARCH) \
+	      -Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
+			-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include/gstreamer-1.0" \
+	      -Dc_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib" \
+	      -Dcpp_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib" \
+	      --prefix=/usr --buildtype=release \
+	      --cross-file meson.cross \
+	      -Dplatform=$(SOCPLATFORM) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
 	 $(call fbprint_d,"imx_gst_plugin")
-endif
-endif

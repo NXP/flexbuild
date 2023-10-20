@@ -4,13 +4,13 @@ Flexbuild Work Flow
 |    BSP components              |    |              |    |   Generated Images   (build/images)   |
 |                                |--->|              |    |                                       |
 |u-boot,uefi,rcw,tfa,fman,pfe,   |    |              |    |flex-installer                         |
-|mc,qe,dpl,dpc,seco,etc          |    |              |    |sdk_yocto_tiny_IMX_<arch>.itb          |
-+--------------------------------+    |              |    |rootfs_<sdk_version>_ubuntu_<arch>.tgz |
-                                      |              |    |rootfs_<sdk_version>_centos_<arch>.tgz |
-+--------------------------------+    |              |--->|rootfs_<sdk_version>_debian_<arch>.tgz |
-|      Linux components          |--->|              |    |rootfs_<sdk_version>_yocto_<arch>.tgz  |
-|   linux, misc modules          |    |              |    |rootfs_<sdk_version>_buildroot.tgz     |
-+--------------------------------+    |              |    |firmware_<machine>_<boottype>.img      |
+|mc,qe,dpl,dpc,seco,etc          |    |              |    |sdk_poky_tiny_IMX_<arch>.itb           |
++--------------------------------+    |              |    |rootfs_<sdk_version>_debian_<arch>.tgz |
+                                      |              |    |rootfs_<sdk_version>_ubuntu_<arch>.tgz |
++--------------------------------+    |              |--->|rootfs_<sdk_version>_poky_<arch>.tgz   |
+|      Linux components          |--->|              |    |rootfs_<sdk_version>_buildroot.tgz     |
+|   linux, misc modules          |    |              |    |lsdk_poky_tiny_IMX_arm64.itb           |
++--------------------------------+    |              |    |lsdk_poky_tiny_LS_arm64.itb            |
                                       |              |    |boot_LS_<arch>_lts_<version>.tgz       |
                                       |              |    |boot_IMX_<arch>_lts_<version>.tgz      |
 +--------------------------------+    |              |    +---------------------------------------+
@@ -18,21 +18,21 @@ Flexbuild Work Flow
 |                                |    |              |    +---------------------------------------+
 |fmc,restool,dpdk,wayland,weston |--->|              |    |            RFS (build/rfs)            |
 |dce,aiopsl,tsntool,libpkcs11,   |    |              |    |                                       |
-|eiq,armnn,secure_obj,ceetm,     |    |              |    |            +------------+             |
-|optee_os,optee_client,aiopsl,   |    |              |    |            |  Ubuntu    |             |
+|ml,armnn,secure_obj,ceetm,      |    |              |    |            +------------+             |
+|optee_os,optee_client,aiopsl,   |    |              |    |            |  Debian    |             |
 |ovs_dpdk,pktgen_dpdk,vpp,etc    |    |              |    |            +------------+             |
 |                                |    |              |    |                                       |
 +--------------------------------+    |              |    |            +------------+             |
-                                      |              |    |            |  Debian    |             |
+                                      |              |    |            |  Ubuntu    |             |
 +--------------------------------+    |              |    |            +------------+             |
 |      Configs                   |    |              |    |                                       |
 |                                |    |              |    |            +------------+             |
-|sdk.yml                         |    |              |    |            |  CentOS    |             |
-|board/<machine>/manifest        |--->|              |    |            +------------+             |
+|sdk.yml                         |    |              |    |            |  UOS       |             |
+|board/<machine>.conf            |--->|              |    |            +------------+             |
 |linux/linux_<arch>.its          |    | flex-builder |--->|                                       |
-|ubuntu/extra_packages_list      |    |              |    |            +------------+             |
+|debian/extra-devel-packages-list|    |              |    |            +------------+             |
 |buildroot/<arch>_defconfig      |    |              |    |            |  Yocto RFS |             |
-|yocto/local_arm64_tiny.conf     |    |              |    |            +------------+             |
+|poky/local_arm64_tiny.conf     |    |              |    |            +------------+              |
 +--------------------------------+    |              |    |                                       |
                                       |              |    |            +-------------+            |
                                       |              |    |            |Buildroot RFS|            |
@@ -44,9 +44,9 @@ Flexbuild Work Flow
 | +---------------+-----------+  |    |              |    |                                       |
 | |Boot Partition |  RootFS   |  |    |              |    +---------------------------------------+
 | |               |           |  |    |              |                      +                      
-| |kernel         |Ubuntu     |  |    |              |    +---------------------------------------+
-| |dtb            |Debian     |  |    |              |    |          Boot Partitoion              |
-| |lsdk_linux.itb |CentOS     |  |    |              |    |                                       |
+| |kernel         |Debian     |  |    |              |    +---------------------------------------+
+| |dtb            |Ubuntu     |  |    |              |    |          Boot Partitoion              |
+| |lsdk_linux.itb |UOS        |  |    |              |    |                                       |
 | |distro boot.scr|Yocto RFS  |  |    |              |    |          kernel image                 |
 | |secure headers |Buildroot  |  |    |              |--->|          composite firmware           |
 | |               |           |  |    |              |    |          DTBs                         |

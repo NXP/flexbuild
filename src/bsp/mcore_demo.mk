@@ -1,15 +1,15 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 # i.MX mcore demo firmware
 
 
-MCORE_VERSION ?= 2.10.0
+MCORE_VERSION ?= 2.14.0
 
-MCORE_LIST ?= imx8mm-m4 imx8mq-m4 imx8mn-m7 imx8mp-m7 imx8ulp-m33
+MCORE_LIST ?= imx8mm-m4 imx8mq-m4 imx8mn-m7 imx8mp-m7 imx8ulp-m33 imx93-m33
 
-FW_DOWNLOAD_URL ?= http://yb2.am.freescale.net
+FW_DOWNLOAD_URL ?= https://www.nxp.com/lgfiles/NMG/MAD/YOCTO
 
 
 mcore_demo:
@@ -24,4 +24,5 @@ mcore_demo:
 		rm -f $${soc}.bin; \
 	     done; \
          fi && \
+	 ln -sf $(BSPDIR)/imx_mcore_demos $(FBOUTDIR)/bsp/imx_mcore_demos && \
 	 $(call fbprint_d,"imx_mcore_demo")

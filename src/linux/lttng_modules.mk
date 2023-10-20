@@ -1,4 +1,4 @@
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -9,7 +9,7 @@ lttng_modules:
 	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir && \
 	 if ! grep CONFIG_STACKTRACE=y $$opdir/.config 1>/dev/null 2>&1; then \
-	     bld -c linux -B fragment:lttng.config -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -B fragment:lttng.config -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
 	 fi && \
 	 cd $(PKGDIR)/linux/lttng_modules && \
 	 $(call fbprint_b,"LTTng modules") && \

@@ -1,0 +1,109 @@
+From b8f18bfd36d551a4b381136bcf2d7e72d39ebd3e Mon Sep 17 00:00:00 2001
+From: Hou Qi <qi.hou@nxp.com>
+Date: Wed, 11 Oct 2023 12:44:47 +0800
+Subject: [PATCH] LF-10264 v4l2: drop frame for frames that cannot be decoded
+
+For streams with some frames that cannot be decoded, these frames'
+timestamps should not participate in sorting and should be dropped.
+Otherwise, it may cause pts of capture buffer smaller than the real
+pts, and further cause AV unsync.
+
+upstream status: pending
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/5479>
+---
+ sys/v4l2/gstv4l2allocator.c |  1 +
+ sys/v4l2/gstv4l2object.c    |  7 +++++++
+ sys/v4l2/gstv4l2object.h    |  2 ++
+ sys/v4l2/gstv4l2videodec.c  | 12 ++++++++++++
+ 4 files changed, 22 insertions(+)
+
+diff --git a/sys/v4l2/gstv4l2allocator.c b/sys/v4l2/gstv4l2allocator.c
+index fcb109d7e..81a489478 100644
+--- a/sys/v4l2/gstv4l2allocator.c
++++ b/sys/v4l2/gstv4l2allocator.c
+@@ -1429,6 +1429,7 @@ gst_v4l2_allocator_dqbuf (GstV4l2Allocator * allocator,
+   if (V4L2_TYPE_IS_OUTPUT (obj->type)) {
+     gst_v4l2_allocator_reset_size (allocator, group);
+     if (group->buffer.flags & V4L2_BUF_FLAG_ERROR) {    //output buffer cannot be decoded
++      obj->drop_frames = g_list_append (obj->drop_frames, &group->buffer.sequence);
+       if (!obj->frame_decoded)
+         obj->err_cnt++;
+     } else {
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index 94f0dccc3..2e41e8a99 100755
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -541,6 +541,7 @@ gst_v4l2_object_new (GstElement * element,
+   v4l2object->norms = NULL;
+   v4l2object->channels = NULL;
+   v4l2object->colors = NULL;
++  v4l2object->drop_frames = NULL;
+ 
+   v4l2object->drm_modifier = 0;
+   v4l2object->is_g2 = FALSE;
+@@ -599,6 +600,7 @@ gst_v4l2_object_destroy (GstV4l2Object * v4l2object)
+   g_free (v4l2object->videodev);
+   g_free (v4l2object->par);
+   g_free (v4l2object->channel);
++  g_free (v4l2object->drop_frames);
+ 
+   if (v4l2object->formats) {
+     gst_v4l2_object_clear_format_list (v4l2object);
+@@ -975,6 +977,11 @@ gst_v4l2_object_close (GstV4l2Object * v4l2object)
+     v4l2object->channel = NULL;
+   }
+ 
++  if (v4l2object->drop_frames) {
++    g_free (v4l2object->drop_frames);
++    v4l2object->drop_frames = NULL;
++  }
++
+   return TRUE;
+ }
+ 
+diff --git a/sys/v4l2/gstv4l2object.h b/sys/v4l2/gstv4l2object.h
+index 82c10f4df..6f9789291 100644
+--- a/sys/v4l2/gstv4l2object.h
++++ b/sys/v4l2/gstv4l2object.h
+@@ -194,6 +194,8 @@ struct _GstV4l2Object {
+   GList *channels;
+   GData *controls;
+ 
++  GList *drop_frames;
++
+   /* properties */
+   v4l2_std_id tv_norm;
+   gchar *channel;
+diff --git a/sys/v4l2/gstv4l2videodec.c b/sys/v4l2/gstv4l2videodec.c
+index 83e628bfe..79e36a046 100644
+--- a/sys/v4l2/gstv4l2videodec.c
++++ b/sys/v4l2/gstv4l2videodec.c
+@@ -1041,6 +1041,12 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+     ret =
+         gst_v4l2_buffer_pool_process (GST_V4L2_BUFFER_POOL (pool), &codec_data,
+         processed ? &frame->system_frame_number : &dummy_frame_number);
++    while (self->v4l2output->drop_frames) {
++      guint32 *tmp = self->v4l2output->drop_frames->data;
++      GstVideoFrame *frame = gst_video_decoder_get_frame (decoder, *tmp);
++      gst_video_decoder_drop_frame (decoder, frame);
++      self->v4l2output->drop_frames = g_list_remove (self->v4l2output->drop_frames, tmp);
++    }
+     GST_VIDEO_DECODER_STREAM_LOCK (decoder);
+ 
+     gst_buffer_unref (codec_data);
+@@ -1093,6 +1099,12 @@ gst_v4l2_video_dec_handle_frame (GstVideoDecoder * decoder,
+     ret =
+         gst_v4l2_buffer_pool_process (GST_V4L2_BUFFER_POOL (pool),
+         &frame->input_buffer, &frame->system_frame_number);
++    while (self->v4l2output->drop_frames) {
++      guint32 *tmp = self->v4l2output->drop_frames->data;
++      GstVideoFrame *frame = gst_video_decoder_get_frame (decoder, *tmp);
++      gst_video_decoder_drop_frame (decoder, frame);
++      self->v4l2output->drop_frames = g_list_remove (self->v4l2output->drop_frames, tmp);
++    }
+     GST_VIDEO_DECODER_STREAM_LOCK (decoder);
+ 
+     if (self->v4l2output->err_cnt > MAX_OUTPUT_ERROR_COUNT) {
+-- 
+2.17.0
+

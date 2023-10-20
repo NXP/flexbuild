@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2017-2021 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -9,54 +9,48 @@
 
 set -e
 
-FB_VERSION=2.7.2110
+FB_VERSION=2.12.2310
 
 usage () {
 cat <<EOF
 Usage: bld -m <machine>
-   or  bld -i <instruction> -c <component> [-r <distro_type>:<distro_scale>] [-a <arch>] [-p <portfolio> ] [-f cfg-file]
+   or  bld <target> [ <option> ]
 
 Most used example with automated build:
- bld -m imx8mpevk                 # automatically build all firmware, linux, apps components and distro userland for imx8mpevk
- bld -m ls1046ardb      	  # automatically build all firmware, linux, apps components and distro userland for ls1046ardb
- bld -i auto -p IMX               # automatically build all firmware, linux, apps components and distro userland for all arm64 iMX machines
- bld -i auto -p LS                # automatically build all firmware, linux, apps components and distro userland for all arm64 Layerscape machines
+ bld -m imx8mpevk                # automatically build BSP + kernel + NXP-specific apps + Debian RootFS for imx8mpevk platform
+ bld -m lx2160ardb               # same as above, for lx2160ardb platform
+ bld auto -p IMX (or -p LS)      # same as above, for all arm64 iMX (or Layerscape) platforms
 
 Most used example with separate command:
- bld -i mkfw -m imx8mpevk         # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, initramfs, etc)
- bld -i mkallfw -p IMX|LS         # generate composite firmware for all iMX or LS machines
- bld -i mkrfs -r ubuntu:desktop   # generate Ubuntu-based desktop arm64 userland (with more graphics/multimedia packages)
- bld -i mkrfs -r ubuntu:main      # generate Ubuntu-based main arm64 userland    (with more networking packages)
- bld -i mkrfs -r ubuntu:lite      # generate Ubuntu-based lite arm64 userland    (for small footprint with base packages)
- bld -i mkrfs -r debian:main      # generate Debian-based main arm64 userland
- bld -i mkrfs -r yocto:tiny       # generate Yocto-based arm64 tiny userland
- bld -i mkrfs -r buildroot:tiny   # generate Buildroot-based arm64 tiny userland
- bld -i mkrfs -r centos           # generate CentOS arm64 userland
- bld -i mkitb -r yocto:tiny       # generate sdk_yocto_tiny_IMX_arm64.itb including kernel, DTBs and rootfs_yocto_tiny_arm64.cpio.gz
- bld -c <component>               # compile <component> or <subsystem> (e.g. dpdk, networking, graphics, multimedia, connectivity, security, eiq, etc)
- bld -c linux    	          # compile linux kernel for all arm64 IMX machines, equivalent to "bld -i compile -c linux -p IMX -a arm64" by default
- bld -c linux -p LS               # compile linux kernel for all arm64 Layerscape machines, equivalent to "bld -i compile -c linux -p LS -a arm64"
- bld -c atf -m ls1046ardb -b sd   # compile atf image for SD boot on LS1046ardb
- bld -i mkboot -p IMX|LS          # generate boot partition tarball (including kernel, dtb, modules, distro boot script, etc) for all iMX or LS machines
- bld -i merge-component           # merge component packages into target ubuntu-based main arm64 userland
- bld -i packrfs -r ubuntu:main    # pack and compress target rootfs as rootfs_<sdk_version>_ubuntu_main_arm64.tgz
- bld -i packapp -r ubuntu:desktop # pack and compress target app components as app_components_arm64_ubuntu_desktop.tgz
- bld -i repo-fetch		  # fetch all git repositories of components from remote repos if not exist locally
- bld docker			  # create or attach Ubuntu docker container to build in docker
- bld clean			  # clean all obsolete firmware/linux/apps image except distro rootfs
- bld clean-rfs -r ubuntu:main     # clean target ubuntu-based main arm64 rootfs
- bld clean-bsp                    # clean obsolete bsp image
- bld clean-linux                  # clean obsolete linux image
- bld list                         # list enabled machines and supported various components
+ bld fw -m imx8mpevk             # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
+ bld rfs -r debian:desktop       # generate Debian-based desktop rootfs  (with more graphics/multimedia packages for Desktop)
+ bld rfs -r debian:server        # generate Debian-based server rootfs   (with more server related packages, no GUI Desktop)
+ bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
+ bld rfs -r poky:tiny            # generate poky-based arm64 tiny rootfs
+ bld rfs -r buildroot:tiny       # generate Buildroot-based arm64 tiny rootfs
+ bld itb -r debian:base          # generate sdk_debian_base_IMX_arm64.itb including kernel, dtb and rootfs_debian_base_arm64.cpio.gz
+ bld linux [ -p IMX|LS]          # compile linux kernel for all arm64 IMX or LS machines
+ bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
+ bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
+ bld apps -r debian:server -p LS # compile NXP-specific apps against the library dependencies of Debian server rootfs for LS machines
+ bld merge-apps                  # merge NXP-specific apps into target Debian rootfs
+ bld packrfs                     # pack and compress target rootfs as rootfs_xx.tar.zst
+ bld packapps                    # pack and compress target app components as app_components_xx.tar.zst
+ bld repo-fetch [ <component> ]  # fetch git repository of all or specified component from remote repos if not exist locally
+ bld docker                      # create or attach docker container to build in docker
+ bld clean                       # clean all obsolete firmware/linux/apps image except distro rootfs
+ bld clean-rfs -r debian:server  # clean target debian-based server arm64 rootfs
+ bld clean-bsp                   # clean obsolete bsp image
+ bld clean-linux                 # clean obsolete linux image
+ bld list                        # list enabled machines and supported various components
 
 Most used options:
- -i, --instruction     instruction for dedicated function: mkfw, mkboot, mkrfs, mkitb, mkdistroscr, signimg, merge-component, repo-update, packrfs, etc
- -c, --component       component or subsystem to be built: linux, uboot, atf, networking, graphics, multimedia, security, eiq, dpdk, armnn, tflite, etc
- -m, --machine	       target machine, e.g. imx6qsabresd, imx8mpevk, imx8ulpevk, ls1028ardb, ls1046ardb, lx2162aqds, etc
- -r, --rootfs          specify flavor of target rootfs, valid argument: ubuntu|debian|centos|yocto|buildroot:main|desktop|lite|tiny|devel
+ -m, --machine	       target machine, e.g. imx8mpevk, imx8mmevk, imx93evk, lx2160ardb, ls1046ardb, ls1028ardb, etc
+ -r, --rootfs          specify flavor of target rootfs, valid argument: debian|poky|buildroot:base|desktop|server|tiny|devel
  -a, --arch            target arch of processor, valid argument: arm64, arm32 (arm64 by default if unspecified)
  -b, --boottype	       type of boot media, valid argument: sd, emmc, nor, qspi, xspi, nand
  -p, --portfolio       specify portfolio of SoC, valid argument: IMX, LS
+
 See docs/flexbuild_usage.md and docs/build_and_deploy_distro.md for more information about the available commands.
 EOF
    exit
@@ -64,14 +58,14 @@ EOF
 
 
 check_toolchain() {
-    tc_version='9.x 11.x or 12.x'
+    tc_version='11.x or 12.x'
     if [ $DESTARCH = arm32 ] && [ $HOSTARCH = x86_64 -o $HOSTARCH = aarch64 -o $HOSTARCH = i686 ]; then
 	[ -f /usr/bin/arm-linux-gnueabihf-gcc ] && gccversion=$(arm-linux-gnueabihf-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
 	if [ $gccversion = 0 ]; then
 	    fbprint_w "Installing toolchain for arm32 ..."
 	    sudo apt install -y crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 	elif ! echo $tc_version | grep -q `echo $gccversion|cut -d. -f1` && [ $DISTROTYPE != buildroot ]; then
-	    fbprint_w "Please build on Ubuntu $UBUNTU_VERSION host or build in docker (run 'bld docker') to use the verified toolchain"
+	    fbprint_w "Please build on Debian $DEBIAN_VERSION host or build in docker (run 'bld docker') to use the verified toolchain"
 	    exit
 	fi
 	export ARCH=arm
@@ -80,10 +74,10 @@ check_toolchain() {
 	[ -f /usr/bin/aarch64-linux-gnu-gcc ] && gccversion=$(aarch64-linux-gnu-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
 	if [ $gccversion = 0 ]; then
 	    fbprint_w "Installing toolchain for arm64 ..."
-	    sudo apt install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+	    sudo apt install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
 	elif ! echo $tc_version | grep -q `echo $gccversion | cut -d. -f1` &&  [ $DISTROTYPE != buildroot ]; then
 	    fbprint_w "The existing toolchain version $gccversion on this host may result in build failure for some components."
-	    fbprint_w "Please build on Ubuntu $UBUNTU_VERSION host or build in docker (run 'bld docker') to use the verified toolchain version $tc_version"
+	    fbprint_w "Please build on Debian $DEBIAN_VERSION or Ubuntu 22.04 host or build in docker (run 'bld docker') to use the verified toolchain version $tc_version"
 	    exit
 	fi
 	export ARCH=arm64
@@ -100,10 +94,10 @@ check_toolchain() {
 
 
 generate_composite_firmware() {
-    if [ -f $FBDIR/configs/board/$MACHINE/manifest ]; then
-	. $FBDIR/configs/board/$MACHINE/manifest
+    if [ -f $FBDIR/configs/board/$MACHINE.conf ]; then
+	. $FBDIR/configs/board/$MACHINE.conf
     else
-	echo $FBDIR/configs/board/$MACHINE/manifest not exist! && exit 1
+	echo $FBDIR/configs/board/$MACHINE.conf not exist! && exit 1
     fi
 
     [ -n "$BOOTTYPE" -a "$BOOTTYPE" != all ] && btlist=$BOOTTYPE || btlist=$BOOT_TYPE
@@ -127,28 +121,28 @@ generate_composite_firmware() {
 		        img=$COMPOSITE_IMG2_FILE_uefi
 		    fi
 		    if [ -n "$img" -a ! -f $FBOUTDIR/$img ]; then
-		        bld -c $compopt -b $btype -m $MACHINE $secarg $blarg -f $CFGLISTYML
+		        bld $compopt -b $btype -m $MACHINE $secarg $blarg -f $CFGLISTYML
 		    fi
 		    [ $MACHINE = ls1012afrwy ] && secfile=IMG7 || secfile=IMG4
 		    img=$(eval echo '$'COMPOSITE_"$secfile"_FILE_"$btype"_sec)
 		    [ -n "$img" -a "$sectype" = secure -a ! -f $FBOUTDIR/$img ] && \
-		    bld -i signimg -m $MACHINE -b $btype -f $CFGLISTYML
+		    bld signimg -m $MACHINE -b $btype -f $CFGLISTYML
 		done
 	    done
 	done
     done
 
-    [ $SOCFAMILY = LS -a ! -f $FBOUTDIR/bsp/.lsfwdone ] && bld -c layerscape_fw -f $CFGLISTYML
+    [ $SOCFAMILY = LS -a ! -f $FBOUTDIR/bsp/.lsfwdone ] && bld layerscape_fw -f $CFGLISTYML
 
-    [ ! -f $FBOUTDIR/images/${DISTRIB_VERSION}_yocto_tiny_${SOCFAMILY}_${DESTARCH}.itb ] && \
-    bld -i mkitb -r yocto:tiny -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    [ ! -f $FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb ] && \
+    bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 
     create_composite_firmware
 }
 
 
 generate_initrd_cpio() {
-    [ -f $RFSDIR/etc/buildinfo ] || bld -i mkrfs -r $DISTROTYPE:$DISTROSCALE -a $DESTARCH -f $CFGLISTYML
+    [ -f $RFSDIR/etc/buildinfo ] || bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH -f $CFGLISTYML
     echo generating ${initrdimg##*/} ...
     if [ -d $RFSDIR/sys/devices ]; then
 	[ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
@@ -164,29 +158,23 @@ generate_initrd_cpio() {
 generate_linux_itb() {
     if [ ! -f $kernel_img ]; then
 	echo building dependent $kernel_img
-	bld -c linux-deb -a ${DESTARCH}${endianstr} -p $SOCFAMILY -f $CFGLISTYML
+	bld linux -a ${DESTARCH}${endianstr} -p $SOCFAMILY -f $CFGLISTYML
     fi
-    if [ $DISTROSCALE = tiny -a $DISTROTYPE = yocto -a ! -f $initrdimg -a "$FETCH_PREBUILT_SDK_RFS" = y ]; then
-	bld -c initrd -a $DESTARCH -f $CFGLISTYML
+    if [ $DISTROVARIANT = tiny -a $DISTROTYPE = poky -a ! -f $initrdimg -a "$FETCH_PREBUILT_SDK_RFS" = y ]; then
+	bld initrd -a $DESTARCH -f $CFGLISTYML
     fi
-    [ -f $initrdimg ] || bld -i mkcpio -r ${DISTROTYPE}:${DISTROSCALE} -a $DESTARCH -f $CFGLISTYML
-    tmpits=$FBDIR/configs/linux/linux_${DESTARCH}_${SOCFAMILY}_$DISTROSCALE.its
-    if [ $DESTARCH = arm64 -a $SOCFAMILY = LS -a "$COT" = arm-cot-with-verified-boot ]; then
-	cp -f $FBDIR/configs/linux/linux_arm64_LS_signature.its $tmpits
-	sed -i "s|../../build|${FBOUTDIR}|g" $tmpits
-	sed -i "s/rootfs_yocto_${DESTARCH}_tiny/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROSCALE}_${DESTARCH}/" $tmpits
-	mkimage -f $tmpits $FBOUTDIR/images/linux_LS_arm64_signature.itb && echo rm -f $tmpits
-    fi
+    [ -f $initrdimg ] || bld cpio -r ${DISTROTYPE}:${DISTROVARIANT} -a $DESTARCH -f $CFGLISTYML
+    tmpits=$FBDIR/configs/linux/linux_${DESTARCH}_${SOCFAMILY}_$DISTROVARIANT.its
     cp -f $FBDIR/configs/linux/linux_${DESTARCH}_${SOCFAMILY}.its $tmpits
     sed -i "s|../../build|${FBOUTDIR}|g" $tmpits
-    sed -i "s/rootfs_yocto_${DESTARCH}_tiny/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROSCALE}_${DESTARCH}/" $tmpits
+    sed -i "s/rootfs_poky_tiny_${DESTARCH}/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}/" $tmpits
     mkimage -f $tmpits $linux_itb && rm -f $tmpits && fbprint_d $linux_itb
 }
 
 
 generate_distro_bootscr() {
     # $1: machine name
-    [ ! -f $FBDIR/configs/board/$1/manifest ] && echo $FBDIR/configs/board/$1/manifest not found && exit
+    [ ! -f $FBDIR/configs/board/$1.conf ] && echo $FBDIR/configs/board/$1.conf not found && exit
     if [ "$ENCAP" = "y" ] ; then
 	    [ -z $KEY_ID ] && KEY_ID=0x12345678123456781234567812345678
 	    if [ ${#KEY_ID} -gt 34 ]; then
@@ -200,10 +188,11 @@ generate_distro_bootscr() {
 	    echo $KEY_ID; key_id_1=${KEY_ID:2:8}; key_id_2=${KEY_ID:10:8}; key_id_3=${KEY_ID:18:8}; key_id_4=${KEY_ID:26:8}
     fi
 
-    . $FBDIR/configs/board/$1/manifest
-    [ $1 = ls1088ardb_pb ] && mkdir -p $FBOUTDIR/bsp/u-boot/ls1088ardb || mkdir -p $FBOUTDIR/bsp/u-boot/$1
+    . $FBDIR/configs/board/$1.conf
+    mkdir -p $FBOUTDIR/firmware/u-boot/$1
 
     if [ -n "$distro_bootscript" ] ; then
+	mkdir -p $FBOUTDIR/${distro_bootscript%/*}
 	if [ -n "$securevalidate" ]; then
 	    if [ "$ENCAP" = "y" ]; then
 		if [ $bootscript_dec != null ]; then
@@ -228,6 +217,7 @@ generate_distro_bootscr() {
 		echo $securevalidate > $FBOUTDIR/${distro_bootscript}.tmp
 	    fi
 	fi
+	mkdir -p $FBOUTDIR/bsp/u-boot/$1
 	[ "$IMA_EVM" = "y" ] && echo $distroboot_ima >> $FBOUTDIR/${distro_bootscript}.tmp || echo $distroboot >> $FBOUTDIR/${distro_bootscript}.tmp
 	mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" -d $FBOUTDIR/${distro_bootscript}.tmp $FBOUTDIR/$distro_bootscript
 	rm -f $FBOUTDIR/${distro_bootscript}.tmp
@@ -237,10 +227,10 @@ generate_distro_bootscr() {
 
 
 generate_uefi_grub_cfg() {
-    for brd in ls1043ardb ls1046ardb ls2088ardb lx2160ardb_rev2; do
-	[ ! -f $FBDIR/configs/board/$brd/manifest ] && echo $FBDIR/configs/board/$brd/manifest not found && continue
-	stra=`grep 'uefi_grub_search' $FBDIR/configs/board/$brd/manifest | cut -d'"' -f2`
-	strb=`grep 'uefi_grub_linux' $FBDIR/configs/board/$brd/manifest | cut -d'"' -f2`
+    for brd in ls1043ardb ls1046ardb ls2088ardb lx2160ardb; do
+	[ ! -f $FBDIR/configs/board/$brd.conf ] && echo $FBDIR/configs/board/$brd.conf not found && continue
+	stra=`grep 'uefi_grub_search' $FBDIR/configs/board/$brd.conf | cut -d'"' -f2`
+	strb=`grep 'uefi_grub_linux' $FBDIR/configs/board/$brd.conf | cut -d'"' -f2`
 	mkdir -p $FBOUTDIR/bsp/uefi/$brd
 	filename=$FBOUTDIR/bsp/uefi/$brd/${brd}_grub.cfg
 	echo set default=\"1\" >  $filename
@@ -254,14 +244,12 @@ generate_uefi_grub_cfg() {
 
 
 generate_distro_rfs() {
-    if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
-	build_distro_rfs_ubuntu
-    elif [ $DISTROTYPE = centos ]; then
-	build_distro_rfs_centos
+    if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ]; then
+	build_distro_rfs_debian
     elif [ $DISTROTYPE = buildroot ]; then
 	build_distro_rfs_buildroot
-    elif [ $DISTROTYPE = yocto ]; then
-        build_distro_rfs_yocto
+    elif [ $DISTROTYPE = poky ]; then
+        build_distro_rfs_poky
     fi
 }
 
@@ -285,7 +273,7 @@ download_distro_images() {
 
 
 get_prebuilt_initrd() {
-    tfile=rootfs_${DISTRIB_VERSION}_yocto_tiny_${DESTARCH}.cpio.gz
+    tfile=rootfs_${DISTRIB_VERSION}_poky_tiny_${DESTARCH}.cpio.gz
     if [ ! -f $FBOUTDIR/images/$tfile ]; then
 	[ $HOSTARCH = x86_64 ] && check_http_request $initrd_bin_url/$tfile
 	wget --progress=bar:force $repo_initrd_bin_url/$tfile -O $FBOUTDIR/images/$tfile
@@ -296,11 +284,11 @@ get_prebuilt_initrd() {
 convert_rfs_raw_to_ext4() {
     # $1: $rawrfs
     [ -z "$1" ] && rawrfs=$RFSDIR || rawrfs=$1
-    [ $DISTROSCALE = lite -o $DISTROSCALE = tiny ] && size=1G || size=5G
+    [ $DISTROVARIANT = base -o $DISTROVARIANT = tiny ] && size=1G || size=5G
     [ -n "$BUILDARG" ] && size=$BUILDARG
     if [ ! -f $rawrfs/etc/buildinfo ]; then
 	echo $rawrfs not exist, generating it ..
-	bld -i mkrfs -r $DISTROTYPE:$DISTROSCALE -a $DESTARCH -f $CFGLISTYML
+	bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH -f $CFGLISTYML
     fi
     local rfsname=${rawrfs##*/}
     rfsname=$FBOUTDIR/images/$rfsname.ext4
@@ -335,126 +323,61 @@ pack_distro_rfs() {
 	    sudo umount $RFSDIR/sys
 	fi
     fi
-    local destpath=${RFSDIR##*/}
-    if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian -o $DISTROTYPE = centos ]; then
-	tarballname=${destpath}_`date +%Y%m%d%H%M`.tgz
-    elif [ $DISTROTYPE = buildroot ]; then
-	destpath=rootfs_${DISTRIB_VERSION}_buildroot_${DISTROSCALE}_${DESTARCH}
-	tarballname=${destpath}_`date +%Y%m%d%H%M`.tgz
-    elif [ $DISTROTYPE = yocto ]; then
-        destpath=rootfs_${DISTRIB_VERSION}_yocto_${DISTROSCALE}_${DESTARCH}
-        tarballname=${destpath}_`date +%Y%m%d%H%M`.tgz
-    fi
-    echo Generating $tarballname ...
-    cd $RFSDIR && sudo tar czf $FBOUTDIR/images/$tarballname *
-    cd $FBOUTDIR/images && ln -sf $tarballname $FBOUTDIR/images/${destpath}.tgz && cd $FBDIR
-    ls -lh $FBOUTDIR/images/${destpath}*
-    fbprint_d $FBOUTDIR/images/$tarballname
+
+    [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && \
+    rname=rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH} || \
+    rname=${RFSDIR##*/}
+
+    tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
+    echo Generating $tarname ...
+    cd $RFSDIR && sudo tar --zstd -cf $FBOUTDIR/images/$tarname *
+    cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
+    ls -lh $FBOUTDIR/images/${rname}*
+    fbprint_d $FBOUTDIR/images/$tarname
 }
 
 
 pack_app_components() {
     local appsname=${DESTDIR##*/}
     local appstarball=app_${appsname}_`date +%Y%m%d%H%M`
-    echo packing ${appstarball}.tgz ...
-    cd $FBOUTDIR/apps/$appsname && sudo tar czf $FBOUTDIR/images/${appstarball}.tgz *
-    cd $FBDIR && fbprint_d $FBOUTDIR/images/${appstarball}.tgz
+    echo packing ${appstarball}.tar.zst ...
+    cd $FBOUTDIR/apps/$appsname && sudo tar --zstd -cf $FBOUTDIR/images/${appstarball}.tar.zst *
+    cd $FBDIR && fbprint_d $FBOUTDIR/images/${appstarball}.tar.zst
 }
 
 
-merge_components() {
+merge_apps() {
     [ ! -f $RFSDIR/etc/buildinfo ] && generate_distro_rfs
     [ $DISTROTYPE = buildroot ] && echo apps components have been installed in $RFSDIR && exit 0
 
-    # install apps components
-    if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ] && [ $DISTROSCALE = lite -a $SOCFAMILY = LS ]; then
-	if [ $DESTARCH = arm64 ]; then
-	    echo Installing app components for $DISTROTYPE lite distro ...
-	    [  -f $DESTDIR/usr/local/bin/restool ] || bld -c restool -a ${DESTARCH} -f $CFGLISTYML
-	    sudo mkdir -p $RFSDIR/usr/local/bin && sudo cp -f $DESTDIR/usr/local/bin/{ls-*,restool} $RFSDIR/usr/local/bin
-	    [ -f $DESTDIR/usr/local/bin/fmc ] || bld -c fmc -r ${DISTROTYPE}:lite -a ${DESTARCH} -f $CFGLISTYML
-	    [ -d $DESTDIR/etc/fmc/config/shared_mac ] || bld -c eth_config -r ${DISTROTYPE}:lite -a ${DESTARCH} -f $CFGLISTYML
-	    [ -f $DESTDIR/usr/local/bin/tsntool ] || bld -c tsntool -r ${DISTROTYPE}:lite -a ${DESTARCH} -f $CFGLISTYML
-	    sudo cp -f $DESTDIR/usr/local/bin/tsntool $RFSDIR/usr/bin && sudo cp -f $DESTDIR/usr/lib/libtsn.so $RFSDIR/usr/lib
-	    [ -f $DESTDIR/usr/bin/aiop_tool ] || bld -c gpp_aioptool -r ${DISTROTYPE}:lite -a ${DESTARCH} -f $CFGLISTYML
-	    sudo cp -f $DESTDIR/usr/bin/aiop_tool $RFSDIR/usr/bin
-
-	    sudo mkdir -p $RFSDIR/usr/local/fmc && sudo mkdir -p $RFSDIR/usr/local/include/fmc
-	    sudo mkdir -p $RFSDIR/usr/local/lib/aarch64-linux-gnu
-	    sudo cp -f $DESTDIR/usr/local/lib/aarch64-linux-gnu/libfmc.a $RFSDIR/usr/local/lib/aarch64-linux-gnu/
-	    sudo cp -Prf --preserve=mode,timestamps $DESTDIR/etc/systemd/system $RFSDIR/etc/systemd
-	    sudo cp -Prf --preserve=mode,timestamps $DESTDIR/etc/fmc $RFSDIR/etc
-	    sudo cp -f $DESTDIR/lib/systemd/system/fmc.service $RFSDIR/lib/systemd/system
-	    sudo cp -f $DESTDIR/usr/local/include/fmc/fmc.h $RFSDIR/usr/local/include/fmc
-	    sudo cp -f $DESTDIR/usr/local/bin/fmc $RFSDIR/usr/local/bin
-	    sudo cp -f $DESTDIR/usr/local/fmc/init-ls104xa $RFSDIR/usr/local/fmc
-	fi
-	if [ -f $RFSDIR/etc/packages.list ] && ! grep -q 'App Component Package List' $RFSDIR/etc/packages.list; then
-	   sudo sed -i "1 i\\$DISTRIB_NAME Lite App Package List:" $RFSDIR/etc/packages.list
-	   [ $DESTARCH = arm64 ] && sudo sed -i "2 i\ fmc restool tsntool aiop_tool" $RFSDIR/etc/packages.list
-	   sudo sed -i "3 i\ " $RFSDIR/etc/packages.list
-	fi
-	exit 0
-    elif [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
+    if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $DISTROVARIANT != base ]; then
 	if [ $DESTDIR != $RFSDIR ]; then
 	    for dir in lib bin sbin; do
 	        [ -d $DESTDIR/$dir ] && sudo cp -Prf --preserve=mode,timestamps $DESTDIR/$dir/* $RFSDIR/$dir/
 	    done
 	    ls -d $DESTDIR/* | grep -v -E "lib|bin|sbin" | xargs -I {} sudo cp -Prf --preserve=mode,timestamps {} $RFSDIR/
-	    [ -f ${DESTDIR}_eIQ/usr/local/bin/TfMnist-Armnn ] && \
-	    echo installing ${DESTDIR}_eIQ to $RFSDIR && \
-	    sudo cp -Prf --preserve=mode,timestamps --no-preserve=ownership ${DESTDIR}_eIQ/* $RFSDIR
-	fi
-	if [ -f $RFSDIR/etc/packages.list ] && ! grep -q 'App Component Package List' $RFSDIR/etc/packages.list; then
-	   sudo sed -i "1 i\\$DISTRIB_NAME App Component Package List:" $RFSDIR/etc/packages.list
-	   sudo sed -i "2 i\ $APPS_REPO_LIST" $RFSDIR/etc/packages.list
-	   sudo sed -i "3 i\ " $RFSDIR/etc/packages.list
 	fi
 	[ $DESTARCH = arm64 ] && tgtarch=aarch64 || tgtarch=arm
 	if update-binfmts --display qemu-$tgtarch | grep -q disabled; then
 	    sudo update-binfmts --enable qemu-$tgtarch
 	fi
 	sudo chroot $RFSDIR ldconfig
-    elif [ $DISTROTYPE = centos ] && [ $SOCFAMILY = LS ]; then
-	[ -d $DESTDIR/usr/local/bin ] || bld -c apps -r centos -f $CFGLISTYML
-	echo Installing app in $DISTROTYPE ...
-	if [ "$DESTDIR" != "$RFSDIR" -a -d $DESTDIR/lib ]; then
-	    sudo cp -Prf --preserve=mode,timestamps $DESTDIR/lib/* $RFSDIR/lib/
-	    ls -d $DESTDIR/* | grep -v -E "lib|bin|sbin" | xargs -I {} sudo cp -Prf --preserve=mode,timestamps {} $RFSDIR/
-	fi
     fi
-
-    if [ $DISTROSCALE = desktop ]; then
-	if [ ! -d  $PKGDIR/bsp/firmware-imx/firmware/sdma ]; then
-	    bld  -c uboot -m imx8mmevk -f $CFGLISTYML 1>/dev/null 2>&1
-	fi
-	sudo mkdir -p $RFSDIR/lib/firmware/imx
-	sudo cp -fr $PKGDIR/bsp/firmware-imx/firmware/{sdma,xcvr,easrc} $RFSDIR/lib/firmware/imx
-	sudo cp -f $FBDIR/src/apps/graphics/sdma $RFSDIR/etc/
-    fi
-
-    # install linux-headers
-    curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2 && cd $FBDIR`
-    if [ $DISTROSCALE = main -o $DISTROSCALE = devel -o $DISTROSCALE = desktop ] && \
-       [ -d $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/output/$curbrch/debian/hdrtmp -a -d $RFSDIR ]; then
-	sudo rm -rf $RFSDIR/usr/src/linux-headers*
-	sudo cp -rf $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/output/$curbrch/debian/hdrtmp/usr $RFSDIR
-    fi
-
-    fbprint_d "merge app components into $RFSDIR"
+    fbprint_d "merge apps to $RFSDIR"
 }
 
 
 check_component_valid() {
-    if ! echo $APPS_REPO_LIST generic security networking graphics multimedia connectivity | grep -q $1 && \
-       ! echo "$LINUX_REPO_LIST linux-deb linux-modules" | grep -q $1 && \
-       ! echo $EIQ_REPO_LIST | grep -q $1 && \
+    if ! echo $APPS_REPO_LIST utils security networking graphics multimedia connectivity | grep -q $1 && \
+       ! echo "$LINUX_REPO_LIST linux-headers linux-deb linux-modules" | grep -q $1 && \
+       ! echo $ML_REPO_LIST | grep -q $1 && \
        ! echo $BSP_REPO_LIST | grep -q $1; then
-	fbprint_e "Invalid component name: $1"
-	fbprint_n "\nValid app component:\n $APPS_REPO_LIST"
-	fbprint_n "\nValid linux component:\n $LINUX_REPO_LIST"
-	fbprint_n "\nValid BSP component:\n $BSP_REPO_LIST"
-	fbprint_n "\nValid eIQ component:\n $EIQ_REPO_LIST"
+	fbprint_e "Invalid target name: $1"
+	fbprint_n "\nSupported target command: fw, boot, rfs, itb, list, apps, clean, auto, packrfs, packapps, merge-apps, repo-fetch"
+	fbprint_n "\nSupported target app component:\n $APPS_REPO_LIST"
+	fbprint_n "\nSupported target linux component:\n $LINUX_REPO_LIST"
+	fbprint_n "\nSupported target BSP component:\n $BSP_REPO_LIST"
+	fbprint_n "\nML component:\n $ML_REPO_LIST"
 	exit
     fi
 }
@@ -473,15 +396,15 @@ check_binfmt_qemu() {
 
 flexbuild_launch_docker() {
     dnum=$(echo $FBDIR | md5sum | cut -b 1-6)
-    containername=${username}_fbubuntu_${DISTRIB_VERSION}_${dnum}
+    containername=${username}_fbdebian_${DEBIAN_VERSION}_${dnum}
     if ! docker ps -a | grep -q $containername; then
-	if ! docker ps -a | grep -q ' fbubuntu:${UBUNTU_VERSION}'; then
-	    make -C $FBDIR/docker/ubuntu
+	if ! docker ps -a | grep -q ' fbdebian_${DEBIAN_VERSION}'; then
+	    make -C $FBDIR/docker/debian
 	fi && \
-	docker run -t -i -h fbubuntu --name="$containername" --privileged=true --net=host \
+	docker run -t -i -h fbdebian --name="$containername" --privileged=true --net=host \
 	       -v $HOME:$HOME -v $FBDIR:$FBDIR -v /lib/modules:/lib/modules -v /dev:/dev \
 	       -v /etc/localtime:/etc/localtime:ro \
-	       -w $FBDIR fbubuntu:${UBUNTU_VERSION} /bin/bash
+	       -w $FBDIR fbdebian:${DEBIAN_VERSION} /bin/bash
     elif docker ps -a | grep $containername | grep -q Exited; then
 	docker start $containername
 	docker attach $containername
@@ -506,7 +429,7 @@ host_connect_target(){
 	  -p22 ${optuser}${1}$optdir $localmntdir && \
     fbprint_n "Successfully connected ${1}$optdir to $localmntdir" && \
     fbprint_n "Now you can read/write remote rootfs via local $localmntdir"
-    fbprint_n "e.g. run 'bld push <kernel|app|eiq> <IP_address>' to push image to target board"
+    fbprint_n "e.g. run 'bld push <kernel|app|ml> <IP_address>' to push image to target board"
 }
 
 
@@ -518,7 +441,7 @@ host_disconnect_target(){
 
 host_push_image_to_target() {
 # $1: kernel|apps  $2: IP address of target
-    [ -z "$2" ] && fbprint_w "Usage: bld push <kernel|apps|eiq> <IP_address>" && exit
+    [ -z "$2" ] && fbprint_w "Usage: bld push <kernel|apps|ml> <IP_address>" && exit
     if ! cat /etc/mtab | grep -q $2; then
         fbprint_w "$2 is not connected yet, please run 'bld connect $2'" && exit
     fi
@@ -526,7 +449,7 @@ host_push_image_to_target() {
     curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
     if [ $1 = kernel ]; then
 	[ ! -f $kernel_img ] && fbprint_n "Generating kernel image ..." && \
-	bld -c linux-deb -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld linux -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 
 	[ -d $localmntdir/boot ] && fbprint_n "Pushing kernel to target $2 ..." && \
 	find $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY -maxdepth 1 -type f -exec cp -f {} $localmntdir/boot/ \;
@@ -534,13 +457,13 @@ host_push_image_to_target() {
 	[ -d $localmntdir/boot/modules ] && fbprint_n "Pushing modules to target $2 ..." && \
 	cp -rf $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules/* $localmntdir/boot/modules/
 	fbprint_d "Push kernel and modules to target $2"
-    elif [ $1 = apps -o $1 = eiq ]; then
-	[ $1 = eiq ] && srcdir=${DESTDIR}_eIQ || srcdir=$DESTDIR
-	[ "`find $srcdir -type f`" = "" ] && fbprint_w "$srcdir is empty, please run 'bld -c <component>' to generate the apps" && exit
+    elif [ $1 = apps -o $1 = ml ]; then
+	[ $1 = ml ] && srcdir=${DESTDIR}_ml || srcdir=$DESTDIR
+	[ "`find $srcdir -type f`" = "" ] && fbprint_w "$srcdir is empty, please run 'bld <component>' to generate the apps" && exit
 	fbprint_n "Pushing apps $srcdir to target $2 ..."; cp -Prf --preserve=mode,timestamps $srcdir/* $localmntdir/ && \
 	fbprint_d "Push apps $srcdir to target $2"
     else
-	fbprint_w "Invalid parameter $1, valid parameter is: kernel, apps, eiq"; exit
+	fbprint_w "Invalid parameter $1, valid parameter is: kernel, apps, ml"; exit
     fi
 }
 
@@ -557,63 +480,43 @@ generate_distro_boot_script() {
 
 
 build_rfs_and_apps() {
-    if [ "$BUILD_YOCTO_RFS" = y ]; then
-	bld -i mkrfs -r yocto:devel -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -c apps -r yocto:devel -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i mkrfs -r yocto:tiny -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i packrfs -r yocto:tiny -a $DESTARCH -p LS -f $CFGLISTYML
+    if [ "$BUILD_DEBIAN_BASE" = y ]; then
+	bld rfs -r debian:base -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld merge-apps -r debian:base -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld packrfs -r debian:base -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     fi
 
-    if [ "$BUILD_UBUNTU_LITE" = y ]; then
-	bld -i mkrfs -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML
-	bld -i merge-component -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML
-	bld -i packrfs -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML
-	bld -i rfsraw2ext -r ubuntu:lite -a $DESTARCH -f $CFGLISTYML
+    if [ "$BUILD_DEBIAN_SERVER" = y -a $SOCFAMILY = LS ]; then
+	bld rfs -r debian:server -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld apps -r debian:server -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld merge-apps -r debian:server -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld packrfs -r debian:server -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     fi
 
-    if [ "$BUILD_UBUNTU_MAIN" = y ] && [ $SOCFAMILY = LS -o "$BUILD_BOTH_SOCFAMILY" = y ]; then
-	bld -i mkrfs -r ubuntu:main -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -c apps -r ubuntu:main -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i merge-component -r ubuntu:main -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i packrfs -r ubuntu:main -a $DESTARCH -p LS -f $CFGLISTYML
+    if [ "$BUILD_DEBIAN_DESKTOP" = y -a $SOCFAMILY = IMX ]; then
+	bld rfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld merge-apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	bld packrfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     fi
 
-    if [ "$BUILD_UBUNTU_DESKTOP" = y -a $DESTARCH = arm64 ] && \
-       [ $SOCFAMILY = IMX -o "$BUILD_BOTH_SOCFAMILY" = y ]; then
-	bld -i mkrfs -r ubuntu:desktop -a $DESTARCH -f $CFGLISTYML
-	bld -c apps -r ubuntu:desktop -a $DESTARCH -f $CFGLISTYML
-	bld -i merge-component -r ubuntu:desktop -a $DESTARCH -f $CFGLISTYML
-	bld -i packrfs -r ubuntu:desktop -a $DESTARCH -f $CFGLISTYML
+    if [ "$PACKAGEGROUPS_ML" = y -a ! -f $FBDIR/src/apps/ml/.mldone ]; then
+	bld clean-ml -f $CFGLISTYML
+	bld ml -r debian:$DISTROVARIANT -a $DESTARCH -f $CFGLISTYML
+	bld install-ml -a $DESTARCH -r debian:$DISTROVARIANT -f $CFGLISTYML
     fi
 
-    if [ "$BUILD_UBUNTU_DEVEL" = y -a $SOCFAMILY = LS ]; then
-	bld -i mkrfs -r ubuntu:devel -a $DESTARCH -f $CFGLISTYML
-	bld -c apps -r ubuntu:devel -a $DESTARCH -f $CFGLISTYML
-	[ "$CONFIG_DOCKER_CE" = y ] && \
-	bld -c docker_ce -r ubuntu:devel -a $DESTARCH -f $CFGLISTYML
-	bld -i merge-component -r ubuntu:devel -a $DESTARCH -f $CFGLISTYML
-	bld -i packrfs -r ubuntu:devel -a $DESTARCH -f $CFGLISTYML
-    fi
-
-    if [ "$CONFIG_EIQ" = y -a \
-	 ! -f $FBDIR/src/apps/eiq/.eiqdone ]; then
-	bld -i clean-eiq -f $CFGLISTYML
-	bld -c eiq -r ubuntu:$DISTROSCALE -a $DESTARCH -f $CFGLISTYML
-	bld -i install-eiq -a $DESTARCH -r ubuntu:$DISTROSCALE -f $CFGLISTYML
-    fi
-
-    if [ "$BUILD_CENTOS_RFS" = y -a $DESTARCH = arm64 ]; then
-	bld -i mkrfs -r centos -a $DESTARCH -f $CFGLISTYML
-	bld -i merge-component -r centos -a $DESTARCH -f $CFGLISTYML
-	bld -i packrfs -r centos -a $DESTARCH -f $CFGLISTYML
+    if [ "$BUILD_poky_RFS" = y ]; then
+        bld rfs -r poky:devel -a $DESTARCH -f $CFGLISTYML
+        bld apps -r poky:devel -a $DESTARCH -f $CFGLISTYML
+        bld rfs -r poky:tiny -a $DESTARCH -f $CFGLISTYML
+        bld packrfs -r poky:tiny -a $DESTARCH -f $CFGLISTYML
     fi
 
     if [ "$BUILD_BUILDROOT_RFS" = y ]; then
-	bld -i mkrfs -r buildroot:tiny -a $DESTARCH -f $CFGLISTYML
-	bld -i mkitb -r buildroot:tiny -a $DESTARCH -f $CFGLISTYML
+	bld rfs -r buildroot:tiny -a $DESTARCH -f $CFGLISTYML
+	bld itb -r buildroot:tiny -a $DESTARCH -f $CFGLISTYML
     fi
-
-    fbprint_d "build rfs and apps"
 }
 
 
@@ -627,44 +530,34 @@ flex_auto_build() {
     echo "Time of fetching repo: `date`"
     [ -d $FBDIR/.git ] && echo Flexbuild HEAD commit: `git log -1 --oneline`
 
-    if [ ! -f $FBOUTDIR/images/.repodone ]; then
-	# bld -i repo-fetch -f $CFGLISTYML
+    if [ ! -f $FBDIR/logs/.repodone ]; then
+	# bld repo-fetch -f $CFGLISTYML
 	if [ "$UPDATE_REPO_PER_TAG" = y ]; then
-	    bld -i repo-tag -f $CFGLISTYML
+	    bld repo-tag -f $CFGLISTYML
 	elif [ "$UPDATE_REPO_PER_COMMIT" = y ]; then
-	    bld -i repo-commit -f $CFGLISTYML
+	    bld repo-commit -f $CFGLISTYML
 	else
 	    # update all repos to latest HEAD commit by default
-	    echo bld -i repo-update -f $CFGLISTYML
+	    echo bld repo-update -f $CFGLISTYML
 	fi
-	touch $FBOUTDIR/images/.repodone
+	touch $FBDIR/logs/.repodone
     fi
 
     echo "Time of build: `date`"
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
 
-    if [ $INSTRUCTION = auto_build -a $SOCFAMILY = LS ] || \
-       [ $MACHINE = all -a "$BUILD_BOTH_SOCFAMILY" = y ] || echo $MACHINE|grep -Eq 'ls|lx'; then
-	bld -c linux-deb -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -c linux-modules -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i mkitb -r yocto:tiny -a $DESTARCH -p LS -f $CFGLISTYML
-	[ $DESTARCH = arm64 ] && bld -c perf -p LS -f $CFGLISTYML
-	bld -i mkdistroscr -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i mkallfw -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -c secure_obj -a $DESTARCH -p LS -f $CFGLISTYML
-	bld -i mkboot -a $DESTARCH -p LS -f $CFGLISTYML
-    fi
+    [ ! -d $KERNEL_PATH ] && bld repo-fetch -c linux
+    curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
+    [ $KERNEL_BRANCH != $curbrch ] && cd $KERNEL_PATH && git checkout $KERNEL_BRANCH -b $KERNEL_BRANCH && cd -
 
-    if [ $INSTRUCTION = auto_build -a $SOCFAMILY = IMX ] || \
-       [ $MACHINE = all -a "$BUILD_BOTH_SOCFAMILY" = y ] || echo $MACHINE|grep -Eq 'imx'; then
-        bld -c linux-deb -a $DESTARCH -p IMX -f $CFGLISTYML
-	bld -c linux-modules -a $DESTARCH -p IMX -f $CFGLISTYML
-        bld -i mkitb -r yocto:tiny -a $DESTARCH -p IMX -f $CFGLISTYML
-        bld -i mkdistroscr -a $DESTARCH -p IMX -f $CFGLISTYML
-        bld -i mkallfw -a $DESTARCH -p IMX -f $CFGLISTYML
-	bld -c secure_obj -a $DESTARCH -p IMX -f $CFGLISTYML
-        bld -i mkboot -a $DESTARCH -p IMX -f $CFGLISTYML
-    fi
+    bld linux -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld linux-modules -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    [ $DESTARCH = arm64 ] && bld perf -p $SOCFAMILY -f $CFGLISTYML
+    bld distroscr -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld fwall -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld secure_obj -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld boot -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 
     build_rfs_and_apps
 
@@ -679,12 +572,12 @@ flex_auto_build() {
     spent=$((end_seconds-start_seconds))
     mins=`expr $(echo $(($spent))) / 60`
     secs=`expr $(echo $(($spent))) % 60`
-    fbprint_n "Duration of $DESTARCH auto build: $mins minutes $secs seconds"
+    fbprint_n "Duration of build: $mins minutes $secs seconds"
 }
 
 
 flex_autobuild_all() {
-    bld -i auto_build -a $DESTARCH -f $CFGLISTYML 2>&1 | \
+    bld auto_build -a $DESTARCH -f $CFGLISTYML 2>&1 | \
     tee $FBDIR/logs/autobuild-${DESTARCH}-log-`date +%Y%m%d%H%M`.txt
 }
 
@@ -702,15 +595,15 @@ check_proxy() {
 }
 
 check_ubuntu_version() {
-    if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/os-release | grep -iE '^ID=ubuntu|^ID=lsdk'` ]]; then
-	fbprint_e "The host is not Ubuntu $UBUNTU_VERSION system, please install docker and run 'bld docker' to build in docker" && exit
+    if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/os-release | grep -iE '^ID=debian|^ID=ubuntu|^ID=lsdk'` ]]; then
+	fbprint_e "The host is not Debian/Ubuntu system, please install docker and run 'bld docker' to build in docker" && exit
     else
 	[ -f /usr/bin/lsb_release ] || sudo apt install -y lsb-release
 	[ ! -f /usr/bin/lsb_release ] && fbprint_e "lsb_release command is not found" && exit
 	releaseVersion=$(lsb_release -rs)
-	result=$(echo "$releaseVersion < $UBUNTU_VERSION" | bc)
+	result=$(echo "$releaseVersion < $DEBIAN_VERSION" | bc)
 	if [ "$result" -eq "1" ]; then
-	    fbprint_e "The distro version installed on this host is older than Ubuntu $UBUNTU_VERSION"
+	    fbprint_e "The distro version installed on this host is older than Debian $DEBIAN_VERSION"
 	    fbprint_e "please upgrade it or install docker and run 'bld docker' to build in docker" && exit
 	else
 	    check_binfmt_qemu
@@ -753,19 +646,19 @@ check_linux_config() {
 }
 
 do_clean() {
-    rm -rf $FBOUTDIR/images
+    rm -rf $FBOUTDIR/images/*
     clean_bsp_components
     clean_linux_components
     clean_apps_components
-    [ "$CONFIG_EIQ" = y ] && bld -i clean-eiq
+    [ "$PACKAGEGROUPS_ML" = y ] && bld clean-ml
     fbprint_d "clean all old images except distro rootfs"
 }
 
 do_clean_rfs() {
-    if [ $DISTROTYPE = yocto ]; then
-	echo cleaning $yoctotmpdir ... && sudo rm -rf $yoctotmpdir
-	sudo rm -rf $FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_yocto_*
-	fbprint_d "clean $yoctotmpdir"
+    if [ $DISTROTYPE = poky ]; then
+	echo cleaning $pokytmpdir ... && sudo rm -rf $pokytmpdir
+	sudo rm -rf $FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}
+	fbprint_d "clean $pokytmpdir"
     elif [ $DISTROTYPE = buildroot ]; then
 	rm -rf ${RFSDIR%/*}
 	fbprint_d "clean ${RFSDIR%/*}"
@@ -782,18 +675,18 @@ do_clean_rfs() {
 }
 
 show_lists() {
-    echo -e "\nEnabled iMX Machine List:"
+    echo -e "\nSupported i.MX Machine List:"
     echo -e "\t$IMX_MACHINE_LIST"
-    echo -e "\nEnabled LS Machine List:"
+    echo -e "\nSupported LS Machine List:"
     echo -e "\t$LS_MACHINE_LIST"
-    echo -e "\nBSP Components List:"
+    echo -e "\ni.MX/LS BSP Component List:"
     echo -e "\t$BSP_REPO_LIST"
-    echo -e "\nLinux Components List:"
+    echo -e "\nLinux & modules Component List:"
     echo -e "\t$LINUX_REPO_LIST"
-    echo -e "\nApp Components List:"
+    echo -e "\nNXP-specific App Component List:"
     echo -e "\t$APPS_REPO_LIST"
-    echo -e "\neIQ Components List:"
-    echo -e "\t$EIQ_REPO_LIST"
+    echo -e "\neIQ ML Component List:"
+    echo -e "\t$ML_REPO_LIST"
 }
 
 fbprint_e() {
@@ -842,33 +735,35 @@ do
 	-b|boottype)
 		BOOTTYPE=$2; echo "BOOTTYPE: $BOOTTYPE"; shift;;
 	-c|--component)
-		COMPONENT=$2; echo "COMPONENT: $COMPONENT"; shift;;
+		COMPONENT=$2; echo "COMPONENT: $2"; shift;;
 	-f|--cfgfile)
 		CFGLISTYML=$2
 		[ ! -f $FBDIR/configs/$CFGLISTYML ] && fbprint_e "$FBDIR/configs/$CFGLISTYML does not exist!" && exit 1; shift;;
 	-r|--rootfs)
 		DISTROTYPE=$(echo $2 | cut -d: -f1)
-		DISTROSCALE=$(echo $2 | cut -d: -f2)
+		DISTROVARIANT=$(echo $2 | cut -d: -f2)
 		CODENAME=$(echo $2 | cut -d: -f3)
-		DISTROSCALEOPT=$(echo $2 | cut -d: -f3)
-		if [ $DISTROSCALE = $DISTROTYPE ]; then DISTROSCALE=; fi
+		DISTROVARIANTOPT=$(echo $2 | cut -d: -f3)
+		if [ $DISTROVARIANT = $DISTROTYPE ]; then DISTROVARIANT=; fi
 		if [ "$CODENAME" = $DISTROTYPE ]; then CODENAME=; fi
-		if [ $DISTROTYPE = yocto -o $DISTROTYPE = buildroot ] && [ -z "$DISTROSCALE" ]; then DISTROSCALE=tiny; fi
-		if [ $DISTROTYPE != ubuntu -a $DISTROTYPE != debian -a $DISTROTYPE != centos -a $DISTROTYPE != buildroot -a $DISTROTYPE != yocto ]; then
-		    fbprint_e "invalid argument $DISTROTYPE for distro type, valid type: ubuntu, debian, centos, buildroot, yocto" && exit 1
+		if [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && [ -z "$DISTROVARIANT" ]; then DISTROVARIANT=tiny; fi
+		if [ $DISTROTYPE != ubuntu -a $DISTROTYPE != debian -a \
+		     $DISTROTYPE != buildroot -a $DISTROTYPE != poky ]; then
+		    fbprint_e "invalid argument $DISTROTYPE for distro type, valid type: debian, poky, buildroot" && exit 1
 		fi
-		if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian -o $DISTROTYPE = centos ] && [ -n "$DISTROSCALE" -a \
-		     "$DISTROSCALE" != main -a "$DISTROSCALE" != devel -a "$DISTROSCALE" != lite -a "$DISTROSCALE" != desktop ]; then
-		    fbprint_e "invalid $DISTROSCALE for DISTROSCALE argument, valid: main, devel, lite, desktop" && exit 1
-		elif [ $DISTROTYPE = buildroot -o $DISTROTYPE = yocto ] && [ "$DISTROSCALE" != tiny -a "$DISTROSCALE" != devel -a "$DISTROSCALE" != imaevm ]; then
-			fbprint_e "invalid $DISTROSCALE for DISTROSCALE argument, valid: tiny, devel, devel:custom, imaevm" && exit 1
+		if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" != server -a \
+		    "$DISTROVARIANT" != full -a "$DISTROVARIANT" != base -a "$DISTROVARIANT" != base -a "$DISTROVARIANT" != desktop ]; then
+		    fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: desktop, server, full, base" && exit 1
+		elif [ $DISTROTYPE = buildroot -o $DISTROTYPE = poky ] && \
+		     [ "$DISTROVARIANT" != tiny -a "$DISTROVARIANT" != devel -a "$DISTROVARIANT" != imaevm ]; then
+			fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: tiny, devel, devel:custom, imaevm" && exit 1
 		fi
 		echo DISTRO TYPE:  $DISTROTYPE
-		[ -n "$DISTROSCALE" ] && echo DISTRO SCALE: $DISTROSCALE
+		[ -n "$DISTROVARIANT" ] && echo DISTRO VARIANT: $DISTROVARIANT
 		[ -n "$CODENAME" ] && echo DISTRO CODENAME: $CODENAME
 		shift;;
 	-i|--instruction)
-		INSTRUCTION=$2; shift;;
+		INSTRUCTION=$2; echo INSTRUCTION: $2; shift;;
 	-p|--portfolio)
 		SOCFAMILY=$2; echo "SOCFAMILY: $SOCFAMILY"; shift;;
 	-B|--buildarg)
@@ -901,7 +796,7 @@ done
 
 if echo $MACHINE | grep -Eq 'imx6|imx7'; then
     DESTARCH=arm32 && SOCFAMILY=IMX
-elif `echo $MACHINE | grep -q imx8`; then
+elif `echo $MACHINE | grep -qE 'imx8|imx9'`; then
     DESTARCH=arm64 && SOCFAMILY=IMX
 elif [ ${MACHINE:0:7} = ls1021a ]; then
     DESTARCH=arm32 && SOCFAMILY=LS
@@ -915,8 +810,14 @@ if [ $SOCFAMILY != LS -a $SOCFAMILY != IMX ]; then
      fbprint_e "$SOCFAMILY is invalid, valid -p parameter is: LS, IMX"; exit 1
 fi
 
-if [ -z "$DISTROSCALE" ]; then
-    [ $SOCFAMILY = IMX -a "$DISTROTYPE" = ubuntu ] && DISTROSCALE=desktop || DISTROSCALE=main
+[ "$1" = mkitb -a -z "$DISTROTYPE" ] && DISTROTYPE=poky && DISTROVARIANT=tiny
+[ -z "$DISTROTYPE" ] && DISTROTYPE=debian
+if [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $SOCFAMILY = IMX -a $DESTARCH = arm64 ]; then
+    DISTROVARIANT=desktop
+elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ]; then
+    DISTROVARIANT=server
+elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ]; then
+    DISTROVARIANT=tiny
 fi
 
 if [ -z "$CFGLISTYML" ]; then
@@ -930,24 +831,22 @@ if [ -z "$CFGLISTYML" ]; then
 fi
 
 . $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
+. $FBDIR/tools/parse_yaml $FBDIR/configs/ml.yml >> $FBDIR/configs/.sdk.cfg
 CONFIGLIST=.sdk.cfg
 export CONFIGLIST CFGLISTYML
 
 . $FBDIR/configs/$CONFIGLIST
-. $FBDIR/configs/centos/distro.cfg
-. $FBDIR/configs/ubuntu/extra_packages_list
-. $FBDIR/tools/distro_ubuntu
-. $FBDIR/tools/distro_centos
-. $FBDIR/tools/distro_yocto
+. $FBDIR/tools/distro_debian
+. $FBDIR/tools/distro_poky
 . $FBDIR/tools/distro_buildroot
-
+. $FBDIR/configs/debian/extra_packages_list
 
 [ -z "$FBOUTDIR" ] && FBOUTDIR=$DEFAULT_OUT_PATH
 [ -z "$PKGDIR" ] && PKGDIR=$DEFAULT_PKGDIR
 export FBOUTDIR PKGDIR && mkdir -p $FBOUTDIR $PKGDIR
 
 [ "$MACHINE" = qemuarm64 -o "$MACHINE" = qemuarm ] && manifest=""
-[ -f $FBDIR/configs/board/$MACHINE/manifest ] && manifest=$FBDIR/configs/board/$MACHINE/manifest
+[ -f $FBDIR/configs/board/$MACHINE.conf ] && manifest=$FBDIR/configs/board/$MACHINE.conf
 [ -n "$manifest" ] && . $manifest
 
 if [ "$SOCFAMILY" = LS ]; then
@@ -972,27 +871,18 @@ if [ $DESTARCH != arm64 -a $DESTARCH != arm32 ]; then
     fbprint_e "invalid $DESTARCH, valid arch: arm64, arm32" && exit 1
 fi
 
-if [ -n "`echo $COMPONENT | grep ^linux:`" -a -n "`echo $COMPONENT | cut -d: -f3`" ]; then
-    KERNEL_TREE=`echo $COMPONENT|cut -d: -f2`
-    KERNEL_BRANCH=`echo $COMPONENT|cut -d: -f3`
+if [ -n "`echo $1 | grep ^linux:`" -a -n "`echo $1 | cut -d: -f3`" ]; then
+    KERNEL_TREE=`echo $1|cut -d: -f2`
+    KERNEL_BRANCH=`echo $1|cut -d: -f3`
 else
     KERNEL_TREE=linux
-    KERNEL_BRANCH=$repo_linux_branch
+    KERNEL_BRANCH=$repo_linux_tag
 fi
 
 KERNEL_PATH=$PKGDIR/linux/$KERNEL_TREE
 KERNEL_OUTPUT_PATH=$FBOUTDIR/linux/$KERNEL_TREE/$DESTARCH/$SOCFAMILY/output
 INSTALL_MOD_PATH=$FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY
 
-[ "$INSTRUCTION" = mkitb -a -z "$DISTROTYPE" ] && DISTROTYPE=yocto && DISTROSCALE=tiny
-[ -z "$DISTROTYPE" ] && DISTROTYPE=ubuntu
-if [ -z "$DISTROSCALE" ] && [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ] && echo $MACHINE|grep -q imx8; then
-    DISTROSCALE=desktop
-elif [ -z "$DISTROSCALE" ] && [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian -o $DISTROTYPE = centos ]; then
-    DISTROSCALE=main
-elif [ -z "$DISTROSCALE" ] && [ $DISTROTYPE = yocto -o $DISTROTYPE = buildroot ]; then
-    DISTROSCALE=tiny
-fi
 
 if [ -z "$CODENAME" -a $DISTROTYPE = ubuntu ]; then
     CODENAME=$UBUNTU_CODENAME; DISTRO_VERSION=$UBUNTU_VERSION
@@ -1001,39 +891,38 @@ elif [ -z "$CODENAME" -a $DISTROTYPE = debian ]; then
 fi
 
 if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
-    RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROSCALE}_${DESTARCH}
+    RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}
 elif [ $DISTROTYPE = buildroot ]; then
-    RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_buildroot_${DISTROSCALE}_${DESTARCH}/target
-elif [ $DISTROTYPE = yocto ]; then
-    [ $DESTARCH != arm64 -a $DESTARCH != arm32 ] && fbprint_e "arch $DESTARCH is not supported for yocto yet" && exit
-    [ $DISTROSCALE = tiny ] && yoctoimgtype=core-image-minimal || yoctoimgtype=core-image-sato
+    RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_buildroot_${DISTROVARIANT}_${DESTARCH}/target
+elif [ $DISTROTYPE = poky ]; then
+    [ $DESTARCH != arm64 -a $DESTARCH != arm32 ] && fbprint_e "arch $DESTARCH is not supported for poky yet" && exit
+    [ $DISTROVARIANT = tiny ] && pokyimgtype=core-image-minimal || pokyimgtype=core-image-sato
     [ $DESTARCH = arm32 ] && machinetype=qemuarm-poky-linux-gnueabi 
     [ $DESTARCH = arm64 ] && machinetype=qemuarm64-poky-linux
-    yoctotmpdir=`grep '^TMPDIR =' $FBDIR/configs/yocto/local_${DESTARCH}_${DISTROSCALE}.conf | cut -d' ' -f3 | cut -d'"' -f2`
-    yoctotmpdir=`eval echo $yoctotmpdir`
-    RFSDIR=$yoctotmpdir/work/$machinetype/$yoctoimgtype/1.0-r0/rootfs
-elif [ $DISTROTYPE = centos ]; then
-    RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_centos_${centos_version}_${DESTARCH}
+    pokytmpdir=`grep '^TMPDIR =' $FBDIR/configs/poky/local_${DESTARCH}_${DISTROVARIANT}.conf | cut -d' ' -f3 | cut -d'"' -f2`
+    pokytmpdir=`eval echo $pokytmpdir`
+    RFSDIR=$pokytmpdir/work/$machinetype/$pokyimgtype/1.0-r0/rootfs
 fi
 
-if [ $DISTROTYPE = yocto -o $DISTROTYPE = buildroot ]; then
+if [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ]; then
     DESTDIR=$FBOUTDIR/apps/components_${DESTARCH}_${DISTROTYPE}
 else
-    [ "$BUILDARG" = eiq ] && postfix="_eIQ" || postfix=""
-    DESTDIR=$FBOUTDIR/apps/components_${DESTARCH}_${DISTROTYPE}_${DISTROSCALE}${postfix}
+    [ "$PKG_GROUPS_ML" = y -o "$GROUPS_ML" = y ] && postfix="_ml" || postfix=""
+    DESTDIR=$FBOUTDIR/apps/components_${DESTARCH}_${DISTROTYPE}_${DISTROVARIANT}${postfix}
 fi
 
-[ $DESTARCH = arm32 -a $DISTROSCALE = desktop ] && echo $DISTROTYPE desktop supports only arm64 && exit
+[ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && echo $DISTROTYPE desktop supports only arm64 && exit
 
-linux_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROSCALE}_${SOCFAMILY}_${DESTARCH}.itb
-tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_yocto_tiny_${SOCFAMILY}_${DESTARCH}.itb
-initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROSCALE}_${DESTARCH}.cpio.gz
+linux_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${SOCFAMILY}_${DESTARCH}.itb
+tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb
+base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
+initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.cpio.gz
 
 mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{bin,include}
 mkdir -p $DESTDIR/usr/local/{bin,include,lib}
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
 mkdir -p $PKGDIR/linux $FBDIR/logs $RFSDIR
-mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,connectivity,generic,eiq}
+mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,connectivity,utils,ml}
 mkdir -p $DESTDIR/usr/lib
 
 [ -z "$JOBS" ] && JOBS=$(nproc)
@@ -1042,12 +931,12 @@ if [ ! $(echo $JOBS | grep '^[0-9]\{1,2\}$' | grep '^[1-9]') ]; then
    fbprint_e "invalid parameter $JOBS for JOBS, valid range: 1 to 99" && exit
 fi
 
-if [ "$COMPONENT" = uboot -o "$COMPONENT" = bsp ]; then
+if [ "$1" = uboot -o "$1" = bsp ]; then
     [ -z "$MACHINE" ] && fbprint_e "please specify -m parameter (machine name or all)" && exit 1
 fi
 
 if [ "$MACHINE" != all ]; then
-    if ! grep -q -i MACHINE_${MACHINE}= $FBDIR/configs/$CONFIGLIST; then
+    if [ ! -f $FBDIR/configs/board/$MACHINE.conf ]; then
 	if [ $MACHINE != qemuarm64 -a $MACHINE != qemuarm ]; then
 	    fbprint_e "Incorrect machine name: $MACHINE"
 	    fbprint_n "Valid LS machine name: $LS_MACHINE_LIST"
@@ -1074,14 +963,14 @@ fi
 [ ! -L $FBOUTDIR/linux/kernel ] && ln -s $KERNEL_TREE $FBOUTDIR/linux/kernel
 
 if [ ! -f $FBDIR/logs/.checkproxydone ]; then
-    if [[ ! `grep Ubuntu /etc/issue` ]] && [[ ! `grep 'NXP LSDK' /etc/issue` ]]; then
+    if [[ ! `grep -E 'Debian|Ubuntu' /etc/issue` ]] && [[ ! `grep 'NXP LSDK' /etc/issue` ]]; then
 	if [ "$1" != "docker" ]; then
 	    fbprint_e "This host is not based on Ubuntu distro, please install docker and run 'bld docker' to build in docker"
 	    exit
 	fi
     fi
-    if ! grep -q fbubuntu /etc/hosts; then
-	echo 127.0.0.1   fbubuntu | sudo tee -a /etc/hosts 1>/dev/null
+    if ! grep -q fbdebian /etc/hosts; then
+	echo 127.0.0.1   fbdebian | sudo tee -a /etc/hosts 1>/dev/null
     fi
     check_proxy && touch $FBDIR/logs/.checkproxydone
 fi
@@ -1113,7 +1002,7 @@ tmppath=$(realpath $FBOUTDIR/linux/kernel)
 
 [ -z "$MACHINE" ] && MACHINE=all
 if [ $MACHINE = all -a $SOCFAMILY = LS -a $DESTARCH = arm64 ]; then
-    machinelist=$(echo $LS_MACHINE_LIST | sed s/ls1021atwr//)
+    machinelist=$(echo $LS_MACHINE_LIST | sed -e 's/ls1021atwr//' -e 's/ls1021aqds//')
 elif [ $MACHINE = all -a $SOCFAMILY = LS -a $DESTARCH = arm32 ]; then
     machinelist=ls1021atwr
 elif [ $MACHINE = all -a $SOCFAMILY = IMX -a $DESTARCH = arm64 ]; then
@@ -1137,81 +1026,69 @@ fi
 
 [ "$BUILDARG" = uefi ] && BL33TYPE=uefi || BL33TYPE=uboot
 
+check_toolchain
+
 MAKE="make -s"
+PKG_CONFIG_SYSROOT_DIR=$RFSDIR
+LD_LIBRARY_PATH=$DESTDIR/usr/lib:$RFSDIR/usr/lib:$RFSDIR/usr/lib/aarch64-linux-gnu
+PKG_CONFIG_PATH=$DESTDIR/usr/lib/pkgconfig:$RFSDIR/usr/lib/pkgconfig:$RFSDIR/usr/lib/aarch64-linux-gnu/pkgconfig:$RFSDIR/usr/share/pkgconfig
 
 export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE KERNEL_TREE \
        KERNEL_PATH KERNEL_OUTPUT_PATH INSTALL_MOD_PATH KERNEL_CFG BOOTTYPE MAKE CONFIGLIST \
-       CFGLISTYML BUILDARG DISTROTYPE DISTROSCALE DISTROSCALEOPT HOSTARCH SYSARCH SECURE \
+       CFGLISTYML BUILDARG DISTROTYPE DISTROVARIANT DISTROVARIANTOPT HOSTARCH SYSARCH SECURE \
        SOCFAMILY BL33TYPE DISTRIB_NAME SOCARCH COT DISTRIB_VERSION BOARD_VARIANTS \
-       UBOOT_CONFIG CODENAME DISTRO_VERSION UBUNTU_VERSION FORCE
+       UBOOT_CONFIG CODENAME DISTRO_VERSION UBUNTU_VERSION FORCE LD_LIBRARY_PATH \
+       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH
 
 
-case "$INSTRUCTION" in
+
+case "$1" in
     repo-fetch)
-	git_repo_update fetch; exit;;
+	git_repo_update fetch $2; exit;;
     repo-update)
-	git_repo_update latest;	exit;;
+	git_repo_update latest $2; exit;;
     repo-commit)
-	git_repo_update commit; exit;;
+	git_repo_update commit $2; exit;;
     repo-tag)
-	git_repo_update tag; exit;;
+	git_repo_update tag $2; exit;;
     repo-branch)
-	git_repo_update branch; exit;;
-esac
-
-check_toolchain
-
-if [ "$1" = all ]; then
-    export BUILD_BOTH_SOCFAMILY=y
-    bld -i auto -a arm32 -p $SOCFAMILY -f $CFGLISTYML
-    bld -i auto -a arm64 -p $SOCFAMILY -f $CFGLISTYML
-    exit
-elif [ "$1" = clean ]; then
-    do_clean && exit
-elif [ "$1" = clean-rfs ]; then
-    do_clean_rfs && exit
-elif [ "$1" = clean-bsp ]; then
-    clean_bsp_components && exit
-elif [ "$1" = clean-linux ]; then
-    clean_linux_components && exit
-elif [ "$1" = clean-apps ]; then
-    clean_apps_components && exit
-elif [ "$1" = list ]; then
-    show_lists && exit
-fi
-
-if [ -z "$COMPONENT" -a -z "$INSTRUCTION" -a -n "$MACHINE" -a "$MACHINE" != all ]; then
-    [ -z "$BOOTTYPE" ] && bld -i auto -m $MACHINE -a $DESTARCH -f $CFGLISTYML || \
-    bld -i auto -m $MACHINE -b $BOOTTYPE -a $DESTARCH -f $CFGLISTYML
-    exit
-fi
-
-case "$INSTRUCTION" in
-    mkfw)
+	git_repo_update branch $2; exit;;
+    clean)
+	do_clean; exit;;
+    clean-rfs)
+	do_clean_rfs; exit;;
+    clean-bsp)
+	clean_bsp_components; exit;;
+    clean-linux)
+	clean_linux_components; exit;;
+    clean-apps)
+	clean_apps_components; exit;;
+    list)
+	show_lists; exit;;
+    fw)
 	generate_composite_firmware; exit;;
-    mkallfw)
+    fwall)
 	for brd in $machinelist; do
-	    bld -i mkfw -m $brd
+	    bld fw -m $brd
 	done
 	fbprint_d "Build all composite firmware"; exit;;
-    mkdistroscr)
+    distroscr)
 	for brd in $machinelist; do
 	    generate_distro_bootscr $brd
 	done
 	exit;;
-    mkflashscr)
+    flashscr)
 	mkimage -T script -C none -d $FBDIR/tools/flash_images $FBOUTDIR/images/flash_images.scr
 	fbprint_d "$FBOUTDIR/images/flash_images.scr"; exit;;
     signimg)
 	[ $MACHINE = all ] && brdlist=$machinelist || brdlist=$MACHINE
 	for brd in $brdlist; do
 	    for boottype in $boottypelist; do
-		[ $brd = lx2160ardb_rev2 -o $brd = lx2160aqds_rev2 -o $brd = ls1088ardb_pb ] && brdname=${brd:0:10} || brdname=$brd
-		secure_sign_image $brdname $boottype
+		secure_sign_image $brd $boottype
 	    done
 	done
 	exit;;
-    mkrfs)
+    rfs)
 	generate_distro_rfs; exit;;
     download)
         download_distro_images; exit;;
@@ -1221,16 +1098,16 @@ case "$INSTRUCTION" in
 	pack_distro_rfs; exit;;
     packapp|packapps)
 	pack_app_components; exit;;
-    mkitb|mklinux)
+    itb|mklinux)
 	generate_linux_itb; exit;;
-    mkcpio)
+    cpio)
         generate_initrd_cpio; exit;;
-    mktoolchain)
+    toolchain)
 	build_distro_rfs_buildroot toolchain $DESTARCH; exit;;
-    mkboot|mkbootpartition)
+    boot)
 	generate_bootpartition_tarball; exit;;
     auto|autobuild)
-	bld -i auto_build -a $DESTARCH -f $CFGLISTYML 2>&1 | \
+	bld auto_build -a $DESTARCH -f $CFGLISTYML 2>&1 | \
 	tee $FBDIR/logs/autobuild-${DESTARCH}-log-`date +%Y%m%d%H%M`.txt
 	exit;;
     auto_build)
@@ -1247,43 +1124,40 @@ case "$INSTRUCTION" in
 	exit;;
     clean-apps)
 	clean_apps_components
-	fbprint_d "clean apps components"; exit;;
-    clean-eiq)
-        make eiq_clean -C $FBDIR/src/apps; exit;;
-    install-eiq)
-        make eiq_install -C $FBDIR/src/apps; exit;;
+	fbprint_d "clean apps components $DESTDIR"; exit;;
+    clean-ml)
+        make ml_clean -C $FBDIR/src/apps; exit;;
+    install-ml)
+        make ml_install -C $FBDIR/src/apps; exit;;
     clean)
 	do_clean; exit;;
-    merge-component)
-	merge_components; exit;;
+    merge-apps)
+	merge_apps; exit;;
     list)
 	show_lists; exit;;
-    compile)
-	;;
-    *)
-	if [ -n "$INSTRUCTION" ]; then
-	    fbprint_e "invalid instruction: $INSTRUCTION" && exit
-	fi ;;
 esac
 
-case $COMPONENT in
+[ -z "$1" -a -n "$MACHINE" -a "$MACHINE" != all ] && bld auto -m $MACHINE -a $DESTARCH -f $CFGLISTYML && exit
+
+# for components
+case $1 in
     rcw|uboot|u-boot|uefi)
-	make -C $FBDIR/src/bsp $COMPONENT;;
+	make -C $FBDIR/src/bsp $1;;
     linux|linux:custom|linux:*:*)
 	if echo "$BUILDARG" | grep -q fragment:; then
 	    export FRAGMENT_CFG=$(echo $BUILDARG | cut -d: -f2);
 	fi
-	if echo $COMPONENT | grep -q :custom; then
+	if echo $1 | grep -q :custom; then
            export BUILDARG=custom
 	fi
 	export MAKE="make --no-print-directory"
-	component=`echo $COMPONENT | cut -d: -f1`
-	repo=`echo $COMPONENT | cut -d: -f2`
-	branch=`echo $COMPONENT | cut -d: -f3`
+	component=`echo $1 | cut -d: -f1`
+	repo=`echo $1 | cut -d: -f2`
+	branch=`echo $1 | cut -d: -f3`
 	repostr=$(echo $repo | sed s/-/_/g)
 	repourl=`eval echo '${'"repo_""$repostr"'_url}'`
-	if  [ $component = linux ]; then
-	    if [ $repo = custom  ] || ! echo $COMPONENT | grep -q ':'; then
+	if  [ $1 = linux ]; then
+	    if [ $repo = custom  ] || ! echo $1 | grep -q ':'; then
 		repo=linux
 		[ $UPDATE_REPO_PER_TAG = y ] && branch=$repo_linux_tag || branch=$repo_linux_branch
 	    fi
@@ -1308,27 +1182,24 @@ case $COMPONENT in
 	if ! git branch -a | grep -q $branch && ! git tag | grep -q $branch; then
 	   fbprint_e "invalid tag/branch name: $branch" && exit 1
 	fi
-	if git show-ref --verify --quiet refs/heads/$branch; then
-	    git checkout $branch
-	else
-	    git checkout remotes/origin/$branch -b $branch 2>/dev/null || git checkout $branch -b $branch
+	if [ "$FORCE" = y ]; then
+	    if git show-ref --verify --quiet refs/heads/$branch; then
+		git checkout $branch
+	    else
+		git checkout remotes/origin/$branch -b $branch 2>/dev/null || git checkout $branch -b $branch
+	    fi
 	fi
 	cd $FBDIR/src && check_linux_config && make $component;;
     initrd)
 	get_prebuilt_initrd;;
-    apps)
-	if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROSCALE ]; then
-	    make -C $FBDIR/src $COMPONENT && \
-	    touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROSCALE
+    app|apps)
+	if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROVARIANT ]; then
+	    make -C $FBDIR/src $1 && \
+	    touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROVARIANT
 	else
-	    echo apps for ${DESTARCH} $DISTROTYPE:$DISTROSCALE was already built, do \'bld clean-apps\' to rebuild.
+	    echo apps for ${DESTARCH} $DISTROTYPE:$DISTROVARIANT was already built, do \'bld clean-apps\' to rebuild.
 	fi;;
-    all)
-        fbprint_e "invalid component name: all, run 'bld -h' for help" && exit;;
-    $COMPONENT)
-	[ -z "$COMPONENT" ] && fbprint_e "invalid instruction" && exit
-	check_component_valid $COMPONENT
-	$MAKE -C $FBDIR/src $COMPONENT;;
     *)
-	exit;;
+	check_component_valid $1
+	$MAKE -C $FBDIR/src $1;;
 esac

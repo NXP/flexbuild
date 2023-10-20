@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2017-2021 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=1.14.2110
+FIVERSION=1.21.2310
 DEFAULT_PARTITION_NUMBER=4
-DEFAULT_DISK_PARTITION="4P=2G:128M:5G:-1"
-DEFAULT_LOOP_DEVICE_PARTITION="4P=1300M:128M:128M:-1"
+DEFAULT_DISK_PARTITION="3P=1G:7G:-1"
+DEFAULT_LOOP_DEVICE_PARTITION="3P=800M:128M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=6144
-DEFAULT_RAW_PARTITION_SIZE_MB=64
-DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/sdk2110
-
+DEFAULT_RAW_PARTITION_SIZE_MB=256
+DEFAULT_LINUX_VERSION=6.1.36
+DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2310
 
 
 usage ()
@@ -27,58 +27,48 @@ cat <<EOF
 Usage:  flex-installer [ -i <instruction> ] [ -b <boot> ] [ -r <rootfs> ] [ -f <firmware> ] [ -d <device> ] [ -m <machine> ]
 OPTION:
  -i, --instruction  Instruction to execute, valid argument as below:
-     'auto'	    Automatically partition and format the target storage drive, then download and install distro images
-     'pf'           Only partition and format the target storage drive without installing distro images
+     'auto'	    Automatically download and install distro images to storage device
+     'pf'           Partition and format storage device
      'download'     Only download distro images without installation
-     'install'      Only install the specified image, can be omitted by default
-     'mksdcard'     Create sdcard.img including composite firmware and distro images
-     'list'         Show the list of supported machines and installation invironment
-     'backup'       Backup rootfs and bootpartition as tarball
+     'mkwic'        Create all-in-one sdcard.wic image including composite bsp firmware, boot image and rootfs
  -b, --bootimg	    The boot partition image
  -r, --rootfsimg    The root partition image
- -B, --bootpart     Specify boot partition number to override default (default boot partition is the 2nd)
+ -B, --bootpart     Specify boot partition number to override default (default boot partition is the first)
  -R, --rootpart     Specify root partition number to override default (default root partition is the last)
  -d, --device	    Device name of the target SD/USB/SATA storage drive in Linux
- -p, --partition    Customize configurable partitions of target disk, default is "-p 4P=100M:2G:5G:-1" if not specified
- -f, --firmware	    The composite firmware image to be programmed into SD card (only for SD boot)
+ -p, --partition    Customize configurable partitions of target disk, default is "-p 3P=1G:7G:-1" if not specified
+ -f, --firmware	    The composite firmware image to be programmed into SD card
  -F, --force        Force partition and format target disk regardless of the existing data in disk
  -e, --efi	    Used for the case of UEFI as bootloader instead of U-Boot, valid argument: dtb or acpi
  -m, --machine	    Target machine name to specify the name of composite firmware for automatical deployment
  -u, --url	    Specify URL of distro webserver to override the default one for automatically downloading distro
- -o, --offset       Specify the offset to burn firmware to storage device (e.g. 1k, 4k, 32k, 33k)
+ -o, --offset       Specify the offset to burn firmware to SD card (e.g. 1k, 4k, 32k, 33k)
  -v, --version	    Print version info
 
-Examples for various use scenarios:
-- Automatically download and install LSDK distro images to target storage drive on host machine or ARM board:
-  $ flex-installer -i auto -m ls1046ardb -d /dev/mmcblk0        (automatically install the latest LSDK distro)
+Examples for various usage scenarios:
+- Automatically download and install distro images onto target storage drive on host machine or ARM board:
+  $ flex-installer -i pf -d /dev/mmcblk0                                (partition and format SD/eMMC card)
+  $ flex-installer -i auto -m imx8mpevk -d /dev/mmcblk0 [ -r <rootfs> ] (automatically download and install Debian distro)
   You can specify one or several of '-b <boot> -r <rootfs> -f <firmware> -u <url>' options to override the default settings
 
-- To partition and format target SD/eMMC/USB disk and install custom distro image:
-  $ flex-installer -i pf -d /dev/mmcblk0                   (default 4 partitions as 4P=2G:128M:5G:-1)
+- To only partition and format target SD/eMMC card or USB/SATA disk
+  $ flex-installer -i pf -d /dev/sdx                   (default 3 partitions as 3P=1G:7G:-1)
   or
-  $ flex-installer -i pf -d /dev/sdx -p 4P=2G:3G:6G:-1     (specify custom partitions as 4P=2G:3G:6G:-1)
+  $ flex-installer -i pf -d /dev/sdx -p 4P=800M:6G:8G:-1 (specify custom partitions as 4P=800M:6G:8G:-1)
 
-  $ flex-installer -b boot_arm64_lts_5.10.tgz -r rootfs_ubuntu_arm64.tgz -f firmware_<machine>_sdboot.img -d /dev/sdx (install multiple images)
+- To install local image to SD card
+  $ flex-installer -d /dev/sdx -m <machine> -f firmware_<machine>_sdboot.img -b boot_IMX_arm64.tar.zst -r rootfs_lsdk_debian_arm64.tar.zst
   or
-  $ flex-installer -r rootfs_ubuntu_main_arm64.tgz -d /dev/sdx   (only install root partition image)
-  $ flex-installer -b boot_arm64_lts_5.10.tgz -d /dev/sdx        (only install boot partition image
-  $ flex-installer -f firmware_<machine>_sdboot.img -d /dev/sdx  (only install composite firmware image)
+  $ flex-installer -r rootfs_lsdk_debian_xx_arm64.tar.zst -d /dev/sdx         (only install rootfs partition image)
+  $ flex-installer -b boot_IMX_arm64_lts_xx.tar.zst -d /dev/sdx -m <machine>  (only install boot partition image)
+  $ flex-installer -f firmware_<machine>_sdboot.img -d /dev/sdx -m <machine>  (only install composite firmware image)
 
-- Install local distro image with custom 3 partitions, to specify partition-1 for boot partition and partition-3 for rootfs partition:
-  $ flex-installer -i pf -p 3P=2G:4G:-1 -d /dev/mmcblk0
-  $ flex-installer -b <boot> -r <rootfs> -f <firmware> -d /dev/mmcblk0 --bootpart=1 --rootpart=3
-  After installing successfully, run "setenv devpart_boot 1;setenv devpart_root 3;boot" in U-Boot to boot distro from the specific partition)
+- Install rootfs image into the 2nd partition instead of the default 3rd partition:
+  $ flex-installer -r <rootfs> -R 2 -d /dev/mmcblk0
+  After installing successfully, run "setenv devpart_root 2;boot" in U-Boot to boot distro from the 2nd partition
 
-- On ARM board in TinyLinux environment, firstly partition target disk, then download distro images onto board and install as below:
-  1. flex-installer -i pf -d /dev/mmcblk0 (or /dev/sdx)
-  2. cd /mnt/mmcblk0p4 (or /mnt/sdx4) and download distro images to this partition via wget or scp
-  3. flex-installer -r <rootfs> -b <boot> -f <firmware> -d /dev/mmcblk0 (or /dev/sdx)
-
-- Convert local distro tarball images into all-in-one sdcard.img
-  $ flex-installer -i mksdcard -f <firmware> -r <rootfs> [ -b <boot> ]
-
-- Backup rootfs and bootpartition from target storage device
-  $ flex-installer -i backup -d /dev/sdx
+- Create the all-in-one sdcard.wic image
+  $ flex-installer -i mkwic -m <machine> -f <firmware> -b <boot> -r <rootfs>
 EOF
     exit
 }
@@ -168,7 +158,7 @@ program_firmware_to_sd() {
 	offset=1
     elif echo $machine | grep -qE 'imx8mq|imx8mm'; then
         offset=33
-    elif echo $machine | grep -qE 'imx8'; then
+    elif echo $machine | grep -qE 'imx8|imx9'; then
 	offset=32
     else
 	# for Layerscape platforms
@@ -229,7 +219,7 @@ partition_format_disk() {
     optimal_io_size=$(sudo cat /sys/block/$devname/queue/optimal_io_size)
     minimum_io_size=$(sudo cat /sys/block/$devname/queue/minimum_io_size)
     [ "$optimal_io_size" = "0" ] && aligntype=minimal || aligntype=optimal
-    [ $pnum -le 2 ] && parttable=gpt || parttable=msdos
+    [ $pnum -le 1 ] && parttable=gpt || parttable=msdos
 
     umount_device
     sudo rm -rf $mntdir/${devpartname}*/*
@@ -251,6 +241,8 @@ partition_format_disk() {
 	[ ${n_p: -2} = -1 ] && eval e_p$i=100% || eval e_p$i=$[ $s_p + $n_p ]
 	e_p=`eval echo '${e_p'"$i"'}'`
 
+	# use logical partition in case more than 4 partitions for Layerscape SoC
+	# as only 4KB space available as partition table of SD card for Layerscape SoC, 32KB for i.MX SoC
 	if [ $pnum -le 4 ]; then
 	    parttype=primary
 	elif [ $i -le 3 ]; then
@@ -320,7 +312,8 @@ flex_install_distro() {
 	echo Installing $bootimg_n to $bootdev  ...
 	[ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
 	[ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
-	[ -n "$machine" ] && ln -sf ${machine}_boot.scr $bootpartition/boot.scr
+	[ $bootimgtype = zst ] && zstd -d -f $bootimg_n && sudo tar xfm ${bootimg_n%.*} -C $bootpartition
+	[ -n "$machine" ] && sudo ln -sf ${machine}_boot.scr $bootpartition/boot.scr
 	print_d "Install $bootimg_n in $bootdev"
     fi
 
@@ -335,9 +328,10 @@ flex_install_distro() {
 	case $rfsimgtype in
 	    dir)  sudo cp -rfp $rootfsimg_n/* $rootpartition;;
 	    tgz)  sudo tar xfm $rootfsimg_n -C $rootpartition;;
-	    ext)  dd if=$rootfsimg_n of=$rootdev bs=4M && sync;;
-	    cpio.gz) mv $rootfsimg_n $rootpartition && cd $rootpartition && \
-		     gunzip $rootfsimg_n && cpio -idm < ${rootfsimg_n::-3} && cd -;;
+	    zst)  zstd -d -f $rootfsimg_n && sudo tar xfm ${rootfsimg_n%.*} -C $rootpartition;;
+	ext|wic)  sudo dd if=$rootfsimg_n of=$rootdev bs=4M && sync;;
+	cpio.gz)  mv $rootfsimg_n $rootpartition && cd $rootpartition && \
+		  gunzip $rootfsimg_n && cpio -idm < ${rootfsimg_n::-3} && cd -;;
 	    *)    echo format $rfsimgtype is not supported; exit
 	esac
 	print_d "Install $rootfsimg_n in $rootdev"
@@ -348,7 +342,7 @@ flex_install_distro() {
 	if [ $bootpartnum != 0 ]; then
 	    uuid_boot=$(lsblk -l --output UUID $bootdev | grep -)
 	    [ -z "$uuid_boot" ] && print_e "Failed to get PARTUUID on $bootdev, please partition and format /dev/$devname" && exit
-	    bootmountfile=$rootpartition/etc/systemd/system/boot.mount
+	    bootmountfile=$rootpartition/lib/systemd/system/boot.mount
 	    if [ -f $bootmountfile ] && grep -q '^What=UUID=' $bootmountfile; then
                 echo setting UUID $uuid_boot for boot partition $bootdev ...
 		mkdir -p $rootpartition/boot
@@ -398,6 +392,7 @@ flex_install_distro() {
 
     echo syncing data ...
     sync
+    umount_device
 
     if [ $instruction = auto -o -n "$bootimg" -o -n "$rootfsimg" ]; then
 	if [ -f $bootmountfile ] && ! grep -q $uuid_boot $bootmountfile; then
@@ -407,9 +402,9 @@ flex_install_distro() {
 	fi
     fi
 
-    if [ $bootpartnum != 1 -o $rootpartnum != 4 ] && [ `uname -m` = aarch64 ]; then
-	print_w "NOTICE: as you configured non-default root and boot partitions, please reboot the board and under U-Boot run:"
-	print_w "'setenv devpart_boot $bootpartnum;setenv devpart_root $rootpartnum;boot' to boot distro from the custom partition"
+    if [ $rootpartnum != 3 ] && [ `uname -m` = aarch64 ]; then
+	print_w "NOTICE: as you configured non-default boot partitions, please reboot the board and under U-Boot run:"
+	print_w "'setenv devpart_root $rootpartnum;boot' to boot distro from the custom partition"
     fi
 }
 
@@ -455,6 +450,8 @@ check_distro_in_disk() {
 check_images_format() {
     if [ -d $bootimg_n ]; then
 	bootimgtype=dir
+    elif echo $bootimg_n | grep -q .tar.zst && file -L $bootimg_n | grep -q 'Zstandard compressed'; then
+	bootimgtype=zst
     elif file -L $bootimg_n | grep -q 'gzip compressed'; then
 	bootimgtype=tgz
     elif file -L $bootimg_n | grep -q 'UUID='; then
@@ -467,6 +464,8 @@ check_images_format() {
 
     if [ -d $rootfsimg_n ]; then
 	rfsimgtype=dir
+    elif echo $rootfsimg_n | grep -q .tar.zst && file -L $rootfsimg_n | grep -q 'Zstandard compressed'; then
+	rfsimgtype=zst
     elif echo $rootfsimg_n | grep -q .cpio.gz && file -L $rootfsimg_n | grep -q 'gzip compressed'; then
 	rfsimgtype=cpio.gz
     elif file -L $rootfsimg_n | grep -q 'gzip compressed'; then
@@ -619,12 +618,12 @@ done
 mntdir=/mnt
 
 if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $instruction != download \
-     -a $instruction != install -a $instruction != list -a $instruction != backup -a $instruction != mksdcard ]; then
+     -a $instruction != install -a $instruction != list -a $instruction != backup -a $instruction != mkwic ]; then
     print_e "Invalid instruction $instruction, valid: auto, pf, download, install, list, backup"; exit
 fi
 
-ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb_pb ls2088ardb lx2160ardb_rev2 lx2162aqds '
-imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk '
+ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
+imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx93evk '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"
@@ -636,13 +635,13 @@ fi
 [ -z "$distrotype" ] && distrotype=linux
 [ -z "$instruction" ] && instruction=null
 
-if [ -z "$mediadevice" ] && [ $instruction != download -a $instruction != mksdcard ]; then
+if [ -z "$mediadevice" ] && [ $instruction != download -a $instruction != mkwic ]; then
     print_e "Please specify '-d <device>'"; exit
 fi
 
 [ -f /etc/issue ] && [[ `cat /etc/issue | grep NXP | grep tiny` ]] && intinyrfs=y || intinyrfs=n
 
-[ $instruction = mksdcard -a -z "$mediadevice" ] && mediadevice=`sudo losetup -f`
+[ $instruction = mkwic -a -z "$mediadevice" ] && mediadevice=`sudo losetup -f`
 
 if [ $intinyrfs = y -a $instruction != download ]; then
     get_device_name_in_tinydistro
@@ -651,7 +650,6 @@ elif [ $intinyrfs = n -a $instruction != download ]; then
     get_device_name_on_host
 fi
 
-default_linux_version=5.10
 
 if [ $instruction = auto -o $instruction = pf ]; then
     disksize=$[ `sudo fdisk -ls /dev/$devname` / 1000000 ]
@@ -690,7 +688,7 @@ if [ $instruction = pf ]; then
     check_partition_number
     [ -z "$bootpartnum" -a $pnum -le 2 ] && bootpartnum=1
     partition_format_disk $diskpartition
-elif [ $instruction != download -a $instruction != mksdcard ]; then
+elif [ $instruction != download -a $instruction != mkwic ]; then
     check_device_partitions
 fi
 
@@ -713,7 +711,7 @@ backuppartition=$mntdir/${devpartname}${backuppartnum}
 if [ $instruction = auto -o $instruction = download ]; then
     if [ -z "$machine" ] || ! echo "$ls_machine_list $imx_machine_list" | grep -q "$machine "; then
         print_w "Please specify correct '-m <machine>'"
-	print_n "Valid machine name: $ls_machine_list $imx_machine_list"; exit
+	print_n "Valid machine name: $imx_machine_list $ls_machine_list"; exit
     fi
     if echo $machine | grep -q imx; then
 	portfolio=IMX
@@ -730,12 +728,14 @@ for i in $bootpartition $rootpartition $backuppartition $efipartition; do
 done
 
 
-[ -n "$bootimg" ] && bootimg_n=$bootimg || bootimg_n=boot_${portfolio}_${tgtarch}_lts_${default_linux_version}.tgz
-[ -n "$rootfsimg" ] && rootfsimg_n=$rootfsimg || rootfsimg_n=rootfs_${distroversion}_ubuntu_main_${tgtarch}.tgz
+[ -n "$bootimg" ] && bootimg_n=$bootimg || bootimg_n=boot_${portfolio}_${tgtarch}_lts_${DEFAULT_LINUX_VERSION}.tar.zst
+[ -n "$rootfsimg" ] && rootfsimg_n=$rootfsimg || rootfsimg_n=rootfs_${distroversion}_debian_desktop_${tgtarch}.tar.zst
 [ -n "$firmware" ] && firmware_n=$firmware || firmware_n=firmware_${machine}_sdboot.img
 
 if [ -z "$firmware" ] && [ "$machine" = imx8mpevk -o "$machine" = imx8mmevk -o "$machine" = imx8mnevk -o "$machine" = imx8mqevk ]; then
     firmware_n=firmware_${machine}_sdboot_lpddr4.img
+elif [ -z "$firmware" -a "$machine" = imx93evk ]; then
+    firmware_n=firmware_${machine}_sdboot_a1.img
 elif [ -z "$firmware" -a "$machine" = imx8qxpmek ]; then
     firmware_n=firmware_${machine}_sdboot_c0.img
 elif [ -z "$firmware" -a "$machine" = ls2088ardb ]; then
@@ -779,26 +779,27 @@ elif [ $instruction = install -o $instruction = null ] && \
     fi
     check_images_format
     flex_install_distro
-elif [ $instruction = mksdcard ]; then
+elif [ $instruction = mkwic ]; then
     if mount | grep $mntdir/$devname; then sudo umount $mntdir/$devname* 1>/dev/null 2>&1 || true; fi
     [ ! -f $rootfsimg_n ] && print_e "Not found $rootfsimg_n" && exit
+    [ ! -f $bootimg_n ] && print_e "Not found $bootimg_n" && exit
     [ ! -f $firmware_n ] && print_e "Not found $firmware_n" && exit
-    print_n "Creating sdcard.img, waiting ..."
-    rm -f sdcard.img && dd if=/dev/zero of=sdcard.img bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB
-    loopdev=$(sudo losetup -j sdcard.img | cut -d' ' -f1)
+    print_n "Creating sdcard.wic, waiting ..."
+    rm -f sdcard.wic && dd if=/dev/zero of=sdcard.wic bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB
+    loopdev=$(sudo losetup -j sdcard.wic | cut -d' ' -f1)
     if [ -n "$loopdev" ]; then
         for lpn in $loopdev; do
             sudo losetup -d ${lpn::-1}
         done
     fi
-    sudo losetup /dev/$devname sdcard.img
+    sudo losetup /dev/$devname sdcard.wic
     [ -n "$bootimg" ] && bootimgopt="-b $bootimg_n"
     [ -n "$diskpartition" ] && diskpartitionopt="-p $diskpartition"
-    flex-installer -i install -r $rootfsimg_n -f $firmware_n $bootimgopt $diskpartitionopt -d /dev/$devname
+    flex-installer -i install -r $rootfsimg_n -f $firmware_n $bootimgopt $diskpartitionopt -d /dev/$devname -m $machine
     sudo losetup -d /dev/$devname
-    fdisk -l sdcard.img
-    print_n "Run the following command to burn sdcard.img to your storage device:"
-    print_n "sudo dd if=sdcard.img of=/dev/sdX bs=1M conv=fsync"
+    fdisk -l sdcard.wic
+    print_n "Run the following command to burn sdcard.wic to SD card:"
+    print_n "sudo dd if=sdcard.wic of=/dev/mmcblk0 bs=1M conv=fsync"
 elif [ $instruction = backup ]; then
     mount_device
     [ -z "$backupdir" ] && backupdir=$backuppartition; mkdir -p $backupdir; timestamp=$(date +%Y%m%d%H%M)

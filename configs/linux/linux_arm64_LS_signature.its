@@ -31,7 +31,7 @@
 
 		initrd {
 			description = "initrd for arm64";
-			data = /incbin/("../../build/images/rootfs_yocto_arm64_tiny.cpio.gz");
+			data = /incbin/("../../build/images/rootfs_poky_arm64_tiny.cpio.gz");
 			type = "ramdisk";
 			arch = "arm64";
 			os = "linux";

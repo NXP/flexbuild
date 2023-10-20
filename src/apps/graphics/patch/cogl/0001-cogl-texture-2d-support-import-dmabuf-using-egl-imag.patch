@@ -1,0 +1,228 @@
+From 99bffe15cf8c84b4cae46c8b6ff41715bd1712d7 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Wed, 3 Feb 2021 19:25:07 +0800
+Subject: [PATCH] cogl-texture-2d: support import dmabuf using egl image
+
+---
+ cogl/cogl-texture-2d.c        | 142 ++++++++++++++++++++++++++++++++++
+ cogl/cogl-texture-2d.h        |  30 +++++++
+ cogl/winsys/cogl-winsys-egl.c |   2 +
+ 3 files changed, 174 insertions(+)
+
+diff --git a/cogl/cogl-texture-2d.c b/cogl/cogl-texture-2d.c
+index cc28cd95..16c7e9db 100644
+--- a/cogl/cogl-texture-2d.c
++++ b/cogl/cogl-texture-2d.c
+@@ -59,6 +59,10 @@
+ #include "cogl-wayland-server.h"
+ #endif
+ 
++#define fourcc_code(a, b, c, d) ((__u32)(a) | ((__u32)(b) << 8) | \
++				 ((__u32)(c) << 16) | ((__u32)(d) << 24))
++#define DRM_FORMAT_NV12		fourcc_code('N', 'V', '1', '2') /* 2x2 subsampled Cr:Cb plane */
++
+ static void _cogl_texture_2d_free (CoglTexture2D *tex_2d);
+ 
+ COGL_TEXTURE_DEFINE (Texture2D, texture_2d);
+@@ -272,6 +276,144 @@ _cogl_egl_texture_2d_new_from_image (CoglContext *ctx,
+ 
+   return tex;
+ }
++
++CoglTexture2D *
++cogl_texture_2d_new_from_dmafd (CoglContext *ctx,
++                                int width,
++                                int height,
++                                int n_planes,
++                                int fourcc,
++                                CoglColorMatrix matrix,
++                                CoglColorRange range,
++                                int *offsets,
++                                int *rowstrides,
++                                int *fds,
++                                CoglError **error)
++{
++  CoglTexture2D *tex = NULL;
++  EGLImageKHR img;
++
++  /* Explanation of array length:
++   * - 6 plane independent values are at the start (width, height, format FourCC)
++   * - 10 values per plane, and there are up to MAX_NUM_DMA_BUF_PLANES planes
++   * - 4 values for color space and range
++   * - 1 extra value for the EGL_NONE sentinel
++   */
++  EGLint attribs[41];         /* 6 + 10 * 3 + 4 + 1 */
++  int atti = 0;
++
++  /* EGL DMABuf importation supports a maximum of 3 planes */
++  if (n_planes > 3) {
++    _cogl_set_error (error,
++                    COGL_SYSTEM_ERROR,
++                    COGL_SYSTEM_ERROR_UNSUPPORTED,
++                    "can not import %d plane buffer\n", n_planes);
++    return NULL;
++  }
++
++  attribs[atti++] = EGL_WIDTH;
++  attribs[atti++] = width;
++  attribs[atti++] = EGL_HEIGHT;
++  attribs[atti++] = height;
++  attribs[atti++] = EGL_LINUX_DRM_FOURCC_EXT;
++  attribs[atti++] = fourcc;
++
++  /* first plane */
++  {
++    attribs[atti++] = EGL_DMA_BUF_PLANE0_FD_EXT;
++    attribs[atti++] = fds[0];
++    attribs[atti++] = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
++    attribs[atti++] = offsets[0];
++    attribs[atti++] = EGL_DMA_BUF_PLANE0_PITCH_EXT;
++    attribs[atti++] = rowstrides[0];
++  }
++
++  /* second plane */
++  if (n_planes >= 2) {
++    attribs[atti++] = EGL_DMA_BUF_PLANE1_FD_EXT;
++    attribs[atti++] = fds[1];
++    attribs[atti++] = EGL_DMA_BUF_PLANE1_OFFSET_EXT;
++    attribs[atti++] = offsets[1];
++    attribs[atti++] = EGL_DMA_BUF_PLANE1_PITCH_EXT;
++    attribs[atti++] = rowstrides[1];
++  }
++
++  /* third plane */
++  if (n_planes == 3) {
++    attribs[atti++] = EGL_DMA_BUF_PLANE2_FD_EXT;
++    attribs[atti++] = fds[2];
++    attribs[atti++] = EGL_DMA_BUF_PLANE2_OFFSET_EXT;
++    attribs[atti++] = offsets[2];
++    attribs[atti++] = EGL_DMA_BUF_PLANE2_PITCH_EXT;
++    attribs[atti++] = rowstrides[2];
++  }
++
++  {
++    EGLint color_space;
++    switch (matrix) {
++      case COGL_COLOR_MATRIX_BT601:
++        color_space = EGL_ITU_REC601_EXT;
++        break;
++      case COGL_COLOR_MATRIX_BT709:
++        color_space = EGL_ITU_REC709_EXT;
++        break;
++      case COGL_COLOR_MATRIX_BT2020:
++        color_space = EGL_ITU_REC2020_EXT;
++        break;
++      default:
++        color_space = 0;
++        break;
++    }
++    if (color_space != 0) {
++      attribs[atti++] = EGL_YUV_COLOR_SPACE_HINT_EXT;
++      attribs[atti++] = color_space;
++    }
++  }
++
++  {
++    EGLint color_range;
++    switch (range) {
++      case COGL_COLOR_RANGE_0_255:
++        color_range = EGL_YUV_FULL_RANGE_EXT;
++        break;
++      case COGL_COLOR_RANGE_16_235:
++        color_range = EGL_YUV_NARROW_RANGE_EXT;
++        break;
++      default:
++        color_range = 0;
++        break;
++    }
++    if (color_range != 0) {
++      attribs[atti++] = EGL_SAMPLE_RANGE_HINT_EXT;
++      attribs[atti++] = color_range;
++    }
++  }
++
++  /* Add the EGL_NONE sentinel */
++  attribs[atti] = EGL_NONE;
++
++  img = _cogl_egl_create_image (ctx,
++                        EGL_LINUX_DMA_BUF_EXT,
++                        NULL,
++                        attribs);
++
++  if (!img) {
++    _cogl_set_error (error,
++                     COGL_SYSTEM_ERROR,
++                     COGL_SYSTEM_ERROR_UNSUPPORTED,
++                     "create egl image error %x\n", eglGetError ());
++    return NULL;
++  }
++
++  tex = _cogl_egl_texture_2d_new_from_image (ctx,
++                                             width, height,
++                                             COGL_PIXEL_FORMAT_RGBA_8888,
++                                             img,
++                                             error);
++  _cogl_egl_destroy_image (ctx, img);
++
++  return tex;
++}
+ #endif /* defined (COGL_HAS_EGL_SUPPORT) && defined (EGL_KHR_image_base) */
+ 
+ #ifdef COGL_HAS_WAYLAND_EGL_SERVER_SUPPORT
+diff --git a/cogl/cogl-texture-2d.h b/cogl/cogl-texture-2d.h
+index c806ced5..f5e490eb 100644
+--- a/cogl/cogl-texture-2d.h
++++ b/cogl/cogl-texture-2d.h
+@@ -229,6 +229,36 @@ cogl_texture_2d_new_from_data (CoglContext *ctx,
+ CoglTexture2D *
+ cogl_texture_2d_new_from_bitmap (CoglBitmap *bitmap);
+ 
++
++#ifdef COGL_HAS_EGL_SUPPORT
++
++typedef enum { /*< prefix=COGL_COLOR_MATRIX >*/
++  COGL_COLOR_MATRIX_BT601,
++  COGL_COLOR_MATRIX_BT709,
++  COGL_COLOR_MATRIX_BT2020,
++  COGL_COLOR_MATRIX_NONE
++} CoglColorMatrix;
++
++typedef enum { /*< prefix=COGL_COLOR_RANGE >*/
++  COGL_COLOR_RANGE_0_255,
++  COGL_COLOR_RANGE_16_235,
++  COGL_COLOR_RANGE_NONE
++} CoglColorRange;
++
++CoglTexture2D *
++cogl_texture_2d_new_from_dmafd (CoglContext *ctx,
++                                int width,
++                                int height,
++                                int n_planes,
++                                int fourcc,
++                                CoglColorMatrix matrix,
++                                CoglColorRange range,
++                                int *offsets,
++                                int *rowstrides,
++                                int *fds,
++                                CoglError **error);
++#endif /* COGL_HAS_EGL_SUPPORT */
++
+ COGL_END_DECLS
+ 
+ #endif /* __COGL_TEXTURE_2D_H */
+diff --git a/cogl/winsys/cogl-winsys-egl.c b/cogl/winsys/cogl-winsys-egl.c
+index 4a9f3aa6..de775543 100644
+--- a/cogl/winsys/cogl-winsys-egl.c
++++ b/cogl/winsys/cogl-winsys-egl.c
+@@ -1027,6 +1027,8 @@ _cogl_egl_create_image (CoglContext *ctx,
+ #ifdef EGL_KHR_image_pixmap
+   if (target == EGL_NATIVE_PIXMAP_KHR)
+     egl_ctx = EGL_NO_CONTEXT;
++  else if (target == EGL_LINUX_DMA_BUF_EXT)
++    egl_ctx = EGL_NO_CONTEXT;
+   else
+ #endif
+ #ifdef COGL_HAS_WAYLAND_EGL_SERVER_SUPPORT
+-- 
+2.17.1
+

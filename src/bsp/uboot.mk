@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -9,7 +9,6 @@ include imx_mkimage.mk
 
 
 uboot u-boot:
-ifeq ($(CONFIG_UBOOT), "y")
 	@$(call repo-mngr,fetch,uboot,bsp) && \
 	 curbrch=`cd $(BSPDIR)/uboot && git branch | grep ^* | cut -d' ' -f2` && \
 	 $(call fbprint_n,"Building u-boot $$curbrch for $(MACHINE)") && \
@@ -36,11 +35,10 @@ define build-uboot-target
 	    export ARCH=arm64 && export CROSS_COMPILE=aarch64-linux-gnu-; \
 	fi && \
 	if [ $(MACHINE) != all ]; then brd=$(MACHINE); fi && \
-	if [ $$brd = ls1088ardb_pb ]; then brd=ls1088ardb; fi && \
-	if [ $${brd:0:7} = lx2160a ]; then brd=$${brd:0:10}; fi && \
 	opdir=$(FBOUTDIR)/bsp/u-boot/$$brd/output/$1 && mkdir -p $$opdir && \
-	$(call fbprint_n,"config = $1") && \
+	unset PKG_CONFIG_SYSROOT_DIR && \
 	\
+	$(call fbprint_n,"config = $1") && \
 	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 && \
 	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir && \
 	\
@@ -68,10 +66,10 @@ define build-uboot-target
 	fi;  \
 	\
 	if echo $1 | grep -q ^ls1021a && [ ! -d $(FBOUTDIR)/bsp/rcw/$(MACHINE) ]; then \
-	    bld -c rcw -m $(MACHINE) -f $(CFGLISTYML); \
+	    bld rcw -m $(MACHINE) -f $(CFGLISTYML); \
 	fi && \
-	if echo $1 | grep -qE ^imx8; then \
-	    bld -c atf -m $(MACHINE) -b sd -f $(CFGLISTYML) && \
+	if echo $1 | grep -qE '^imx8|^imx9'; then \
+	    bld atf -m $(MACHINE) -b sd -f $(CFGLISTYML) && \
 	    $(call imx_mkimage_target, $1) \
 	elif echo $1 | grep -qiE "mx6|mx7"; then \
 	    cp $$opdir/u-boot-dtb.imx $(FBOUTDIR)/bsp/u-boot/$$brd/; \
@@ -80,5 +78,3 @@ define build-uboot-target
 	fi && \
 	$(call fbprint_d,"u-boot for $$brd in $(FBOUTDIR)/bsp/u-boot/$$brd");
 endef
-
-endif

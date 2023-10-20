@@ -9,7 +9,7 @@
 #
 # ${BOOTLOADER_TYPE} can be uboot, uefi
 #
-# ${BOOT_TYPE} can be sd, emmc, qspi, xspi, nor, nand, defined in configs/board/<brd>/manifest
+# ${BOOT_TYPE} can be sd, emmc, qspi, xspi, nor, nand, defined in configs/board/<machine>.conf
 #
 # In case of SD/eMMC boot, the DISK_BOOTLOADER_OFFSET is 4k for QorIQ SoC or 1k/32k/33k for i.MX SoC
 #
@@ -17,9 +17,9 @@
 #
 # - docs/memory_layout.txt
 # - configs/board/common/layerscape_memorylayout.cfg
-# - configs/board/<machine>/manifest
+# - configs/board/<machine>.conf
 #
-# Usage: bld -i mkfw -m <machine>  [ -b <boottype> ]
+# Usage: bld fw -m <machine>  [ -b <boottype> ]
 #
 
 
@@ -94,7 +94,7 @@ create_composite_firmware() {
 
 			if [ -n "${img_file}" ]; then
 			    if [ -e "$FBOUTDIR/${img_file}" ]; then
-				echo " Writing ${img_offset} <---> ${img_file}"
+				echo " Writing ${img_offset} <---> build/${img_file}"
 				if [ $i != 1 ] && [ "${boottype}" = "sd" -o "${boottype}" = "emmc" ]; then
 				    img_offset=`printf "%d - %d\n" ${img_offset} ${DISK_BOOTLOADER_OFFSET} | bc`
 				fi

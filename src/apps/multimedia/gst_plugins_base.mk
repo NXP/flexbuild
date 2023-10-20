@@ -1,56 +1,89 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
+# 'base' GStreamer plugins and helper libraries
+# https://gstreamer.freedesktop.org
+
+# need to set gl_winsys with x11 to include libX11-xcb.so libX11.so for libgstgl-1.0.so
 
 
 gst_plugins_base:
-ifeq ($(CONFIG_GSTREAMER), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"gst_plugins_base") && \
 	 $(call repo-mngr,fetch,gst_plugins_base,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_base && \
-	 export CROSS=$(CROSS_COMPILE) && \
-	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@TARGET_ARCH@%aarch64%g' \
-	     -e 's%@TARGET_CPU@%cortex-a53%g' -e 's%@TARGET_ENDIAN@%little%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     $(FBDIR)/src/misc/meson/cross-compilation.conf > cross-compilation.conf && \
+	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
+	 if [ ! -f .patchdone ] && [ $(MACHINE) = imx8qmmek -o $(MACHINE) = imx8qxpmek ]; then \
+	     git am $(FBDIR)/src/apps/multimedia/patch/gst_plugins_base/*g2d-into-playsink.patch && touch .patchdone; \
+	 fi && \
+	 if ! grep -q libexecdir= meson.build; then \
+	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
+	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \
+	     sed -i 's/0.62/0.61/' meson.build; \
+	 fi && \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld -i mkrfs -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgbm_viv.so ]; then \
-	     bld -c gpulib -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML) && \
-	     sudo cp -rf $(DESTDIR)/usr/lib/lib* $(RFSDIR)/usr/lib/; \
+	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
-	 if [ ! -d $(RFSDIR)/usr/include/libdrm ]; then \
-	     bld -c libdrm -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/include/gstreamer-1.0 ]; then \
-	     bld -c gstreamer -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -f $(CFGLISTYML); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/imx/linux/dma-buf.h ]; then \
-	     bld -c imx_vpu -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	     bld gstreamer -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so ]; then \
-              bld -c imx_g2d -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	      bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
-	 if [ ! -f $(RFSDIR)/usr/lib/libgstbase-1.0.so ]; then \
-	     sudo cp -rf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include && \
-	     sudo cp -rf $(DESTDIR)/usr/lib/libgst* $(DESTDIR)/usr/lib/libGAL.so $(DESTDIR)/usr/lib/libgbm_viv.so* \
-	          $(DESTDIR)/usr/lib/libg2d*.so* $(RFSDIR)/usr/lib && \
-	     sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstbase-1.0.so && \
-	     sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstreamer-1.0.so; \
+	 if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
+	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
-	 mkdir -p build && \
-	 meson build \
-	      -Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/imx -I$(RFSDIR)/usr/include/gstreamer-1.0" \
-	      -Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -lgbm -lEGL -lgbm_viv -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
-	      --prefix=/usr --buildtype=release --cross-file cross-compilation.conf \
-	      -Dgl-graphene=disabled \
-	      -Dalsa=enabled && \
-	 ninja -j $(JOBS) -C build install && \
+	 if [ ! -f $(RFSDIR)/usr/include/gstreamer-1.0/gst/gstconfig.h ]; then \
+	     sudo cp -Prf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include; \
+	 fi && \
+	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0} && \
+	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstallocators-1.0.so.0,libgstreamer-1.0.so.0,libdrm.so.2} && \
+	 \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+	 export GI_SCANNER_DISABLE_CACHE=1 && \
+	 meson setup build_$(DISTROTYPE)_$(ARCH) \
+		--cross-file meson.cross \
+		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0" \
+		-Dc_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 \
+			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -lgbm -lEGL \
+			       -lgbm_viv -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
+		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
+			       -lgbm -lEGL -lgbm_viv -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
+		--prefix=/usr --buildtype=release \
+		--strip \
+		-Dintrospection=disabled \
+		-Dexamples=disabled \
+		-Dnls=enabled \
+		-Ddoc=disabled \
+		-Dgl_api=gles2 \
+		-Dgl_platform=egl \
+		-Dgl_winsys=egl,viv-fb,wayland,x11 \
+		-Dalsa=enabled \
+		-Dcdparanoia=disabled \
+		-Dgl-graphene=disabled \
+		-Dgl-jpeg=disabled \
+		-Dogg=enabled \
+		-Dopus=disabled \
+		-Dorc=enabled \
+		-Dpango=enabled \
+		-Dgl-png=enabled \
+		-Dqt5=disabled \
+		-Dtheora=enabled \
+		-Dtremor=disabled \
+		-Dlibvisual=disabled \
+		-Dvorbis=enabled \
+		-Dx11=enabled \
+		-Dxvideo=enabled \
+		-Dxshm=enabled && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
 	 $(call fbprint_d,"gst_plugins_base")
-endif
-endif

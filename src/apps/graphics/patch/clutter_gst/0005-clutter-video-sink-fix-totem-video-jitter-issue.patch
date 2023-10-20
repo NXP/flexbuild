@@ -1,0 +1,405 @@
+From ccf43dfd2558f5c198a5be590ea85eb7eb26101e Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Mon, 27 Sep 2021 15:44:14 +0800
+Subject: [PATCH] clutter-video-sink: fix totem video jitter issue
+
+add buffer sync between gstreamer rendering thread
+and clutter repaint thread
+
+Signed-off-by: Haihua Hu <jared.hu@nxp.com>
+---
+ clutter-gst/clutter-gst-content.c    |  22 +++++
+ clutter-gst/clutter-gst-video-sink.c | 126 ++++++++++++++++++++++++++-
+ clutter-gst/clutter-gst-video-sink.h |   2 +
+ 3 files changed, 146 insertions(+), 4 deletions(-)
+
+diff --git a/clutter-gst/clutter-gst-content.c b/clutter-gst/clutter-gst-content.c
+index 23ec2c7..fd07ec7 100644
+--- a/clutter-gst/clutter-gst-content.c
++++ b/clutter-gst/clutter-gst-content.c
+@@ -65,6 +65,8 @@ struct _ClutterGstContentPrivate
+ 
+   gboolean paint_frame;
+   gboolean paint_overlays;
++  gboolean redraw_pending;
++  guint repaint_id;
+ };
+ 
+ enum
+@@ -157,6 +159,8 @@ update_frame (ClutterGstContent *self,
+     old_res = old_frame->resolution;
+   if (new_frame)
+     new_res = new_frame->resolution;
++  
++  priv->redraw_pending = TRUE;
+ 
+   if (memcmp(&old_res, &new_res, sizeof(old_res)) != 0)
+     g_signal_emit (self, signals[SIZE_CHANGE], 0,
+@@ -326,6 +330,7 @@ clutter_gst_content_paint_content (ClutterContent   *content,
+   ClutterPaintNode *node;
+   ClutterContentRepeat repeat;
+   guint8 paint_opacity;
++  ClutterActor  *stage = NULL;
+ 
+   clutter_actor_get_content_box (actor, &box);
+   paint_opacity = clutter_actor_get_paint_opacity (actor);
+@@ -348,6 +353,7 @@ clutter_gst_content_paint_content (ClutterContent   *content,
+     }
+ 
+   repeat = clutter_actor_get_content_repeat (actor);
++  stage = clutter_actor_get_stage (actor);
+ 
+   if (priv->paint_frame && priv->current_frame)
+     {
+@@ -505,6 +511,8 @@ clutter_gst_content_dispose (GObject *object)
+       g_boxed_free (CLUTTER_GST_TYPE_FRAME, priv->current_frame);
+       priv->current_frame = NULL;
+     }
++  
++  clutter_threads_remove_repaint_func(priv->repaint_id);
+ 
+   G_OBJECT_CLASS (clutter_gst_content_parent_class)->dispose (object);
+ }
+@@ -585,6 +593,18 @@ clutter_gst_content_class_init (ClutterGstContentClass *klass)
+                   G_TYPE_INT, G_TYPE_INT);
+ }
+ 
++static gboolean
++post_redraw (gpointer data_)
++{
++  ClutterGstContentPrivate *priv = (ClutterGstContentPrivate * )data_;
++
++  if (priv && priv->paint_frame && priv->redraw_pending) {
++    clutter_gst_video_sink_frame_done (priv->sink);
++    priv->redraw_pending = FALSE;
++  }
++
++  return TRUE;
++}
+ 
+ static void
+ clutter_gst_content_init (ClutterGstContent *self)
+@@ -596,9 +616,11 @@ clutter_gst_content_init (ClutterGstContent *self)
+   content_set_sink (self,
+                     CLUTTER_GST_VIDEO_SINK (clutter_gst_create_video_sink ()),
+                     FALSE);
++  priv->repaint_id = clutter_threads_add_repaint_func_full (CLUTTER_REPAINT_FLAGS_POST_PAINT, post_redraw, self->priv, NULL);
+ 
+   priv->paint_frame = TRUE;
+   priv->paint_overlays = TRUE;
++  priv->redraw_pending = FALSE;
+ }
+ 
+ 
+diff --git a/clutter-gst/clutter-gst-video-sink.c b/clutter-gst/clutter-gst-video-sink.c
+index a590a4b..5b8cdd4 100644
+--- a/clutter-gst/clutter-gst-video-sink.c
++++ b/clutter-gst/clutter-gst-video-sink.c
+@@ -238,6 +238,12 @@ struct _ClutterGstVideoSinkPrivate
+   gboolean frame_dirty;
+   gboolean had_upload_once;
+   gboolean is_dmabuf;
++
++  GMutex render_lock;
++  GCond redraw_wait;
++  gboolean redraw_pending;
++  gboolean flushing;
++  GstBuffer *last_buffer;
+   
+   /* fps print support */
+   guint64 frame_showed;
+@@ -734,6 +740,8 @@ clutter_gst_source_finalize (GSource *source)
+ {
+   ClutterGstSource *gst_source = (ClutterGstSource *) source;
+ 
++  GST_WARNING_OBJECT (gst_source->sink, "finalize");
++
+   g_mutex_lock (&gst_source->buffer_lock);
+   if (gst_source->buffer)
+     gst_buffer_unref (gst_source->buffer);
+@@ -1033,6 +1041,7 @@ clutter_gst_source_prepare (GSource *source,
+   ClutterGstSource *gst_source = (ClutterGstSource *) source;
+ 
+   *timeout = -1;
++  GST_WARNING_OBJECT (gst_source->sink, "prepare");
+ 
+   return gst_source->buffer != NULL;
+ }
+@@ -1042,6 +1051,8 @@ clutter_gst_source_check (GSource *source)
+ {
+   ClutterGstSource *gst_source = (ClutterGstSource *) source;
+ 
++  GST_WARNING_OBJECT (gst_source->sink, "check");
++
+   return (gst_source->buffer != NULL ||
+           gst_source->sink->priv->balance_dirty);
+ }
+@@ -2314,6 +2325,7 @@ clutter_gst_source_dispatch (GSource *source,
+   GstBuffer *buffer;
+   gboolean pipeline_ready = FALSE;
+   gboolean caps_parsed;
++  GST_WARNING_OBJECT (gst_source->sink, "dispatch");
+ 
+   g_mutex_lock (&gst_source->buffer_lock);
+ 
+@@ -2344,8 +2356,6 @@ clutter_gst_source_dispatch (GSource *source,
+   buffer = gst_source->buffer;
+   gst_source->buffer = NULL;
+ 
+-  g_mutex_unlock (&gst_source->buffer_lock);
+-
+   if (buffer)
+     {
+       if (gst_is_dmabuf_memory (gst_buffer_peek_memory (buffer, 0))) {
+@@ -2373,7 +2383,7 @@ clutter_gst_source_dispatch (GSource *source,
+       priv->had_upload_once = TRUE;
+       priv->frame_showed ++;
+ 
+-      gst_buffer_unref (buffer);
++      //gst_buffer_unref (buffer);
+     }
+   else
+     GST_WARNING_OBJECT (gst_source->sink, "No buffers available for display");
+@@ -2386,6 +2396,15 @@ clutter_gst_source_dispatch (GSource *source,
+     g_signal_emit (gst_source->sink,
+                    video_sink_signals[NEW_FRAME], 0,
+                    NULL);
++  if (buffer) {
++    if (priv->last_buffer)
++      gst_buffer_unref (priv->last_buffer);
++    priv->last_buffer = gst_buffer_ref (buffer);
++    gst_buffer_unref (buffer);
++  }
++
++  g_mutex_unlock (&gst_source->buffer_lock);
++  GST_WARNING_OBJECT (gst_source->sink, "new frame signal emitted");
+ 
+   return TRUE;
+ 
+@@ -2405,6 +2424,7 @@ clutter_gst_source_dispatch (GSource *source,
+     GST_WARNING_OBJECT (gst_source->sink, "Failed to upload buffer");
+     priv->flow_return = GST_FLOW_ERROR;
+     gst_buffer_unref (buffer);
++    g_mutex_unlock (&gst_source->buffer_lock);
+     return FALSE;
+   }
+ }
+@@ -2460,6 +2480,10 @@ clutter_gst_video_sink_init (ClutterGstVideoSink *sink)
+   priv->overlays = clutter_gst_overlays_new ();
+ 
+   priv->pool = NULL;
++
++  g_mutex_init (&priv->render_lock);
++  g_cond_init (&priv->redraw_wait);
++  priv->last_buffer = NULL;
+ }
+ 
+ static GstFlowReturn
+@@ -2471,6 +2495,27 @@ _clutter_gst_video_sink_render (GstBaseSink *bsink,
+   ClutterGstSource *gst_source = priv->source;
+   GstBuffer *to_render = NULL;
+   GstFlowReturn ret = GST_FLOW_OK;
++
++  g_mutex_lock (&priv->render_lock);
++
++    /* drop double rendering */
++  if (G_UNLIKELY (buffer == priv->last_buffer)) {
++    GST_LOG_OBJECT (sink, "Buffer already being rendered");
++    goto done;
++  }
++
++  GST_WARNING_OBJECT (sink, "new buffer coming %p wait on pending redraw (%s)",
++                              buffer, priv->redraw_pending?"yes":"no");
++
++  while (priv->redraw_pending)
++    g_cond_wait (&priv->redraw_wait, &priv->render_lock);
++  
++  if (G_UNLIKELY (priv->flushing)) {
++    GST_LOG_OBJECT (sink, "we are flushing");
++    goto done;
++  }
++  
++  GST_WARNING_OBJECT (sink, "start to render %p", buffer);
+  
+   if (!gst_is_dmabuf_memory (gst_buffer_peek_memory (buffer, 0)) && priv->pool) {
+     GstVideoFrame src, dst;
+@@ -2518,29 +2563,42 @@ _clutter_gst_video_sink_render (GstBaseSink *bsink,
+ 
+   g_main_context_wakeup (NULL);
+ 
++  priv->redraw_pending = TRUE;
++
+   if (buffer != to_render)
+     gst_buffer_unref (to_render);
++  
++  //if (priv->last_buffer)
++  //  gst_buffer_unref (priv->last_buffer);
++  //
++  //priv->last_buffer = gst_buffer_ref (buffer);
++done:
++  g_mutex_unlock (&priv->render_lock);
+ 
+   return GST_FLOW_OK;
+ 
+  dispatch_flow_ret:
+   {
+     g_mutex_unlock (&gst_source->buffer_lock);
++    g_mutex_unlock (&priv->render_lock);
+     return priv->flow_return;
+   }
+   src_map_fail:
+   {
+     GST_ERROR ("map src error");
++    g_mutex_unlock (&priv->render_lock);
+     return GST_FLOW_ERROR;
+   }
+   dst_map_fail:
+   {
+     GST_ERROR ("map dst error");
++    g_mutex_unlock (&priv->render_lock);
+     return GST_FLOW_ERROR;
+   }
+   activate_failed:
+   {
+     GST_ERROR ("activate_failed");
++    g_mutex_unlock (&priv->render_lock);
+     return GST_FLOW_ERROR;
+   }
+ }
+@@ -2603,6 +2661,9 @@ clutter_gst_video_sink_dispose (GObject *object)
+       priv->pool = NULL;
+     }
+ 
++  g_mutex_clear (&priv->render_lock);
++  g_cond_clear (&priv->redraw_wait);
++
+   G_OBJECT_CLASS (clutter_gst_video_sink_parent_class)->dispose (object);
+ }
+ 
+@@ -2627,6 +2688,8 @@ clutter_gst_video_sink_start (GstBaseSink *base_sink)
+   priv->source = clutter_gst_source_new (sink);
+   g_source_attach ((GSource *) priv->source, NULL);
+   priv->flow_return = GST_FLOW_OK;
++  priv->redraw_pending = FALSE;
++  priv->flushing = FALSE;
+   return TRUE;
+ }
+ 
+@@ -2659,6 +2722,11 @@ clutter_gst_video_sink_stop (GstBaseSink *base_sink)
+       g_boxed_free (CLUTTER_GST_TYPE_FRAME, priv->clt_frame);
+       priv->clt_frame = NULL;
+     }
++  
++  if (priv->last_buffer) {
++    gst_buffer_unref (priv->last_buffer);
++    priv->last_buffer = NULL;
++  }
+ 
+   return TRUE;
+ }
+@@ -2732,15 +2800,31 @@ clutter_gst_video_sink_event (GstBaseSink * basesink, GstEvent * event)
+ 
+   switch (GST_EVENT_TYPE (event)) {
+     case GST_EVENT_FLUSH_START:
++      GST_DEBUG_OBJECT (sink, "flush start");
+       g_mutex_lock (&gst_source->buffer_lock);
+       if (gst_source->buffer) {
+         GST_DEBUG_OBJECT (sink, "Freeing existing buffer %p", gst_source->buffer);
+         gst_buffer_unref (gst_source->buffer);
+         gst_source->buffer = NULL;
+       }
++      if (priv->last_buffer) {
++        GST_DEBUG_OBJECT (sink, "Freeing last buffer %p", priv->last_buffer);
++        gst_buffer_unref (priv->last_buffer);
++        priv->last_buffer = NULL;
++      }
+       g_mutex_unlock (&gst_source->buffer_lock);
++      g_mutex_lock (&priv->render_lock);
++      priv->redraw_pending = FALSE;
++      priv->flushing = TRUE;
++      g_cond_signal (&priv->redraw_wait);
++      g_mutex_unlock (&priv->render_lock);
++      break;
++    case GST_EVENT_FLUSH_STOP:
++      GST_DEBUG_OBJECT (sink, "flush stop");
++      g_mutex_lock (&priv->render_lock);
++      priv->flushing = FALSE;
++      g_mutex_unlock (&priv->render_lock);
+       break;
+-
+     default:
+       break;
+   }
+@@ -2761,6 +2845,21 @@ clutter_gst_video_sink_change_state (GstElement     *element,
+       priv->frame_showed = 0;
+       priv->run_time = GST_CLOCK_TIME_NONE;
+     break;
++    case GST_STATE_CHANGE_PLAYING_TO_PAUSED:
++      GST_WARNING_OBJECT(sink,"change_state PLAYING_TO_PAUSED");
++      g_mutex_lock (&priv->render_lock);
++      priv->redraw_pending = FALSE;
++      priv->flushing = TRUE;
++      GST_WARNING_OBJECT(sink,"singal wait");
++      g_cond_signal (&priv->redraw_wait);
++      g_mutex_unlock (&priv->render_lock);
++      break;
++    case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
++      GST_WARNING_OBJECT(sink,"change_state PAUSED to PLAYING");
++      g_mutex_lock (&priv->render_lock);
++      priv->flushing = FALSE;
++      g_mutex_unlock (&priv->render_lock);
++      break;
+   default:
+     break;
+   }
+@@ -2771,11 +2870,14 @@ clutter_gst_video_sink_change_state (GstElement     *element,
+ 
+   switch (transition) {
+     case GST_STATE_CHANGE_PLAYING_TO_PAUSED:
++      GST_WARNING_OBJECT(sink,"change_state PLAYING_TO_PAUSED");
+       priv->run_time = gst_element_get_start_time (element);
+       break;
+     case GST_STATE_CHANGE_PAUSED_TO_READY:
++      GST_WARNING_OBJECT(sink,"change_state PAUSED_TO_READY");
+       break;
+     case GST_STATE_CHANGE_READY_TO_NULL:
++      GST_WARNING_OBJECT(sink,"change_state READY_TO_NULL");
+       if (priv->run_time != GST_CLOCK_TIME_NONE) {
+         g_print ("Total showed frames (%lld), playing for (%" GST_TIME_FORMAT
+             "), fps (%.3f).\n", priv->frame_showed,
+@@ -3123,3 +3225,19 @@ clutter_gst_video_sink_get_overlays (ClutterGstVideoSink *sink)
+ 
+   return sink->priv->overlays;
+ }
++
++void
++clutter_gst_video_sink_frame_done (ClutterGstVideoSink *sink)
++{
++  ClutterGstVideoSinkPrivate *priv;
++
++  g_return_if_fail (CLUTTER_GST_IS_VIDEO_SINK (sink));
++
++  priv = sink->priv;
++  GST_LOG ("frame_done_cb");
++
++  g_mutex_lock (&priv->render_lock);
++  priv->redraw_pending = FALSE;
++  g_cond_signal (&priv->redraw_wait);
++  g_mutex_unlock (&priv->render_lock);
++}
+diff --git a/clutter-gst/clutter-gst-video-sink.h b/clutter-gst/clutter-gst-video-sink.h
+index ce2c7fe..d66e8b6 100644
+--- a/clutter-gst/clutter-gst-video-sink.h
++++ b/clutter-gst/clutter-gst-video-sink.h
+@@ -119,6 +119,8 @@ void                  clutter_gst_video_sink_setup_pipeline (ClutterGstVideoSink
+ 
+ ClutterGstOverlays *  clutter_gst_video_sink_get_overlays   (ClutterGstVideoSink *sink);
+ 
++void clutter_gst_video_sink_frame_done (ClutterGstVideoSink *sink);
++
+ G_END_DECLS
+ 
+ #endif
+-- 
+2.17.1
+

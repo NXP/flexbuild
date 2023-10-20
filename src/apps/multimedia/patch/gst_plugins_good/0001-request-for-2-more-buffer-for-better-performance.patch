@@ -1,0 +1,22 @@
+From b7d3b3620cb5a3c566b747e9045f3c5027b30690 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Wed, 7 Jul 2021 15:38:11 +0800
+Subject: [PATCH] request for 2 more buffer for better performance
+
+---
+ sys/v4l2/gstv4l2object.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sys/v4l2/gstv4l2object.c b/sys/v4l2/gstv4l2object.c
+index eddd4f77d..486ba01ff 100755
+--- a/sys/v4l2/gstv4l2object.c
++++ b/sys/v4l2/gstv4l2object.c
+@@ -5479,7 +5479,7 @@ gst_v4l2_object_decide_allocation (GstV4l2Object * obj, GstQuery * query)
+     /* If no allocation parameters where provided, allow for a little more
+      * buffers and enable copy threshold */
+     if (!update) {
+-      own_min += 2;
++      own_min += 4;
+       gst_v4l2_buffer_pool_copy_at_threshold (GST_V4L2_BUFFER_POOL (pool),
+           TRUE);
+     } else {

@@ -1,0 +1,414 @@
+From a54cbabffef09383f9982f8e046f95b3327a13b3 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Fri, 5 Feb 2021 13:05:58 +0800
+Subject: [PATCH] cluttervideosink: try to import dmabuf
+
+---
+ clutter-gst/Makefile.am              |   1 +
+ clutter-gst/clutter-gst-video-sink.c | 291 ++++++++++++++++++++++++++-
+ 2 files changed, 290 insertions(+), 2 deletions(-)
+
+diff --git a/clutter-gst/Makefile.am b/clutter-gst/Makefile.am
+index dfb9274..60c26d5 100644
+--- a/clutter-gst/Makefile.am
++++ b/clutter-gst/Makefile.am
+@@ -87,6 +87,7 @@ libclutter_gst_@CLUTTER_GST_MAJORMINOR@_la_LIBADD  = @CLUTTER_GST_LIBS@ $(GST_LI
+ libclutter_gst_@CLUTTER_GST_MAJORMINOR@_la_LDFLAGS =	\
+ 	$(CLUTTER_GST_LT_LDFLAGS)			\
+ 	$(GL_LDFLAGS)					\
++	-lgstallocators-1.0				\
+ 	-export-dynamic					\
+ 	-export-symbols-regex "^clutter_gst.*"		\
+ 	-rpath $(libdir)
+diff --git a/clutter-gst/clutter-gst-video-sink.c b/clutter-gst/clutter-gst-video-sink.c
+index 2cbabe6..084821c 100644
+--- a/clutter-gst/clutter-gst-video-sink.c
++++ b/clutter-gst/clutter-gst-video-sink.c
+@@ -81,10 +81,13 @@
+ #include <gst/gstvalue.h>
+ #include <gst/video/navigation.h>
+ #include <gst/video/video.h>
++#include <gst/allocators/gstdmabuf.h>
+ #include <gst/riff/riff-ids.h>
+ #include <string.h>
+ #include <math.h>
+ 
++#include <libdrm/drm_fourcc.h>
++
+ #include "clutter-gst-video-sink.h"
+ #include "clutter-gst-private.h"
+ 
+@@ -133,6 +136,7 @@ static GstStaticPadTemplate sinktemplate_all =
+ static void color_balance_iface_init (GstColorBalanceInterface *iface);
+ static void navigation_interface_init (GstNavigationInterface *iface);
+ 
++#define clutter_gst_video_sink_parent_class parent_class
+ G_DEFINE_TYPE_WITH_CODE (ClutterGstVideoSink,
+                          clutter_gst_video_sink,
+                          GST_TYPE_VIDEO_SINK,
+@@ -230,6 +234,11 @@ struct _ClutterGstVideoSinkPrivate
+   CoglTexture *frame[3];
+   gboolean frame_dirty;
+   gboolean had_upload_once;
++  gboolean is_dmabuf;
++  
++  /* fps print support */
++  guint64 frame_showed;
++  GstClockTime run_time;
+ 
+   ClutterGstVideoFormat format;
+   gboolean bgr;
+@@ -966,14 +975,18 @@ clutter_gst_video_sink_setup_conversions (ClutterGstVideoSink *sink,
+ 
+   if (entry == NULL)
+     {
+-      const char *source = _shader_from_colorimetry (matrix);
++      const char *source;
++      if (priv->is_dmabuf) 
++        source = no_color_conversions_shader;
++      else
++        source = _shader_from_colorimetry (matrix);
+       entry = add_global_cache_entry (&snippet_cache, source, matrix);
+     }
+ 
+   cogl_pipeline_add_snippet (pipeline, entry->vertex_snippet);
+   cogl_pipeline_add_snippet (pipeline, entry->fragment_snippet);
+ 
+-  if (matrix != GST_VIDEO_COLOR_MATRIX_RGB)
++  if (!priv->is_dmabuf && matrix != GST_VIDEO_COLOR_MATRIX_RGB)
+     {
+       gint yuv_to_rgb_location =
+         cogl_pipeline_get_uniform_location (pipeline, "clutter_gst_yuv_to_rgb_");
+@@ -1756,6 +1769,200 @@ static ClutterGstRenderer nv12_glsl_renderer =
+     clutter_gst_dummy_shutdown,
+   };
+ 
++static int
++_drm_fourcc_from_info (GstVideoInfo * info)
++{
++  GstVideoFormat format = GST_VIDEO_INFO_FORMAT (info);
++
++  GST_DEBUG ("Getting DRM fourcc for %s", gst_video_format_to_string (format));
++
++  switch (format) {
++    case GST_VIDEO_FORMAT_YUY2:
++      return DRM_FORMAT_YUYV;
++
++    case GST_VIDEO_FORMAT_UYVY:
++      return DRM_FORMAT_UYVY;
++
++    case GST_VIDEO_FORMAT_NV12:
++      return DRM_FORMAT_NV12;
++
++    case GST_VIDEO_FORMAT_NV16:
++      return DRM_FORMAT_NV16;
++
++    case GST_VIDEO_FORMAT_I420:
++      return DRM_FORMAT_YUV420;
++
++    case GST_VIDEO_FORMAT_RGB16:
++      return DRM_FORMAT_RGB565;
++
++    case GST_VIDEO_FORMAT_BGR16:
++      return DRM_FORMAT_BGR565;
++
++    case GST_VIDEO_FORMAT_RGBA:
++      return DRM_FORMAT_ABGR8888;
++
++    case GST_VIDEO_FORMAT_RGBx:
++      return DRM_FORMAT_XBGR8888;
++
++    case GST_VIDEO_FORMAT_BGRA:
++      return DRM_FORMAT_ARGB8888;
++
++    case GST_VIDEO_FORMAT_BGRx:
++      return DRM_FORMAT_XRGB8888;
++
++    case GST_VIDEO_FORMAT_ARGB:
++      return DRM_FORMAT_BGRA8888;
++
++    case GST_VIDEO_FORMAT_xRGB:
++      return DRM_FORMAT_BGRX8888;
++
++    case GST_VIDEO_FORMAT_ABGR:
++      return DRM_FORMAT_RGBA8888;
++
++    case GST_VIDEO_FORMAT_xBGR:
++      return DRM_FORMAT_RGBX8888;
++
++    default:
++      GST_INFO ("Unsupported format for direct DMABuf.");
++      return -1;
++  }
++}
++
++static void
++clutter_gst_dmabuf_setup_pipeline (ClutterGstVideoSink *sink,
++                                      CoglPipeline *pipeline)
++{
++  ClutterGstVideoSinkPrivate *priv = sink->priv;
++  static SnippetCache snippet_cache;
++  SnippetCacheEntry *entry;
++
++  entry = get_layer_cache_entry (sink, &snippet_cache);
++
++  setup_pipeline_from_cache_entry (sink, pipeline, entry, 1);
++}
++
++static gboolean
++clutter_gst_dmabuf_upload (ClutterGstVideoSink *sink,
++                         GstBuffer *buffer)
++{
++  ClutterGstVideoSinkPrivate *priv = sink->priv;
++  GstMemory *mem;
++  guint i, width, height;
++  guint nplanes;
++  int fourcc;
++  gint fds[4] = {0};
++  gint offsets[4] = {0};
++  gint rowstrides[4] = {0};
++  CoglColorMatrix matrix;
++  CoglColorRange range;
++  CoglError *internal_error = NULL;
++
++  mem = gst_buffer_peek_memory (buffer, 0);
++
++
++  width = GST_VIDEO_INFO_WIDTH (&priv->info);
++  height = GST_VIDEO_INFO_HEIGHT (&priv->info);
++  nplanes = GST_VIDEO_INFO_N_PLANES (&priv->info);
++  fourcc = _drm_fourcc_from_info (&priv->info);
++
++  if (fourcc < 0)
++    goto bail;
++
++  for (i = 0; i < nplanes; i++) {
++    guint offset, stride, mem_idx, length;
++    gsize skip;
++
++    offset = GST_VIDEO_INFO_PLANE_OFFSET (&priv->info, i);
++    stride = GST_VIDEO_INFO_PLANE_STRIDE (&priv->info, i);
++    if (gst_buffer_find_memory (buffer, offset, 1, &mem_idx, &length, &skip)) {
++      GstMemory *m = gst_buffer_peek_memory (buffer, mem_idx);
++      gint fd = gst_dmabuf_memory_get_fd (m);
++      fds[i] = fd;
++      offsets[i] = m->offset + skip;
++      rowstrides[i] = stride;
++    } else {
++      GST_ERROR_OBJECT (sink, "memory does not seem to contain "
++          "enough data for the specified format");
++      goto bail;
++    }
++  }
++  GST_DEBUG ("dmabuf fd %d %d %d %d offsets %d %d %d %d, stride %d %d %d %d",
++  fds[0], fds[1], fds[2], fds[3],
++  offsets[0], offsets[1], offsets[2], offsets[3],
++  rowstrides[0], rowstrides[1], rowstrides[2], rowstrides[3]);
++
++  switch (priv->info.colorimetry.matrix) {
++    case GST_VIDEO_COLOR_MATRIX_BT601:
++      matrix = COGL_COLOR_MATRIX_BT601;
++      break;
++    case GST_VIDEO_COLOR_MATRIX_BT709:
++      matrix = COGL_COLOR_MATRIX_BT709;
++      break;
++    case GST_VIDEO_COLOR_MATRIX_BT2020:
++      matrix = COGL_COLOR_MATRIX_BT2020;
++      break;
++    default:
++      matrix = COGL_COLOR_MATRIX_NONE;
++      break;
++  }
++
++  switch (priv->info.colorimetry.range) {
++    case GST_VIDEO_COLOR_RANGE_0_255:
++      range = COGL_COLOR_RANGE_0_255;
++      break;
++    case GST_VIDEO_COLOR_RANGE_16_235:
++      range = COGL_COLOR_RANGE_16_235;
++      break;
++    default:
++      range = COGL_COLOR_RANGE_NONE;
++      break;
++  }
++
++  clear_frame_textures (sink);
++
++  priv->frame[0] = cogl_texture_2d_new_from_dmafd (priv->ctx,
++                                  width,
++                                  height,
++                                  nplanes,
++                                  fourcc,
++                                  matrix,
++                                  range,
++                                  offsets,
++                                  rowstrides,
++                                  fds,
++                                  &internal_error);
++
++  if (!priv->frame[0]) {
++    GST_ERROR_OBJECT (sink,
++                        "create texture from dmabuf fail : %s",
++                        internal_error->message);
++    cogl_error_free (internal_error);
++    goto bail;
++  }
++
++  return TRUE;
++
++ bail:
++  {
++    GST_ERROR_OBJECT (sink, "dmabuf upload fail");
++    return FALSE;
++  }
++}
++
++static ClutterGstRenderer dmabuf_renderer =
++  {
++    "dmabuf",
++    CLUTTER_GST_NV12,
++    CLUTTER_GST_RENDERER_NEEDS_GLSL | CLUTTER_GST_RENDERER_NEEDS_TEXTURE_RG,
++    GST_STATIC_CAPS (MAKE_CAPS(GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY,
++                               "NV12")),
++    1, /* n_layers */
++    clutter_gst_dmabuf_setup_pipeline,
++    clutter_gst_dmabuf_upload,
++    clutter_gst_dummy_upload_gl,
++    clutter_gst_dummy_shutdown,
++  };
++
+ static GSList*
+ clutter_gst_build_renderers_list (CoglContext *ctx)
+ {
+@@ -1775,6 +1982,7 @@ clutter_gst_build_renderers_list (CoglContext *ctx)
+       &i420_glsl_renderer,
+       &rgb24_glsl_renderer,
+       &rgb32_glsl_renderer,
++      &dmabuf_renderer,
+       NULL
+     };
+ 
+@@ -1852,6 +2060,31 @@ clutter_gst_find_renderer_by_format (ClutterGstVideoSink *sink,
+   return renderer;
+ }
+ 
++static ClutterGstRenderer *
++clutter_gst_get_dmabuf_renderer (ClutterGstVideoSink *sink)
++{
++  ClutterGstVideoSinkPrivate *priv = sink->priv;
++  ClutterGstRenderer *renderer = NULL;
++  GSList *element;
++
++  if (!priv->is_dmabuf) {
++    GST_DEBUG_OBJECT (sink, "no need to get dmabuf renderer");
++    return NULL;
++  }
++
++  for (element = priv->renderers; element; element = g_slist_next (element))
++    {
++      ClutterGstRenderer *candidate = (ClutterGstRenderer *) element->data;
++      if (strcmp(candidate->name, "dmabuf") == 0)
++        {
++          renderer = candidate;
++          break;
++        }
++    }
++
++  return renderer;
++}
++
+ static GstCaps *
+ clutter_gst_video_sink_get_caps (GstBaseSink *bsink,
+                                  GstCaps *filter)
+@@ -2043,6 +2276,11 @@ clutter_gst_source_dispatch (GSource *source,
+ 
+   if (buffer)
+     {
++      if (gst_is_dmabuf_memory (gst_buffer_peek_memory (buffer, 0))) {
++        priv->is_dmabuf = TRUE;
++        priv->renderer = clutter_gst_get_dmabuf_renderer (gst_source->sink);
++      }
++
+       if (gst_buffer_get_video_gl_texture_upload_meta (buffer) != NULL) {
+         GST_DEBUG_OBJECT (gst_source->sink,
+                           "Trying to upload buffer %p with GL using renderer %s",
+@@ -2061,6 +2299,7 @@ clutter_gst_source_dispatch (GSource *source,
+       clutter_gst_video_sink_upload_overlay (gst_source->sink, buffer);
+ 
+       priv->had_upload_once = TRUE;
++      priv->frame_showed ++;
+ 
+       gst_buffer_unref (buffer);
+     }
+@@ -2135,6 +2374,7 @@ clutter_gst_video_sink_init (ClutterGstVideoSink *sink)
+                                                    ClutterGstVideoSinkPrivate);
+   priv->custom_start = 0;
+   priv->default_sample = TRUE;
++  priv->is_dmabuf = FALSE;
+ 
+   priv->brightness = DEFAULT_BRIGHTNESS;
+   priv->contrast = DEFAULT_CONTRAST;
+@@ -2375,6 +2615,50 @@ clutter_gst_video_sink_event (GstBaseSink * basesink, GstEvent * event)
+   return GST_BASE_SINK_CLASS (clutter_gst_video_sink_parent_class)->event (basesink, event);
+ }
+ 
++static GstStateChangeReturn
++clutter_gst_video_sink_change_state (GstElement     *element,
++                                    GstStateChange  transition)
++{
++  GstStateChangeReturn ret = GST_STATE_CHANGE_SUCCESS;
++  ClutterGstVideoSink *sink = CLUTTER_GST_VIDEO_SINK (element);
++  ClutterGstVideoSinkPrivate *priv = sink->priv;
++
++  switch (transition) {
++  case GST_STATE_CHANGE_NULL_TO_READY:
++      priv->frame_showed = 0;
++      priv->run_time = GST_CLOCK_TIME_NONE;
++    break;
++  default:
++    break;
++  }
++
++  ret = GST_ELEMENT_CLASS (parent_class)->change_state (element, transition);
++  if (ret == GST_STATE_CHANGE_FAILURE)
++    return ret;
++
++  switch (transition) {
++    case GST_STATE_CHANGE_PLAYING_TO_PAUSED:
++      priv->run_time = gst_element_get_start_time (element);
++      break;
++    case GST_STATE_CHANGE_PAUSED_TO_READY:
++      break;
++    case GST_STATE_CHANGE_READY_TO_NULL:
++      if (priv->run_time != GST_CLOCK_TIME_NONE) {
++        g_print ("Total showed frames (%lld), playing for (%" GST_TIME_FORMAT
++            "), fps (%.3f).\n", priv->frame_showed,
++            GST_TIME_ARGS (priv->run_time),
++            (gfloat) GST_SECOND * priv->frame_showed / priv->run_time);
++      }
++      priv->frame_showed = 0;
++      priv->run_time = GST_CLOCK_TIME_NONE;
++      break;
++    default:
++      break;
++  }
++
++  return ret;
++}
++
+ static void
+ clutter_gst_video_sink_class_init (ClutterGstVideoSinkClass *klass)
+ {
+@@ -2418,6 +2702,9 @@ clutter_gst_video_sink_class_init (ClutterGstVideoSinkClass *klass)
+   gb_class->propose_allocation = clutter_gst_video_sink_propose_allocation;
+   gb_class->event = clutter_gst_video_sink_event;
+ 
++  ge_class->change_state =
++      GST_DEBUG_FUNCPTR (clutter_gst_video_sink_change_state);
++
+   gv_class->show_frame = _clutter_gst_video_sink_show_frame;
+ 
+   pspec = g_param_spec_int ("update-priority",
+-- 
+2.17.1
+

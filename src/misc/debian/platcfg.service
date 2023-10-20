@@ -1,0 +1,8 @@
+[Unit]
+Description=Runtime Dynamic Configuration for various NXP i.MX/LS platforms
+
+[Service]
+ExecStart=/usr/bin/distroplatcfg
+
+[Install]
+WantedBy=multi-user.target

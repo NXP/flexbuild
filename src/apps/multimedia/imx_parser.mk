@@ -1,4 +1,4 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,8 +7,7 @@
 
 
 imx_parser:
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || true && \
+	@[ $(DISTROVARIANT) != desktop -o $(DESTARCH) != arm64 ] && exit || \
 	 $(call fbprint_b,"imx_parser") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_parser ]; then \
@@ -19,9 +18,8 @@ ifeq ($(DESTARCH),arm64)
 	 cd imx_parser && \
 	 ./configure CC=aarch64-linux-gnu-gcc \
 	   --enable-armv8 \
-	   --enable-fhw \
+	   --disable-static \
 	   --prefix=/usr && \
 	 $(MAKE) -j$(JOBS) && \
 	 $(MAKE) install && \
 	 $(call fbprint_d,"imx_parser")
-endif

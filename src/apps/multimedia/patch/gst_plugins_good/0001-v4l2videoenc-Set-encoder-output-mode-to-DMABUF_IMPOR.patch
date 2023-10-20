@@ -1,0 +1,47 @@
+From ecbd55708b7ff5082c2c1060d5ee94430653312a Mon Sep 17 00:00:00 2001
+From: Hou Qi <qi.hou@nxp.com>
+Date: Tue, 15 Nov 2022 09:01:25 +0800
+Subject: [PATCH] v4l2videoenc: Set encoder output mode to DMABUF_IMPORT if
+
+ receive dmabuf
+
+When output-io-mode is none auto, set output mode to DMABUF_IMPORT to avoid
+memory copy if encoder receives dmabuf. Check buffer type for each input
+buffer and drop non-dmabuf in DMABUF_IMPORT mode.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/-/merge_requests/1095>
+
+---
+ sys/v4l2/gstv4l2videoenc.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/sys/v4l2/gstv4l2videoenc.c b/sys/v4l2/gstv4l2videoenc.c
+index 0d16f9c5f..6601102c8 100644
+--- a/sys/v4l2/gstv4l2videoenc.c
++++ b/sys/v4l2/gstv4l2videoenc.c
+@@ -774,6 +774,25 @@ gst_v4l2_video_enc_handle_frame (GstVideoEncoder * encoder,
+     goto drop;
+   }
+ 
++  if (self->v4l2output->req_mode == GST_V4L2_IO_AUTO) {
++    GstV4l2IOMode mode = self->v4l2output->mode;
++
++    if (gst_is_dmabuf_memory (gst_buffer_peek_memory (frame->input_buffer, 0))
++        && (frame->system_frame_number == 0)) {
++      self->v4l2output->mode = GST_V4L2_IO_DMABUF_IMPORT;
++      if (!gst_v4l2_object_try_import (self->v4l2output, frame->input_buffer))
++        self->v4l2output->mode = mode;
++    }
++  }
++  /* It is possible that a system buffer is received when the number of
++   * buffers runs low. */
++  if (self->v4l2output->mode == GST_V4L2_IO_DMABUF_IMPORT
++      && !gst_is_dmabuf_memory (gst_buffer_peek_memory (frame->input_buffer,
++              0))) {
++    frame->output_buffer = NULL;
++    goto drop;
++  }
++
+   task_state = gst_pad_get_task_state (GST_VIDEO_ENCODER_SRC_PAD (self));
+   if (task_state == GST_TASK_STOPPED || task_state == GST_TASK_PAUSED) {
+     GstBufferPool *pool = gst_v4l2_object_get_buffer_pool (self->v4l2output);

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 NXP
+# Copyright 2020-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,6 +7,7 @@ define imx_mkimage_target
     if [ ! -d $(BSPDIR)/imx_mkimage ]; then \
 	$(call repo-mngr,fetch,imx_mkimage,bsp); \
     fi && \
+    \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \
 	cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin && chmod +x firmware_imx.bin && \
 	./firmware_imx.bin --auto-accept && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
@@ -28,7 +29,7 @@ define imx_mkimage_target
 	./imx-scfw.bin --auto-accept && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/imx_mcore_demos ]; then \
-        bld -c mcore_demo; \
+	bld mcore_demo; \
     fi && \
     \
     if echo $1 | grep -qE ^imx8mp_ddr4_evk; then \
@@ -57,27 +58,36 @@ define imx_mkimage_target
 	cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qx*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QX; \
     elif echo $1 | grep -qE ^imx8ulp; then \
 	SOC=iMX8ULP; SOC_FAMILY=iMX8ULP; target=flash_singleboot_m33; \
-	cp $(BSPDIR)/fw_sentinel/mx8ulpa0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
-	cp $(BSPDIR)/fw_upower/upower.bin $(BSPDIR)/imx_mkimage/iMX8ULP; \
+	cp $(BSPDIR)/fw_sentinel/mx8ulpa2-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
+	cp $(BSPDIR)/fw_upower/upower_a1.bin $(BSPDIR)/imx_mkimage/iMX8ULP/upower.bin; \
 	cp $(BSPDIR)/imx_mcore_demos/imx8ulp-m33-demo/imx8ulp_m33_TCM_rpmsg_lite_str_echo_rtos.bin \
 	   $(BSPDIR)/imx_mkimage/iMX8ULP/m33_image.bin; \
+    elif echo $1 | grep -qE ^imx93; then \
+	SOC=iMX9; SOC_FAMILY=iMX9; target=flash_singleboot_m33; \
+	cp $(BSPDIR)/fw_sentinel/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX9; \
+	cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX9; \
+	cp $(BSPDIR)/imx_mcore_demos/imx93-m33-demo/imx93-11x11-evk_m33_TCM_rpmsg_lite_str_echo_rtos.bin \
+	   $(BSPDIR)/imx_mkimage/iMX9/m33_image.bin; \
     fi && \
+    cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
     \
     cd $(BSPDIR)/imx_mkimage && \
     $(MAKE) clean && $(MAKE) bin && \
-    $(MAKE) SOC=$$SOC -C iMX8M -f soc.mak mkimage_imx8 && \
+    $(MAKE) SOC=iMX8M mkimage_imx8 && \
     if [ $(MACHINE) = imx8qmevk ];  then \
 	$(MAKE) -C iMX8QM -f soc.mak imx8qm_dcd.cfg.tmp; \
     elif [ $(MACHINE) = imx8qxpmek ]; then \
-	$(MAKE) -C iMX8QX REV=B0 -f soc.mak imx8qx_dcd.cfg.tmp; \
+	$(MAKE) -C iMX8QX REV=B0 -f soc.mak $$target; \
+    elif [ $(MACHINE) = imx93evk ]; then \
+	$(MAKE) SOC=iMX93 REV=A0 -C iMX9 -f soc.mak $$target; \
     fi && \
     \
-    cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
     bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \
     if [ $(CONFIG_OPTEE) = y -a ! -f $$bl32 ]; then \
-	bld -c optee_os -m $$brd -f $(CFGLISTYML); \
+	bld optee_os -m $$brd -f $(CFGLISTYML); \
     fi && \
     [ $(MACHINE) = imx8ulpevk ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
+    [ $(MACHINE) = imx93evk ] && plat=$${MACHINE:0:5} || true && \
     cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
 	$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
@@ -109,8 +119,14 @@ define imx_mkimage_target
     if [ $(MACHINE) = imx8qxpmek ]; then \
 	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-b0.bin; \
 	$(MAKE) clean && $(MAKE) bin && \
-	$(MAKE) SOC=$$SOC -C iMX8M -f soc.mak mkimage_imx8 && \
-	$(MAKE) SOC=iMX8QX REV=C0 $$target && \
+	$(MAKE) SOC=iMX8QX mkimage_imx8 && \
+	$(MAKE) SOC=iMX8QX REV=C0 -C iMX8QX -f soc.mak $$target && \
 	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-c0.bin; \
+    elif [ $(MACHINE) = imx93evk ]; then \
+	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-singleboot-m33-a0.bin; \
+	$(MAKE) clean && $(MAKE) bin && \
+	$(MAKE) SOC=iMX8M mkimage_imx8 && \
+	$(MAKE) SOC=iMX93 REV=A1 -C iMX9 -f soc.mak $$target; \
+	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-singleboot-m33-a1.bin; \
     fi
 endef

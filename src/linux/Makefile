@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -18,6 +18,3 @@ include cryptodev_linux.mk
 include lttng_modules.mk
 include mdio_proxy_module.mk
 include isp_vvcam_module.mk
-
-
-linux-modules: cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt

@@ -1,4 +1,4 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,40 +7,42 @@
 # Take photos and videos with your webcam, with fun graphical effects
 
 
-# depend: libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev
-#         libcanberra-dev libcanberra-gtk3-dev libcheese-gtk-dev
+# depends on gstreamer1.0 gstreamer1.0-plugins-base libcanberra gtk4 clutter-1.0 clutter-gst-3.0
+#	  libclutter-gtk-1.0-dev vala-native gnome-desktop libxml2-native gdk-pixbuf-native itstool-native
 
 
 cheese:
-ifeq ($(CONFIG_CHEESE), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || \
+	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"cheese") && \
 	 $(call repo-mngr,fetch,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \
 	 if [ ! -f .patchdone ]; then \
-             git am $(FBDIR)/src/apps/multimedia/patch/cheese/*.patch && touch .patchdone; \
-         fi && \
-	 export CROSS=$(CROSS_COMPILE) && \
-	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/share/pkgconfig && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@TARGET_ARCH@%aarch64%g' \
-	     -e 's%@TARGET_CPU@%cortex-a53%g' -e 's%@TARGET_ENDIAN@%little%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     $(FBDIR)/src/misc/meson/cross-compilation.conf > cross-compilation.conf && \
-	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstvolume.so ]; then \
-	     bld -c gst_plugins_base -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -f $(CFGLISTYML); \
+	      git am $(FBDIR)/src/apps/multimedia/patch/cheese/*.patch && touch .patchdone; \
 	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstv4l2codecs.so ]; then \
-	     bld -c gst_plugins_bad -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -f $(CFGLISTYML); \
-         fi && \
-	 sudo cp -rf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include; \
-	 rm -rf build && mkdir -p build && \
-	 meson build \
-		-Dc_args="-I$(RFSDIR)/usr/include/gstreamer-1.0 -I$(DESTDIR)/usr/include" \
-		-Dc_link_args="-L$(RFSDIR)/usr/lib/aarch64-linux-gnu" \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
+	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
+	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 if [ ! -f $(DESTDIR)/usr/lib/libclutter-gst-3.0.so ]; then \
+	     bld clutter_gst -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
+	 \
+	 meson setup build_$(DISTROTYPE)_$(ARCH) \
+		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 -I$(DESTDIR)/usr/include \
+			  -I$(DESTDIR)/usr/include/clutter-gst-3.0" \
+		-Dc_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib \
+			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -lgstbase-1.0 -lclutter-gst-3.0" \
+		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
+				 -lgstbase-1.0 -lclutter-gst-3.0" \
 		--prefix=/usr --buildtype=release \
-		--cross-file cross-compilation.conf \
-		-Dintrospection=false -Dgtk_doc=false -Dman=false && \
-	 ninja -C build install && \
+		--cross-file meson.cross \
+		--strip \
+		-Dintrospection=false \
+		-Dgtk_doc=false \
+		-Dman=false && \
+	 ninja -C build_$(DISTROTYPE)_$(ARCH) install && \
+	 rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/org.gnome.Cheese.svg && \
+	 rm -f $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/org.gnome.Cheese-symbolic.svg && \
 	 $(call fbprint_d,"cheese")
-endif
-endif

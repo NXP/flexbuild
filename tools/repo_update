@@ -1,63 +1,65 @@
 #
-# Copyright 2019-2021 NXP
+# Copyright 2019-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 git_repo_update() {
-    if [ -n "$COMPONENT" ]; then
-	check_component_valid $COMPONENT
-	reponame=$(echo $COMPONENT | sed 's/-/_/')
+    if [ -n "$2" ]; then
+	check_component_valid $2
+	reponame=$(echo $2 | sed 's/-/_/')
 	branch=$(eval echo '$'"repo_"$reponame"_branch")
 	commit=$(eval echo '$'"repo_"$reponame"_commit")
 	repourl=$(eval echo '$'"repo_"$reponame"_url")
 	tag=$(eval echo '$'"repo_"$reponame"_tag")
     fi
 
-    [ "$CONFIG_EIQ" = y ] && eiqdir=apps/eiq
-    dirlist="bsp linux apps/generic apps/networking apps/graphics apps/multimedia apps/security apps/connectivity $eiqdir"
+    [ -z "$tag" -a "$UPDATE_REPO_PER_TAG" = y ] && tag=$DEFAULT_REPO_TAG
+
+    [ "$PACKAGEGROUPS_ML" = y ] && mldir=apps/ml
+    dirlist="bsp linux apps/utils apps/networking apps/graphics apps/multimedia apps/security apps/connectivity $mldir"
     for pdn in $dirlist; do
 	rn=$(echo $pdn | xargs basename -s /)
 	[ $pdn = bsp -o $pdn = linux ] && obj=$FBDIR/src/$pdn || obj=$FBDIR/src/apps
 	if [ $1 = fetch ]; then
-	    if [ -n "$COMPONENT" ]; then
+	    if [ -n "$2" ]; then
 		pkgdn=`echo $pdn | tr a-z A-Z`
 		[ ${pdn:0:4} = apps ] && repolist=$APPS_REPO_LIST || \
 		repolist=$(eval echo '${'"$pkgdn"'_REPO_LIST}')
-		if ! echo $repolist | grep -q $COMPONENT; then continue; fi
+		if ! echo $repolist | grep -q $2; then continue; fi
 		repolist=$(ls $FBDIR/src/$pdn/*.mk | xargs basename -s .mk | tr '\n' ' ')
-		if ! echo $repolist | grep -q $COMPONENT; then continue; fi
+		if ! echo $repolist | grep -q $2; then continue; fi
 		if [ -n "$tag" ]; then
-		    git_repo_checkout $PKGDIR/$pdn $COMPONENT tag $tag $repourl
+		    git_repo_checkout $PKGDIR/$pdn $2 tag $tag $repourl
 		elif [ -n "$commit" ]; then
-		    git_repo_checkout $PKGDIR/$pdn $COMPONENT commit $commit $repourl
+		    git_repo_checkout $PKGDIR/$pdn $2 commit $commit $repourl
 		elif [ -n "$branch" ]; then
-		    git_repo_checkout $PKGDIR/$pdn $COMPONENT branch $branch $repourl
+		    git_repo_checkout $PKGDIR/$pdn $2 branch $branch $repourl
 		fi
-		fbprint_n "$COMPONENT in $PKGDIR/$pdn"
+		fbprint_n "$2 in $PKGDIR/$pdn"
 		break
 	    else
 		make -C $obj ${rn}_repo_fetch
 	    fi
 	elif [ $1 = latest ]; then
-	    if [ -n "$COMPONENT" -a -z "$branch" -a -n "$commit" ]; then
+	    if [ -n "$2" -a -z "$branch" -a -n "$commit" ]; then
 		echo commit = $commit; break;
-	    elif [ -n "$COMPONENT" -a -z "$branch" ]; then
+	    elif [ -n "$2" -a -z "$branch" ]; then
 		echo branch of $reponame repo is not specified in $CONFIGLIST!; exit
-	    elif [ -n "$COMPONENT" -a -n "$branch" ] && [ -d $PKGDIR/$pdn/$reponame ]; then
+	    elif [ -n "$2" -a -n "$branch" ] && [ -d $PKGDIR/$pdn/$reponame ]; then
 		cd $PKGDIR/$pdn/$reponame && git pull origin $branch && git fetch --tags && cd -
-	    elif [ -n "$COMPONENT" ] && [ ! -d $PKGDIR/$pdn/$reponame ]; then
+	    elif [ -n "$2" ] && [ ! -d $PKGDIR/$pdn/$reponame ]; then
 		continue
 	    else
 		make -C $obj ${rn}_repo_update_latest
 	    fi
         else
-            if [ -n "$COMPONENT" -a -z "$(eval echo '$'$1)" ]; then
-                echo $1 of $COMPONENT repo is not specified in $CONFIGLIST!; exit
-            elif [ -n "$COMPONENT" ] && [ ! -d $PKGDIR/$pdn/$COMPONENT ]; then
+            if [ -n "$2" -a -z "$(eval echo '$'$1)" ]; then
+                echo $1 of $2 repo is not specified in $CONFIGLIST!; exit
+            elif [ -n "$2" ] && [ ! -d $PKGDIR/$pdn/$2 ]; then
                 continue;
-            elif [ -n "$COMPONENT" -a -n "$(eval echo '$'$1)" ] && [ -d $PKGDIR/$pdn/$COMPONENT ]; then
-                git_repo_checkout $PKGDIR/$pdn $COMPONENT $1 $(eval echo '$'$1)
+            elif [ -n "$2" -a -n "$(eval echo '$'$1)" ] && [ -d $PKGDIR/$pdn/$2 ]; then
+                git_repo_checkout $PKGDIR/$pdn $2 $1 $(eval echo '$'$1)
             else
                 make -C $obj ${rn}_repo_update_$1
             fi

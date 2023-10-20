@@ -1,30 +1,31 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-
-# NXP i.MX alsa-lib plugin
-
+# depends on libasound2 and libasound2-dev
 
 imx_alsa_plugin:
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_alsa_plugin") && \
 	 $(call repo-mngr,fetch,imx_alsa_plugin,apps/multimedia) && \
-	 if [ ! -f $(DESTDIR)/usr/include/imx/linux/mxc_asrc.h ]; then \
-	     bld -c imx_vpu -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
-	 fi && \
 	 if  [ ! -f $(DESTDIR)/usr/lib/pkgconfig/alsa.pc ]; then \
-	     bld -c alsa_lib -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
 	 fi && \
-	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig && \
+	 if [ ! -f $(DESTDIR)/usr/include/imx-mm/audio-codec/swpdm/imx-swpdm.h ]; then \
+	     bld imx_sw_pdm -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	 fi && \
+	 sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include && \
+	 sudo ln -sf libasound.so.2 $(RFSDIR)/usr/lib/aarch64-linux-gnu/libasound.so && \
+	 \
 	 cd $(MMDIR)/imx_alsa_plugin && \
+	 sed -i 's/imx\///' asrc/asrc_pair.h asrc/asrc_pair.c && \
 	 libtoolize --force --copy --automake && \
-	 aclocal $(ACLOCAL_FLAGS) && autoheader && \
+	 aclocal && autoheader && \
 	 automake --foreign --copy --add-missing && \
 	 touch depcomp && autoconf && \
 	 ./configure --host=aarch64 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
-	   CFLAGS="-O2 -Wall -W -pipe -g -I$(DESTDIR)/usr/include/imx" 1>/dev/null && \
+	   --with-libtool-sysroot=$(RFSDIR) \
+	   --disable-silent-rules --disable-static --enable-swpdm \
+	   CFLAGS="-O2 -Wall -W -pipe -g -I$(DESTDIR)/usr/include" 1>/dev/null && \
 	 $(MAKE) install && \
 	 $(call fbprint_d,"imx_alsa_plugin")
-endif

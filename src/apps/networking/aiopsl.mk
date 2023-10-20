@@ -1,14 +1,11 @@
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 
 aiopsl:
-ifeq ($(CONFIG_AIOPSL), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(SOCFAMILY) != LS -a $(DISTROTYPE) != ubuntu -a $(DISTROTYPE) != yocto -o $(DISTROSCALE) = desktop \
-	   -o $(DISTROSCALE) = lite -o $(DISTROSCALE) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"AIOPSL") && \
 	 $(call repo-mngr,fetch,aiopsl,apps/networking) && \
 	 cd $(NETDIR)/aiopsl && \
@@ -17,5 +14,3 @@ ifeq ($(DESTARCH),arm64)
 	 cp -rf misc/setup/traffic_files $(DESTDIR)/usr/local/aiop && \
 	 cp -rf demos/images/* $(DESTDIR)/usr/local/aiop/bin && \
 	 $(call fbprint_d,"AIOPSL")
-endif
-endif

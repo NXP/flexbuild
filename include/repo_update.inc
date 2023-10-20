@@ -143,42 +143,42 @@ connectivity_repo_update_commit:
 	@echo -e "\nconnectivity repositories update to specified commit ID"
 	@$(call repo-mngr,commit,$(CONNECTIVITY_REPO_LIST),apps/connectivity)
 
-generic_repo_fetch:
-	@echo -e "\nfetch generic repositories: $(GENERIC_REPO_LIST)"
-	@$(call repo-mngr,fetch,$(GENERIC_REPO_LIST),apps/generic)
+utils_repo_fetch:
+	@echo -e "\nfetch utils repositories: $(UTILS_REPO_LIST)"
+	@$(call repo-mngr,fetch,$(UTILS_REPO_LIST),apps/utils)
 
-generic_repo_update_branch:
-	@echo -e "\ngeneric repositories update for branch"
-	@$(call repo-mngr,branch,$(GENERIC_REPO_LIST),apps/generic)
+utils_repo_update_branch:
+	@echo -e "\nutils repositories update for branch"
+	@$(call repo-mngr,branch,$(UTILS_REPO_LIST),apps/utils)
 
-generic_repo_update_tag:
-	@echo -e "\ngeneric repositories update for tag"
-	@$(call repo-mngr,tag,$(GENERIC_REPO_LIST),apps/generic)
+utils_repo_update_tag:
+	@echo -e "\nutils repositories update for tag"
+	@$(call repo-mngr,tag,$(UTILS_REPO_LIST),apps/utils)
 
-generic_repo_update_latest:
-	@echo -e "\ngeneric repositories update to latest HEAD commit"
-	@$(call repo-mngr,update,$(GENERIC_REPO_LIST),apps/generic)
+utils_repo_update_latest:
+	@echo -e "\nutils repositories update to latest HEAD commit"
+	@$(call repo-mngr,update,$(UTILS_REPO_LIST),apps/utils)
 
-generic_repo_update_commit:
-	@echo -e "\ngeneric repositories update to specified commit ID"
-	@$(call repo-mngr,commit,$(GENERIC_REPO_LIST),apps/generic)
+utils_repo_update_commit:
+	@echo -e "\nutils repositories update to specified commit ID"
+	@$(call repo-mngr,commit,$(UTILS_REPO_LIST),apps/utils)
 
-eiq_repo_fetch:
-	@echo -e "\nfetch eIQ repositories: $(eIQ_REPO_LIST)"
-	@$(call repo-mngr,fetch,$(eIQ_REPO_LIST),apps/eiq)
+ml_repo_fetch:
+	@echo -e "\nfetch eIQ repositories: $(ML_REPO_LIST)"
+	@$(call repo-mngr,fetch,$(ML_REPO_LIST),apps/ml)
 
-eiq_repo_update_branch:
+ml_repo_update_branch:
 	@echo -e "\neIQ repositories update for branch"
-	@$(call repo-mngr,branch,$(eIQ_REPO_LIST),apps/eiq)
+	@$(call repo-mngr,branch,$(ML_REPO_LIST),apps/ml)
 
-eiq_repo_update_tag:
+ml_repo_update_tag:
 	@echo -e "\neIQ repositories update for tag"
-	@$(call repo-mngr,tag,$(eIQ_REPO_LIST),apps/eiq)
+	@$(call repo-mngr,tag,$(ML_REPO_LIST),apps/ml)
 
-eiq_repo_update_latest:
+ml_repo_update_latest:
 	@echo -e "\neIQ repositories update to latest HEAD commit"
-	@$(call repo-mngr,update,$(eIQ_REPO_LIST),apps/eiq)
+	@$(call repo-mngr,update,$(ML_REPO_LIST),apps/ml)
 
-eiq_repo_update_commit:
+ml_repo_update_commit:
 	@echo -e "\neIQ repositories update to specified commit ID"
-	@$(call repo-mngr,commit,$(eIQ_REPO_LIST),apps/eiq)
+	@$(call repo-mngr,commit,$(ML_REPO_LIST),apps/ml)

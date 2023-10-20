@@ -1,4 +1,4 @@
-# Copyright 2017-2019 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -7,18 +7,13 @@
 
 
 dce:
-ifeq ($(CONFIG_DCE), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(SOCFAMILY) != LS -a $(DISTROTYPE) != ubuntu -a $(DISTROTYPE) != yocto -o \
-	   $(DISTROSCALE) = desktop -o $(DISTROSCALE) = tiny ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
+	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"dce") && \
 	 $(call repo-mngr,fetch,dce,apps/networking) && \
 	 cd $(NETDIR)/dce && \
-	 if [ ! -f lib/qbman_userspace/Makefile ]; then \
-	     git submodule update; \
-	 fi && \
-	 $(MAKE) ARCH=aarch64 && \
-	 $(MAKE) install && \
+	 sed -i 's/-Wwrite-strings -Wno-error/-Wwrite-strings -fcommon -Wno-error/' lib/qbman_userspace/Makefile && \
+	 make clean  && \
+	 $(MAKE) -j$(JOBS) ARCH=aarch64 && \
+	 $(MAKE) -j$(JOBS) install && \
 	 $(call fbprint_d,"dce")
-endif
-endif

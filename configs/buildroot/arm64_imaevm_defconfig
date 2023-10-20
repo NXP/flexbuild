@@ -11,7 +11,7 @@ BR2_TOOLCHAIN_EXTERNAL_PREFIX="aarch64-linux-gnu"
 
 # Download
 BR2_DL_DIR="$(HOME)/.buildrootdl"
-BR2_ROOTFS_OVERLAY="$(FBOUTDIR)/rfs/rootfs_$(DISTRIB_VERSION)_buildroot_$(DISTROSCALE)_$(DESTARCH)/overlay"
+BR2_ROOTFS_OVERLAY="$(FBOUTDIR)/rfs/rootfs_$(DISTRIB_VERSION)_buildroot_$(DISTROVARIANT)_$(DESTARCH)/overlay"
 
 # Hostname and issue
 BR2_TARGET_GENERIC_HOSTNAME="lsdk-imaevm"

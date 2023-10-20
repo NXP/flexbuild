@@ -1,4 +1,4 @@
-# Copyright 2017-2021 NXP
+# Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -13,9 +13,9 @@ apps:
 $(BSP_REPO_LIST):
 	@$(MAKE) -C $(FBDIR)/src/bsp $@
 
-$(LINUX_REPO_LIST) linux-deb linux-modules:
+$(LINUX_REPO_LIST) linux-headers linux-deb linux-modules:
 	@$(MAKE) -C $(FBDIR)/src/linux $@
 
-$(APPS_REPO_LIST) $(EIQ_REPO_LIST) generic security \
+$(APPS_REPO_LIST) utils security \
 networking graphics multimedia connectivity:
 	@$(MAKE) -C $(FBDIR)/src/apps $@

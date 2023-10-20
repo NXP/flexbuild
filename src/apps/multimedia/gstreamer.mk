@@ -1,4 +1,4 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,31 +8,49 @@
 # GStreamer is a multimedia framework for encoding and decoding video and sound.
 # It supports a wide range of formats including mp3, ogg, avi, mpeg and quicktime.
 
-# i.MX fork of Gstreamer for customizations
+# introspection=enabled option depends on gobject-introspection for /usr/bin/g-ir-scanner g-ir-compiler on host
+# depends on libgirepository1.0-dev for GLib-2.0.gir and GObject-2.0.gir on host
+# depends on libgstreamer1.0-dev for /usr/share/gir-1.0/Gst-1.0.gir
 
 
 gstreamer:
-ifeq ($(CONFIG_GSTREAMER), "y")
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || \
+	@[ $(DISTROVARIANT) != desktop -o $(DESTARCH) != arm64 ] && exit || \
 	 $(call fbprint_b,"gstreamer") && \
 	 $(call repo-mngr,fetch,gstreamer,apps/multimedia) && \
-         if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-             bld -i mkrfs -r $(DISTROTYPE):$(DISTROSCALE) -a $(DESTARCH) -f $(CFGLISTYML); \
-         fi && \
+	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
 	 cd $(MMDIR)/gstreamer && \
-	 export CROSS=$(CROSS_COMPILE) && \
-	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(DESTDIR)/usr/local/lib/pkgconfig && \
+	 if [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/src/apps/multimedia/patch/gstreamer/*.patch && touch .patchdone; \
+	 fi && \
 	 export HAVE_PTP_HELPER_CAPABILITIES=0 && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@TARGET_ARCH@%aarch64%g' \
-	     -e 's%@TARGET_CPU@%cortex-a53%g' -e 's%@TARGET_ENDIAN@%little%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     $(FBDIR)/src/misc/meson/cross-compilation.conf > $(MMDIR)/gstreamer/cross-compilation.conf && \
-	 mkdir -p build && \
-	 meson build -Dc_args="--sysroot=$(RFSDIR) -I$(DESTDIR)/usr/local/include -Dexamples=disabled \
-			       -Ddbghelp=disabled -Dgtk_doc=disabled -Dtests=disabled -Dnls=disabled" \
-		-Dc_link_args="-L$(DESTDIR)/usr/local/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" \
-	        --prefix=/usr --buildtype=release --cross-file cross-compilation.conf && \
-	 ninja -j $(JOBS) -C build install && \
+	 if ! grep -q libexecdir= meson.build; then \
+	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
+	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \
+	     sed -i 's/0.62/0.61/' meson.build; \
+	 fi && \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
+	 \
+	 meson setup build_$(DISTROTYPE)_$(ARCH) \
+		--cross-file meson.cross \
+		-Dc_args="--sysroot=$(RFSDIR) -I$(DESTDIR)/usr/local/include" \
+		-Dc_link_args="-L$(DESTDIR)/usr/lib" \
+		--prefix=/usr --buildtype=release --strip \
+		-Dintrospection=disabled \
+		-Ddoc=disabled \
+		-Dexamples=disabled \
+		-Ddbghelp=disabled \
+		-Dnls=enabled \
+		-Dbash-completion=disabled \
+		-Dcheck=enabled \
+		-Dcoretracers=disabled \
+		-Dgst_debug=true \
+		-Dlibdw=disabled \
+		-Dtests=disabled \
+		-Dtools=enabled \
+		-Dtracer_hooks=true \
+		-Dlibunwind=disabled && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
 	 $(call fbprint_d,"gstreamer")
-endif
-endif

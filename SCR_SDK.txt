@@ -1,0 +1,124 @@
+NXP Software Content Register
+
+Release - Debian Desktop Release with Linux 6.1.36
+
+Outgoing License: LA_OPT_NXP_Software_License v56 April 2024 - No distribution permitted, license in Section 2.2 applies
+License File: EULA_SDK.txt
+
+Flexbuild Debian Project:
+  https://github.com/flexbuild/flexbuild
+
+Release tag: LSDK-23.10_DEBIAN-12_LF-6.1.36
+
+--------------------------------------------
+PACKAGES FOR FLEXBUILD DEBIAN_RELEASE
+--------------------------------------------
+
+Package:                     imx-gpu-viv-6.4.11.p2.0d-aarch64.bin
+Outgoing License:            LA_OPT_NXP_Software_License v48 July 2023 - No distribution permitted, license in Section 2.2 applies
+License File:                COPYING
+Package Category:            Graphics
+Type of Content:             binary and source
+Description and comments:    GPU Core IP in binary and test application source
+Release Location:            Mirror
+Origin:                      NXP (proprietary)
+                             Verisilicon (formerly Vivante Corp.) (proprietary)
+                             opengleskul (MIT) - https://code.google.com/archive/p/opengleskul/
+                             The Khronos Group Inc. (MIT) - http://www.khronos.org/opencl/
+                             Mesa3D - Mesa Lib [GL3ext header] (SGI-B-2.0) - http://mesa3d.sourceforge.net/
+                             libdri (MIT) - http://dri.freedesktop.org/wiki/
+                             The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                             LLVM Compiler (BSD-3-clause) - https://github.com/prof123/llvm/
+
+--------------------------------------------
+
+Package:                     imx-gpu-g2d-6.4.11.p2.0d-aarch64.bin
+Outgoing License:            LA_OPT_NXP_Software_License v48 July 2023 - No distribution permitted, license in Section 2.2 applies
+License File:                COPYING
+Package Category:            Graphics
+Type of Content:             binary
+Description and comments:    Graphics 2D with GPU
+Release Location:            Mirror
+Origin:                      NXP (proprietary)
+
+--------------------------------------------
+
+Package:                     imx-dpu-g2d-2.1.10d.bin
+Outgoing License:            LA_OPT_NXP_Software_License v48 July 2023 - No distribution permitted, license in Section 2.2 applies
+License File:                COPYING
+Package Category:            Graphics
+Type of Content:             binary
+Description and comments:    Graphics 2D with DPU
+Release Location:            Mirror
+Origin:                      NXP (proprietary)
+
+--------------------------------------------
+
+Package:                     libgpuperfcnt-6.4.11.p2.0d-aarch64-wayland.bin
+Outgoing License:            LA_OPT_NXP_Software_License v48 July 2023 - No distribution permitted, license in Section 2.2 applies
+License File:                COPYING
+Package Category:            Graphics
+Type of Content:             binary
+Description and comments:    Library to retrieve i.MX GPU performance data
+Release Location:            Mirror
+Origin:                      NXP (proprietary)
+
+--------------------------------------------
+
+Package:                     isp-imx-4.2.2.23.0d.bin
+Outgoing License:            LA_OPT_NXP_Software_License v48 July 2023 - No distribution permitted, license in Section 2.2 applies
+License File:                COPYING
+Package Category:            Graphics
+Type of Content:             binary and source
+Description and comments:    i.MX software ISP
+Release Location:            Mirror
+Origin:                      VeriSilicon Holdings Co., Ltd. (proprietary)
+
+--------------------------------------------
+
+Package:                     imx-vpu-hantro-vc-1.9.1.1d.bin
+Outgoing License:            LA_OPT_NXP_Software_License v48 July 2023 - No distribution permitted, license in Section 2.2 applies
+License Files:               COPYING
+Package Category:            Multimedia
+Type of content:             Source, recipes
+Description and comments:    VPU Library
+Release Location:            NXP Mirror
+Origin:                      VeriSilicon Inc. (proprietary)
+                             Alliance for Open Media (BSD-2-clause, AFOM Patent License) - http://www.aomedia.org/
+                             The WebM project by Google Inc. (BSD-3-clause) https://bugs.chromium.org/p/webm/issues/list
+
+
+--------------------------------------------
+PATCHES IN FLEXBUILD DEBIAN RELEASE
+--------------------------------------------
+
+Patches for:               cheese
+Source Location:           https://gitlab.gnome.org/GNOME/cheese
+Patch Location:            src/apps/multimedia/patch/cheese
+Outgoing License:          GPL-2.0
+License File:              COPYING
+Package Category:          GNOME
+Description and comments:  Take photos and videos with your webcam, with fun graphical effects
+Origin of patches:         NXP (GPL-2.0)
+
+--------------------------------------------
+
+Patches for:               clutter-gst
+Source Location:           https://gitlab.gnome.org/GNOME/clutter-gst
+Patch Location:            src/apps/graphics/patch/clutter_gst
+Outgoing License:          LGPL-2.1
+License File:              COPYING
+Package Category:          Graphics
+Description and comments:  Clutter-Gst is an integration library for using GStreamer with Clutter
+Origin of patches:         NXP (LGPL-2.1)
+
+--------------------------------------------
+
+Patches for:               cogl
+Source Location:           https://ftp.gnome.org/pub/GNOME/sources/cogl/1.22/
+Patch Location:            src/apps/graphics/patch/cogl
+Outgoing License:          MIT
+License File:              COPYING
+Package Category:          Graphics
+Description and comments:  Cogl is a small open source library for using 3D graphics hardware for rendering.
+Origin of patches:         NXP (MIT)

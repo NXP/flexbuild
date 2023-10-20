@@ -1,4 +1,4 @@
-# Copyright 2021 NXP
+# Copyright 2021-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,14 +8,17 @@
 
 
 alsa_lib:
-ifeq ($(DESTARCH),arm64)
-	@[ $(DISTROTYPE) != ubuntu -o $(DISTROSCALE) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"alsa_lib") && \
 	 $(call repo-mngr,fetch,alsa_lib,apps/multimedia) && \
 	 cd $(MMDIR)/alsa_lib && \
+	 if [ ! -f .patchdone ]; then \
+	    git am $(FBDIR)/src/apps/multimedia/patch/alsa_lib/*.patch && touch .patchdone; \
+	 fi && \
+	 export LD_LIBRARY_PATH=$(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu && \
+	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig && \
 	 libtoolize --force --copy --automake && aclocal && \
 	 autoheader && automake --foreign --copy --add-missing && autoconf && \
 	 ./configure --host=aarch64 CC=aarch64-linux-gnu-gcc 1>/dev/null && \
 	 $(MAKE) -j$(JOBS) install && \
 	 $(call fbprint_d,"alsa_lib")
-endif

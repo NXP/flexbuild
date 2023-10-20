@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# expands the rootfs partition to full size of SD card.
+
+set -e
+
+rootpart=$(mount | grep "/ " | cut -f1 -d' ' | cut -d'/' -f3)
+device=${rootpart%p*}
+
+[[ "$device" != *"mmc"* ]] && exit 0
+
+freespace=$(parted /dev/$device unit '%' print free | grep 'Free Space' | tail -n1 | awk '{print $3}')
+
+if [[ ${freespace%.*} -gt 0 ]]; then
+    echo $freespace of /dev/$device is free
+    echo resize it to full space ...
+    echo ",+" | sfdisk -N 2 /dev/$device --no-reread
+    partprobe
+    resize2fs /dev/$rootpart
+fi

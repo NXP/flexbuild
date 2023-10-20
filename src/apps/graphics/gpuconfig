@@ -3,4 +3,4 @@
 ldconfig
 
 # Replace libGL.so.1 to libGLESv2.so.2 for libmutter
-patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-6.so.0.0.0
+patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-*.so.0.0.0

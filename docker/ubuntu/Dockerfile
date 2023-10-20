@@ -1,5 +1,4 @@
-FROM ubuntu:20.04
-MAINTAINER Shengzhou Liu <shengzhou.liu@nxp.com>
+FROM ubuntu:22.04
 
 ARG http_proxy
 ENV http_proxy $http_proxy
@@ -30,5 +29,3 @@ RUN apt-get update && apt-get install -y \
 	parted rpm2cpio lsb-release xutils-dev libwayland-bin cmake locales texinfo gawk \
 	chrpath diffstat scons libgflags-dev libhdf5-serial-dev python3-numpy python3-wheel \
 	python3-h5py
-
-RUN ln -sf /usr/bin/python3 /usr/bin/python && pip3 install six

@@ -42,7 +42,7 @@ define repo-mngr
 		elif [ $1 = tag -a -n "$$tag" ]; then if [ "$${repo_en}" = "n" ]; then echo $$tree disabled!; \
 		    else cd $$tree && if ! git show-ref --verify --quiet refs/tags/$$tag; then \
 		    git fetch --tags || true;fi && if [ "`cat .git/HEAD | cut -d/ -f3`" != "$$tag" ]; then if git show-ref --verify --quiet refs/heads/$$tag; \
-		    then git checkout $$tag; else git checkout $$tag -b $$tag;fi;fi || exit 1; cd -; fi; \
+		    then git checkout $$tag; else git checkout -f $$tag -b $$tag;fi;fi || exit 1; cd -; fi; \
 		elif [ $1 = commit -a -n "$$commit" ]; then cd $$tree && git config advice.objectNameWarning false && \
 		    if git show-ref --verify --quiet refs/heads/$$commit; then git checkout $$commit; else git checkout $$commit -b $$commit; fi || exit 1; cd -; \
                 elif [ $1 = branch -a -n "$$branch" ]; then if [ "$${repo_en}" = "n" ]; then echo $$tree disabled!; \
@@ -51,9 +51,9 @@ define repo-mngr
 	    elif [ -n "$$repourl" -a $1 = fetch ]; then \
 	        if [ "$${repo_en}" = "n" ]; then echo $$tree disabled!; \
 		elif [ -n "$$tag" -a $(UPDATE_REPO_PER_TAG) = y ] || [ -n "$$tag" -a -z "$$branch" -a -z "$$commit" ]; then \
-		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout $$tag -b $$tag && cd -; \
+		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout -f $$tag -b $$tag && cd -; \
 		elif [ -n "$$commit" -a $(UPDATE_REPO_PER_COMMIT) = y ] || [ -n "$$commit" -a -z "$$branch" -a -z "$$tag" ]; then \
-		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout $$commit -b $$commit && cd -; \
+		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout -f $$commit -b $$commit && cd -; \
 		elif [ -n "$$branch" -a $(UPDATE_REPO_PER_BRANCH) = y ] || [ -z "$$tag" -a -n "$$branch" -a $(UPDATE_REPO_PER_TAG) = y ]; then \
 		    git clone --recurse-submodules $$repourl $$tree -b $$branch; \
 		else \
@@ -79,7 +79,7 @@ define fbprint_n
 	echo -e "$(green)$1 $(NC)"
 endef
 define fbprint_d
-	echo -e "$(GREEN)Build $1  [Done] $(NC)"
+	echo -e "$(GREEN)$1  [Done] $(NC)"
 endef
 define fbprint_w
         echo -e "$(YELLOW)$1 $(NC)"

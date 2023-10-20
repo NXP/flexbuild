@@ -1,0 +1,126 @@
+# Copyright 2022-2024 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Shengzhou Liu <shengzhou.liu@nxp.com>
+#
+# Customized Debian desktop rootfs for NXP i.MX & Layerscape MPU platforms
+
+
+---
+mmdebstrap:
+  architectures:
+    - arm64
+  mode: auto
+  keyrings:
+    - /usr/share/keyrings/debian-archive-keyring.gpg
+  suite: bookworm
+  target: rootfs
+  hostname: localhost
+  variant: standard
+  components:
+    - main
+    - contrib
+  packages:
+    - systemd
+    - systemd-sysv
+    - sudo
+    - vim
+    - apt
+    - udev
+    - memtool
+    - wget
+    - curl
+    - ethtool
+    - net-tools
+    - openssh-server
+    - openssh-client
+    - iputils-ping
+    - isc-dhcp-client
+    - patchelf
+    - parted
+    - fdisk
+    - dosfstools
+    - htop
+    - ntpdate
+    - bridge-utils
+    - tcpdump
+    - mtd-utils
+    - pciutils
+    - net-tools
+    - iputils-ping
+    - hdparm psmisc
+    - keyutils
+    - util-linux
+    - libssl-dev
+    - lshw
+    - usbutils # for lsusb
+    - psmisc   # for fuser, killall, etc
+    - iproute2
+    - sysstat
+    - lsb-release
+    - kexec-tools
+    - iptables
+    - libhugetlbfs0
+    - strongswan
+    - dmidecode
+    - flex
+    - rdate
+    - ca-certificates
+    - initramfs-tools
+    - fbset
+    - gnome
+    - chromium
+    - libinput-tools
+    - libqt6core6
+    - qt6-base-dev
+    - qt6-wayland
+    - glmark2-es2-wayland
+    - libgles2-mesa
+    - clinfo
+    - v4l-utils
+    - mesa-utils
+    - alsa-utils
+    - dmz-cursor-theme
+  setup-hooks:
+      # Setup NXP board-specific configurations for various platforms
+    - 'mkdir -p $1/usr/local/bin'
+    - 'mkdir -p $1/etc/systemd/system/multi-user.target.wants'
+    - 'mkdir -p $1/etc/systemd/system/graphical.target.wants'
+    - 'mkdir -p $1/etc/systemd/system/local-fs.target.wants'
+  essential-hooks:
+    - 'sleep 10'
+  customize-hooks:
+    - 'chroot "$1" apt purge -y xserver-xorg xserver-xorg-core xserver-xorg-legacy gnome-games gnome-chess apache2-bin'
+    - 'chroot "$1" useradd -m -d /home/debian -s /bin/bash debian'
+    - 'chroot "$1" gpasswd -a debian sudo'
+    - 'chroot "$1" usermod -aG sudo debian'
+    - 'chroot "$1" passwd --delete root'
+    - 'chroot "$1" passwd --delete debian'
+    - 'chroot "$1" apt-get update'
+    - 'chroot "$1" cp /etc/skel/.bashrc ~/.bashrc'
+    - 'chroot "$1" echo "PermitRootLogin yes" >> $1/etc/ssh/sshd_config'
+    - 'chroot "$1" echo "PermitEmptyPasswords yes" >> $1/etc/ssh/sshd_config'
+    - 'cp src/misc/boot.mount $1/lib/systemd/system/'
+    - 'cp tools/flex-installer $1/usr/bin/'
+    - 'cp tools/resizerfs $1/usr/bin/'
+    - 'cp src/misc/udev/udev-rules-*/*.rules $1/etc/udev/rules.d/'
+    - 'cp src/misc/debian/distroplatcfg $1/usr/bin/'
+    - 'cp src/misc/debian/platcfg.service $1/lib/systemd/system/'
+    - 'chroot "$1" ln -s /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service'
+    - 'chroot "$1" ln -s /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/boot.mount'
+    - 'chroot "$1" ln -s /boot/tools/perf /usr/local/bin/perf'
+    - 'chroot "$1" ln -s /sbin/init /init'
+    - 'chroot "$1" ln -s /boot/modules /lib/modules'
+    - 'chroot "$1" rm -rf /lib/firmware'
+    - 'chroot "$1" ln -s /boot/firmware /lib/firmware'
+    - 'cp src/apps/graphics/gpuconfig $1/etc/'
+    - 'cp src/apps/graphics/gpuconfig.service $1/lib/systemd/system/'
+    - 'chroot "$1" ln -s /lib/systemd/system/gpuconfig.service /etc/systemd/system/graphical.target.wants/gpuconfig.service'
+    - 'chroot "$1" ln -s /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target'
+    - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles" >> $1/etc/environment'
+    - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
+    - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
+    - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
+    - 'printf "NXP LSDK 2310 Debian Desktop (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
+    - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

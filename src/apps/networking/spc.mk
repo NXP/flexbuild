@@ -15,8 +15,10 @@ spc:
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CFLAGS="-I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
-	 export LDFLAGS="-L$(RFSDIR)/usr/lib -Wl,-rpath=$(RFSDIR)/usr/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
+	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 \
 	 $(MAKE) -C $(NETDIR)/spc/source \
 		 LIBXML2_HEADER_PATH=$$xmlhdr \

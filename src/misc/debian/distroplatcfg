@@ -69,6 +69,7 @@ fi
 # vpu hantro daemon
 if [ $soc = imx8mp ]; then
     ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
+    rm -f /etc/systemd/system/multi-user.target.wants/firmwared.service
 elif [ $soc = imx8mq ]; then
     ln -sf vsidaemon-IMX8MQ /usr/bin/vsidaemon
 elif [ $soc = imx8mm ]; then
@@ -80,7 +81,8 @@ if [ $soc = imx8qm -o $soc = imx8qxp ] && [ ! -L /lib/firmware/vpu ]; then
 fi
 
 if [ $soc = imx93 -a -f /etc/ld.so.conf.d/01-sdk.conf ]; then
-    rm -f /etc/ld.so.conf.d/01-sdk.conf
+    sudo rm -f /etc/ld.so.conf.d/01-sdk.conf
+    sudo rm -f /usr/lib/{libGLESv2.so,libEGL.so,libgbm.so,libcogl.so,libgstallocators-1.0.so,libvulkan.so}
 fi
 
 # fmc service only for DPAA on ls1043/ls1046

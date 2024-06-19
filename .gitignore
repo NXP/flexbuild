@@ -1,12 +1,13 @@
 # Build products
-components
-build
+components_lsdk*
+build_lsdk*
 logs
 uuu
 configs/.sdk.cfg
 tools/bld
 .bash*
 *.tgz
+*.tar.zst
 *.log
 *.o
 

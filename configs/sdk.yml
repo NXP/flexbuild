@@ -1,12 +1,12 @@
 # Linux SDK configuration for iMX and Layerscape MPU platforms
 
 DISTRIB_NAME:    "NXP Linux SDK"
-DISTRIB_VERSION: "lsdk2310"
+DISTRIB_VERSION: "lsdk2406"
 RELEASE_TYPE:    "external"
 
 
 # default repo tag which can be overrided by specified tag
-DEFAULT_REPO_TAG: "lf-6.1.36-2.1.0"
+DEFAULT_REPO_TAG: "lf-6.6.3-1.0.0"
 
 
 # default Debian version for target userland
@@ -15,14 +15,13 @@ DEBIAN_VERSION:  "12"
 
 
 # enable/disable custom packagegroups
-PKG_GROUPS:
-  GRAPHICS: y
-  MULTIMEDIA: y
-  NETWORKING: y
-  CONNECTIVITY: y
-  UTILS: y
-  SECURITY: y
-  ML: n
+PKG_GROUPS_GRAPHICS: y
+PKG_GROUPS_MULTIMEDIA: y
+PKG_GROUPS_NETWORKING: y
+PKG_GROUPS_CONNECTIVITY: y
+PKG_GROUPS_UTILS: y
+PKG_GROUPS_SECURITY: y
+PKG_GROUPS_ML: n
 
 
 # choose one of the 3 ways to fetch/update repo for various use cases
@@ -33,8 +32,8 @@ UPDATE_REPO:
 
 
 # Optionally, fetch the prebuilt SDK rootfs instead of building from scratch
-FETCH_PREBUILT_SDK_RFS: y
-DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/lsdk"
+FETCH_PREBUILT_SDK_RFS: n
+DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/sdk"
 
 # fuse provisioning
 CONFIG_FUSE_PROVISIONING: n
@@ -43,12 +42,9 @@ CONFIG_OPTEE: y
 
 INSTALL_DESKTOP_TEST_PACKAGES: n
 
-# In case UPDATE_REPO_PER_TAG is enabled, still use branch for those repos in which only branch is available due to no tag
-REPO_TAG_EXCLUDE: " iperf opencv "
-
 # user can customize the default path of components source and build output path
-DEFAULT_OUT_PATH: $FBDIR/build
-DEFAULT_PKGDIR: $FBDIR/components
+DEFAULT_OUT_PATH: $FBDIR/build_${DISTRIB_VERSION}
+DEFAULT_PKGDIR: $FBDIR/components_${DISTRIB_VERSION}
 
 
 # default build options for CI auto build
@@ -71,6 +67,8 @@ KERNEL_CONFIG:
 # DPAA2 MC firmware version
 MC_FW_VERSION:  "10.38.0"
 
+IMX_MCORE_VERSION: "2.15.000"
+
 
 repo:
 
@@ -86,7 +84,7 @@ repo:
 
   mbedtls:
     url:  https://github.com/ARMmbed/mbedtls.git
-    tag:  mbedtls-2.28.3
+    tag:  mbedtls-2.28.8
 
   mc_utils:
     url:  https://github.com/nxp-qoriq/mc-utils.git
@@ -131,8 +129,8 @@ repo:
     url:  https://github.com/NXP/imx-firmware.git
     # firmware for wifi/bt
 
-  fw_sentinel_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-sentinel-0.11.bin
+  fw_ele_bin:
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-ele-imx-0.1.1.bin
 
   fw_upower_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-upower-1.3.1.bin
@@ -140,12 +138,13 @@ repo:
 
 # kernel and modules git repositories
   linux:
-    url:    https://github.com/nxp-imx/linux-imx.git
-    tag:    lf-6.1.36-2.1.0
+    url:  https://github.com/nxp-imx/linux-imx.git
+    tag:  lf-6.6.3-1.0.0
 
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git
-    tag:  cryptodev-linux-1.13
+    # tag:  cryptodev-linux-1.13
+    commit: 5e7121e45ff283d
     
   lttng_modules:
     url:  https://git.lttng.org/lttng-modules.git
@@ -221,7 +220,7 @@ repo:
 
   openssl:
     url:  https://github.com/openssl/openssl.git
-    tag:  openssl-3.1.1
+    tag:  openssl-3.1.4
 
   libpkcs11:
     url:  https://github.com/nxp-qoriq/libpkcs11.git
@@ -250,7 +249,7 @@ repo:
 # graphics component repositories
   wayland:
     url:  https://gitlab.freedesktop.org/wayland/wayland.git
-    tag:  1.21.0
+    tag:  1.22.0
 
   wayland_protocols:
     url:  https://github.com/nxp-imx/wayland-protocols-imx.git
@@ -262,20 +261,19 @@ repo:
     url:  https://github.com/nxp-imx/libdrm-imx.git
 
   gpu_viv_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-viv-6.4.11.p2.0d-aarch64.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2406/imx-gpu-viv-6.4.11.p2.4d-aarch64.bin
 
   gputop:
     url:  https://github.com/nxp-imx/imx-gputop.git
 
   apitrace:
-    url:  https://github.com/apitrace/apitrace.git
-    tag:  11.1
+    url:  https://github.com/nxp-imx/apitrace-imx.git
 
   libgpuperfcnt_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/libgpuperfcnt-6.4.11.p2.0d-aarch64-wayland.bin
 
   imx_gpu_g2d_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p2.0d-aarch64.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p2.4-aarch64-b07999b.bin
 
   imx_dpu_g2d_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-2.1.10d.bin
@@ -285,10 +283,6 @@ repo:
 
   imx_g2d_samples:
     url:  https://github.com/nxp-imx/g2d-samples.git
-
-  xwayland:
-    url:  https://gitlab.freedesktop.org/xorg/xserver.git
-    tag:  xwayland-23.1.1
 
   cogl:
     url:  https://gitlab.gnome.org/GNOME/cogl.git
@@ -304,19 +298,19 @@ repo:
 
 # multimedia component repositories
   vpu_hantro_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.30.0.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.32.0.bin
 
   vpu_hantro_vc_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-vc-1.9.1.1d.bin
 
   vpu_hantro_daemon_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.1.8.tar.gz
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.1.9.tar.gz
 
   basler_camera_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/basler-camera-4.2.2.23.0.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/basler-camera-4.2.2.24.1.bin
 
   imx_isp_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/isp-imx-4.2.2.23.0d.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/isp-imx-4.2.2.24.1.bin
 
   gstreamer:
     url:  https://github.com/nxp-imx/gstreamer.git
@@ -342,25 +336,25 @@ repo:
 
   alsa_lib:
     url:  git://git.alsa-project.org/alsa-lib.git
-    tag:  v1.2.8
+    tag:  v1.2.10
 
   imx_sof_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-imx-2.6.0.tar.gz
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-imx-2.8.0.tar.gz
 
   imx_codec_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-codec-4.8.1.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-codec-4.8.3.bin
 
   imx_dsp_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.5.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.7.bin
 
   imx_dsp_codec_ext_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-codec-ext-2.1.5.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-codec-ext-2.1.7.bin
 
   imx_dspc_asrc_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dspc-asrc-1.0.1.bin
 
   imx_parser_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.8.1.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.8.3.bin
 
   imx_sw_pdm_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sw-pdm-1.0.3.bin
@@ -373,37 +367,38 @@ repo:
     tag:  43.0
 
 
-# generic component repositories
+# generic utils component repositories
+  imx_test:
+    url:  https://github.com/nxp-imx/imx-test.git
+
   cjson:
     url:  https://github.com/DaveGamble/cJSON.git
     tag:  v1.7.10
 
   iperf:
     url:  https://github.com/lynxis/iperf2.git
-    branch:  master
+    commit: 70e07ddee3
+
+  firmwared:
+    url:  https://github.com/teg/firmwared.git
+    commit: 2e6b5db43d
 
   buildroot:
     url:  https://github.com/buildroot/buildroot.git
-    tag:  2023.11
+    tag:  2024.02.2
 
   yocto_poky:
-    url:  https://git.yoctoproject.org/poky.git 
+    url:  https://git.yoctoproject.org/poky.git
     tag:  mickledore-4.2.1
 
   yocto_oe:
     url:  https://github.com/openembedded/meta-openembedded.git
     branch: mickledore
 
-  initrd_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2310
-
   uuu:
     url:  https://github.com/nxp-imx/mfgtools.git
     tag:  uuu_1.5.165
 
-  firmwared:
-    url:  https://github.com/teg/firmwared.git
-    branch:  master
 
 # connectivity component repositories
   nxp_wlan_bt:

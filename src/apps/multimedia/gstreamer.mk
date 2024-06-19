@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -22,7 +22,7 @@ gstreamer:
 	 fi && \
 	 cd $(MMDIR)/gstreamer && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/src/apps/multimedia/patch/gstreamer/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/gstreamer/*.patch && touch .patchdone; \
 	 fi && \
 	 export HAVE_PTP_HELPER_CAPABILITIES=0 && \
 	 if ! grep -q libexecdir= meson.build; then \

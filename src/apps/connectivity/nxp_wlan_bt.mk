@@ -23,9 +23,8 @@ nxp_wlan_bt:
 	 \
 	 make build KERNELDIR=$(KERNEL_PATH) O=$$kerneloutdir && \
 	 kernelrelease=`cat $(KERNEL_OUTPUT_PATH)/$$curbrch/include/config/kernel.release` && \
-	 install -d $(DESTDIR)/usr/share/nxp_wireless && \
+	 sudo mkdir -p $(RFSDIR)/usr/share/nxp_wireless && \
 	 install -d $$kerneloutdir/tmp/lib/modules/$$kernelrelease/kernel/drivers/net/wireless/nxp && \
 	 cp -f mlan.ko moal.ko $$kerneloutdir/tmp/lib/modules/$$kernelrelease/kernel/drivers/net/wireless/nxp && \
-	 cp -f ../bin_wlan/{load,unload,README} $(DESTDIR)/usr/share/nxp_wireless/ && \
-	 ls -l $$kerneloutdir/tmp/lib/modules/$$kernelrelease/kernel/drivers/net/wireless/nxp && \
+	 sudo cp -f ../bin_wlan/{load,unload,README} $(RFSDIR)/usr/share/nxp_wireless/ && \
 	 $(call fbprint_d,"nxp_wlan_bt")

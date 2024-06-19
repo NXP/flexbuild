@@ -14,6 +14,7 @@ libpkcs11:
 	 cd $(SECDIR)/libpkcs11 && \
 	 sed -e 's/^CC/#CC/' -e 's/^LD/#LD/' -e 's/s -Werror/s/' -i flags.mk && \
 	 sed -i 's/-g -Iinclude/-g -fcommon -Iinclude/' Makefile && \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 $(MAKE) clean && \
 	 $(MAKE) all OPENSSL_PATH=$(SECDIR)/openssl \

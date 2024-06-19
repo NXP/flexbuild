@@ -14,9 +14,16 @@ device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
 
 ## Build Environment
 --------------------
-- Cross-build on x86 host machine running Debian 12 or Ubuntu 22.04
-- Native-build on ARM board running Debian
-- Build in Docker container hosted on any machine running any distro
+- Cross-build in Debian Docker container hosted on Ubuntu or any other distro host machine for arm64 target
+- Cross-build on x86 host machine running Debian 12 for arm64 target
+- Native-build on ARM board running Debian for arm64 target
+
+## Host system requirement
+- Debian 12 host
+  Refer to [host_requirement](docs/host_requirement.md)
+- Ubuntu LTS host (e.g. 22.04, 20.04) on which Docker Engine is running
+  Refer to [docker-setup](docs/FAQ-docker-setup.md)
+- If other distro version is installed on your host machine, you can run 'bld docker' to create a Debian 12 docker and build it in docker.
 
 
 ## Supported distro for target arm64
@@ -42,7 +49,9 @@ ls1088ardb, ls2088ardb, ls2160ardb, lx2162aqds, etc
 
 ```
 $ cd flexbuild
-$ source setup.env
+$ . setup.env
+$ bld docker (create or attach a docker container)
+$ . setup.env
 $ bld -h
 
 Usage: bld -m <machine>
@@ -58,7 +67,7 @@ Most used example with automated build:
 
 Most used example with separate command:
 ```
- bld fw -m imx8mpevk             # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
+ bld bsp -m imx8mpevk            # generate BSP composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
  bld rfs -r debian:desktop       # generate Debian-based desktop rootfs  (with more graphics/multimedia packages for Desktop)
  bld rfs -r debian:server        # generate Debian-based server rootfs   (with more server related packages, no GUI Desktop)
  bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
@@ -69,6 +78,7 @@ Most used example with separate command:
  bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
  bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
  bld apps -r debian:server -p LS # compile NXP-specific apps against the library dependencies of Debian server rootfs for LS machines
+ bld ml                          # compile NXP-specific eIQ AI/ML components against the library dependencies of Debian rootfs
  bld merge-apps                  # merge NXP-specific apps into target Debian rootfs
  bld packrfs                     # pack and compress target rootfs as rootfs_xx.tar.zst
  bld packapps                    # pack and compress target app components as app_components_xx.tar.zst

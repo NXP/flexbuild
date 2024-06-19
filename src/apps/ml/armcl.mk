@@ -4,7 +4,7 @@
 
 
 armcl:
-	@[ $(DESTARCH) != arm64 ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"Arm Compute Library") && \
 	 $(call repo-mngr,fetch,armcl,apps/ml) && \
 	 \
@@ -18,6 +18,7 @@ armcl:
 		Werror=0 debug=0 embed_kernels=0 \
 		-j$(JOBS) && \
 	 $(call fbprint_n,"Installing ARM Compute Library") && \
+	 $(CROSS_COMPILE)strip build/{libarm_compute*.so,libarm_compute*.a} && \
 	 cp_args="-Prf --preserve=mode,timestamps --no-preserve=ownership" && \
 	 cp $$cp_args arm_compute support include/half $(DESTDIR)/usr/include && \
 	 install -m 0755 build/{libarm_compute*.so,libarm_compute*.a} $(DESTDIR)/usr/lib && \

@@ -22,53 +22,64 @@ mmdebstrap:
     - main
     - contrib
   packages:
-    - systemd
-    - systemd-sysv
+    - init
+    - udev
     - sudo
     - vim
     - apt
-    - udev
-    - memtool
-    - wget
-    - curl
-    - ethtool
-    - net-tools
-    - openssh-server
-    - openssh-client
-    - iputils-ping
-    - isc-dhcp-client
-    - patchelf
+    - file
+    - zstd
     - parted
     - fdisk
     - dosfstools
+    - iputils-ping
+    - isc-dhcp-client
+    - memtool
+    - wget
+    - curl
+    - ca-certificates
+    - systemd
+    - systemd-sysv
+    - psmisc   # for fuser, killall, etc
+    - ethtool
+    - net-tools
+    - iproute2
+    - openssh-server
+    - openssh-client
+    - patchelf
     - htop
+    - cpuinfo
+    - util-linux
+    - lshw
+    - keyutils
+    - wpasupplicant
     - ntpdate
     - bridge-utils
     - tcpdump
     - mtd-utils
     - pciutils
-    - net-tools
-    - iputils-ping
     - hdparm psmisc
-    - keyutils
-    - util-linux
     - libssl-dev
-    - lshw
     - usbutils # for lsusb
-    - psmisc   # for fuser, killall, etc
-    - iproute2
     - sysstat
     - lsb-release
     - kexec-tools
     - iptables
     - libhugetlbfs0
     - strongswan
+    - libcharon-extra-plugins
     - dmidecode
     - flex
     - rdate
-    - ca-certificates
     - initramfs-tools
     - fbset
+    - mmc-utils
+    - usbutils
+    - i2c-tools
+    - lm-sensors
+    - rt-tests
+    - linuxptp
+    - mosquitto
     - gnome
     - chromium
     - libinput-tools
@@ -122,5 +133,5 @@ mmdebstrap:
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
-    - 'printf "NXP LSDK 2310 Debian Desktop (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
+    - 'printf "NXP LSDK 2406 Debian Desktop (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
     - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

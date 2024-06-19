@@ -7,11 +7,14 @@
 
 linux:
 	@$(call repo-mngr,fetch,linux,linux) && \
-	cd $(PKGDIR)/linux && \
-	curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
+	cd $(KERNEL_PATH) && \
+	curbrch=`git branch | grep ^* | cut -d' ' -f2` && \
 	if echo $$curbrch | grep -qE '\(HEAD'; then \
 	    $(call fbprint_w,"Please set proper tag/branch name in kernel repo $(KERNEL_PATH)") && exit 1; \
 	fi && \
+	if [ -d $(FBDIR)/patch/linux ] && [ ! -f .patchdone ]; then \
+            git am $(FBDIR)/patch/linux/*.patch && touch .patchdone; \
+        fi && \
 	$(call fbprint_n,"Building $(KERNEL_TREE) with $$curbrch") && \
 	$(call fbprint_n,"Compiler = `$(CROSS_COMPILE)gcc --version | head -1`") && \
 	if [ $(DESTARCH) = arm64 -a $(SOCFAMILY) = IMX ]; then \

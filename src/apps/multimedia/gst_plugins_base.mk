@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -16,7 +16,7 @@ gst_plugins_base:
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
 	 if [ ! -f .patchdone ] && [ $(MACHINE) = imx8qmmek -o $(MACHINE) = imx8qxpmek ]; then \
-	     git am $(FBDIR)/src/apps/multimedia/patch/gst_plugins_base/*g2d-into-playsink.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/gst_plugins_base/*g2d-into-playsink.patch && touch .patchdone; \
 	 fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
@@ -46,15 +46,17 @@ gst_plugins_base:
 	 if [ ! -f $(RFSDIR)/usr/include/gstreamer-1.0/gst/gstconfig.h ]; then \
 	     sudo cp -Prf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include; \
 	 fi && \
+	 sudo cp -fa $(DESTDIR)/usr/lib/{libGAL.so,libdrm.so*,libdrm_vivante.so*,libg2d*.so*} $(RFSDIR)/usr/lib && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0} && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstallocators-1.0.so.0,libgstreamer-1.0.so.0,libdrm.so.2} && \
 	 \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export GI_SCANNER_DISABLE_CACHE=1 && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file meson.cross \
 		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0" \
-		-Dc_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 \
+		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 \
 			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -lgbm -lEGL \
 			       -lgbm_viv -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
 		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \

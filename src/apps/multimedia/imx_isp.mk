@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -29,7 +29,7 @@ imx_isp:
 	 fi && \
 	 \
 	 cd imx_isp/appshell && \
-	 sed -i 's/imx\///' display/DrmDisplay.cpp v4l_drm_test/video_test.cpp && \
+	 sed -i 's/imx\///' display/DrmDisplay.cpp display/WlDisplay.cpp v4l_drm_test/video_test.cpp && \
 	 sudo cp -f ../mediacontrol/lib/arm-64/fpga/libtinyxml2.so $(RFSDIR)/usr/lib/libtinyxml2.so.9 && \
 	 sudo ln -sf libtinyxml2.so.9 $(RFSDIR)/usr/lib/libtinyxml2.so && \
 	 cp -Pf $(RFSDIR)/usr/lib/libtinyxml2.so* $(DESTDIR)/usr/lib && \
@@ -55,7 +55,7 @@ imx_isp:
 		-DIMX_G2D=ON \
 		-Wno-dev \
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/libdrm \
-			-Wl,-rpath-link=$(DESTDIR)/usr/lib -Wno-error=variadic-macros -Wno-error=pedantic" && \
+			-Wno-error=variadic-macros -Wno-error=pedantic" && \
 	 $(MAKE) -j$(JOBS) && \
 	 install -d $(DESTDIR)/opt/imx8-isp/bin && \
 	 install -d $(DESTDIR)/usr/lib/systemd/system && \
@@ -65,11 +65,15 @@ imx_isp:
 	 cp -rf generated/release/bin/vvext $(DESTDIR)/opt/imx8-isp/bin && \
 	 cp -Pf generated/release/lib/*.so* $(DESTDIR)/usr/lib && \
 	 cp -rf generated/release/include/* $(DESTDIR)/usr/include && \
+	 cp -rf generated/release/bin/*.xml $(DESTDIR)/opt/imx8-isp/bin && \
+	 cp -rf generated/release/bin/*_test $(DESTDIR)/opt/imx8-isp/bin && \
 	 cp -rf $(MMDIR)/imx_isp/dewarp/dewarp_config $(DESTDIR)/opt/imx8-isp/bin && \
 	 cp $(MMDIR)/imx_isp/imx/run.sh $(DESTDIR)/opt/imx8-isp/bin && \
 	 cp $(MMDIR)/imx_isp/imx/start_isp.sh $(DESTDIR)/opt/imx8-isp/bin && \
 	 chmod +x $(DESTDIR)/opt/imx8-isp/bin/run.sh && \
 	 chmod +x $(DESTDIR)/opt/imx8-isp/bin/start_isp.sh && \
+	 sed -i 's/bin\/sh/bin\/bash/' $(DESTDIR)/opt/imx8-isp/bin/run.sh && \
+	 find $(MMDIR)/imx_isp -name "*.drv" | xargs -I {} cp {} $(DESTDIR)/opt/imx8-isp/bin/ && \
 	 install -m 0644 $(MMDIR)/imx_isp/imx/imx8-isp.service $(DESTDIR)/usr/lib/systemd/system/ && \
 	 ln -sf /usr/lib/systemd/system/imx8-isp.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/imx8-isp.service && \
 	 $(call fbprint_d,"imx_isp")

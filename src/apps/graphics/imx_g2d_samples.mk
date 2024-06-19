@@ -31,12 +31,12 @@ imx_g2d_samples:
 	     bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
 	 cd $(GRAPHICSDIR)/imx_g2d_samples && \
+	 sudo cp $(DESTDIR)/usr/lib/{libOpenCL.so*,libSPIRV_viv.so*} $(RFSDIR)/usr/lib && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export BUILD_IMPLEMENTATION=$(BUILD_IMPLEMENTATION) && \
 	 export SDKTARGETSYSROOT=$(RFSDIR) && \
-	 export CFLAGS="-I $(DESTDIR)/usr/include" && \
-	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-rpath-link=$(DESTDIR)/usr/lib" && \
-	 \
+	 export CFLAGS="-I$(DESTDIR)/usr/include" && \
+	 export LDFLAGS="-L$(DESTDIR)/usr/lib" && \
 	 $(MAKE) clean && \
 	 $(MAKE) -j$(JOBS) && \
 	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) && \

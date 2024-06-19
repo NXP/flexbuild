@@ -31,14 +31,25 @@ mmdebstrap:
     - dosfstools
     - iputils-ping
     - isc-dhcp-client
-    - psmisc
     - memtool
     - wget
     - curl
+    - ca-certificates
+    - systemd
+    - systemd-sysv
+    - psmisc   # for fuser, killall, etc
     - ethtool
     - net-tools
+    - iproute2
     - openssh-server
-    - ca-certificates
+    - openssh-client
+    - patchelf
+    - htop
+    - cpuinfo
+    - util-linux
+    - lshw
+    - keyutils
+    - wpasupplicant
   setup-hooks:
     # Setup NXP board-specific configurations for various platforms
     - 'mkdir -p $1/usr/local/bin'
@@ -59,6 +70,7 @@ mmdebstrap:
     - 'chroot "$1" echo "PermitEmptyPasswords yes" >> $1/etc/ssh/sshd_config'
     - 'chroot "$1" echo "127.0.0.1 localhost" >> $1/etc/hosts'
     - 'cp src/misc/boot.mount $1/lib/systemd/system/'
+    - 'cp src/misc/debian/debian-post-install-pkg $1/usr/bin/'
     - 'cp tools/flex-installer $1/usr/bin/'
     - 'cp tools/resizerfs $1/usr/bin/'
     - 'cp src/misc/udev/udev-rules-*/*.rules $1/etc/udev/rules.d/'
@@ -79,5 +91,5 @@ mmdebstrap:
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
-    - 'printf "NXP LSDK 2310 Debian base\n" >> $1/etc/issue'
+    - 'printf "NXP LSDK 2406 Debian base\n" >> $1/etc/issue'
     - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

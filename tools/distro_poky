@@ -10,15 +10,15 @@ build_distro_rfs_poky() {
     mkdir -p $PKGDIR/yocto
     [ -d $PKGDIR/yocto/poky/meta-poky/recipes-core ] || \
     git clone $repo_yocto_poky_url $PKGDIR/yocto/poky -b $repo_yocto_poky_tag
-    [ -d $PKGDIR/poky/meta-openembedded/meta-oe/recipes-core ] || \
-    git clone $repo_yocto_oe_url $PKGDIR/poky/meta-openembedded -b $repo_yocto_oe_branch
+    [ -d $PKGDIR/yocto/meta-openembedded/meta-oe/recipes-core ] || \
+    git clone $repo_yocto_oe_url $PKGDIR/yocto/meta-openembedded -b $repo_yocto_oe_branch
 
     pokyrfs=rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}
     . $PKGDIR/yocto/poky/oe-init-build-env $FBOUTDIR/rfs/$pokyrfs
     $FBDIR/configs/poky/reconfig.sh fixcfg
     cp -f $FBDIR/configs/poky/local_${DESTARCH}_${DISTROVARIANT}.conf $FBOUTDIR/rfs/$pokyrfs/conf/local.conf
     if [ `grep -c "meta-oe" $FBOUTDIR/rfs/$pokyrfs/conf/bblayers.conf` -eq '0' ]; then
-	cd $PKGDIR/poky/meta-openembedded
+	cd $PKGDIR/yocto/meta-openembedded
 	bitbake-layers add-layer meta-oe
 	bitbake-layers add-layer meta-python
 	bitbake-layers add-layer meta-networking
@@ -27,7 +27,7 @@ build_distro_rfs_poky() {
     fi
     export LANG=en_US.UTF-8
     [ $DESTARCH = arm64 ] && export MACHINE=qemuarm64 || export MACHINE=qemuarm
-    bitbake -c clean $pokyimgtype
+    # bitbake -c cleansstate $pokyimgtype
     bitbake $pokyimgtype
     [ $DESTARCH = arm64 -a $DISTROVARIANT = devel ] && $FBDIR/configs/poky/reconfig.sh fixlib $RFSDIR/usr/lib/libc.so
     [ -L $FBOUTDIR/rfs/$pokyrfs/target ] || ln -s $RFSDIR $FBOUTDIR/rfs/$pokyrfs/target
@@ -63,7 +63,7 @@ build_distro_rfs_poky() {
     $FBDIR/configs/poky/reconfig.sh fixsys $RFSDIR
     cd $RFSDIR && sudo chown -h -R 0:0 * && \
     sudo find . | sudo cpio --quiet -o -H newc | gzip > $FBOUTDIR/images/$pokyrfs.cpio.gz && fbprint_d $FBOUTDIR/images/$pokyrfs.cpio.gz
-    cp -f $pokytmpdir/deploy/images/$MACHINE/${pokyimgtype}-${MACHINE}.manifest $FBOUTDIR/rfs/$pokyrfs/$pokyrfs.packages.manifest
+    cp -f $pokytmpdir/deploy/images/$MACHINE/${pokyimgtype}-${MACHINE}.rootfs.manifest $FBOUTDIR/rfs/$pokyrfs/$pokyrfs.packages.manifest
 
     bld packrfs -r poky:$DISTROVARIANT -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     ls -goh $FBOUTDIR/images/$pokyrfs*

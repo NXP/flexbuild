@@ -19,7 +19,7 @@ ifeq ($(MACHINE), all)
 	 done
 else
 	@cd $(BSPDIR) && \
-	 [ $${MACHINE:0:5} = lx216 ] && machine=$${MACHINE:0:10}_rev2 || machine=$(MACHINE) && \
+	 [ $${MACHINE:0:6} = lx2160 ] && machine=$${MACHINE:0:10}_rev2 || machine=$(MACHINE) && \
 	 $(MAKE) -C rcw/$$machine && \
 	 $(MAKE) -C rcw/$$machine install DESTDIR=$(FBOUTDIR)/bsp/rcw/$(MACHINE)
 endif

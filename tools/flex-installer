@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=1.21.2310
+FIVERSION=1.24.2406
 DEFAULT_PARTITION_NUMBER=4
-DEFAULT_DISK_PARTITION="3P=1G:7G:-1"
-DEFAULT_LOOP_DEVICE_PARTITION="3P=800M:128M:-1"
-DEFAULT_SDCARD_IMG_SIZE_MB=6144
+DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
+DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
+DEFAULT_SDCARD_IMG_SIZE_MB=8192
 DEFAULT_RAW_PARTITION_SIZE_MB=256
-DEFAULT_LINUX_VERSION=6.1.36
-DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2310
+DEFAULT_LINUX_VERSION=6.6.3
+DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2406
 
 
 usage ()
@@ -36,7 +36,7 @@ OPTION:
  -B, --bootpart     Specify boot partition number to override default (default boot partition is the first)
  -R, --rootpart     Specify root partition number to override default (default root partition is the last)
  -d, --device	    Device name of the target SD/USB/SATA storage drive in Linux
- -p, --partition    Customize configurable partitions of target disk, default is "-p 3P=1G:7G:-1" if not specified
+ -p, --partition    Customize configurable partitions of target disk, default is "-p 3P=512M:8G:-1" if not specified
  -f, --firmware	    The composite firmware image to be programmed into SD card
  -F, --force        Force partition and format target disk regardless of the existing data in disk
  -e, --efi	    Used for the case of UEFI as bootloader instead of U-Boot, valid argument: dtb or acpi
@@ -52,7 +52,7 @@ Examples for various usage scenarios:
   You can specify one or several of '-b <boot> -r <rootfs> -f <firmware> -u <url>' options to override the default settings
 
 - To only partition and format target SD/eMMC card or USB/SATA disk
-  $ flex-installer -i pf -d /dev/sdx                   (default 3 partitions as 3P=1G:7G:-1)
+  $ flex-installer -i pf -d /dev/sdx                   (default 3 partitions as 3P=512G:8G:-1)
   or
   $ flex-installer -i pf -d /dev/sdx -p 4P=800M:6G:8G:-1 (specify custom partitions as 4P=800M:6G:8G:-1)
 
@@ -456,8 +456,8 @@ check_images_format() {
 	bootimgtype=tgz
     elif file -L $bootimg_n | grep -q 'UUID='; then
 	bootimgtype=ext
-    elif [ $instruction != auto ] && [ -n "$bootimg" ] && [ ! -f $bootimg ]; then
-	print_e "Not found $bootimg"; exit
+    elif [ $instruction != auto ] && [ -n "$bootimg" ] && [ ! -e $bootimg ]; then
+	print_e "Not found $bootimg"; exit 1
     else
 	bootimgtype=unknown
     fi
@@ -472,8 +472,8 @@ check_images_format() {
 	rfsimgtype=tgz
     elif file -L $rootfsimg_n | grep -q 'UUID='; then
 	rfsimgtype=ext
-    elif [ $instruction != auto ] && [ -n "$rootfsimg" ] && [ ! -f $rootfsimg ]; then
-	print_e "Not found $rootfsimg"; exit
+    elif [ $instruction != auto ] && [ -n "$rootfsimg" ] && [ ! -e $rootfsimg ]; then
+	print_e "Not found $rootfsimg"; exit 1
     else
 	rfsimgtype=unknown
     fi
@@ -723,13 +723,10 @@ fi
 [ "${machine:0:7}" = "ls1021a" -o "${machine:0:4}" = "imx6" -o "${machine:0:4}" = "imx7" ] && tgtarch=arm32 || tgtarch=arm64
 [ -f $rootpartition ] && [ "`ls -A $rootpartition`" != "" ] && print_e "Directory $mntdir is not empty, please clean it first" && exit
 
-for i in $bootpartition $rootpartition $backuppartition $efipartition; do
-    sudo mkdir -p $i
-done
-
+sudo mkdir -p $bootpartition $rootpartition $backuppartition $efipartition
 
 [ -n "$bootimg" ] && bootimg_n=$bootimg || bootimg_n=boot_${portfolio}_${tgtarch}_lts_${DEFAULT_LINUX_VERSION}.tar.zst
-[ -n "$rootfsimg" ] && rootfsimg_n=$rootfsimg || rootfsimg_n=rootfs_${distroversion}_debian_desktop_${tgtarch}.tar.zst
+[ -n "$rootfsimg" ] && rootfsimg_n=$rootfsimg || rootfsimg_n=rootfs_${distroversion}_debian_base_${tgtarch}.tar.zst
 [ -n "$firmware" ] && firmware_n=$firmware || firmware_n=firmware_${machine}_sdboot.img
 
 if [ -z "$firmware" ] && [ "$machine" = imx8mpevk -o "$machine" = imx8mmevk -o "$machine" = imx8mnevk -o "$machine" = imx8mqevk ]; then
@@ -781,9 +778,9 @@ elif [ $instruction = install -o $instruction = null ] && \
     flex_install_distro
 elif [ $instruction = mkwic ]; then
     if mount | grep $mntdir/$devname; then sudo umount $mntdir/$devname* 1>/dev/null 2>&1 || true; fi
-    [ ! -f $rootfsimg_n ] && print_e "Not found $rootfsimg_n" && exit
-    [ ! -f $bootimg_n ] && print_e "Not found $bootimg_n" && exit
-    [ ! -f $firmware_n ] && print_e "Not found $firmware_n" && exit
+    [ ! -e $rootfsimg_n ] && print_e "Not found $rootfsimg_n" && exit 1
+    [ ! -e $bootimg_n ] && print_e "Not found $bootimg_n" && exit 1
+    [ ! -e $firmware_n ] && print_e "Not found $firmware_n" && exit 1
     print_n "Creating sdcard.wic, waiting ..."
     rm -f sdcard.wic && dd if=/dev/zero of=sdcard.wic bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB
     loopdev=$(sudo losetup -j sdcard.wic | cut -d' ' -f1)

@@ -15,8 +15,7 @@ DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool"
 
 
 dpdk:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = desktop -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"dpdk") && \
 	 $(call repo-mngr,fetch,dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \

@@ -15,7 +15,7 @@ ifeq ($(CONFIG_OPENSSL),y)
 	 fi && \
 	 cd $(SECDIR)/openssl && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/src/apps/security/patch/openssl/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/openssl/*.patch && touch .patchdone; \
 	 fi && \
 	 ./Configure enable-devcryptoeng linux-aarch64 shared \
 		     -I$(DESTDIR)/usr/include -I$(PKGDIR)/linux/cryptodev_linux \

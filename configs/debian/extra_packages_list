@@ -23,7 +23,8 @@ host_dependent_packages=" \
     python3-jsonschema python3-cryptography libzstd-dev libtinyxml2-dev g++ \
     libgnutls28-dev pandoc xtrans-dev libusb-1.0-0-dev libzip-dev libbz2-dev \
     texlive-font-utils libglib2.0-dev autoconf-archive valac libcanberra-dev \
-    zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin
+    zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin \
+    rename protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome
 "
 
 
@@ -62,7 +63,18 @@ extra_server_devel_packages=" \
     libxv-dev \
     libtheora-dev \
     libcjson-dev \
-    uuid-dev
+    libmnl-dev \
+    uuid-dev \
+    libpython3.11-dev \
+    python3-pip \
+    python3-pybind11 \
+    python3-numpy \
+    python3-pillow \
+    python3-flatbuffers \
+    python3-lxml \
+    libflatbuffers-dev \
+    libcpuinfo-dev \
+    libwaffle-dev \
 "
 
 extra_desktop_devel_packages=" \
@@ -73,6 +85,8 @@ extra_desktop_devel_packages=" \
     libxkbfile-dev \
     libxv-dev \
     libbsd-dev \
+    libxcb-dri3-dev \
+    libxcb-present-dev \
     libepoxy-dev \
     libpciaccess-dev \
     libdbus-1-dev \
@@ -100,6 +114,8 @@ extra_desktop_devel_packages=" \
     libspeex-dev x264 \
     libtag1-dev \
     libvulkan-dev \
+    libglm-dev \
+    libassimp-dev \
     libxkbcommon-x11-dev \
     libusb-1.0-0-dev \
     librsvg2-dev \
@@ -112,5 +128,7 @@ extra_desktop_devel_packages=" \
     libtheora-dev \
     libxv-dev \
     libx11-xcb-dev \
-    libjson-glib-dev
+    libjson-glib-dev \
+    python3-opencv \
+    googletest \
 "

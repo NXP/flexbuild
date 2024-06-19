@@ -26,7 +26,8 @@ pktgen_dpdk:
 	 build_dir=build_$(DISTROTYPE)_$(ARCH) && \
 	 \
 	 meson setup $$build_dir \
-		-Dc_args="-DRTE_FORCE_INTRINSICS -I$(DESTDIR)/usr/include -Wno-error=mismatched-dealloc -Wno-error=nonnull" \
+		-Dc_args="-DRTE_FORCE_INTRINSICS -I$(DESTDIR)/usr/include -Wno-error=mismatched-dealloc \
+			  -Wno-error=nonnull -Wno-error=implicit-function-declaration -Wno-error=unused-variable" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" \
 		--prefix=$(DESTDIR)/usr --buildtype=release \
 		--cross-file meson.cross && \

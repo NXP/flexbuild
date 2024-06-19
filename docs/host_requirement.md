@@ -1,5 +1,7 @@
 ## Host system requirement
-- The supported distro on host machine is Ubuntu 22.04 LTS or Debian 12.
+- Debian 12 host
+
+- Ubuntu LTS host (e.g. 22.04, 20.04) on which Docker Engine is running (Refer to docs/FAQ-docker-setup.md)
 
 - If other distro version is installed on your host machine, you can run 'bld docker' to create a Debian 12 docker and build it in docker.
 

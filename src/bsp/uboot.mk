@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -12,7 +12,10 @@ uboot u-boot:
 	@$(call repo-mngr,fetch,uboot,bsp) && \
 	 curbrch=`cd $(BSPDIR)/uboot && git branch | grep ^* | cut -d' ' -f2` && \
 	 $(call fbprint_n,"Building u-boot $$curbrch for $(MACHINE)") && \
-	 cd $(BSPDIR) && \
+	 cd $(BSPDIR)/uboot && \
+	 if [ -d $(FBDIR)/patch/uboot ] && [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/uboot/*.patch && touch .patchdone; \
+	 fi && \
 	 if [ "$(BOOTTYPE)" = tfa -a "$(COT)" = arm-cot-with-verified-boot ]; then \
 	     uboot_cfg=$(MACHINE)_tfa_verified_boot_defconfig; \
 	 elif [ -n "$(UBOOT_CONFIG)" ]; then \
@@ -38,6 +41,7 @@ define build-uboot-target
 	opdir=$(FBOUTDIR)/bsp/u-boot/$$brd/output/$1 && mkdir -p $$opdir && \
 	unset PKG_CONFIG_SYSROOT_DIR && \
 	\
+	sed -i 's/CONFIG_SYS_BOOTM_LEN=0x2000000/CONFIG_SYS_BOOTM_LEN=0x4000000/' $(BSPDIR)/uboot/configs/imx* && \
 	$(call fbprint_n,"config = $1") && \
 	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 && \
 	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir && \

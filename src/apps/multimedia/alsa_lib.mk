@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -13,7 +13,7 @@ alsa_lib:
 	 $(call repo-mngr,fetch,alsa_lib,apps/multimedia) && \
 	 cd $(MMDIR)/alsa_lib && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/src/apps/multimedia/patch/alsa_lib/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/alsa_lib/*.patch && touch .patchdone; \
 	 fi && \
 	 export LD_LIBRARY_PATH=$(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu && \
 	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig && \

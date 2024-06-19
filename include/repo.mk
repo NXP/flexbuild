@@ -11,22 +11,20 @@ SHELL=/bin/bash
 
 define repo-mngr
 	for tree in $2; do \
-	    branch=`grep -E "^repo_$${tree}_branch" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2` && branch=`echo $$branch | sed 's/\"//g'`; \
-	    commit=`grep -E "^repo_$${tree}_commit" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2` && commit=`echo $$commit | sed 's/\"//g'`; \
-	    tag=`grep -E "^repo_$${tree}_tag" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2` && tag=`echo $$tag | sed 's/\"//g'`; \
-	    repourl=`grep -E "^repo_$${tree}_url" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2` && repourl=`echo $$repourl | sed 's/\"//g'` && \
-	    if [ -z "$$tag" -a $(UPDATE_REPO_PER_TAG) = y ] && ! echo "$(REPO_TAG_EXCLUDE)" | grep -q " $$tree "; then tag=$(DEFAULT_REPO_TAG); fi; \
+	    branch=`grep -rE "^repo_$${tree}_branch" $(FBDIR)/configs/$(CONFIGLIST) $(FBDIR)/src/*/*/*.mk | cut -d= -f2` && branch=`echo $$branch | sed 's/\"//g'`; \
+	    commit=`grep -rE "^repo_$${tree}_commit" $(FBDIR)/configs/$(CONFIGLIST) $(FBDIR)/src/*/*/*.mk | cut -d= -f2` && commit=`echo $$commit | sed 's/\"//g'`; \
+	    tag=`grep -rE "^repo_$${tree}_tag" $(FBDIR)/configs/$(CONFIGLIST) $(FBDIR)/src/*/*/*.mk | cut -d= -f2` && tag=`echo $$tag | sed 's/\"//g'`; \
+	    repourl=`grep -rE "^repo_$${tree}_url" $(FBDIR)/configs/$(CONFIGLIST) $(FBDIR)/src/*/*/*.mk | cut -d= -f2` && repourl=`echo $$repourl | sed 's/\"//g'` && \
+	    if [ -z "$$tag" -a -z "$$commit" -a $(UPDATE_REPO_PER_TAG) = y ]; then tag=$(DEFAULT_REPO_TAG); fi; \
 	    repo_en=`grep -iE "^CONFIG_BUILD_$${tree}" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2`; \
 	    if [ $$tree = linux ]; then tree=$(KERNEL_TREE); fi; \
 	    if [ -n "$$repourl" ]; then echo -e "\nrepo: $$tree"; fi && \
 	    if [ $(UPDATE_REPO_PER_TAG) = y ]; then \
-		[ -n "$$repourl" -a -n "$$tag" ] && echo tag: $$tag; \
-		if [ -n "$$branch" ] && echo "$(REPO_TAG_EXCLUDE)" | grep -q " $$tree "; then echo branch: $$branch; fi; \
+		if [ -n "$$repourl" -a -n "$$tag" ]; then echo tag: $$tag; fi; \
 	    elif [ $(UPDATE_REPO_PER_BRANCH) = y ]; then \
-		[ -n "$$repourl" -a -n "$$branch" ] && echo branch: $$branch; \
-		if [ -n "$$repourl" -a -n "$$tag" ] && echo "$(REPO_BRANCH_EXCLUDE)" | grep -q " $$tree "; then echo tag: $$tag; fi; \
+		if [ -n "$$repourl" -a -n "$$branch" ]; then echo branch: $$branch; fi; \
 	    elif [ $(UPDATE_REPO_PER_COMMIT) = y ]; then \
-		[ -n "$$repourl" -a -n "$$commit" ] && echo commit: $$commit; \
+		if [ -n "$$repourl" -a -n "$$commit" ]; then echo commit: $$commit; fi; \
 	    fi && \
 	    tree=$(PKGDIR)/$3/$$tree && \
 	    if [ -n "$$repourl" ] && [ -d $$tree -o -L $$tree ]; then \

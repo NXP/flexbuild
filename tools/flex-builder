@@ -9,7 +9,7 @@
 
 set -e
 
-FB_VERSION=2.12.2310
+FB_VERSION=2.15.2406
 
 usage () {
 cat <<EOF
@@ -22,7 +22,7 @@ Most used example with automated build:
  bld auto -p IMX (or -p LS)      # same as above, for all arm64 iMX (or Layerscape) platforms
 
 Most used example with separate command:
- bld fw -m imx8mpevk             # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
+ bld bsp -m imx8mpevk            # generate BSP composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
  bld rfs -r debian:desktop       # generate Debian-based desktop rootfs  (with more graphics/multimedia packages for Desktop)
  bld rfs -r debian:server        # generate Debian-based server rootfs   (with more server related packages, no GUI Desktop)
  bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
@@ -33,9 +33,10 @@ Most used example with separate command:
  bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
  bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
  bld apps -r debian:server -p LS # compile NXP-specific apps against the library dependencies of Debian server rootfs for LS machines
+ bld ml                          # compile NXP-specific eIQ AI/ML components against the library dependencies of Debian rootfs
  bld merge-apps                  # merge NXP-specific apps into target Debian rootfs
  bld packrfs                     # pack and compress target rootfs as rootfs_xx.tar.zst
- bld packapps                    # pack and compress target app components as app_components_xx.tar.zst
+ bld packapps                    # pack and compress target app components as apps_xx.tar.zst
  bld repo-fetch [ <component> ]  # fetch git repository of all or specified component from remote repos if not exist locally
  bld docker                      # create or attach docker container to build in docker
  bld clean                       # clean all obsolete firmware/linux/apps image except distro rootfs
@@ -63,7 +64,7 @@ check_toolchain() {
 	[ -f /usr/bin/arm-linux-gnueabihf-gcc ] && gccversion=$(arm-linux-gnueabihf-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
 	if [ $gccversion = 0 ]; then
 	    fbprint_w "Installing toolchain for arm32 ..."
-	    sudo apt install -y crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+	    sudo apt-get install -y crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 	elif ! echo $tc_version | grep -q `echo $gccversion|cut -d. -f1` && [ $DISTROTYPE != buildroot ]; then
 	    fbprint_w "Please build on Debian $DEBIAN_VERSION host or build in docker (run 'bld docker') to use the verified toolchain"
 	    exit
@@ -74,7 +75,7 @@ check_toolchain() {
 	[ -f /usr/bin/aarch64-linux-gnu-gcc ] && gccversion=$(aarch64-linux-gnu-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
 	if [ $gccversion = 0 ]; then
 	    fbprint_w "Installing toolchain for arm64 ..."
-	    sudo apt install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+	    sudo apt-get install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
 	elif ! echo $tc_version | grep -q `echo $gccversion | cut -d. -f1` &&  [ $DISTROTYPE != buildroot ]; then
 	    fbprint_w "The existing toolchain version $gccversion on this host may result in build failure for some components."
 	    fbprint_w "Please build on Debian $DEBIAN_VERSION or Ubuntu 22.04 host or build in docker (run 'bld docker') to use the verified toolchain version $tc_version"
@@ -160,7 +161,7 @@ generate_linux_itb() {
 	echo building dependent $kernel_img
 	bld linux -a ${DESTARCH}${endianstr} -p $SOCFAMILY -f $CFGLISTYML
     fi
-    if [ $DISTROVARIANT = tiny -a $DISTROTYPE = poky -a ! -f $initrdimg -a "$FETCH_PREBUILT_SDK_RFS" = y ]; then
+    if [ $DISTROVARIANT = tiny -a $DISTROTYPE = poky -a ! -f $initrdimg ]; then
 	bld initrd -a $DESTARCH -f $CFGLISTYML
     fi
     [ -f $initrdimg ] || bld cpio -r ${DISTROTYPE}:${DISTROVARIANT} -a $DESTARCH -f $CFGLISTYML
@@ -276,7 +277,7 @@ get_prebuilt_initrd() {
     tfile=rootfs_${DISTRIB_VERSION}_poky_tiny_${DESTARCH}.cpio.gz
     if [ ! -f $FBOUTDIR/images/$tfile ]; then
 	[ $HOSTARCH = x86_64 ] && check_http_request $initrd_bin_url/$tfile
-	wget --progress=bar:force $repo_initrd_bin_url/$tfile -O $FBOUTDIR/images/$tfile
+	wget --progress=bar:force $DISTRO_SVR_URL/$DISTRIB_VERSION/$tfile -O $FBOUTDIR/images/$tfile
     fi
 }
 
@@ -339,7 +340,7 @@ pack_distro_rfs() {
 
 pack_app_components() {
     local appsname=${DESTDIR##*/}
-    local appstarball=app_${appsname}_`date +%Y%m%d%H%M`
+    local appstarball=${appsname}_`date +%Y%m%d%H%M`
     echo packing ${appstarball}.tar.zst ...
     cd $FBOUTDIR/apps/$appsname && sudo tar --zstd -cf $FBOUTDIR/images/${appstarball}.tar.zst *
     cd $FBDIR && fbprint_d $FBOUTDIR/images/${appstarball}.tar.zst
@@ -374,10 +375,10 @@ check_component_valid() {
        ! echo $BSP_REPO_LIST | grep -q $1; then
 	fbprint_e "Invalid target name: $1"
 	fbprint_n "\nSupported target command: fw, boot, rfs, itb, list, apps, clean, auto, packrfs, packapps, merge-apps, repo-fetch"
-	fbprint_n "\nSupported target app component:\n $APPS_REPO_LIST"
-	fbprint_n "\nSupported target linux component:\n $LINUX_REPO_LIST"
-	fbprint_n "\nSupported target BSP component:\n $BSP_REPO_LIST"
-	fbprint_n "\nML component:\n $ML_REPO_LIST"
+	fbprint_n "\nSupported app component:\n $APPS_REPO_LIST"
+	fbprint_n "\nSupported linux component:\n $LINUX_REPO_LIST"
+	fbprint_n "\nSupported BSP component:\n $BSP_REPO_LIST"
+	fbprint_n "\nSupported eIQ AI/ML component:\n $ML_REPO_LIST"
 	exit
     fi
 }
@@ -386,7 +387,7 @@ check_component_valid() {
 check_binfmt_qemu() {
     if grep -q Ubuntu /etc/issue; then
 	[ -f /usr/bin/qemu-aarch64-static ] || \
-	sudo apt install -y binfmt-support qemu-system-common qemu-user-static
+	sudo apt-get install -y binfmt-support qemu-system-common qemu-user-static
     fi
     if ! grep -q binfmt_misc /proc/filesystems; then
 	sudo modprobe binfmt_misc
@@ -423,7 +424,7 @@ host_connect_target(){
     fi
     if ! echo $1 | grep -q @; then optuser=root@; fi
     if ! echo $1 | grep -q :; then optdir=":/"; fi
-    [ -f /usr/bin/sshfs ] || sudo apt install -y sshfs
+    [ -f /usr/bin/sshfs ] || sudo apt-get install -y sshfs
     mkdir -p $localmntdir
     sshfs -o nonempty,reconnect,exec,allow_other -o idmap=user,uid=`id -u`,gid=`id -g` \
 	  -p22 ${optuser}${1}$optdir $localmntdir && \
@@ -496,17 +497,13 @@ build_rfs_and_apps() {
     if [ "$BUILD_DEBIAN_DESKTOP" = y -a $SOCFAMILY = IMX ]; then
 	bld rfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 	bld apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	[ "$PKG_GROUPS_ML" = y -o "$GROUPS_ML" = y ] && \
+	bld ml -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 	bld merge-apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 	bld packrfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     fi
 
-    if [ "$PACKAGEGROUPS_ML" = y -a ! -f $FBDIR/src/apps/ml/.mldone ]; then
-	bld clean-ml -f $CFGLISTYML
-	bld ml -r debian:$DISTROVARIANT -a $DESTARCH -f $CFGLISTYML
-	bld install-ml -a $DESTARCH -r debian:$DISTROVARIANT -f $CFGLISTYML
-    fi
-
-    if [ "$BUILD_poky_RFS" = y ]; then
+    if [ "$BUILD_YOCTO_RFS" = y ]; then
         bld rfs -r poky:devel -a $DESTARCH -f $CFGLISTYML
         bld apps -r poky:devel -a $DESTARCH -f $CFGLISTYML
         bld rfs -r poky:tiny -a $DESTARCH -f $CFGLISTYML
@@ -548,14 +545,14 @@ flex_auto_build() {
 
     [ ! -d $KERNEL_PATH ] && bld repo-fetch -c linux
     curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
-    [ $KERNEL_BRANCH != $curbrch ] && cd $KERNEL_PATH && git checkout $KERNEL_BRANCH -b $KERNEL_BRANCH && cd -
+    [ "$KERNEL_BRANCH" != "$curbrch" ] && cd $KERNEL_PATH && git checkout $KERNEL_BRANCH -b $KERNEL_BRANCH && cd -
 
     bld linux -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     bld linux-modules -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     [ $DESTARCH = arm64 ] && bld perf -p $SOCFAMILY -f $CFGLISTYML
     bld distroscr -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-    bld fwall -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld bspall -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     bld secure_obj -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
     bld boot -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 
@@ -594,11 +591,11 @@ check_proxy() {
     done
 }
 
-check_ubuntu_version() {
+check_debian_version() {
     if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/os-release | grep -iE '^ID=debian|^ID=ubuntu|^ID=lsdk'` ]]; then
 	fbprint_e "The host is not Debian/Ubuntu system, please install docker and run 'bld docker' to build in docker" && exit
     else
-	[ -f /usr/bin/lsb_release ] || sudo apt install -y lsb-release
+	[ -f /usr/bin/lsb_release ] || sudo apt-get install -y lsb-release
 	[ ! -f /usr/bin/lsb_release ] && fbprint_e "lsb_release command is not found" && exit
 	releaseVersion=$(lsb_release -rs)
 	result=$(echo "$releaseVersion < $DEBIAN_VERSION" | bc)
@@ -615,13 +612,12 @@ check_ubuntu_version() {
 check_host_dependent_pkg() {
     for pkg in $host_dependent_packages; do
 	if ! dpkg-query -l $pkg | grep -q ii; then
-	    [ "$aptupdatedone" != y ] && sudo apt autoclean && sudo apt update && aptupdatedone=y
-	    echo installing $pkg ... && sudo apt install -y $pkg
+	    [ "$aptupdatedone" != y ] && sudo apt autoclean && sudo apt-get update && aptupdatedone=y
+	    echo installing $pkg ... && sudo apt-get install -y $pkg
 	fi
     done
 
     if [ ! -f ~/.gitconfig ] || [[ ! `grep 'name =' ~/.gitconfig` ]]; then
-	fbprint_w "git configuration is not set in ~/.gitconfig yet, automatically setting it ..."
 	echo [user] > ~/.gitconfig
 	echo "        name = `whoami`" >> ~/.gitconfig
 	echo "        email = `whoami`@`hostname`.com" >> ~/.gitconfig
@@ -632,7 +628,9 @@ check_host_dependent_pkg() {
 	    echo "        proxy = $https_proxy" >> ~/.gitconfig
 	fi
     fi
-    check_toolchain && touch $FBDIR/logs/.deppkgdone
+    [ `hostname` = fbdebian ] && git config --global --add safe.directory $FBDIR
+    [ `hostname` = fbdebian ] && nflag=.deppkgdonefbdeb || nflag=.deppkgdone
+    check_toolchain && touch $FBDIR/logs/$nflag
 }
 
 check_linux_config() {
@@ -650,7 +648,6 @@ do_clean() {
     clean_bsp_components
     clean_linux_components
     clean_apps_components
-    [ "$PACKAGEGROUPS_ML" = y ] && bld clean-ml
     fbprint_d "clean all old images except distro rootfs"
 }
 
@@ -677,7 +674,7 @@ do_clean_rfs() {
 show_lists() {
     echo -e "\nSupported i.MX Machine List:"
     echo -e "\t$IMX_MACHINE_LIST"
-    echo -e "\nSupported LS Machine List:"
+    echo -e "\nSupported LayerScape Machine List:"
     echo -e "\t$LS_MACHINE_LIST"
     echo -e "\ni.MX/LS BSP Component List:"
     echo -e "\t$BSP_REPO_LIST"
@@ -685,7 +682,7 @@ show_lists() {
     echo -e "\t$LINUX_REPO_LIST"
     echo -e "\nNXP-specific App Component List:"
     echo -e "\t$APPS_REPO_LIST"
-    echo -e "\neIQ ML Component List:"
+    echo -e "\neIQ AI/ML Component List:"
     echo -e "\t$ML_REPO_LIST"
 }
 
@@ -905,10 +902,9 @@ elif [ $DISTROTYPE = poky ]; then
 fi
 
 if [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ]; then
-    DESTDIR=$FBOUTDIR/apps/components_${DESTARCH}_${DISTROTYPE}
+    DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}
 else
-    [ "$PKG_GROUPS_ML" = y -o "$GROUPS_ML" = y ] && postfix="_ml" || postfix=""
-    DESTDIR=$FBOUTDIR/apps/components_${DESTARCH}_${DISTROTYPE}_${DISTROVARIANT}${postfix}
+    DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}_${DISTROVARIANT}
 fi
 
 [ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && echo $DISTROTYPE desktop supports only arm64 && exit
@@ -918,12 +914,10 @@ tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.
 base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
 initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.cpio.gz
 
-mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{bin,include}
-mkdir -p $DESTDIR/usr/local/{bin,include,lib}
+[ $DISTROVARIANT != base ] && mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
 mkdir -p $PKGDIR/linux $FBDIR/logs $RFSDIR
 mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,connectivity,utils,ml}
-mkdir -p $DESTDIR/usr/lib
 
 [ -z "$JOBS" ] && JOBS=$(nproc)
 
@@ -993,8 +987,10 @@ elif [ "$1" = push ]; then
     host_push_image_to_target $2 $3; exit
 fi
 
-if [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && [ $DISTROTYPE != buildroot -a ! -f $FBDIR/logs/.deppkgdone ]; then
-    check_ubuntu_version && check_host_dependent_pkg
+if [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && [ $DISTROTYPE != buildroot ]; then
+    if [ `hostname` = fbdebian -a ! -f $FBDIR/logs/.deppkgdonefbdeb ] || [ `hostname` != fbdebian -a ! -f $FBDIR/logs/.deppkgdone ]; then
+	check_debian_version && check_host_dependent_pkg
+    fi
 fi
 
 tmppath=$(realpath $FBOUTDIR/linux/kernel)
@@ -1038,7 +1034,7 @@ export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE K
        CFGLISTYML BUILDARG DISTROTYPE DISTROVARIANT DISTROVARIANTOPT HOSTARCH SYSARCH SECURE \
        SOCFAMILY BL33TYPE DISTRIB_NAME SOCARCH COT DISTRIB_VERSION BOARD_VARIANTS \
        UBOOT_CONFIG CODENAME DISTRO_VERSION UBUNTU_VERSION FORCE LD_LIBRARY_PATH \
-       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH
+       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH DEFAULT_REPO_TAG
 
 
 
@@ -1065,11 +1061,11 @@ case "$1" in
 	clean_apps_components; exit;;
     list)
 	show_lists; exit;;
-    fw)
+    fw|bsp)
 	generate_composite_firmware; exit;;
-    fwall)
+    fwall|bspall)
 	for brd in $machinelist; do
-	    bld fw -m $brd
+	    bld bsp -m $brd
 	done
 	fbprint_d "Build all composite firmware"; exit;;
     distroscr)
@@ -1125,10 +1121,6 @@ case "$1" in
     clean-apps)
 	clean_apps_components
 	fbprint_d "clean apps components $DESTDIR"; exit;;
-    clean-ml)
-        make ml_clean -C $FBDIR/src/apps; exit;;
-    install-ml)
-        make ml_install -C $FBDIR/src/apps; exit;;
     clean)
 	do_clean; exit;;
     merge-apps)
@@ -1193,9 +1185,9 @@ case $1 in
     initrd)
 	get_prebuilt_initrd;;
     app|apps)
-	if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROVARIANT ]; then
+	if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY} ]; then
 	    make -C $FBDIR/src $1 && \
-	    touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROVARIANT
+	    touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
 	else
 	    echo apps for ${DESTARCH} $DISTROTYPE:$DISTROVARIANT was already built, do \'bld clean-apps\' to rebuild.
 	fi;;

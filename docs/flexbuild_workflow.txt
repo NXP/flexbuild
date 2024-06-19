@@ -3,25 +3,25 @@ Flexbuild Work Flow
 +--------------------------------+    +--------------+    +---------------------------------------+
 |    BSP components              |    |              |    |   Generated Images   (build/images)   |
 |                                |--->|              |    |                                       |
-|u-boot,uefi,rcw,tfa,fman,pfe,   |    |              |    |flex-installer                         |
-|mc,qe,dpl,dpc,seco,etc          |    |              |    |sdk_poky_tiny_IMX_<arch>.itb           |
+|u-boot,atf,imx-seco,imx-scfw,rcw|    |              |    |flex-installer                         |
+|imx-scfw,imx-seco,fw_ele,etc    |    |              |    |sdk_poky_tiny_IMX_<arch>.itb           |
 +--------------------------------+    |              |    |rootfs_<sdk_version>_debian_<arch>.tgz |
                                       |              |    |rootfs_<sdk_version>_ubuntu_<arch>.tgz |
 +--------------------------------+    |              |--->|rootfs_<sdk_version>_poky_<arch>.tgz   |
 |      Linux components          |--->|              |    |rootfs_<sdk_version>_buildroot.tgz     |
-|   linux, misc modules          |    |              |    |lsdk_poky_tiny_IMX_arm64.itb           |
+| linux kernel and misc modules  |    |              |    |lsdk_poky_tiny_IMX_arm64.itb           |
 +--------------------------------+    |              |    |lsdk_poky_tiny_LS_arm64.itb            |
                                       |              |    |boot_LS_<arch>_lts_<version>.tgz       |
                                       |              |    |boot_IMX_<arch>_lts_<version>.tgz      |
 +--------------------------------+    |              |    +---------------------------------------+
 |     Apps components            |    |              |
 |                                |    |              |    +---------------------------------------+
-|fmc,restool,dpdk,wayland,weston |--->|              |    |            RFS (build/rfs)            |
-|dce,aiopsl,tsntool,libpkcs11,   |    |              |    |                                       |
-|ml,armnn,secure_obj,ceetm,      |    |              |    |            +------------+             |
+|gstreamer,fmc,restool,dpdk,     |--->|              |    |            RFS (build/rfs)            |
+|imx_gst_plugin,tsntool,libpkcs11|    |              |    |                                       |
+|imx_isp,multimedia,secure_obj,  |    |              |    |            +------------+             |
 |optee_os,optee_client,aiopsl,   |    |              |    |            |  Debian    |             |
-|ovs_dpdk,pktgen_dpdk,vpp,etc    |    |              |    |            +------------+             |
-|                                |    |              |    |                                       |
+|ovs_dpdk,pktgen_dpdk,vpp,       |    |              |    |            +------------+             |
+|ml,tflite,pytorch,armcl,etc     |    |              |    |                                       |
 +--------------------------------+    |              |    |            +------------+             |
                                       |              |    |            |  Ubuntu    |             |
 +--------------------------------+    |              |    |            +------------+             |
@@ -32,7 +32,7 @@ Flexbuild Work Flow
 |linux/linux_<arch>.its          |    | flex-builder |--->|                                       |
 |debian/extra-devel-packages-list|    |              |    |            +------------+             |
 |buildroot/<arch>_defconfig      |    |              |    |            |  Yocto RFS |             |
-|poky/local_arm64_tiny.conf     |    |              |    |            +------------+              |
+|poky/local_arm64_tiny.conf      |    |              |    |            +------------+             |
 +--------------------------------+    |              |    |                                       |
                                       |              |    |            +-------------+            |
                                       |              |    |            |Buildroot RFS|            |
@@ -53,7 +53,6 @@ Flexbuild Work Flow
 | +---------------+-----------+  |    |              |    |          secure boot header           |
 |                                |    |              |    |          distro boot script           |
 |                                |    |              |    |          flash_images                 |
-|                                |    |              |    |                                       |
 |                                |    |              |    |                                       |
 +--------------------------------+    +--------------+    +---------------------------------------+
               ^                                                             |                         

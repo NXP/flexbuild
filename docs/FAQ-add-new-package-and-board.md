@@ -55,7 +55,7 @@ e.g.
 ## How to add a custom machine/board in Flexbuild
 1. Run the commands below to fetch the source git repositories of SDK various components for the first time
 ```
-   $ git clone https://github.com/flexbuild/flexbuild
+   $ git clone https://github.com/nxp/flexbuild
    $ cd flexbuild
    $ source setup.env
    $ bld repo-fetch
@@ -77,7 +77,7 @@ e.g.
    $ bld atf -m <machine>
    $ bld uboot -m <machine>
    $ bld linux  (or add option '-p LS' for Layerscape platforms)
-   $ bld fw -m <machine>
+   $ bld bsp -m <machine>
 ```
 
 5. Optionally, to build application components against Debian userland for the custom machine

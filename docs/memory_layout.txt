@@ -86,7 +86,7 @@ Table-4: The default partitions of SD/USB/SATA storage media installed by flex-i
 +---------------+--------------------+-------------------+-------------------+-----------------------+
 |  Region 1     |      Region 2      |     Region 3      |      Region 4     |      Region 5         |
 |   4K(LS)      |       (RAW)        |   (Partition-1)   | (Partition-2 EXT4)| (Partition-3 EXT4)    |
-|1K/32K/33K(iMX)|      256 MiB       |      1 GiB Boot   |    7 GiB Backup   |Primary RFS, remaining |
+|1K/32K/33K(iMX)|      256 MiB       |    512 MiB Boot   |    8 GiB Backup   |Primary RFS, remaining |
 +---------------+--------------------+-------------------+-------------------+-----------------------+
 | MBR/GPT       | bootloader         | kernel & dtb      | backup partition  |    Debian-based RFS   |
 |               | env and firmware   | distro boot scr   | or                | or Yocto-based RFS    |

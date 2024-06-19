@@ -5,5 +5,5 @@
 
 
 misc:
-	@$(CROSS_COMPILE)gcc $(FBDIR)/src/misc/ccsr.c -o $(DESTDIR)/usr/local/bin/ccsr && \
-	 $(call fbprint_d,"misc")
+	@[ $(SOCFAMILY) != LS ] && exit || \
+	 sudo $(CROSS_COMPILE)gcc $(FBDIR)/src/misc/ccsr.c -o $(RFSDIR)/usr/local/bin/ccsr

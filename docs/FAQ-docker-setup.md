@@ -1,11 +1,48 @@
+Q1: How to install Docker Engine on Ubuntu host?
 
-Q1: Unable to connnect to registry-1.docker.io as below while creating an Ubuntu-20.04 docker by command 'bld docker'?
+A1: To install Docker Engine on Ubuntu, you need the 64-bit version of one of these Ubuntu versions:
+    Ubuntu Noble 24.04 (LTS), Ubuntu Jammy 22.04 (LTS), Ubuntu Focal 20.04 (LTS)
+
+1. Run the following command to uninstall all unofficial/conflicting packages
 ```
-    Step 1/15 : FROM ubuntu:20.04
+   $ for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+```
+
+2. Set up Docker's apt repository
+```
+   sudo apt-get update
+   sudo apt-get install ca-certificates curl
+   sudo install -m 0755 -d /etc/apt/keyrings
+   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+   sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+   # Add the repository to Apt sources:
+```
+   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+   sudo apt-get update
+```
+
+3. Install the Docker packages
+```
+   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+   sudo service docker start
+```
+
+4. Verify that the Docker Engine installation is successful by running the hello-world image.
+```
+   $ sudo docker run hello-world
+```
+
+
+
+Q2: Unable to connnect to registry-1.docker.io as below when creating a docker container?
+```
+    Step 1/15 : FROM debian:bookworm
     Get https://registry-1.docker.io/v2/: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
 ```
 
-A1: This problem may be caused in various cases, users can try the methods below to fix it.
+A2: This problem may be caused in various cases, users can try the methods below to fix it.
 ```
     Method 1: In case it needs a proxy to access external network, please set HTTP proxy for docker as below:
               a. add the following content in /etc/systemd/system/docker.service.d/http-proxy.conf

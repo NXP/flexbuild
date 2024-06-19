@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -16,7 +16,7 @@ optee_test:
 	 fi && \
 	 \
 	 cd $(SECDIR)/optee_test && \
-	 export CC=${CROSS_COMPILE}gcc && \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 $(MAKE) CFG_ARM64=y OPTEE_CLIENT_EXPORT=$(DESTDIR)/usr \
 	         TA_DEV_KIT_DIR=$(SECDIR)/optee_os/out/arm-plat-ls/export-ta_arm64 && \
 	 mkdir -p $(DESTDIR)/usr/lib/optee_armtz && \

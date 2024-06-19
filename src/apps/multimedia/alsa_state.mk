@@ -10,6 +10,6 @@ alsa_state:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"alsa_state") && \
 	 install -d $(DESTDIR)/var/lib/alsa && \
-	 install -m 0644 $(FBDIR)/src/apps/multimedia/patch/alsa_state/asound.state $(DESTDIR)/var/lib/alsa && \
-	 install -m 0644 $(FBDIR)/src/apps/multimedia/patch/alsa_state/asound.conf $(DESTDIR)/etc && \
+	 install -m 0644 $(FBDIR)/patch/alsa_state/asound.state $(DESTDIR)/var/lib/alsa && \
+	 install -m 0644 $(FBDIR)/patch/alsa_state/asound.conf $(DESTDIR)/etc && \
 	 $(call fbprint_d,"alsa_state")

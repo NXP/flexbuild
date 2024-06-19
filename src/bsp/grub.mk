@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-grub_url =  git://git.savannah.gnu.org/grub.git
-grub_tag = grub-2.12-rc1
+grub_url ?=  git://git.savannah.gnu.org/grub.git
+grub_tag ?= grub-2.12-rc1
 
 grub:
 ifeq ($(CONFIG_GRUB),y)

@@ -30,23 +30,21 @@ gst_plugins_bad:
 	 if [ ! -f $(DESTDIR)/usr/share/pkgconfig/wayland-protocols.pc ]; then \
 	     bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
-	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so.0 ]; then \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0} && \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so,libgstsdp-1.0.so.0} && \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}; \
+	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then \
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1} && \
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} && \
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}; \
 	 fi && \
-	 sudo cp -rf $(DESTDIR)/usr/include/libdrm $(RFSDIR)/usr/include && \
+	 sudo cp -rf $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include && \
 	 sudo cp -rf $(DESTDIR)/usr/share/wayland-protocols $(RFSDIR)/usr/share && \
-	 sudo cp -rf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include && \
+	 sudo cp -f $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib && \
 	 \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
 			  -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/lib/gstreamer-1.0/include \
 			  -I$(DESTDIR)/usr/include/gstreamer-1.0 -I$(RFSDIR)/usr/include" \
-		-Dc_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib \
-				-L$(RFSDIR)/usr/lib/aarch64-linux-gnu -ludev -lbsd -lpthread -lgstbase-1.0" \
-		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-				 -ludev -lbsd -lpthread -lgstbase-1.0" \
+		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -ludev -lbsd -lpthread -lgstbase-1.0" \
+		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -ludev -lbsd -lpthread -lgstbase-1.0" \
 		--prefix=/usr --buildtype=release \
 		--cross-file meson.cross \
 		--strip \

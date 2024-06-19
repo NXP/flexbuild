@@ -22,7 +22,7 @@ imx_gst_plugin:
 	 cd $(MMDIR)/imx_gst_plugin && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CROSS=$(CROSS_COMPILE) && \
-	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
+	 export PKG_CONFIG_SYSROOT_DIR="" && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
 	 sed -i "s/libfslaudiocodec', required: false/libfslaudiocodec', required: true/"  plugins/meson.build && \
@@ -49,12 +49,13 @@ imx_gst_plugin:
 	 fi && \
 	 \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
-	      -Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
+	      -Dc_args="-O2 -pipe -g -feliminate-unused-debug-types -Wno-unused-variable -Wno-format -Wno-unused-value \
+			-Wno-unused-function -Wno-error=nonnull -Wno-error=implicit-function-declaration \
 			-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include/gstreamer-1.0" \
-	      -Dc_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib" \
-	      -Dcpp_link_args="-Wl,-rpath-link=$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib" \
+	      -Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" \
 	      --prefix=/usr --buildtype=release \
 	      --cross-file meson.cross \
 	      -Dplatform=$(SOCPLATFORM) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/beep_registry_1.0.arm.cf && \
 	 $(call fbprint_d,"imx_gst_plugin")

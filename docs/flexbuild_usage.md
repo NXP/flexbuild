@@ -2,7 +2,9 @@
 ------------------
 ```
 $ cd flexbuild
-$ source setup.env
+$ . setup.env
+$ bld docker (create or attach a docker container)
+$ . setup.env
 $ bld -h
 ```
 
@@ -20,7 +22,7 @@ Most used example with automated build:
 
 Most used example with separate command:
 ```
- bld fw -m imx8mpevk             # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
+ bld bsp -m imx8mpevk            # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
  bld rfs -r debian:desktop       # generate Debian-based desktop rootfs  (with more graphics/multimedia packages for Desktop)
  bld rfs -r debian:server        # generate Debian-based server rootfs   (with more server related packages, no GUI Desktop)
  bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
@@ -31,6 +33,7 @@ Most used example with separate command:
  bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
  bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
  bld apps -r debian:server -p LS # compile NXP-specific apps against the library dependencies of Debian server rootfs for LS machines
+ bld ml                          # compile NXP-specific eIQ AI/ML components against the library dependencies of Debian rootfs
  bld merge-apps                  # merge NXP-specific apps into target Debian rootfs
  bld packrfs                     # pack and compress target rootfs as rootfs_xx.tar.zst
  bld packapps                    # pack and compress target app components as app_components_xx.tar.zst
@@ -64,8 +67,8 @@ The supported options:
 ```
 The supported object commands:
 ```
-  fw                generate composite firmware (contains atf, u-boot, peripheral firmware, kernel, dtb, tinylinux rootfs, etc)
-  fwall             generate composite firmware for all platforms
+  bsp               generate BSP composite firmware (contains atf, u-boot, peripheral firmware, kernel, dtb, tinylinux rootfs, etc)
+  bspall            generate BSP composite firmware for all platforms
   itb               generate <sdk_version>_<distro_type>_<distro_scale>_<portfolio>_<arch>.itb
   boot              generate boot partition tarball (contains kernel, modules, dtb, distro boot script, secure boot header, etc)
   rfs               generate target rootfs, associated with -r, -a and -p options for different distro type and architecture
@@ -98,12 +101,12 @@ The composite firmware consists of ATF BL2, ATF BL31, BL32 OPTEE, BL33 U-Boot/UE
 secure boot headers, Ethernet firmware, dtb, kernel and tiny initrd rootfs, etc, this composite firmware can be programmed
 at offset 0x0 in NOR/QSPI/FlexSPI flash device or at offset 4k (LS) or 1k/32k/33k (I.MX) in SD/eMMC card.
 ```
-Usage: bld fw -m <machine> [-b <boottype>]
+Usage: bld bsp -m <machine> [-b <boottype>]
 Example:
-$ bld fw -m imx8mpevk         # generate composite firmware_imx8mpevk_sdboot.img
-$ bld fw -m imx93evk          # generate composite firmware_imx93evk_sdboot.img
-$ bld fw -m ls1046ardb        # generate composite firmware_ls1046ardb_<boottype>.img
-$ bld fw -m lx2160ardb        # generate composite firmware_lx2160ardb_<boottype>.img
+$ bld bsp -m imx8mpevk         # generate composite firmware_imx8mpevk_sdboot.img
+$ bld bsp -m imx93evk          # generate composite firmware_imx93evk_sdboot.img
+$ bld bsp -m ls1046ardb        # generate composite firmware_ls1046ardb_<boottype>.img
+$ bld bsp -m lx2160ardb        # generate composite firmware_lx2160ardb_<boottype>.img
 ```
 
 
@@ -200,9 +203,10 @@ $ bld uboot -m ls1046ardb      # build U-Boot image for ls1046ardb
 ```
 Usage: bld <component> [ -b <boottype> ]
 Examples:
-$ bld rcw -m ls1046ardb                   # build RCW images for ls1046ardb
-$ bld mc_utils                            # build mc_utils image
-$ bld layerscape_fw                       # build binary fm_ucode, qe_ucode, mc_bin, phy_cortina, pfe_bin, dp_firmware_cadence, etc
+$ bld rcw -m ls1046ardb        # build RCW images for ls1046ardb
+$ bld mc_utils                 # build mc_utils image for DPAA2 on Layerscape platform
+$ bld layerscape_fw            # build binary fm_ucode, qe_ucode, mc_bin, phy_cortina, pfe_bin, dp_firmware_cadence, etc
+$ bld mcore_demo               # build imx m-core demo
 ```
 
 

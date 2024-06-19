@@ -48,5 +48,5 @@ clean_apps_components() {
     rm -rf $PKGDIR/apps/security/optee_test/out
 
     find $PKGDIR/apps -name build_${DISTROTYPE}_$ARCH | xargs rm -rf
-    rm -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}$DISTROVARIANT
+    rm -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
 }

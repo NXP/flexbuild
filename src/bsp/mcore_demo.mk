@@ -1,11 +1,10 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-# i.MX mcore demo firmware
+# i.MX M4/M7/M33 core Demo images
 
-
-MCORE_VERSION ?= 2.14.0
+IMX_MCORE_VERSION ?= 2.15.000
 
 MCORE_LIST ?= imx8mm-m4 imx8mq-m4 imx8mn-m7 imx8mp-m7 imx8ulp-m33 imx93-m33
 
@@ -18,9 +17,9 @@ mcore_demo:
 	     mkdir -p $(BSPDIR)/imx_mcore_demos && \
 	     cd $(BSPDIR)/imx_mcore_demos && \
 	     for soc in $(MCORE_LIST); do \
-		wget -q $(FW_DOWNLOAD_URL)/$${soc}-demo-$(MCORE_VERSION).bin -O $${soc}.bin && \
+		wget -q $(FW_DOWNLOAD_URL)/$${soc}-demo-$(IMX_MCORE_VERSION).bin -O $${soc}.bin && \
 		chmod +x $${soc}.bin && ./$${soc}.bin --auto-accept && \
-		mv $${soc}-demo-$(MCORE_VERSION) $${soc}-demo && \
+		mv $${soc}-demo-$(IMX_MCORE_VERSION) $${soc}-demo && \
 		rm -f $${soc}.bin; \
 	     done; \
          fi && \

@@ -14,7 +14,7 @@ git_repo_update() {
 	tag=$(eval echo '$'"repo_"$reponame"_tag")
     fi
 
-    [ -z "$tag" -a "$UPDATE_REPO_PER_TAG" = y ] && tag=$DEFAULT_REPO_TAG
+    [ -z "$tag" -a -z "$commit" -a "$UPDATE_REPO_PER_TAG" = y ] && tag=$DEFAULT_REPO_TAG
 
     [ "$PACKAGEGROUPS_ML" = y ] && mldir=apps/ml
     dirlist="bsp linux apps/utils apps/networking apps/graphics apps/multimedia apps/security apps/connectivity $mldir"

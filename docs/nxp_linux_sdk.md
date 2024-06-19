@@ -1,10 +1,12 @@
-NXP Linux SDK for iMX and Layerscape can be built via flex-builder and be deployed via flex-installer or uuu easily.
+NXP Linux Debian SDK for i.MX and Layerscape can be built by FlexBuild and be deployed via flex-installer easily.
 
 
-## How to automatically build all images for single board
+## How to automatically build all images for i.MX/Layerscape board
 ```
 $ cd flexbuild
-$ source setup.env
+$ . setup.env
+$ bld docker (create or attach a docker container)
+$ . setup.env
 $ bld -m <machine>
 
 The supported iMX <machine>:
@@ -20,13 +22,13 @@ $ bld -m lx2160ardb  # automatically build all images (bootloader, linux, app co
 ```
 
 
-## How to build composite firmware
-The iMX/Layerscape composite firmware consists of atf, u-boot, optee_os, kernel, dtb, peripheral firmware, initramfs, etc.
+## How to build BSP composite firmware
+The iMX/Layerscape BSP composite firmware consists of atf, u-boot, optee_os, kernel, dtb, peripheral firmware, initramfs, etc.
 ```
-Usage: bld fw -m <machine> [-b <boottype>]
+Usage: bld bsp -m <machine> [-b <boottype>]
 Example:
-$ bld fw -m imx8mpevk      # generate firmware_imx8mpevk_sdboot_lpddr4.img and firmware_imx8mpevk_sdboot_ddr4.img
-$ bld fw -m lx2160ardb     # generate firmware_lx2160ardb_sdboot.img and firmware_lx2160ardb_xspiboot.img
+$ bld bsp -m imx8mpevk      # generate BSP composite image (firmware_imx8mpevk_sdboot_lpddr4.img and firmware_imx8mpevk_sdboot_ddr4.img)
+$ bld bsp -m lx2160ardb     # generate BSP composite image (firmware_lx2160ardb_sdboot.img and firmware_lx2160ardb_xspiboot.img)
 ```
 
 
@@ -69,8 +71,8 @@ $ flex-installer -i download -m lx2160ardb
 ## How to flash Linux SDK composite firmware to SD card or NOR/QSPI/XSPI flash device in various environment
 - For SD/eMMC card
 ```
-$ wget http://www.nxp.com/lgfiles/sdk/lsdk2310/firmware_imx8mpevk_sdboot_lpddr4.img
-$ wget http://www.nxp.com/lgfiles/sdk/lsdk2310/firmware_lx2160ardb_sdboot.img
+$ wget http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_imx8mpevk_sdboot_lpddr4.img
+$ wget http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_lx2160ardb_sdboot.img
 
 In U-Boot environment:
 Example for imx8mpevk:
@@ -80,12 +82,6 @@ Example for imx8mpevk:
 Example for lx2160ardb:
 => tftp a0000000 <tftp_dir>/firmware_lx2160ardb_sdboot.img
 => mmc write a0000000 8 1f000
-
-In Linux environment:
-Example for using uuu:
-$ uuu -b sd flash-lpddr4.bin firmware_imx8mpevk_sdboot_lpddr4.img
-or
-$ uuu -b emmc_all imx8ulpevk-flash-singleboot-m33.bin firmware_imx8ulpevk_sdboot.img
 
 Example for using flex-installer:
 $ flex-installer -f firmware_imx8mpevk_sdboot_lpddr4.img -d /dev/mmcblk0 -o 32k
@@ -126,10 +122,10 @@ If you have no Linux host machine available, you can follow the steps below to f
 
 2. Create a folder (e.g. C:/LSDK) and download the prebuilt LSDK composite firmware from the links below to this folder, e.g.
 ```
-   http://www.nxp.com/lgfiles/sdk/lsdk2310/sd_pt_32k.img  (or sd_pt_4k.img, sd_pt_33k.img)
-   http://www.nxp.com/lgfiles/sdk/lsdk2310/firmware_lx2160ardb_sdboot.img
-   http://www.nxp.com/lgfiles/sdk/lsdk2310/firmware_imx8mpevk_sdboot_lpddr4.img
-   http://www.nxp.com/lgfiles/sdk/lsdk2310/firmware_imx93evk_sdboot_a1.img
+   http://www.nxp.com/lgfiles/sdk/lsdk2406/sd_pt_32k.img  (or sd_pt_4k.img, sd_pt_33k.img)
+   http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_lx2160ardb_sdboot.img
+   http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_imx8mpevk_sdboot_lpddr4.img
+   http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_imx93evk_sdboot_a1.img
 ```
    Note: sd_pt_4k.img is used for Layerscape SoC, sd_pt_33k.img for imx8mq and imx8mm SoC, sd_pt_32k.img for all other imx8/imx9 SoC.
 
@@ -150,7 +146,7 @@ If you have no Linux host machine available, you can follow the steps below to f
    $ flex-installer -i pf -d /dev/mmcblkx
    $ flex-installer -i auto -m <machine> -d /dev/mmcblkx -r <rootfs>
 ```
-   The \<rootfs\> can be rootfs_lsdk2310_debian_desktop_arm64.tar.zst, rootfs_lsdk2310_debian_server_arm64.tar.zst or rootfs_lsdk2310_debian_base_arm64.tar.zst)
+   The \<rootfs\> can be rootfs_lsdk2406_debian_desktop_arm64.tar.zst, rootfs_lsdk2406_debian_server_arm64.tar.zst or rootfs_lsdk2406_debian_base_arm64.tar.zst)
    The \<machine\> can be imx93evk, imx8mpevk, imx8mqevk, imx8mmevk, imx8ulpevk, imx8mnevk, imx8qmmek, imx8qxpmek, etc
    or lx2160ardb, lx2160aqds, ls1012ardb, ls1028ardb, ls1043ardb, ls1046ardb, ls1046afrwy, ls1088ardb, ls2088ardb, etc
 
@@ -185,6 +181,6 @@ environment variable 'rcw_bin' to override the default RCW as below, for example
 ```
 $ export rcw_bin=lx2160ardb/XGGFF_PP_HHHH_RR_19_5_2/rcw_2200_700_3200_19_5_2.bin
 $ bld clean-bsp
-$ bld fw -m lx2160ardb
+$ bld bsp -m lx2160ardb
 $ unset rcw_bin (unset to avoid impacting the subsequent build)
 ```

@@ -1,11 +1,42 @@
 # repo configuration for Machine Learning on iMX & Layerscape MPU platforms
 
 
-# enable/disable ML
-PKG_GROUPS_ML: n
-
-
-# eIQ AI/ML component repositories
+# eIQ AI/ML components
 repo:
   armcl:
     url:    https://github.com/nxp-imx/arm-computelibrary-imx.git
+
+  tim_vx:
+    url:    https://github.com/nxp-imx/tim-vx-imx.git
+
+  tflite:
+    url:    https://github.com/nxp-imx/tensorflow-imx.git
+
+  tflite_vx_delegate:
+    url:    https://github.com/nxp-imx/tflite-vx-delegate-imx.git
+
+  tflite_ethosu_delegate:
+    url:    https://github.com/nxp-imx/tflite-ethosu-delegate-imx.git
+
+  ethosu_driver_stack:
+    url:    https://github.com/nxp-imx/ethos-u-driver-stack-imx.git
+
+  ethosu_firmware:
+    url:    https://github.com/nxp-imx/ethos-u-firmware.git
+
+  ethosu_vela:
+    url:    https://github.com/nxp-imx/ethos-u-vela.git
+
+  nnstreamer:
+    url:    https://github.com/nnstreamer/nnstreamer.git
+    commit: f82789170b8f2696
+
+  nnstreamer_edge:
+    url:    https://github.com/nnstreamer/nnstreamer-edge.git
+    commit: 2efc10afd1161a02
+
+  eiq_examples:
+    url:    https://github.com/nxp-imx/eiq-example.git
+
+  pytorch:
+    url:    https://github.com/nxp-imx/pytorch-release.git

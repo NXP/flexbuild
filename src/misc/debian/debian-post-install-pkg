@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# Copyright 2024 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Shengzhou Liu <shengzhou.liu@nxp.com>
+
+set -e
+
+DEFAULT_DL_URL=http://www.nxp.com/lgfiles/sdk/lsdk2406
+
+if [ "$1" != server -a "$1" != desktop ]; then
+cat <<EOF
+  run 'debian-post-install-pkg server' to install extra packages for Debian server (without GUI desktop)
+  run 'debian-post-install-pkg desktop' to install extra packages for Debian desktop
+EOF
+  exit
+fi
+
+
+pkglist_server="ntpdate bridge-utils tcpdump mtd-utils usbutils mmc-utils i2c-tools pciutils linuxptp
+	hdparm psmisc libssl-dev sysstat lsb-release iptables libhugetlbfs0 strongswan rt-tests
+	libcharon-extra-plugins dmidecode flex rdate initramfs-tools fbset lm-sensors mosquitto"
+
+
+pkglist_desktop="gnome chromium libinput-tools libqt6core6 qt6-base-dev qt6-wayland
+	glmark2-es2-wayland libgles2-mesa clinfo v4l-utils mesa-utils alsa-utils dmz-cursor-theme"
+
+
+pkglist_server_dev="libxml2-dev libssl-dev dh-autoreconf libnuma-dev libpcap-dev libtclap-dev
+	libncurses5-dev libelf-dev libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev
+	libinput-dev libpixman-1-dev libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev
+	liblua5.3-dev libsystemd-dev libxcb-composite0-dev libxcursor-dev libtinfo-dev
+	libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev
+	uuid-dev libpython3.11-dev python3-pip python3-pybind11 python3-numpy python3-pillow
+	python3-flatbuffers python3-lxml libflatbuffers-dev libcpuinfo-dev libwaffle-dev"
+
+
+pkglist_desktop_dev="libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev
+	libxv-dev libbsd-dev libxcb-dri3-dev libxcb-present-dev libepoxy-dev libpciaccess-dev
+	libdbus-1-dev libwayland-bin libasound2-dev gstreamer1.0-libav libgstrtspserver-1.0-0
+	libgudev-1.0-dev libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
+	libgnome-desktop-3-dev libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev
+	libmpeg2-4-dev libx264-dev libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev
+	libmp3lame-dev libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev
+	libassimp-dev libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libsbc-dev libsndfile1-dev
+	libwebp-dev libcurl4-openssl-dev libbluetooth-dev liborc-0.4-dev libtheora-dev libxv-dev
+	libx11-xcb-dev libjson-glib-dev"
+
+
+if ! `ping deb.debian.org -c 2 1>/dev/null 2>&1`; then
+  echo ERROR: unable to access deb.debian.org !
+  echo Please check your network to ensure the access to external Internet.
+  exit
+fi
+
+if [ -n "$http_proxy" ]; then
+  if ! grep -i -q 'acquire::http::proxy' /etc/apt/apt.conf 2>/dev/null; then
+	echo Please set HTTP proxy in /etc/apt/apt.conf
+	exit
+  fi
+fi
+
+sudo apt update -y
+
+[ "$1" = server ] && pkglist_desktop="" && pkglist_desktop_dev=""
+
+for pkg in $pkglist_server $pkglist_server_dev $pkglist_desktop $pkglist_desktop_dev; do
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
+done
+
+if ! grep -iq mx93 /proc/device-tree/model && [ "$1" = desktop ]; then
+    sudo rm -f /usr/lib/aarch64-linux-gnu/{libGLESv2.so,libEGL.so,libgbm.so,libcogl.so,libgstallocators-1.0.so,libvulkan.so}
+fi
+
+echo Installation of extra debian packages done.
+
+[ -n "$2" ] && pkglink=$2 || pkglink=$DEFAULT_DL_URL
+
+NXPAPPSPKG=apps_arm64_debian_$1.tar.zst
+
+wget -q $pkglink/$NXPAPPSPKG
+
+sudo tar -I zstd -xf $NXPAPPSPKG -C /
+
+rm -f $NXPAPPSPKG
+
+sed -i "s/Debian base/Debian ($1)/" /etc/issue
+
+if ! grep -iq mx93 /proc/device-tree/model && [ "$1" = desktop ]; then
+    for pkg in $pkglist_desktop; do
+	sudo apt-get reinstall -y $pkg
+    done
+fi
+
+echo
+echo Successfully installed extra packages for Debian $1.
+echo Please reboot the system now.

@@ -14,7 +14,7 @@ fmc:
 	 $(call repo-mngr,fetch,eth_config,apps/networking) && \
 	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then \
 	     mkdir -p $(DESTDIR)/etc/fmc/config && \
-             cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config; \
+	     cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config; \
 	 fi && \
 	 if [ $(DISTROTYPE) = debian -o $(DISTROTYPE) = ubuntu -o $(DISTROTYPE) = poky ]; then \
 	     xmlhdr=$(RFSDIR)/usr/include/libxml2; \
@@ -30,8 +30,9 @@ fmc:
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
 	 fi && \
-	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/lib \
-	 	-Wl,-rpath=$(RFSDIR)/usr/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(DESTDIR)/usr/lib" && \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 export CFLAGS="-Wno-write-strings -I$(RFSDIR)/usr/include/aarch64-linux-gnu -I$(NETDIR)/fmlib/include/fmd \
 		-I$(NETDIR)/fmlib/include/fmd/Peripherals -I$(NETDIR)/fmlib/include/fmd/integrations" && \
 	 \

@@ -12,6 +12,7 @@ vpp:
 ifeq ($(CONFIG_VPP),y)
 	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
 	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 if ! grep -q Debian /etc/issue; then $(call fbprint_w,"Please build on Debian host") && exit; fi && \
 	 $(call fbprint_b,"vpp") && \
 	 $(call repo-mngr,fetch,vpp,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
@@ -29,8 +30,12 @@ ifeq ($(CONFIG_VPP),y)
 	 export EXTRA_LIBS=$(RFSDIR)/lib/aarch64-linux-gnu && \
 	 export DPDK_PATH=$(DESTDIR)/usr && \
 	 export LD_LIBRARY_PATH=$(DESTDIR)/usr/local/lib:$(RFSDIR)/lib/aarch64-linux-gnu:$(RFSDIR)/lib && \
+	 [ ! -f /usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py ] && \
+	 sudo ln -s $(RFSDIR)/usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py \
+	 /usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py || true && \
 	 \
 	 cd $(NETDIR)/vpp && \
+	 sed -i -e 's/22.04)/12)/g' -e 's/clang-format-11/clang-format/g' -e 's/libffi7/libffi8/g' Makefile && \
 	 sed -i -e "s/-Werror -Wall//g" -e "/^#check_c_compiler_flag/s/#//g" \
 	        -e "/^#		      compiler_flag_no_address/s/#//g" src/CMakeLists.txt && \
 	 $(MAKE) -j$(JOBS) install-dep && \

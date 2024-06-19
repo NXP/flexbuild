@@ -40,19 +40,21 @@ generate_bootpartition_tarball() {
     # install kernel modules
     fbprint_n "Installing kernel modules ..."
     cp -rf $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules $bootpartdir
-    modversion=$(ls $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules)
+    modversion=$(ls $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules|xargs echo|cut -d' ' -f1)
     rm -f $bootpartdir/modules/$modversion/{build,source}
 
     # install /lib/firmware
     mkdir -p $bootpartdir/firmware
-    [ $SOCFAMILY = IMX -a ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] && \
-    bld imx_sof -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-    [ $SOCFAMILY = IMX -a ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && \
-    bld imx_dsp -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-    [ $SOCFAMILY = IMX -a ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && \
-    bld imx_firmware -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    if [ $SOCFAMILY = IMX ]; then
+	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld imx_sof -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	[ ! -d $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	[ ! -d $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
 
-    [ $SOCFAMILY = IMX ] && cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware
+	cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware
+	cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo/imx93-*m33*.elf $DESTDIR/usr/lib/ethosu_firmware $bootpartdir/firmware
+     fi
 
     # install distro boot script
     fbprint_n "Installing distro boot script ..."

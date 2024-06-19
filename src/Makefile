@@ -16,6 +16,6 @@ $(BSP_REPO_LIST):
 $(LINUX_REPO_LIST) linux-headers linux-deb linux-modules:
 	@$(MAKE) -C $(FBDIR)/src/linux $@
 
-$(APPS_REPO_LIST) utils security \
+$(APPS_REPO_LIST) $(ML_REPO_LIST) utils security ml \
 networking graphics multimedia connectivity:
 	@$(MAKE) -C $(FBDIR)/src/apps $@

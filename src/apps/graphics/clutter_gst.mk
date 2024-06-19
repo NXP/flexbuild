@@ -1,4 +1,4 @@
-# Copyright 2023 NXP
+# Copyright 2023-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -21,13 +21,18 @@ clutter_gst:
 	 if [ ! -f $(DESTDIR)/usr/lib/libcogl.so ]; then \
 	     bld cogl -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
 	 fi && \
-	 sudo cp -Pf $(DESTDIR)/usr/lib/{libcogl.so*,libdrm.so*,libgst*.so*} $(RFSDIR)/usr/lib && \
+	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	 fi && \
+	 sudo cp -Pf $(DESTDIR)/usr/lib/{libGLESv2.so*,libVSC.so,libEGL.so*,libGAL.so*,libgbm.so*,libcogl.so*,libdrm.so*,libgst*.so*} \
+	 $(RFSDIR)/usr/lib && \
 	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
-	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libcogl.so,libgstallocators-1.0.so,libgstallocators-1.0.so.0,libclutter-gst-3.0.so.0} && \
+	 sudo cp $(DESTDIR)/usr/lib/libgbm_viv.so* $(RFSDIR)/usr/lib && \
+	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgbm.so,libcogl.so,libgstallocators-1.0.so,libgstallocators-1.0.so.0,libclutter-gst-3.0.so.0} && \
 	 \
 	 cd $(GRAPHICSDIR)/clutter_gst && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/src/apps/graphics/patch/clutter_gst/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/clutter_gst/*.patch && touch .patchdone; \
 	 fi && \
 	 sed -i 's/noinst_PROGRAMS/bin_PROGRAMS/' examples/Makefile.am && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0 \

@@ -125,3 +125,5 @@ define imx_mkimage_target
 	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-c0.bin; \
     fi
 endef
+
+# The firmware file for imx8qxpmek is not available in this release.

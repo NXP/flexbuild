@@ -4,9 +4,9 @@
 
 # i.MX M4/M7/M33 core Demo images
 
-IMX_MCORE_VERSION ?= 2.15.000
+IMX_MCORE_VERSION ?= 2.16.000
 
-MCORE_LIST ?= imx8mm-m4 imx8mq-m4 imx8mn-m7 imx8mp-m7 imx8ulp-m33 imx93-m33
+MCORE_LIST ?= imx8mm-m4 imx8mq-m4 imx8mn-m7 imx8mp-m7 imx8ulp-m33 imx93-m33 imx95-m7
 
 FW_DOWNLOAD_URL ?= https://www.nxp.com/lgfiles/NMG/MAD/YOCTO
 
@@ -22,6 +22,6 @@ mcore_demo:
 		mv $${soc}-demo-$(IMX_MCORE_VERSION) $${soc}-demo && \
 		rm -f $${soc}.bin; \
 	     done; \
-         fi && \
-	 ln -sf $(BSPDIR)/imx_mcore_demos $(FBOUTDIR)/bsp/imx_mcore_demos && \
+	 fi && \
+	 [ ! -L $(FBOUTDIR)/bsp/imx_mcore_demos ] && ln -sf $(BSPDIR)/imx_mcore_demos $(FBOUTDIR)/bsp/imx_mcore_demos || true && \
 	 $(call fbprint_d,"imx_mcore_demo")

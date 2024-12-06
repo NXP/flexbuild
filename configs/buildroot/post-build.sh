@@ -33,6 +33,6 @@ if [ -n "$modulename" -a $DISTROVARIANT = devel ]; then
 fi
 
 if [ -d ${TARGET_DIR}/etc/udev/rules.d ]; then
-    sudo cp -f $FBDIR/src/misc/udev/udev-rules-qoriq/72-fsl-dpaa-persistent-networking.rules ${TARGET_DIR}/etc/udev/rules.d
-    sudo cp -f $FBDIR/src/misc/udev/udev-rules-qoriq/73-fsl-enetc-networking.rules ${TARGET_DIR}/etc/udev/rules.d
+    sudo cp -f $FBDIR/src/system/udev/udev-rules-qoriq/72-fsl-dpaa-persistent-networking.rules ${TARGET_DIR}/etc/udev/rules.d
+    sudo cp -f $FBDIR/src/system/udev/udev-rules-qoriq/73-fsl-enetc-networking.rules ${TARGET_DIR}/etc/udev/rules.d
 fi

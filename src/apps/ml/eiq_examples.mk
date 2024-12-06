@@ -8,7 +8,7 @@
 
 
 eiq_examples:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"eiq_examples") && \
 	 $(call repo-mngr,fetch,eiq_examples,apps/ml) && \
 	 cd $(MLDIR)/eiq_examples && \

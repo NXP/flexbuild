@@ -1,19 +1,18 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 
 pktgen_dpdk:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = desktop -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"pktgen_dpdk") && \
 	 $(call repo-mngr,fetch,pktgen_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
-	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 \
 	 cd $(NETDIR)/pktgen_dpdk && \
@@ -22,7 +21,8 @@ pktgen_dpdk:
 	 export RTE_TARGET=arm64-dpaa-linuxapp-gcc && export RTE_SDK=$(DESTDIR)/usr/share/dpdk && \
 	 sed -i "/add_project_arguments('-march=native'/s/^/#&/" meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
+	 sudo cp -ra $(DESTDIR)/usr/lib/librte* $(RFSDIR)/usr/lib/ && \
 	 build_dir=build_$(DISTROTYPE)_$(ARCH) && \
 	 \
 	 meson setup $$build_dir \

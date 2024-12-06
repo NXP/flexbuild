@@ -182,3 +182,23 @@ ml_repo_update_latest:
 ml_repo_update_commit:
 	@echo -e "\neIQ repositories update to specified commit ID"
 	@$(call repo-mngr,commit,$(ML_REPO_LIST),apps/ml)
+
+gopoint_repo_fetch:
+	@echo -e "\nfetch eIQ repositories: $(GOPOINT_REPO_LIST)"
+	@$(call repo-mngr,fetch,$(GOPOINT_REPO_LIST),apps/gopoint)
+
+gopoint_repo_update_branch:
+	@echo -e "\neIQ repositories update for branch"
+	@$(call repo-mngr,branch,$(GOPOINT_REPO_LIST),apps/gopoint)
+
+gopoint_repo_update_tag:
+	@echo -e "\neIQ repositories update for tag"
+	@$(call repo-mngr,tag,$(GOPOINT_REPO_LIST),apps/gopoint)
+
+gopoint_repo_update_latest:
+	@echo -e "\neIQ repositories update to latest HEAD commit"
+	@$(call repo-mngr,update,$(GOPOINT_REPO_LIST),apps/gopoint)
+
+gopoint_repo_update_commit:
+	@echo -e "\neIQ repositories update to specified commit ID"
+	@$(call repo-mngr,commit,$(GOPOINT_REPO_LIST),apps/gopoint)

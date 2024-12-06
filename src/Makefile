@@ -5,7 +5,7 @@
 
 include $(FBDIR)/configs/$(CONFIGLIST)
 
-.PHONY: linux bsp apps misc
+.PHONY: linux bsp apps
 
 apps:
 	@$(MAKE) -C $(FBDIR)/src/$@
@@ -16,6 +16,6 @@ $(BSP_REPO_LIST):
 $(LINUX_REPO_LIST) linux-headers linux-deb linux-modules:
 	@$(MAKE) -C $(FBDIR)/src/linux $@
 
-$(APPS_REPO_LIST) $(ML_REPO_LIST) utils security ml \
+$(APPS_REPO_LIST) utils security ml gopoint robotics \
 networking graphics multimedia connectivity:
 	@$(MAKE) -C $(FBDIR)/src/apps $@

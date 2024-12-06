@@ -7,8 +7,7 @@
 
 
 dce:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
-	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"dce") && \
 	 $(call repo-mngr,fetch,dce,apps/networking) && \
 	 cd $(NETDIR)/dce && \

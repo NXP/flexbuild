@@ -11,15 +11,15 @@ cryptodev_linux:
 	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && \
 	 if [ ! -f $$opdir/include/config/auto.conf ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -a $(DESTARCH) -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld rfs -a $(DESTARCH) -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 \
 	 cd $(PKGDIR)/linux/cryptodev_linux && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/cryptodev_linux/*.patch && touch .patchdone; \
+	 if [ -d $(FBDIR)/patch/cryptodev_linux ] && [ ! -f .patchdone ]; then \
+	    git am $(FBDIR)/patch/cryptodev_linux/*.patch && touch .patchdone; \
 	 fi && \
 	 export KERNEL_MAKE_OPTS="-lcrypto -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 $(MAKE) KERNEL_DIR=$(KERNEL_PATH) O=$$opdir && \

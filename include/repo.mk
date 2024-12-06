@@ -18,7 +18,7 @@ define repo-mngr
 	    if [ -z "$$tag" -a -z "$$commit" -a $(UPDATE_REPO_PER_TAG) = y ]; then tag=$(DEFAULT_REPO_TAG); fi; \
 	    repo_en=`grep -iE "^CONFIG_BUILD_$${tree}" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2`; \
 	    if [ $$tree = linux ]; then tree=$(KERNEL_TREE); fi; \
-	    if [ -n "$$repourl" ]; then echo -e "\nrepo: $$tree"; fi && \
+	    if [ -n "$$repourl" ]; then echo -e "repo: $$tree"; fi && \
 	    if [ $(UPDATE_REPO_PER_TAG) = y ]; then \
 		if [ -n "$$repourl" -a -n "$$tag" ]; then echo tag: $$tag; fi; \
 	    elif [ $(UPDATE_REPO_PER_BRANCH) = y ]; then \

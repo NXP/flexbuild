@@ -1,4 +1,4 @@
-NXP Linux Debian SDK for i.MX and Layerscape can be built by FlexBuild and be deployed via flex-installer easily.
+NXP Debian Linux SDK for i.MX and Layerscape can be built with Flexbuild and be deployed by flex-installer easily.
 
 
 ## How to automatically build all images for i.MX/Layerscape board
@@ -10,24 +10,24 @@ $ . setup.env
 $ bld -m <machine>
 
 The supported iMX <machine>:
-    imx6qpsabresd, imx6qsabresd, imx6sllevk, imx7ulpevk, imx8mmevk, imx8mnevk, imx8mpevk,
-    imx8mqevk, imx8qmmek, imx8qxpmek, imx8ulpevk, imx93evk, etc
+    imx93frdm, imx93evk, imx91frdm, imx91evk, imx8mpevk, imx8mmevk, imx8mnevk, imx8mqevk,
+    imx8qmmek, imx8qxpmek, imx8ulpevk, etc
 
 The supported Layerscape <machine>:
     ls1012ardb, ls1012afrwy, ls1021atwr, ls1028ardb, ls1043ardb, ls1046ardb, ls1046afrwy,
     ls1088ardb, ls2088ardb, ls2160ardb, lx2162aqds, etc
 e.g.
-$ bld -m imx8mpevk   # automatically build all images (bootloader, linux, app components, Debian RootFS, etc) for imx8mpevk
+$ bld -m imx93frdm   # automatically build all images (bootloader, linux, app components, Debian RootFS, etc) for imx93frdm
 $ bld -m lx2160ardb  # automatically build all images (bootloader, linux, app components, Debian RootFS, etc) for lx2160ardb
 ```
 
 
 ## How to build BSP composite firmware
-The iMX/Layerscape BSP composite firmware consists of atf, u-boot, optee_os, kernel, dtb, peripheral firmware, initramfs, etc.
+The iMX/Layerscape BSP composite firmware consists of atf, u-boot, kernel, dtb, peripheral firmware, initramfs, etc.
 ```
 Usage: bld bsp -m <machine> [-b <boottype>]
 Example:
-$ bld bsp -m imx8mpevk      # generate BSP composite image (firmware_imx8mpevk_sdboot_lpddr4.img and firmware_imx8mpevk_sdboot_ddr4.img)
+$ bld bsp -m imx93frdm      # generate BSP composite image (firmware_imx93frdm_sdboot.img)
 $ bld bsp -m lx2160ardb     # generate BSP composite image (firmware_lx2160ardb_sdboot.img and firmware_lx2160ardb_xspiboot.img)
 ```
 
@@ -36,10 +36,19 @@ $ bld bsp -m lx2160ardb     # generate BSP composite image (firmware_lx2160ardb_
 Examples:
 - To automatically download and install remote distro image to local storage device
 ```
-$ flex-installer -i pf -d /dev/mmcblk0   (partition and format SD card, the device name may be /dev/sdx)
-$ flex-installer -i auto -d /dev/mmcblk0 -m imx8mpevk   (using the default composite firmware, boot and rootfs images)
-or
-$ flex-installer -i auto -d /dev/mmcblk0 -m imx8mpevk -f <firmware> -r <rootfs> (using specified image name instead of default)
+$ flex-installer -i pf -d /dev/mmcblk0      (partition and format SD card, the device name may be /dev/sdX)
+$ flex-installer -i auto -d /dev/mmcblk0 -m imx8mpevk (automatically download the prebuilt composite firmware, boot and rootfs images from nxp.com)
+```
+
+If you want to install custom images built in Flexbuild by yourself locally, run the command below:
+```
+$ flex-installer -d <device> -m <machine> -f <firmware> -r <rootfs> -b <boot>
+e.g.
+$ flex-installer -i pf -d /dev/mmcblk0
+$ flex-installer -d /dev/mmcblk0 -m imx93frdm \
+		 -f firmware_imx93frdm_sdboot.img \
+		 -r rootfs_lsdk2412_debian_server_arm64.tar.zst \
+		 -b boot_IMX_arm64_lts_6.6.36.tar.zst
 ```
 
 
@@ -68,15 +77,16 @@ $ flex-installer -i download -m lx2160ardb
 
 
 
-## How to flash Linux SDK composite firmware to SD card or NOR/QSPI/XSPI flash device in various environment
+## How to flash Linux SDK composite firmware to SD card or NOR/QSPI/XSPI flash device
 - For SD/eMMC card
 ```
-$ wget http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_imx8mpevk_sdboot_lpddr4.img
-$ wget http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_lx2160ardb_sdboot.img
+$ wget http://www.nxp.com/lgfiles/sdk/lsdk2412/firmware_imx93frm_sdboot.img
+$ wget http://www.nxp.com/lgfiles/sdk/lsdk2412/firmware_imx8mpevk_sdboot.img
+$ wget http://www.nxp.com/lgfiles/sdk/lsdk2412/firmware_lx2160ardb_sdboot.img
 
 In U-Boot environment:
-Example for imx8mpevk:
-=> tftp a0000000 <tftp_dir>/firmware_imx8mpevk_sdboot_lpddr4.img
+Example for imx93frdm:
+=> tftp a0000000 <tftp_dir>/firmware_imx93frdm_sdboot.img
 => mmc write a0000000 64 1f000
 
 Example for lx2160ardb:
@@ -84,14 +94,14 @@ Example for lx2160ardb:
 => mmc write a0000000 8 1f000
 
 Example for using flex-installer:
-$ flex-installer -f firmware_imx8mpevk_sdboot_lpddr4.img -d /dev/mmcblk0 -o 32k
+$ flex-installer -f firmware_imx93frdm_sdboot.img -d /dev/mmcblk0 -o 32k
 $ flex-installer -f firmware_ls1046ardb_sdboot.img -d /dev/mmcblk0
 
 Example for using dd:
-$ sudo dd if=firmware_imx8mpevk_sdboot_lpddr4.img of=/dev/mmcblk0 bs=1k seek=32
+$ sudo dd if=firmware_imx93frdm_sdboot.img of=/dev/mmcblk0 bs=1k seek=32
 
 $ sudo dd if=<image> of=/dev/mmcblk0 bs=1k seek=<offset>
-The <offset> is equal to 4 for Layerscape board and 1/32/33 for various iMX board
+The <offset> is equal to 4 for Layerscape boards and 32(or 33) for various iMX boards
 ```
 
 - For IFC-NOR flash
@@ -111,44 +121,6 @@ On LX2160ARDB, LS1012ARDB, LS1028ARDB, LS1046ARDB, LS1088ARDB
 => sf probe 0:1
 => sf erase 0 +$filesize && sf write 0xa0000000 0 $filesize
 ```
-
-
-
-## How to flash LSDK composite firmware to SD card in Win10/Win11 environment
-
-If you have no Linux host machine available, you can follow the steps below to flash a composite image to SD card on Windows host.
-
-1. Download the 'etcher' tool (https://etcher.balena.io) and install it on your Windows machine.
-
-2. Create a folder (e.g. C:/LSDK) and download the prebuilt LSDK composite firmware from the links below to this folder, e.g.
-```
-   http://www.nxp.com/lgfiles/sdk/lsdk2406/sd_pt_32k.img  (or sd_pt_4k.img, sd_pt_33k.img)
-   http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_lx2160ardb_sdboot.img
-   http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_imx8mpevk_sdboot_lpddr4.img
-   http://www.nxp.com/lgfiles/sdk/lsdk2406/firmware_imx93evk_sdboot_a1.img
-```
-   Note: sd_pt_4k.img is used for Layerscape SoC, sd_pt_33k.img for imx8mq and imx8mm SoC, sd_pt_32k.img for all other imx8/imx9 SoC.
-
-3. Run Windows cmd command as below to combine the partition table image with the composite firmware
-```
-   C:\Windows\System32> cd C:/LSDK
-   C:\LSDK>  dir
-   C:\LSDK>  copy /b sd_pt_32k.img + firmware_imx8mpevk_sdboot_lpddr4.img firmware_imx8mpevk_sdboot_new.img
-```
-   The new firmware_imx8mpevk_sdboot_new.img will be generated.
-
-4. Run the etcher tool, choose image file and target disk, then begin flashing the newly generated image to the target SD card.
-
-5. Unplug SD card from Windows host machine and plug it on the target board, set DIP switch for SD boot or run run sd_bootcmd at U-Boot prompt.
-
-6. Log in to TinyLinux as 'root', setup your network on the board and install LSDK Debian distro with the commands below by flex-installer.
-```
-   $ flex-installer -i pf -d /dev/mmcblkx
-   $ flex-installer -i auto -m <machine> -d /dev/mmcblkx -r <rootfs>
-```
-   The \<rootfs\> can be rootfs_lsdk2406_debian_desktop_arm64.tar.zst, rootfs_lsdk2406_debian_server_arm64.tar.zst or rootfs_lsdk2406_debian_base_arm64.tar.zst)
-   The \<machine\> can be imx93evk, imx8mpevk, imx8mqevk, imx8mmevk, imx8ulpevk, imx8mnevk, imx8qmmek, imx8qxpmek, etc
-   or lx2160ardb, lx2160aqds, ls1012ardb, ls1028ardb, ls1043ardb, ls1046ardb, ls1046afrwy, ls1088ardb, ls2088ardb, etc
 
 
 

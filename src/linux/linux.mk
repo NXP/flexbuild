@@ -30,7 +30,7 @@ linux:
 	if [ "$(BUILDARG)" = "custom" ]; then \
 	    $(MAKE) menuconfig -C $(KERNEL_PATH) O=$$opdir && \
 	    $(call fbprint_d,"Custom kernel config: $$opdir/.config") && \
-	    $(call fbprint_n,"Then rerun the command with removing \'custom\' to proceed with the customized .config") && exit; \
+	    $(call fbprint_n,"Run 'bld linux' to proceed with the customized .config above") && exit; \
 	fi; \
 	$(call fbprint_n,"Total Config List = $(KERNEL_CFG) $(FRAGMENT_CFG)") && \
 	if [ ! -f $$opdir/.config ]; then \

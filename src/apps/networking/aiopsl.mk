@@ -5,7 +5,7 @@
 
 
 aiopsl:
-	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:5} != lx216 -a $${MACHINE:0:6} != ls1088 -a $${MACHINE:0:6} != ls2088 ] && exit || \
 	 $(call fbprint_b,"AIOPSL") && \
 	 $(call repo-mngr,fetch,aiopsl,apps/networking) && \
 	 cd $(NETDIR)/aiopsl && \

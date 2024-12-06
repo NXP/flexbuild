@@ -1,0 +1,6 @@
+ Name: tvm
+ Description: tvm library
+ Version: 0.7.0
+ Requires:
+ Libs: -L/usr/lib -ltvm_runtime
+ Cflags: -I/usr/include

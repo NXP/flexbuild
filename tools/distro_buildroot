@@ -43,7 +43,7 @@ build_distro_rfs_buildroot() {
     fi
     make -j8 O=${RFSDIR%/*} -C $PKGDIR/buildroot KERNEL_TREE=$KERNEL_TREE
     [ $DISTROVARIANT = devel ] && mkdir -p $RFSDIR/etc/systemd/system && \
-    cp -f $FBDIR/src/misc/boot.mount $RFSDIR/lib/systemd/system/
+    cp -f $FBDIR/src/system/boot.mount $RFSDIR/lib/systemd/system/
 
     if [ $DISTROVARIANT = imaevm ]; then
 	mkimage -A arm -O linux -T ramdisk -n "initramfs imaevm" -d ${RFSDIR%/*}/images/rootfs.cpio.gz \
@@ -55,6 +55,6 @@ build_distro_rfs_buildroot() {
     fi
     ls -l $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_buildroot*
     rm -f $RFSDIR/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
-    bld packrfs -r buildroot:$DISTROVARIANT -a ${DESTARCH}$endianstr -f $CFGLISTYML
+    bld packrfs -r buildroot:$DISTROVARIANT -a ${DESTARCH}$endianstr
 }
 

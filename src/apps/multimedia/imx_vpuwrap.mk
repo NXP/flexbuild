@@ -11,7 +11,7 @@ imx_vpuwrap:
 	 $(call fbprint_b,"imx_vpuwrap") && \
 	 $(call repo-mngr,fetch,imx_vpuwrap,apps/multimedia) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libcodec.so ]; then \
-	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 cd $(MMDIR)/imx_vpuwrap && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/hantro_dec -I$(DESTDIR)/usr/include/hantro_enc" && \
@@ -23,7 +23,7 @@ imx_vpuwrap:
 	     -e 's/^am__DEPENDENCIES_2/#am__DEPENDENCIES_2/' -e 's/^am__append_5/#am__append_5/' \
 	     -e 's/^include /#include /' -i Makefile && \
 	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/hevcencapi.h ]; then \
-	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 $(MAKE) DEST_DIR=$(DESTDIR) SDKTARGETSYSROOT=$(DESTDIR) CC=aarch64-linux-gnu-gcc && \
 	 $(MAKE) DEST_DIR=$(DESTDIR) SDKTARGETSYSROOT=$(DESTDIR) install && \

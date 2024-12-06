@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,7 +7,7 @@
 
 
 imx_parser:
-	@[ $(DISTROVARIANT) != desktop -o $(DESTARCH) != arm64 ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_parser") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_parser ]; then \

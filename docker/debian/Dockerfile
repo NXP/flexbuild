@@ -10,7 +10,8 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 RUN echo "Acquire::http::proxy \"$http_proxy\";" | tee -a /etc/apt/apt.conf && \
     echo "Acquire::https::proxy \"$https_proxy\";" | tee -a /etc/apt/apt.conf && \
-    echo 'PS1="[\u@\h \W]\$ "' | tee -a /root/.bashrc 1>/dev/null
+    echo 'PS1="[\u@\h \W]\$ "' | tee -a /root/.bashrc 1>/dev/null && \
+    echo syntax on > /root/.vimrc
 RUN rm -rf /var/lib/apt/lists/* && apt autoclean
 RUN apt-get update --fix-missing && apt-get install -y locales && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 && export LANG=en_US.utf8

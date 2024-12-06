@@ -13,6 +13,9 @@ mmdebstrap:
     - arm64
   keyrings:
     - /usr/share/keyrings/debian-archive-keyring.gpg
+  mirrors:
+    - http://ftp.cn.debian.org/debian
+    - http://ftp.de.debian.org/debian
   mode: unshare
   suite: bookworm
   target: rootfs
@@ -52,7 +55,7 @@ mmdebstrap:
     - wpasupplicant
   setup-hooks:
     # Setup NXP board-specific configurations for various platforms
-    - 'mkdir -p $1/usr/local/bin'
+    - 'mkdir -p $1/usr/local/bin $1/etc/udev/rules.d $1/etc/modprobe.d'
     - 'mkdir -p $1/etc/systemd/system/multi-user.target.wants'
     - 'mkdir -p $1/etc/systemd/system/graphical.target.wants'
     - 'mkdir -p $1/etc/systemd/system/local-fs.target.wants'
@@ -69,13 +72,15 @@ mmdebstrap:
     - 'chroot "$1" echo "PermitRootLogin yes" >> $1/etc/ssh/sshd_config'
     - 'chroot "$1" echo "PermitEmptyPasswords yes" >> $1/etc/ssh/sshd_config'
     - 'chroot "$1" echo "127.0.0.1 localhost" >> $1/etc/hosts'
-    - 'cp src/misc/boot.mount $1/lib/systemd/system/'
-    - 'cp src/misc/debian/debian-post-install-pkg $1/usr/bin/'
+    - 'cp src/system/boot.mount $1/lib/systemd/system/'
+    - 'cp src/system/debian-post-install-pkg $1/usr/bin/'
     - 'cp tools/flex-installer $1/usr/bin/'
     - 'cp tools/resizerfs $1/usr/bin/'
-    - 'cp src/misc/udev/udev-rules-*/*.rules $1/etc/udev/rules.d/'
-    - 'cp src/misc/debian/distroplatcfg $1/usr/bin/'
-    - 'cp src/misc/debian/platcfg.service $1/lib/systemd/system/'
+    - 'cp src/system/udev/udev-rules-*/*.rules $1/etc/udev/rules.d/'
+    - 'cp src/system/distroplatcfg $1/usr/bin/'
+    - 'cp src/system/platcfg.service $1/lib/systemd/system/'
+    - 'cp src/system/blacklist.conf $1/etc/modprobe.d/'
+    - 'cp src/system/ts.conf $1/etc/'
     - 'chroot "$1" ln -s /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service'
     - 'chroot "$1" ln -s /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/boot.mount'
     - 'chroot "$1" ln -s /boot/tools/perf /usr/local/bin/perf'
@@ -83,13 +88,13 @@ mmdebstrap:
     - 'chroot "$1" ln -s /boot/modules /lib/modules'
     - 'chroot "$1" rm -rf /lib/firmware'
     - 'chroot "$1" ln -s /boot/firmware /lib/firmware'
-    - 'cp src/apps/graphics/gpuconfig $1/etc/'
-    - 'cp src/apps/graphics/gpuconfig.service $1/lib/systemd/system/'
+    - 'cp src/system/gpuconfig $1/etc/'
+    - 'cp src/system/gpuconfig.service $1/lib/systemd/system/'
     - 'chroot "$1" ln -s /lib/systemd/system/gpuconfig.service /etc/systemd/system/graphical.target.wants/gpuconfig.service'
     - 'chroot "$1" ln -s /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target'
     - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles" >> $1/etc/environment'
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
-    - 'printf "NXP LSDK 2406 Debian base\n" >> $1/etc/issue'
+    - 'printf "NXP Linux SDK 2412 Debian base\n" >> $1/etc/issue'
     - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

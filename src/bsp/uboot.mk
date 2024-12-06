@@ -41,7 +41,6 @@ define build-uboot-target
 	opdir=$(FBOUTDIR)/bsp/u-boot/$$brd/output/$1 && mkdir -p $$opdir && \
 	unset PKG_CONFIG_SYSROOT_DIR && \
 	\
-	sed -i 's/CONFIG_SYS_BOOTM_LEN=0x2000000/CONFIG_SYS_BOOTM_LEN=0x4000000/' $(BSPDIR)/uboot/configs/imx* && \
 	$(call fbprint_n,"config = $1") && \
 	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 && \
 	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir && \
@@ -70,10 +69,10 @@ define build-uboot-target
 	fi;  \
 	\
 	if echo $1 | grep -q ^ls1021a && [ ! -d $(FBOUTDIR)/bsp/rcw/$(MACHINE) ]; then \
-	    bld rcw -m $(MACHINE) -f $(CFGLISTYML); \
+	    bld rcw -m $(MACHINE); \
 	fi && \
 	if echo $1 | grep -qE '^imx8|^imx9'; then \
-	    bld atf -m $(MACHINE) -b sd -f $(CFGLISTYML) && \
+	    bld atf -m $(MACHINE) -b sd && \
 	    $(call imx_mkimage_target, $1) \
 	elif echo $1 | grep -qiE "mx6|mx7"; then \
 	    cp $$opdir/u-boot-dtb.imx $(FBOUTDIR)/bsp/u-boot/$$brd/; \

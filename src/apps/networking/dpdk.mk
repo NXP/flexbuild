@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -15,15 +15,16 @@ DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool"
 
 
 dpdk:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"dpdk") && \
 	 $(call repo-mngr,fetch,dpdk,apps/networking) && \
+	 $(call repo-mngr,fetch,linux,linux) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
 	 if [ ! -f $(KERNEL_OUTPUT_PATH)/$$curbrch/.config ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 \
 	 cd $(NETDIR)/dpdk && \

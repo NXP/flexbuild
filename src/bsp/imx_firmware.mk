@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,6 +7,10 @@
 imx_firmware:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call repo-mngr,fetch,imx_firmware,bsp) && \
+	 cd $(BSPDIR)/imx_firmware && \
+	 if [ -d $(FBDIR)/patch/imx_firmware ] && [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/imx_firmware/*.patch && touch .patchdone; \
+	 fi && \
 	 mkdir -p $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/{nxp,imx,brcm} && \
 	 echo Installing NXP WIFI/BT firmware && \
 	 cp -f $(BSPDIR)/imx_firmware/nxp/FwImage_*/* $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/nxp 2>/dev/null || true && \

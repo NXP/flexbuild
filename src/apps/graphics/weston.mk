@@ -1,61 +1,83 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# A lightweight and functional Wayland compositor.
+
 # Weston is the reference implementation of a Wayland compositor
+
 # http://wayland.freedesktop.org
 
+# version：12.0.3
 
 weston:
 ifeq ($(CONFIG_WESTON),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop -a $(MACHINE) != imx93evk ] && exit || \
+	@[ $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"weston") && \
 	 $(call repo-mngr,fetch,weston,apps/graphics) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/wayland-client.h ]; then \
-	     bld wayland -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld wayland -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/share/wayland-protocols ]; then \
-	     bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/include/EGL ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
+	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
 	 cd $(GRAPHICSDIR)/weston && \
-	 rm -rf build_$(DISTROTYPE) && \
-	 sudo cp -Prf --preserve=mode,timestamps $(DESTDIR)/usr/* $(RFSDIR)/usr/ && \
-	 sed -i 's,native: false,native: true,' protocol/meson.build && \
-	 sed -i 's/17.2/21.3.5/' $(DESTDIR)/usr/lib/pkgconfig/gbm.pc && \
+	 sed -i 's/0.63/0.61/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
-	 \
-	 PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/share/pkgconfig \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 PYTHONNOUSERSITE=y PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file=meson.cross \
-		--prefix=/usr --libdir=lib --default-library=shared --buildtype=release \
-		-Dpipewire=false -Dimage-webp=false -Dlauncher-libseat=false -Dcolor-management-lcms=false \
-		-Dbackend-drm-screencast-vaapi=false -Dbackend-rdp=false \
-		-Dsystemd=true -Dlauncher-logind=true \
-		-Drenderer-g2d=true \
+		--prefix=/usr --libdir=lib \
+		--default-library=shared \
+		--buildtype=release \
 		-Dxwayland=true \
+		-Dpipewire=false \
+		-Dsimple-clients=all \
+		-Ddemo-clients=true \
+		-Ddeprecated-color-management-colord=false \
+		-Drenderer-gl=true \
+		-Dbackend-headless=false \
 		-Dimage-jpeg=true \
+		-Drenderer-g2d=true \
+		-Dbackend-drm=true \
+		-Dlauncher-libseat=true \
+		-Ddeprecated-launcher-logind=false \
+		-Dcolor-management-lcms=false \
+		-Dbackend-pipewire=false \
+		-Dbackend-rdp=false \
+		-Dremoting=false \
+		-Dscreenshare=true \
+		-Dshell-desktop=true \
+		-Dshell-fullscreen=true \
+		-Dshell-ivi=true \
+		-Dshell-kiosk=true \
+		-Dsystemd=true \
+		-Dbackend-drm-screencast-vaapi=false \
+		-Dbackend-vnc=false \
+		-Dbackend-wayland=false \
+		-Dimage-webp=false \
+		-Dbackend-x11=false \
 		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/local/include -I$(RFSDIR)/usr/include" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu -lgbm" && \
 	 ninja install -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) && \
-	 echo OPTARGS=\" \" | sudo tee $(RFSDIR)/etc/default/weston && \
-	 sudo install -d $(RFSDIR)/etc/xdg/weston && \
-	 sudo cp $(FBDIR)/src/misc/weston/weston.ini $(RFSDIR)/etc/xdg/weston/ && \
-	 if [ $(SOCFAMILY) = IMX ]; then \
-	     sudo sed -i 's%DP%HDMI-A%g' $(RFSDIR)/etc/xdg/weston/weston.ini; \
-	 fi && \
-	 sudo install -m 755 $(FBDIR)/src/misc/weston/weston.sh $(RFSDIR)/etc/profile.d/ && \
-	 sudo install -m 644 $(FBDIR)/src/misc/weston/weston.service $(RFSDIR)/lib/systemd/system/ && \
-	 sudo ln -sf /lib/systemd/system/weston.service $(RFSDIR)/etc/systemd/system/multi-user.target.wants/weston.service && \
+	 mkdir -p $(DESTDIR)/etc/xdg/weston $(DESTDIR)/etc/systemd/system/graphical.target.wants $(DESTDIR)/etc/default && \
+	 mkdir -p $(DESTDIR)/usr/share/applications $(DESTDIR)/usr/share/icons/hicolor/48x48/apps $(DESTDIR)/lib/systemd/system && \
+	 cp $(FBDIR)/src/system/weston/weston.ini $(DESTDIR)/etc/xdg/weston/weston.ini && \
+	 install -m 644 $(FBDIR)/src/system/weston/weston $(DESTDIR)/etc/default/weston && \
+	 install -m 644 $(FBDIR)/src/system/weston/weston.service $(DESTDIR)/lib/systemd/system/ && \
+	 ln -sf /lib/systemd/system/weston.service $(DESTDIR)/etc/systemd/system/graphical.target.wants/weston.service && \
+	 install -m 644 $(FBDIR)/patch/weston/weston.png $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/weston.png && \
+	 install -m 644 $(FBDIR)/patch/weston/weston.desktop $(DESTDIR)/usr/share/applications/weston.desktop && \
 	 $(call fbprint_d,"weston")
 endif

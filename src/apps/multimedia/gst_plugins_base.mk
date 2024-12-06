@@ -8,45 +8,54 @@
 
 # need to set gl_winsys with x11 to include libX11-xcb.so libX11.so for libgstgl-1.0.so
 
+# gst version 1.24.0
 
 gst_plugins_base:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
+	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"gst_plugins_base") && \
 	 $(call repo-mngr,fetch,gst_plugins_base,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
-	 if [ ! -f .patchdone ] && [ $(MACHINE) = imx8qmmek -o $(MACHINE) = imx8qxpmek ]; then \
+	 if [ ! -f .patchdone ] && [ $${MACHINE:0:6} = imx8qm -o $${MACHINE:0:7} = imx8qxp ]; then \
 	     git am $(FBDIR)/patch/gst_plugins_base/*g2d-into-playsink.patch && touch .patchdone; \
 	 fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
 	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \
-	     sed -i 's/0.62/0.61/' meson.build; \
+	     sed -i 's/1\.1/0.61/' meson.build; \
 	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgbm_viv.so ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/include/gstreamer-1.0 ]; then \
-	     bld gstreamer -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld gstreamer -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so ]; then \
-	      bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	      bld imx_gpu_g2d -m imx8mmevk -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
-	 if [ ! -f $(RFSDIR)/usr/include/gstreamer-1.0/gst/gstconfig.h ]; then \
+	 if  [ ! -f $(DESTDIR)/usr/include/alsa/asoundlib.h ]; then \
+	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
+	 fi && \
+	 if [ ! -f $(RFSDIR)/usr/include/gstreamer-1.0/gst/gstbytearrayinterface.h ]; then \
 	     sudo cp -Prf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include; \
 	 fi && \
-	 sudo cp -fa $(DESTDIR)/usr/lib/{libGAL.so,libdrm.so*,libdrm_vivante.so*,libg2d*.so*} $(RFSDIR)/usr/lib && \
+	 if [ ! -f $(DESTDIR)/usr/share/pkgconfig/wayland-protocols.pc ]; then \
+	      bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	 fi && \
+	 sudo cp -rf $(DESTDIR)/usr/share/{pkgconfig,wayland-protocols} $(RFSDIR)/usr/share/ && \
+	 sudo cp -fPa $(DESTDIR)/usr/lib/{libGAL.so,libdrm.so*,libdrm_vivante.so*,libg2d*.so*} $(RFSDIR)/usr/lib && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0} && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstallocators-1.0.so.0,libgstreamer-1.0.so.0,libdrm.so.2} && \
 	 \

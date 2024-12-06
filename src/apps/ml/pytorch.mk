@@ -12,8 +12,8 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
 
 
 pytorch:
+ifeq ($(CONFIG_PYTORCH),y)
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 if ! grep -q Debian /etc/issue; then $(call fbprint_w,"Please build on Debian host") && exit; fi && \
 	 $(call fbprint_b,"pytorch") && \
 	 $(call repo-mngr,fetch,pytorch,apps/ml) && \
 	 cd $(MLDIR)/pytorch && \
@@ -27,3 +27,4 @@ pytorch:
 	 rm -rf $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin && \
 	 rm -rf $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/torch/bin/test_cpp_rpc &&\
 	 $(call fbprint_d,"pytorch")
+endif

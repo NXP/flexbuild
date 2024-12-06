@@ -5,10 +5,14 @@
 
 
 optee_os:
+ifeq ($(CONFIG_OPTEE),y)
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"optee_os") && \
 	 $(call repo-mngr,fetch,optee_os,apps/security) && \
 	 cd $(SECDIR)/optee_os && \
+	 if [ -d $(FBDIR)/patch/optee_os ] && [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/optee_os/*.patch && touch .patchdone; \
+	 fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 		 if [ $(MACHINE) = lx2162aqds ]; then \
 		     brd=lx2160aqds; \
@@ -43,3 +47,4 @@ optee_os:
 		 cp -f out/arm-plat-imx/export-ta_arm64/ta/*.ta $(DESTDIR)/usr/lib/optee_armtz/; \
 	fi && \
 	$(call fbprint_d,"optee_os")
+endif

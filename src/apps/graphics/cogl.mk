@@ -14,7 +14,7 @@ cogl:
 	 $(call repo-mngr,fetch,cogl,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/cogl && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libGLESv2.so ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -f .patchdone ]; then \
 	    git am $(FBDIR)/patch/cogl/*.patch && touch .patchdone; \

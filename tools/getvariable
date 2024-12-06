@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 BIN_FW="fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin uefi_bin mc_bin mc_utils ddr_phy_bin dp_fw_cadence"
 
-LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | cut -d= -f2 | xargs echo`
+LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | cut -d= -f2 | sed -e '/qds/d' | xargs echo`
 
 IMX_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=imx' | cut -d= -f2 | xargs echo`
 
@@ -16,8 +16,6 @@ BSP_REPO_LIST=`find $FBDIR/src/bsp -name '*.mk' | xargs basename -s .mk | tr '\n
 BSP_REPO_LIST="$BSP_REPO_LIST $BIN_FW"
 
 LINUX_REPO_LIST=`ls $FBDIR/src/linux/*.mk | xargs basename -s .mk | tr '\n' ' '`
-
-ML_REPO_LIST=`ls $FBDIR/src/apps/ml/*.mk | xargs basename -s .mk | tr '\n' ' '`
 
 NETWORKING_REPO_LIST=`ls $FBDIR/src/apps/networking/*.mk | xargs basename -s .mk | tr '\n' ' '`
 
@@ -31,6 +29,12 @@ CONNECTIVITY_REPO_LIST=`ls $FBDIR/src/apps/connectivity/*.mk | xargs basename -s
 
 UTILS_REPO_LIST=`ls $FBDIR/src/apps/utils/*.mk | xargs basename -s .mk | tr '\n' ' '`
 
+ML_REPO_LIST=`ls $FBDIR/src/apps/ml/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+GOPOINT_REPO_LIST=`ls $FBDIR/src/apps/gopoint/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
+ROBOTICS_REPO_LIST=`ls $FBDIR/src/apps/robotics/*.mk | xargs basename -s .mk | tr '\n' ' '`
+
 APPS_REPO_LIST=""
 [ $SOCFAMILY = LS ] && PKG_GROUPS_NETWORKING=y
 [ "$PKG_GROUPS_GRAPHICS" = y -o "$GROUPS_GRAPHICS" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $GRAPHICS_REPO_LIST"
@@ -39,8 +43,10 @@ APPS_REPO_LIST=""
 [ "$PKG_GROUPS_SECURITY" = y -o "$GROUPS_SECURITY" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $SECURITY_REPO_LIST"
 [ "$PKG_GROUPS_CONNECTIVITY" = y -o "$GROUPS_CONNECTIVITY" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $CONNECTIVITY_REPO_LIST"
 [ "$PKG_GROUPS_UTILS" = y -o "$GROUPS_UTILS" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $UTILS_REPO_LIST"
-
+[ "$PKG_GROUPS_ML" = y -o "$GROUPS_ML" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $ML_REPO_LIST"
+[ "$PKG_GROUPS_GOPOINT" = y -o "$GROUPS_GOPOINT" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $GOPOINT_REPO_LIST"
+[ "$PKG_GROUPS_ROBOTICS" = y -o "$GROUPS_ROBOTICS" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $ROBOTICS_REPO_LIST"
 
 export LS_MACHINE_LIST IMX_MACHINE_LIST BSP_REPO_LIST LINUX_REPO_LIST APPS_REPO_LIST ML_REPO_LIST \
        UTILS_REPO_LIST NETWORKING_REPO_LIST GRAPHICS_REPO_LIST MULTIMEDIA_REPO_LIST SECURITY_REPO_LIST \
-       CONNECTIVITY_REPO_LIST
+       CONNECTIVITY_REPO_LIST GOPOINT_REPO_LIST ROBOTICS_REPO_LIST

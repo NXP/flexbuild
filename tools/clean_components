@@ -10,7 +10,7 @@ clean_bsp_components() {
     rm -rf $PKGDIR/bsp/atf/build
 
     [ -d $PKGDIR/bsp/rcw ] && \
-    $MAKE clean -C $PKGDIR/bsp/rcw
+    $MAKE clean -C $PKGDIR/bsp/rcw 2>/dev/null
 
     [ -d $PKGDIR/bsp/mc_utils/config ] &&
     $MAKE clean -C $PKGDIR/bsp/mc_utils/config
@@ -32,7 +32,6 @@ clean_apps_components() {
     [ -d $PKGDIR/apps/networking/fmc/source ] && \
     $MAKE clean -C $PKGDIR/apps/networking/fmc/source
 
-    # security
     [ -d $PKGDIR/apps/security/optee_os ] && \
     $MAKE clean -C $PKGDIR/apps/security/optee_os ARCH=arm
 

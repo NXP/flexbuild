@@ -6,23 +6,24 @@
 
 
 gst_plugins_good:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
+	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"gst_plugins_good") && \
 	 $(call repo-mngr,fetch,gst_plugins_good,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_good && \
 	 if [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/gst_plugins_good/*.patch && touch .patchdone; \
 	 fi && \
-	 sed -i 's/0.62/0.61/' meson.build && \
+	 sed -i 's/1\.1/0.61/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstvolume.so ]; then \
-	     bld gst_plugins_base -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld gst_plugins_base -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 sudo cp -fr $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include && \
 	 sudo cp -fa $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 \

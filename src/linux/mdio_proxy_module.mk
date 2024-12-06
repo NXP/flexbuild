@@ -9,7 +9,7 @@ mdio_proxy_module:
 	 $(call repo-mngr,fetch,mdio_proxy_module,linux) && \
 	 $(call repo-mngr,fetch,$(KERNEL_TREE),linux) && \
 	 if [ ! -d $(FBOUTDIR)/linux/kernel/$(DESTARCH)/$(SOCFAMILY) ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir && \

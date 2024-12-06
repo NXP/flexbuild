@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -6,7 +6,7 @@
 # depends on libnl-3-dev
 
 tsntool:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"tsntool") && \
 	 $(call repo-mngr,fetch,tsntool,apps/networking) && \
 	 $(call repo-mngr,fetch,linux,linux) && \

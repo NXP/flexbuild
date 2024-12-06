@@ -11,12 +11,12 @@ gputop:
 	 $(call fbprint_b,"gputop") && \
 	 $(call repo-mngr,fetch,gputop,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/gpuperfcnt/gpuperfcnt.h ]; then \
-	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 cd $(GRAPHICSDIR)/gputop && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cd build_$(DISTROTYPE)_$(ARCH) && \
-	 export CC=$(CROSS_COMPILE)gcc && \
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 cmake -DCMAKE_TOOLCHAIN_FILE=$(GRAPHICSDIR)/gputop/cmake/OEToolchainConfig.cmake \
 	       -DGPUPERFCNT_INCLUDE_PATH=$(DESTDIR)/usr/include \
 	       -DGPUPERFCNT_LIB_PATH=$(DESTDIR)/usr/lib .. && \

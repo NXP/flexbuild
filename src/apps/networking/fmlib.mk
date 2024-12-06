@@ -6,11 +6,11 @@
 # DPAA1 Frame Manager User Space Library
 
 fmlib:
-	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"fmlib") && \
 	 $(call repo-mngr,fetch,fmlib,apps/networking) && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 cd $(NETDIR)/fmlib && \
 	 export PREFIX=/usr && \

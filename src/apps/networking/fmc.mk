@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,8 +7,7 @@
 # depend on libtclap-dev for tclap/CmdLine.h
 
 fmc:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
-	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"fmc") && \
 	 $(call repo-mngr,fetch,fmc,apps/networking) && \
 	 $(call repo-mngr,fetch,eth_config,apps/networking) && \
@@ -22,18 +21,18 @@ fmc:
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
 	 if [ ! -d $(NETDIR)/fmlib/include/fmd/Peripherals -o ! -f $(DESTDIR)/usr/lib/libfm-arm.a ]; then \
-	     bld fmlib -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS -f $(CFGLISTYML); \
+	     bld fmlib -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
 	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
 	 fi && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
-	 export CFLAGS="-Wno-write-strings -I$(RFSDIR)/usr/include/aarch64-linux-gnu -I$(NETDIR)/fmlib/include/fmd \
+	 export CFLAGS="-Wno-write-strings -fpermissive -I$(RFSDIR)/usr/include/aarch64-linux-gnu -I$(NETDIR)/fmlib/include/fmd \
 		-I$(NETDIR)/fmlib/include/fmd/Peripherals -I$(NETDIR)/fmlib/include/fmd/integrations" && \
 	 \
 	 cd $(NETDIR)/fmc && \
@@ -55,9 +54,9 @@ fmc:
 	 install -d $(DESTDIR)/usr/local/lib/aarch64-linux-gnu && \
 	 install source/libfmc.a $(DESTDIR)/usr/local/lib/aarch64-linux-gnu && \
 	 install -d $(DESTDIR)/usr/local/fmc/ && \
-	 install -m 755 $(FBDIR)/src/misc/fmc/init-ls104xa $(DESTDIR)/usr/local/fmc && \
+	 install -m 755 $(FBDIR)/src/system/init-ls104xa $(DESTDIR)/usr/local/fmc && \
 	 install -d $(DESTDIR)/usr/lib/systemd/system/ && \
 	 install -d $(DESTDIR)/etc/systemd/system/multi-user.target.wants/ && \
-	 install -m 644 $(FBDIR)/src/misc/fmc/fmc.service $(DESTDIR)/usr/lib/systemd/system/ && \
+	 install -m 644 $(FBDIR)/src/system/fmc.service $(DESTDIR)/usr/lib/systemd/system/ && \
 	 ln -sf /lib/systemd/system/fmc.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/fmc.service && \
 	 $(call fbprint_d,"fmc")

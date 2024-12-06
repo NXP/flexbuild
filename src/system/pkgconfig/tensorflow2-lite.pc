@@ -1,0 +1,6 @@
+ Name: tensorflow lite
+ Description: tensorflow lite static library
+ Version: 2.16.2
+ Requires:
+ Libs: -L/usr/lib -ltensorflow-lite -lrt
+ Cflags: -I/usr/include

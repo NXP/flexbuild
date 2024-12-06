@@ -5,7 +5,7 @@
 # a utility to program Aquantia PHY firmware
 
 aquantia_fw_util:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call repo-mngr,fetch,aquantia_fw_util,apps/networking) && \
 	 cd $(NETDIR)/aquantia_fw_util && \
 	 $(MAKE) -j$(JOBS) && \

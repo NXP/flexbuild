@@ -14,6 +14,9 @@ mmdebstrap:
   mode: auto
   keyrings:
     - /usr/share/keyrings/debian-archive-keyring.gpg
+  mirrors:
+    - http://ftp.cn.debian.org/debian
+    - http://ftp.de.debian.org/debian
   suite: bookworm
   target: rootfs
   hostname: localhost
@@ -80,9 +83,16 @@ mmdebstrap:
     - rt-tests
     - linuxptp
     - mosquitto
+    - xterm
+    - bluez
+    - pipewire
+    - pipewire-audio
+    - pipewire-pulse
+    - wireplumber
+    - libspa-0.2-bluetooth
   setup-hooks:
       # Setup NXP board-specific configurations for various platforms
-    - 'mkdir -p $1/usr/local/bin'
+    - 'mkdir -p $1/usr/local/bin $1/etc/udev/rules.d $1/etc/modprobe.d'
     - 'mkdir -p $1/etc/systemd/system/multi-user.target.wants'
     - 'mkdir -p $1/etc/systemd/system/local-fs.target.wants'
   essential-hooks:
@@ -97,12 +107,14 @@ mmdebstrap:
     - 'chroot "$1" cp /etc/skel/.bashrc ~/.bashrc'
     - 'chroot "$1" echo "PermitRootLogin yes" >> $1/etc/ssh/sshd_config'
     - 'chroot "$1" echo "PermitEmptyPasswords yes" >> $1/etc/ssh/sshd_config'
-    - 'cp src/misc/boot.mount $1/lib/systemd/system/'
+    - 'cp src/system/boot.mount $1/lib/systemd/system/'
     - 'cp tools/flex-installer $1/usr/bin/'
     - 'cp tools/resizerfs $1/usr/bin/'
-    - 'cp src/misc/udev/udev-rules-*/*.rules $1/etc/udev/rules.d/'
-    - 'cp src/misc/debian/distroplatcfg $1/usr/bin/'
-    - 'cp src/misc/debian/platcfg.service $1/lib/systemd/system/'
+    - 'cp src/system/udev/udev-rules-*/*.rules $1/etc/udev/rules.d/'
+    - 'cp src/system/distroplatcfg $1/usr/bin/'
+    - 'cp src/system/platcfg.service $1/lib/systemd/system/'
+    - 'cp src/system/blacklist.conf $1/etc/modprobe.d/'
+    - 'cp src/system/ts.conf $1/etc/'
     - 'chroot "$1" ln -s /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service'
     - 'chroot "$1" ln -s /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/boot.mount'
     - 'chroot "$1" ln -s /boot/tools/perf /usr/local/bin/perf'
@@ -113,5 +125,5 @@ mmdebstrap:
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
-    - 'printf "NXP LSDK 2406 Debian Server (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
+    - 'printf "NXP Linux SDK 2412 Debian Server (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
     - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

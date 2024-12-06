@@ -1,0 +1,234 @@
+From d1c7b5312c0094824150be00808807ef2ef2dc37 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Sat, 15 Jun 2024 01:47:32 +0800
+Subject: [PATCH 03/19] arm64: dts: add imx93-11x11-frdm-mt9m114 dts
+
+Add MT9M114 device node for iMX93-11x11 FRDM board.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   2 +-
+ .../freescale/imx93-11x11-frdm-mt9m114.dts    | 198 ++++++++++++++++++
+ 2 files changed, 199 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx93-11x11-frdm-mt9m114.dts
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 4a09858cb93a..78ff577e9cdf 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -384,7 +384,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
+ 			  imx93-11x11-evk-ld.dtb \
+ 			  imx93-11x11-evk-iw612-otbr.dtb \
+ 			  imx93-11x11-evk-rpmsg.dtb imx93-11x11-evk-rpmsg-lpv.dtb \
+-			  imx93-11x11-frdm.dtb
++			  imx93-11x11-frdm.dtb imx93-11x11-frdm-mt9m114.dtb
+ 
+ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
+ 			  imx91-11x11-evk-flexspi-m2.dtb imx91-11x11-evk-flexspi-nand-m2.dtb \
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-mt9m114.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-mt9m114.dts
+new file mode 100644
+index 000000000000..14ecfc6b4308
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-mt9m114.dts
+@@ -0,0 +1,198 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2024 NXP
++ */
++
++#include "imx93-11x11-frdm.dts"
++
++/ {
++	reg_mt9m114_dovdd: regulator-mt9m114-dovdd {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-dovdd";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <0>;
++		off-on-delay-us  = <1000>;
++		gpio = <&pca9538 0 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	reg_mt9m114_avdd: regulator-mt9m114-avdd {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-avdd";
++		regulator-min-microvolt = <2800000>;
++		regulator-max-microvolt = <2800000>;
++		startup-delay-us = <200>;
++		off-on-delay-us  = <500>;
++		gpio = <&pca9538 1 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	reg_mt9m114_dvdd: regulator-mt9m114-dvdd {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-dvdd";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <500>;
++		off-on-delay-us  = <200>;
++		gpio = <&pca9538 2 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	reg_mt9m114_extclk: regulator-mt9m114-extclk {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-extclk";
++		startup-delay-us = <10000>;
++		off-on-delay-us  = <200>;
++		gpio = <&pca9538 3 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	reg_mt9m114_ctrl_9509: regulator-mt9m114-ctrl-9509 {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-ctrl-9509";
++		gpio = <&pca9538 4 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
++	};
++
++	reg_mt9m114_ctrl_4t245: regulator-mt9m114-ctrl-4t245 {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-ctrl-4t245";
++		startup-delay-us = <10000>;
++		off-on-delay-us  = <200>;
++		gpio = <&pca9538 5 GPIO_ACTIVE_HIGH>;
++		enable-active-low;
++	};
++
++	reg_mt9m114_ctrl_16t245: regulator-mt9m114-ctrl-16t245 {
++		compatible = "regulator-fixed";
++		regulator-name = "mt9m114-ctrl-16t245";
++		gpio = <&pca9538 6 GPIO_ACTIVE_HIGH>;
++		enable-active-low;
++		regulator-always-on;
++	};
++};
++
++&iomuxc {
++	pinctrl_parallel_csi: ci_pi {
++		fsl,pins = <
++			MX93_PAD_GPIO_IO01__MEDIAMIX_CAM_DATA00		0xb9e
++			MX93_PAD_GPIO_IO07__MEDIAMIX_CAM_DATA01		0xb9e
++			MX93_PAD_GPIO_IO08__MEDIAMIX_CAM_DATA02		0xb9e
++			MX93_PAD_GPIO_IO09__MEDIAMIX_CAM_DATA03		0xb9e
++			MX93_PAD_GPIO_IO10__MEDIAMIX_CAM_DATA04		0xb9e
++			MX93_PAD_GPIO_IO11__MEDIAMIX_CAM_DATA05		0xb9e
++			MX93_PAD_GPIO_IO14__MEDIAMIX_CAM_DATA06		0xb9e
++			MX93_PAD_GPIO_IO15__MEDIAMIX_CAM_DATA07		0xb9e
++			MX93_PAD_GPIO_IO17__MEDIAMIX_CAM_DATA08		0xb9e
++			MX93_PAD_GPIO_IO18__MEDIAMIX_CAM_DATA09		0xb9e
++
++			MX93_PAD_GPIO_IO00__MEDIAMIX_CAM_CLK		0xb9e
++			MX93_PAD_GPIO_IO02__MEDIAMIX_CAM_VSYNC		0xb9e
++			MX93_PAD_GPIO_IO03__MEDIAMIX_CAM_HSYNC		0xb9e
++			MX93_PAD_GPIO_IO05__GPIO2_IO05			0x31e
++			MX93_PAD_GPIO_IO04__GPIO2_IO04			0x31e
++		>;
++	};
++
++	pinctrl_lpi2c8: lpi2c8grp {
++		fsl,pins = <
++			MX93_PAD_GPIO_IO12__LPI2C8_SDA		0x40000b9e
++			MX93_PAD_GPIO_IO13__LPI2C8_SCL		0x40000b9e
++		>;
++	};
++};
++
++&cameradev {
++	parallel_csi;
++	status = "okay";
++};
++
++&isi_0 {
++	interface = <6 0 2>;
++	status = "okay";
++
++	cap_device {
++		status = "okay";
++	};
++};
++
++&parallel_csi {
++	status = "okay";
++
++	port {
++		parallel_csi_ep: endpoint {
++			remote-endpoint = <&mt9m114_ep>;
++		};
++	};
++};
++
++&mipi_csi {
++	status = "disabled";
++};
++
++&lpi2c8 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	clock-frequency = <400000>;
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&pinctrl_lpi2c8>;
++	pinctrl-1 = <&pinctrl_lpi2c8>;
++	status = "okay";
++
++	pca9538: gpio@70 {
++		compatible = "nxp,pca9538";
++		reg = <0x70>;
++		gpio-controller;
++		#gpio-cells = <2>;
++		status = "okay";
++	};
++
++	mt9m114: mt9m114@48 {
++		compatible = "on,mt9m114";
++		reg = <0x48>;
++		pinctrl-names    = "default";
++		pinctrl-0        = <&pinctrl_parallel_csi>;
++		reset-gpios      = <&gpio2 4 GPIO_ACTIVE_HIGH>;
++		powerdown-gpios  = <&gpio2 5 GPIO_ACTIVE_HIGH>;
++		DOVDD-supply     = <&reg_mt9m114_dovdd>;
++		AVDD-supply      = <&reg_mt9m114_avdd>;
++		DVDD-supply      = <&reg_mt9m114_dvdd>;
++		EXTCLK-supply    = <&reg_mt9m114_extclk>;
++		CTRL_4T245-supply = <&reg_mt9m114_ctrl_4t245>;
++		mclk             = <27000000>;
++		status = "okay";
++
++		port {
++			mt9m114_ep: endpoint {
++				remote-endpoint = <&parallel_csi_ep>;
++				bus-type = <5>; /* V4L2_FWNODE_BUS_TYPE_PARALLEL */
++				bus-width = <8>;
++				vsync-active = <1>;
++				hsync-active = <1>;
++				pclk-sample = <1>;
++			};
++		};
++	};
++};
++
++&adp5585_isp {
++	status = "disabled";
++};
++
++&ap1302 {
++	status = "disabled";
++};
++
++&lpspi3 {
++	status = "disabled";
++};
++
++&sai3 {
++	status = "disabled";
++};
++
++&flexcan2 {
++	status = "disabled";
++};
+-- 
+2.25.1
+

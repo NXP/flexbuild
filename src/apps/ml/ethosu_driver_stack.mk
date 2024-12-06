@@ -7,11 +7,13 @@
 
 # depend: libflatbuffers-dev on target
 
+# COMPATIBLE_MACHINE: imx93
+
 PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
 
 
 ethosu_driver_stack:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"ethosu_driver_stack") && \
 	 $(call repo-mngr,fetch,ethosu_driver_stack,apps/ml) && \
 	 cd $(MLDIR)/ethosu_driver_stack && \

@@ -12,7 +12,7 @@
 
 
 firmwared:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != IMX ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"firmwared") && \
 	 $(call repo-mngr,fetch,firmwared,apps/utils) && \
 	 cd $(UTILSDIR)/firmwared && \
@@ -33,6 +33,6 @@ firmwared:
 	 $(MAKE) -j$(JOBS) && \
 	 $(MAKE) install && \
 	 mkdir -p $(DESTDIR)/usr/lib/systemd/system $(DESTDIR)/etc/systemd/system/multi-user.target.wants && \
-	 install -m 0644 $(FBDIR)/src/apps/utils/firmwared.service $(DESTDIR)/usr/lib/systemd/system && \
+	 install -m 0644 $(FBDIR)/src/system/firmwared.service $(DESTDIR)/usr/lib/systemd/system/ && \
 	 ln -sf /usr/lib/systemd/system/firmwared.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/firmwared.service && \
 	 $(call fbprint_d,"firmwared")

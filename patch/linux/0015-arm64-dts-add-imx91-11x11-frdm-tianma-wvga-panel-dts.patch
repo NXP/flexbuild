@@ -1,0 +1,146 @@
+From fc81a078491148061127893ee4c21d3675d03f48 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Wed, 7 Aug 2024 12:13:12 +0900
+Subject: [PATCH 15/19] arm64: dts: add imx91-11x11-frdm-tianma-wvga-panel dts
+
+Add Tianma TM050RDH03 5.0" WVGA TFT LCD panel support on i.MX91 11x11 FRDM Board
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   3 +-
+ .../imx91-11x11-frdm-tianma-wvga-panel.dts    | 109 ++++++++++++++++++
+ 2 files changed, 111 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx91-11x11-frdm-tianma-wvga-panel.dts
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 6f3512ce21e1..1b19dd57a10d 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -399,7 +399,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
+ 			  imx91-11x11-evk-ld.dtb \
+ 			  imx91-11x11-evk-i2c-spi-slave.dtb \
+ 			  imx91-11x11-evk-i3c.dtb \
+-			  imx91-11x11-frdm.dtb imx91-11x11-frdm-ld.dtb
++			  imx91-11x11-frdm.dtb imx91-11x11-frdm-ld.dtb \
++			  imx91-11x11-frdm-tianma-wvga-panel.dtb
+ 
+ imx93-11x11-evk-pmic-pf0900-dtbs := imx93-11x11-evk.dtb imx93-11x11-evk-pmic-pf0900.dtbo
+ imx93-11x11-evk-pmic-pf0900-root-dtbs := imx93-11x11-evk-root.dtb imx93-11x11-evk-pmic-pf0900.dtbo
+diff --git a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-tianma-wvga-panel.dts b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-tianma-wvga-panel.dts
+new file mode 100644
+index 000000000000..f0804023cb6c
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-tianma-wvga-panel.dts
+@@ -0,0 +1,109 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2024 NXP
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/pwm/pwm.h>
++#include "imx91-11x11-frdm.dts"
++
++/ {
++	backlight: backlight {
++		compatible = "pwm-backlight";
++		pwms = <&tpm5 3 40000 PWM_POLARITY_INVERTED>;	/* 25KHz PWM */
++		brightness-levels = <0 100>;
++		num-interpolated-steps = <100>;
++		default-brightness-level = <80>;
++		power-supply = <&reg_vexp_5v>;
++	};
++
++	panel {
++		compatible = "tianma,tm050rdh03";
++		standby-gpios = <&gpio2 27 GPIO_ACTIVE_LOW>;	/* STBYB */
++		backlight = <&backlight>;
++		power-supply = <&reg_vexp_3v3>;
++
++		port {
++			panel_in: endpoint {
++				remote-endpoint = <&display_out>;
++			};
++		};
++	};
++};
++
++&gpio2 {
++	/* avoid power leakage */
++	disp-clk-hog {
++		gpio-hog;
++		gpios = <0 GPIO_ACTIVE_HIGH>;
++		output-low;
++	};
++
++	disp-de-hog {
++		gpio-hog;
++		gpios = <1 GPIO_ACTIVE_HIGH>;
++		output-low;
++	};
++
++	disp-vsync-hog {
++		gpio-hog;
++		gpios = <2 GPIO_ACTIVE_HIGH>;
++		output-low;
++	};
++
++	disp-hsync-hog {
++		gpio-hog;
++		gpios = <3 GPIO_ACTIVE_HIGH>;
++		output-low;
++	};
++};
++
++&iomuxc {
++	pinctrl_tpm5_ch3: tpm5ch3grp {
++		fsl,pins = <
++			MX91_PAD_GPIO_IO26__TPM5_CH3	0x31e
++		>;
++	};
++};
++
++&lcdif {
++	assigned-clock-rates = <300000000>, <30000000>, <200000000>, <133333333>;
++	status = "okay";
++};
++
++&parallel_disp_fmt {
++	pinctrl-names = "default", "gpio";
++	pinctrl-0 = <&pinctrl_lcdif>;
++	pinctrl-1 = <&pinctrl_lcdif_gpio>;
++	fsl,interface-pix-fmt = "rgb666";
++	status = "okay";
++
++	ports {
++		port@1 {
++			reg = <1>;
++
++			display_out: endpoint {
++				remote-endpoint = <&panel_in>;
++			};
++		};
++	};
++};
++
++/* pin conflicts */
++&sai3 {
++	status = "disabled";
++};
++
++&tpm5 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_tpm5_ch3>;
++	status = "okay";
++};
++
++&flexcan2 {
++	status = "disabled";
++};
++
++&lpspi3 {
++	status = "disabled";
++};
+-- 
+2.25.1
+

@@ -12,13 +12,13 @@ imx_test:
 	 $(call fbprint_b,"imx_test") && \
 	 $(call repo-mngr,fetch,imx_test,apps/utils) && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/mxc_asrc.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/xf86drm.h ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/alsa/asoundlib.h ]; then \
-	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 sudo cp -rf $(DESTDIR)/usr/include/alsa $(RFSDIR)/usr/include && \
 	 cd $(UTILSDIR)/imx_test && \

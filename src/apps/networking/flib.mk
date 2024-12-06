@@ -4,8 +4,7 @@
 
 
 flib:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
-	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"flib") && \
 	 $(call repo-mngr,fetch,flib,apps/networking) && \
 	 $(MAKE) -C $(NETDIR)/flib install && \

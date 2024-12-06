@@ -337,9 +337,9 @@ fi
 
 if test -z "$linux_itb_img"; then
     if test $board = ls1021atwr; then
-	linux_itb_img=/lsdk2406_poky_tiny_LS_arm32.itb
+	linux_itb_img=/lsdk2412_poky_tiny_LS_arm32.itb
     else
-	linux_itb_img=/lsdk2406_poky_tiny_LS_arm64.itb
+	linux_itb_img=/lsdk2412_poky_tiny_LS_arm64.itb
     fi
 fi
 

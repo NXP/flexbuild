@@ -32,21 +32,13 @@ define imx_mkimage_target
 	bld mcore_demo; \
     fi && \
     \
-    if echo $1 | grep -qE ^imx8mp_ddr4_evk; then \
-	SOC=iMX8MP; SOC_FAMILY=iMX8M; target=flash_ddr4_evk; \
-    elif echo $1 | grep -qE ^imx8mp_evk; then \
+    if echo $1 | grep -qE ^imx8mp; then \
 	SOC=iMX8MP; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8mm_ddr4_evk; then \
-	SOC=iMX8MM; SOC_FAMILY=iMX8M; target=flash_ddr4_evk; \
-    elif echo $1 | grep -qE ^imx8mm_evk; then \
+    elif echo $1 | grep -qE ^imx8mm; then \
 	SOC=iMX8MM; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8mn_ddr4_evk; then \
-	SOC=iMX8MN; SOC_FAMILY=iMX8M; target=flash_ddr4_evk; \
-    elif echo $1 | grep -qE ^imx8mn_evk; then \
+    elif echo $1 | grep -qE ^imx8mn; then \
 	SOC=iMX8MN; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8mq_ddr4_val; then \
-	SOC=iMX8M; SOC_FAMILY=iMX8M; target=flash_ddr4_val; \
-    elif echo $1 | grep -qE ^imx8mq_evk; then \
+    elif echo $1 | grep -qE ^imx8mq; then \
 	SOC=iMX8M; SOC_FAMILY=iMX8M; target=flash_evk; \
     elif echo $1 | grep -qE ^imx8qm; then \
 	SOC=iMX8QM; SOC_FAMILY=iMX8QM; target=flash_spl; \
@@ -60,7 +52,11 @@ define imx_mkimage_target
 	SOC=iMX8ULP; SOC_FAMILY=iMX8ULP; target=flash_singleboot_m33; \
 	cp $(BSPDIR)/fw_ele/mx8ulpa2-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
 	cp $(BSPDIR)/fw_upower/upower_a1.bin $(BSPDIR)/imx_mkimage/iMX8ULP/upower.bin; \
-	cp $(BSPDIR)/imx_mcore_demos/imx8ulp-m33.bin $(BSPDIR)/imx_mkimage/iMX8ULP/m33_image.bin; \
+	cp $(BSPDIR)/imx_mcore_demos/imx8ulp-m33-demo/imx8ulp_m33_TCM_rpmsg_lite_str_echo_rtos.bin $(BSPDIR)/imx_mkimage/iMX8ULP/m33_image.bin; \
+    elif echo $1 | grep -qE ^imx91; then \
+	SOC=iMX91; SOC_FAMILY=iMX91; target=flash_singleboot; \
+	cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
+	cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX91/; \
     elif echo $1 | grep -qE ^imx93; then \
 	SOC=iMX93; SOC_FAMILY=iMX93; target=flash_singleboot; \
 	cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
@@ -72,56 +68,35 @@ define imx_mkimage_target
     \
     cd $(BSPDIR)/imx_mkimage && \
     $(MAKE) clean && $(MAKE) bin && \
-    $(MAKE) SOC=iMX8M mkimage_imx8 && \
-    if [ $(MACHINE) = imx8qmevk ];  then \
-	$(MAKE) -C iMX8QM -f soc.mak imx8qm_dcd.cfg.tmp; \
-    elif [ $(MACHINE) = imx8qxpmek ]; then \
-	$(MAKE) -C iMX8QX REV=B0 -f soc.mak $$target; \
-    elif [ $(MACHINE) = imx93evk ]; then \
-	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target; \
-    fi && \
+    $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 && \
     \
     bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \
     if [ $(CONFIG_OPTEE) = y -a ! -f $$bl32 ]; then \
-	bld optee_os -m $$brd -f $(CFGLISTYML); \
+	CONFIG_OPTEE=y bld optee_os -m $$brd; \
     fi && \
-    [ $(MACHINE) = imx8ulpevk ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
-    [ $(MACHINE) = imx93evk ] && plat=$${MACHINE:0:5} || true && \
+    [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
+    [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
     cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
 	$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 	$$opdir/arch/arm/dts/*$${plat}*.dtb \
 	$$opdir/u-boot-nodtb.bin && \
-    cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin && \
-    cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
-    cp -f $(BSPDIR)/atf/build/$$plat/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
-    \
-    $(MAKE) SOC=$$SOC $$REV_OPTION $$target && \
-    mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
-    if [ $(MACHINE) = imx8mpevk -o $(MACHINE) = imx8mnevk -o $(MACHINE) = imx8mmevk -o \
-	   $(MACHINE) = imx8mqevk ] && [ $$target = flash_ddr4_evk -o $$target = flash_ddr4_val ]; then \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-ddr4.bin; \
-    elif [ $(MACHINE) = imx8mpevk -o $(MACHINE) = imx8mnevk -o $(MACHINE) = imx8mmevk -o \
-	   $(MACHINE) = imx8mqevk ] && [ $$target = flash_evk ]; then \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-lpddr4.bin; \
-    elif [ $(MACHINE) = imx8ulpevk -a $$target = flash_singleboot ]; then \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-singleboot.bin; \
-    elif [ $(MACHINE) = imx8ulpevk -a $$target = flash_singleboot_m33 ]; then \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-singleboot-m33.bin; \
-    elif [ $(MACHINE) = imx8ulpevk -a $$target = flash_dualboot ]; then \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-dualboot.bin; \
-    elif [ $(MACHINE) = imx8ulpevk -a $$target = flash_dualboot_m33 ]; then \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-dualboot-m33.bin; \
-    elif [ $(MACHINE) = imx93evk -a $$target = flash_singleboot ]; then \
-	 cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-singleboot-a1.bin; \
-    else \
-	cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin; \
+    if [ $(CONFIG_OPTEE) = y -a -f $$bl32 ]; then \
+	cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
     fi && \
-    if [ $(MACHINE) = imx8qxpmek ]; then \
-	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-b0.bin; \
-	$(MAKE) clean && $(MAKE) bin && \
-	$(MAKE) SOC=iMX8QX mkimage_imx8 && \
-	$(MAKE) SOC=iMX8QX REV=C0 -C iMX8QX -f soc.mak $$target && \
-	mv $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash-c0.bin; \
-    fi
+    cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot && \
+    cp -f $(BSPDIR)/atf/build/$$plat/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/ && \
+    \
+    if [ $${MACHINE:0:6} = imx8qm ];  then \
+	$(MAKE) SOC=iMX8QM -C iMX8QM -f soc.mak $$target; \
+    elif [ $${MACHINE:0:6} = imx8qx ]; then \
+	$(MAKE) SOC=iMX8QX REV=B0 -C iMX8QX -f soc.mak $$target; \
+    elif [ $${MACHINE:0:5} = imx91 ]; then \
+        $(MAKE) SOC=iMX91 REV=A0 -C iMX91 -f soc.mak $$target; \
+    elif [ $${MACHINE:0:5} = imx93 ]; then \
+	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target; \
+    fi && \
+    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target; \
+    mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
+    cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin;
 endef

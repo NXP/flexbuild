@@ -1,0 +1,53 @@
+From bcdd6561d22887e6f7312b9cc92acaf16bc98c5e Mon Sep 17 00:00:00 2001
+From: Michael Pontikes <michael.pontikes_1@nxp.com>
+Date: Thu, 15 Feb 2024 14:21:10 -0700
+Subject: [PATCH 1/2] [MICRSE-2243] Use GoPoint downloads folder
+
+---
+ classification/example_classification_mobilenet_v1_tflite.sh | 2 +-
+ detection/example_detection_mobilenet_ssd_v2_tflite.sh       | 2 +-
+ pose/example_pose_movenet_tflite.py                          | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/classification/example_classification_mobilenet_v1_tflite.sh b/classification/example_classification_mobilenet_v1_tflite.sh
+index 82d87ea..6516ee7 100755
+--- a/classification/example_classification_mobilenet_v1_tflite.sh
++++ b/classification/example_classification_mobilenet_v1_tflite.sh
+@@ -6,7 +6,7 @@ set -x
+ 
+ REALPATH="$(readlink -e "$0")"
+ BASEDIR="$(dirname "${REALPATH}")/.."
+-MODELS_DIR="${BASEDIR}/downloads/models/classification"
++MODELS_DIR="/opt/gopoint-apps/downloads"
+ 
+ source "${BASEDIR}/common/common_utils.sh"
+ source "${BASEDIR}/classification/classification_utils.sh"
+diff --git a/detection/example_detection_mobilenet_ssd_v2_tflite.sh b/detection/example_detection_mobilenet_ssd_v2_tflite.sh
+index b771615..4c34a3c 100755
+--- a/detection/example_detection_mobilenet_ssd_v2_tflite.sh
++++ b/detection/example_detection_mobilenet_ssd_v2_tflite.sh
+@@ -6,7 +6,7 @@ set -x
+ 
+ REALPATH="$(readlink -e "$0")"
+ BASEDIR="$(dirname "${REALPATH}")/.."
+-MODELS_DIR="${BASEDIR}/downloads/models/detection"
++MODELS_DIR="/opt/gopoint-apps/downloads"
+ 
+ source "${BASEDIR}/common/common_utils.sh"
+ source "${BASEDIR}/detection/detection_utils.sh"
+diff --git a/pose/example_pose_movenet_tflite.py b/pose/example_pose_movenet_tflite.py
+index 7facc1a..bff8d0d 100755
+--- a/pose/example_pose_movenet_tflite.py
++++ b/pose/example_pose_movenet_tflite.py
+@@ -144,7 +144,7 @@ class PoseExample:
+ 
+         current_folder = os.path.dirname(os.path.abspath(__file__))
+ 
+-        model_dir = os.path.join(current_folder, '../downloads/models/pose')
++        model_dir = os.path.realpath("/opt/gopoint-apps/downloads")
+         self.tflite_path = os.path.join(model_dir, tflite_model)
+         if not os.path.exists(self.tflite_path):
+             raise FileExistsError(f'cannot find tflite model [{self.tflite_path}]')
+-- 
+2.34.1
+

@@ -10,26 +10,26 @@
 secure_sign_image() {
     # $1: <machine>,  $2: <boottype>
     [ ! -f $FBDIR/configs/board/$1.conf ] && echo $FBDIR/configs/board/$1.conf not exist! && exit
-    [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst -f $CFGLISTYML
+    [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst
     [ $MACHINE = ls1012afrwy ] && secfile=IMG7 || secfile=IMG4
     if ! grep -q ${secfile}_FILE_${2}_sec $FBDIR/configs/board/$1.conf; then exit; fi
     . $FBDIR/configs/board/$1.conf
 
-    [ -f $FBOUTDIR/$distro_bootscript ] || bld distroscr -m $1 -a $DESTARCH -f $CFGLISTYML
-    [ "$IMA_EVM" = y -a ! -f $FBOUTDIR/$bootscript_enforce ] && bld distroscr -t -m $1 -f $CFGLISTYML
-    [ "$ENCAP" = y -a ! -f $FBOUTDIR/$bootscript_dec ] && bld distroscr -e -m $1 -f $CFGLISTYML
+    [ -f $FBOUTDIR/$distro_bootscript ] || bld distroscr -m $1 -a $DESTARCH
+    [ "$IMA_EVM" = y -a ! -f $FBOUTDIR/$bootscript_enforce ] && bld distroscr -t -m $1
+    [ "$ENCAP" = y -a ! -f $FBOUTDIR/$bootscript_dec ] && bld distroscr -e -m $1
 
     [ ! -f $kernel_img ] && echo $kernel_img not exist, generating it ... && \
-    bld linux -p $SOCFAMILY -a $DESTARCH -f $CFGLISTYML
+    bld linux -p $SOCFAMILY -a $DESTARCH
 
-    [ ! -f $tiny_itb ] && bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    [ ! -f $tiny_itb ] && bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
 
     fbprint_n "Signing $2boot images for $1 ..."
     [ "$ENCAP" = y ] && cp $FBOUTDIR/$bootscript_dec $PKGDIR/apps/security/cst/bootscript_dec && echo "Copying bootscript_decap"
 
     if [ "$IMA_EVM" = y ]; then
 	[ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
-	bld rfs -r buildroot:imaevm -a $DESTARCH -f $CFGLISTYML
+	bld rfs -r buildroot:imaevm -a $DESTARCH
 	cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $PKGDIR/apps/security/cst/initramfs.img && echo "Copying initramfs.img"
 	cp -f $FBOUTDIR/$bootscript_enforce $PKGDIR/apps/security/cst/bootscript_enforce && echo "Copying bootscript_enforce"
     fi
@@ -50,7 +50,7 @@ secure_sign_image() {
     # for platform without ATF support
     if [ ${1:0:7} = ls1021a ]; then
 	ubootimg_sec=`eval echo '${'"COMPOSITE_IMG1_FILE_""$2"'_sec}'`
-	[ -f $FBOUTDIR/$ubootimg_sec ] || bld u-boot -m $1 -b $2 -f $CFGLISTYML
+	[ -f $FBOUTDIR/$ubootimg_sec ] || bld u-boot -m $1 -b $2
 	if [ $2 = nor ]; then
 	    cp $FBOUTDIR/$ubootimg_sec $PKGDIR/apps/security/cst/u-boot-dtb.bin
 	elif [ $2 = sd ]; then
@@ -60,12 +60,12 @@ secure_sign_image() {
 	fi
     fi
 
-    [ -f $pfe_fw ] || bld pfe_bin -f $CFGLISTYML
+    [ -f $pfe_fw ] || bld pfe_bin
     [ ${1:0:7} = ls1012a ] && cp $pfe_fw $PKGDIR/apps/security/cst/pfe.itb && echo "Copying PFE"
 
     if [ ${1:0:7} = ls1088a -o ${1:0:7} = ls2088a -o ${1:0:5} = lx216 ]; then
-	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin -f $CFGLISTYML
-	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils -f $CFGLISTYML
+	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin
+	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils
 	cp -f $FBOUTDIR/$COMPOSITE_IMG11_FILE $PKGDIR/apps/security/cst/mc.itb
 	cp -f $FBOUTDIR/$COMPOSITE_IMG12_FILE $PKGDIR/apps/security/cst/dpl.dtb
 	cp -f $FBOUTDIR/$COMPOSITE_IMG13_FILE $PKGDIR/apps/security/cst/dpc.dtb

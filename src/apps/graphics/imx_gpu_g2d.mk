@@ -1,13 +1,15 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-# GPU G2D library and apps for i.MX with 2D GPU and no DPU
+# GPU G2D library and apps for i.MX with 2D GPU
 
+# COMPATIBLE_MACHINE: imx8mm
 
 imx_gpu_g2d:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
+	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"imx_gpu_g2d") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/imx_gpu_g2d ]; then \
@@ -17,7 +19,6 @@ imx_gpu_g2d:
 	 fi && \
 	 cd imx_gpu_g2d && \
 	 cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/ && \
-	 cp -Pf g2d/usr/lib/libg2d-viv.so.* $(DESTDIR)/usr/lib/ && \
-	 ln -sf libg2d.so.2 $(DESTDIR)/usr/lib/libg2d.so && \
-	 ln -sf libg2d-viv.so.2.1.0 $(DESTDIR)/usr/lib/libg2d.so.2 && \
+	 cp -Pf g2d/usr/lib/libg2d* $(DESTDIR)/usr/lib/ && \
+	 cp g2d/usr/lib/mx8mm/libg2d-viv.so.2.2.0 $(DESTDIR)/usr/lib/libg2d-viv-mx8mm.so.2.2.0 && \
 	 $(call fbprint_d,"imx_gpu_g2d")

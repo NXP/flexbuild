@@ -1,18 +1,17 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 ovs_dpdk:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = desktop -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"ovs_dpdk") && \
 	 $(call repo-mngr,fetch,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
-	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
 	 fi && \
          if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then \
 	     sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/ && \

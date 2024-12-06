@@ -1,0 +1,83 @@
+From 837f578eda64396a780c0d0d4db04b5f0c0a2738 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Tue, 24 Sep 2024 18:23:31 +0800
+Subject: [PATCH 13/19] arm64: dts: add imx93-11x11-frdm-lpuart.dts
+
+Add a new dts file for uart test on imx93-11x11-frdm board.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |  3 +-
+ .../dts/freescale/imx93-11x11-frdm-lpuart.dts | 46 +++++++++++++++++++
+ 2 files changed, 48 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 1fb3f3cf545d..87f149fb2fb1 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -387,7 +387,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
+ 			  imx93-11x11-frdm.dtb imx93-11x11-frdm-mt9m114.dtb \
+ 			  imx93-11x11-frdm-dsi.dtb imx93-11x11-frdm-tianma-wvga-panel.dtb \
+ 			  imx93-11x11-frdm-aud-hat.dtb imx93-11x11-frdm-ov5640.dtb \
+-			  imx93-11x11-frdm-ld.dtb imx93-11x11-frdm-8mic.dtb
++			  imx93-11x11-frdm-ld.dtb imx93-11x11-frdm-8mic.dtb \
++			  imx93-11x11-frdm-lpuart.dtb \
+ 
+ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
+ 			  imx91-11x11-evk-flexspi-m2.dtb imx91-11x11-evk-flexspi-nand-m2.dtb \
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
+new file mode 100644
+index 000000000000..cbb67ddaf9c2
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2024 NXP
++ */
++
++#include "imx93-11x11-frdm.dts"
++
++&tpm3 {
++	status = "disabled";
++};
++
++/* Unbind lpuart5 from Bluetooth, use it for lpuart test. */
++&lpuart5 {
++	/delete-node/ bluetooth;
++};
++
++&lpuart6 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart6>;
++	status = "okay";
++};
++
++/*
++ * uart test port1. Note: don't use Bluetooth at the sametime.
++ * J1001: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
++ */
++&pinctrl_uart5 {
++	fsl,pins = <
++		MX93_PAD_GPIO_IO00__LPUART5_TX      0x31e
++		MX93_PAD_GPIO_IO01__LPUART5_RX      0x31e
++		MX93_PAD_GPIO_IO02__LPUART5_CTS_B   0x31e
++		MX93_PAD_GPIO_IO03__LPUART5_RTS_B   0x31e
++	>;
++};
++
++&iomuxc {
++/* uart test port2: J1001: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
++	pinctrl_uart6: uart6grp {
++		fsl,pins = <
++			MX93_PAD_GPIO_IO04__LPUART6_TX		0x31e
++			MX93_PAD_GPIO_IO05__LPUART6_RX		0x31e
++			MX93_PAD_GPIO_IO06__LPUART6_CTS_B	0x31e
++			MX93_PAD_GPIO_IO07__LPUART6_RTS_B	0x31e
++		>;
++	};
++};
+-- 
+2.25.1
+

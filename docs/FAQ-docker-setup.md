@@ -1,37 +1,24 @@
-Q1: How to install Docker Engine on Ubuntu host?
+Q1: How to install Docker on Ubuntu host?
 
-A1: To install Docker Engine on Ubuntu, you need the 64-bit version of one of these Ubuntu versions:
-    Ubuntu Noble 24.04 (LTS), Ubuntu Jammy 22.04 (LTS), Ubuntu Focal 20.04 (LTS)
-
-1. Run the following command to uninstall all unofficial/conflicting packages
+A1: To install Docker on Ubuntu Jammy 22.04, Ubuntu Focal 20.04 or other distro
+1. Run the commands below
 ```
-   $ for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+   sudo apt install docker.io
 ```
 
-2. Set up Docker's apt repository
+2. Users must have sudo permission for Docker commands or be added to docker group as below,
+   Change current group to "docker", add account to it and restart docker service:
 ```
-   sudo apt-get update
-   sudo apt-get install ca-certificates curl
-   sudo install -m 0755 -d /etc/apt/keyrings
-   sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-   sudo chmod a+r /etc/apt/keyrings/docker.asc
-```
-   # Add the repository to Apt sources:
-```
-   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-   sudo apt-get update
+   $ sudo newgrp - docker
+   $ sudo usermod -aG docker <accountname>
+   $ sudo gpasswd -a <accountname> docker
+   $ sudo service docker restart
 ```
 
-3. Install the Docker packages
+3. Verify that the Docker installation is successful by running the hello-world image.
 ```
-   sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-   sudo service docker start
-```
-
-4. Verify that the Docker Engine installation is successful by running the hello-world image.
-```
-   $ sudo docker run hello-world
+   $ docker run hello-world
+   $ docker ps -a
 ```
 
 

@@ -1,0 +1,50 @@
+From d277001dc50e99f4fe517c7331c7dec6618df91e Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Fri, 21 Jun 2024 10:59:52 +0800
+Subject: [PATCH 08/19] arm64: dts: add button support
+
+FRDM board was equipped 3 buttons.
+K1 is onoff button to power on/off the board.
+K2 and K3 are user defined buttons.
+K2/K3 can be tested by:
+~# evtest /dev/input/event1
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ .../boot/dts/freescale/imx93-11x11-frdm.dts   | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts
+index 0f3d483c16f0..4ef8e729f3f5 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts
+@@ -205,6 +205,26 @@ sound-mqs {
+ 		audio-cpu = <&sai1>;
+ 		audio-codec = <&mqs1>;
+ 	};
++
++	sw-keys {
++		compatible = "gpio-keys";
++
++		K2: user_btn1 {
++			label = "User Button1";
++			linux,code = <BTN_1>;
++			gpios = <&pcal6524 5 GPIO_PULL_UP>;
++			interrupt-parent = <&pcal6524>;
++			interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
++		};
++
++		K3: user_btn2 {
++			label = "User Button2";
++			linux,code = <BTN_2>;
++			gpios = <&pcal6524 6 GPIO_PULL_UP>;
++			interrupt-parent = <&pcal6524>;
++			interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
++		};
++	};
+ };
+ 
+ &sai1 {
+-- 
+2.25.1
+

@@ -1,13 +1,13 @@
-# repo configuration for Machine Learning on iMX & Layerscape MPU platforms
+# repo configurations for eIQ Machine Learning and GoPoint demo experience on iMX MPU platforms
 
 
 # eIQ AI/ML components
 repo:
-  armcl:
-    url:    https://github.com/nxp-imx/arm-computelibrary-imx.git
-
   tim_vx:
     url:    https://github.com/nxp-imx/tim-vx-imx.git
+
+  tvm:
+    url:    https://github.com/nxp-imx/eiq-tvm-imx.git
 
   tflite:
     url:    https://github.com/nxp-imx/tensorflow-imx.git
@@ -35,8 +35,40 @@ repo:
     url:    https://github.com/nnstreamer/nnstreamer-edge.git
     commit: 2efc10afd1161a02
 
+  nnshark:
+    url:    https://github.com/nxp-imx/nnshark.git
+
+  ssat:
+    url:    https://github.com/myungjoo/ssat.git
+    commit: 1635168973
+
   eiq_examples:
     url:    https://github.com/nxp-imx/eiq-example.git
 
   pytorch:
     url:    https://github.com/nxp-imx/pytorch-release.git
+    commit: 6948822f1d3
+
+  flatbuffers:
+    url:    https://github.com/google/flatbuffers.git
+    commit: 7d6d99c6befa63
+
+
+# NXP GoPoint Demo Experience components
+  imx_demo_experience:
+    url:    https://github.com/nxp-imx-support/nxp-demo-experience.git
+
+  imx_nnstreamer_examples:
+    url:    https://github.com/nxp-imx/nxp-nnstreamer-examples.git
+    commit: 1450073874cf6ef
+
+  imx_demos_list:
+    url:    https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git
+
+  imx_smart_kitchen:
+    url:    https://github.com/nxp-imx-support/smart-kitchen.git
+    commit: 1f42aceae2e79f
+
+  imx_smart_fitness:
+    url:    https://github.com/nxp-imx-support/imx-smart-fitness.git
+    commit: 5ac9a93c6c651e

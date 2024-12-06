@@ -1,11 +1,10 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 spc:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
-	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call repo-mngr,fetch,spc,apps/networking) && \
 	 if [ $(DISTROTYPE) = ubuntu -o $(DISTROTYPE) = poky -o $(DISTROTYPE) = debian ]; then \
 	     xmlhdr=$(RFSDIR)/usr/include/libxml2; \
@@ -13,11 +12,11 @@ spc:
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-	 export CFLAGS="-I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
+	 export CFLAGS="-fpermissive -I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 \
 	 $(MAKE) -C $(NETDIR)/spc/source \

@@ -11,14 +11,14 @@
 
 
 tflite_vx_delegate:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"tflite_vx_delegate") && \
 	 $(call repo-mngr,fetch,tflite_vx_delegate,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
-	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtim-vx.so ]; then \
-	     bld tim_vx -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -f $(CFGLISTYML); \
+	     bld tim_vx -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 cd $(MLDIR)/tflite_vx_delegate && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

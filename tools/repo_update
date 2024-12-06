@@ -16,9 +16,15 @@ git_repo_update() {
 
     [ -z "$tag" -a -z "$commit" -a "$UPDATE_REPO_PER_TAG" = y ] && tag=$DEFAULT_REPO_TAG
 
-    [ "$PACKAGEGROUPS_ML" = y ] && mldir=apps/ml
-    dirlist="bsp linux apps/utils apps/networking apps/graphics apps/multimedia apps/security apps/connectivity $mldir"
+    [ "$PKG_GROUPS_ML" = y ] && mldir=apps/ml
+    [ "$PKG_GROUPS_NETWORKING" = y ] && netdir=apps/networking
+    [ "$PKG_GROUPS_GRAPHICS" = y ] && graphdir=apps/graphics
+    [ "$PKG_GROUPS_MULTIMEDIA" = y ] && mmdir=apps/multimedia
+    [ "$PKG_GROUPS_GOPOINT" = y ] && gpdir=apps/gopoint
+    [ "$PKG_GROUPS_ROBOTICS" = y ] && robotdir=apps/robotics
+    dirlist="bsp linux apps/utils $netdir $graphdir $mmdir apps/security apps/connectivity $mldir $gpdir $robotdir"
     for pdn in $dirlist; do
+	[ ! -d $PKGDIR/$pdn ] && mkdir -p $PKGDIR/$pdn
 	rn=$(echo $pdn | xargs basename -s /)
 	[ $pdn = bsp -o $pdn = linux ] && obj=$FBDIR/src/$pdn || obj=$FBDIR/src/apps
 	if [ $1 = fetch ]; then

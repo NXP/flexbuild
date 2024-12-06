@@ -34,7 +34,7 @@ build_distro_rfs_poky() {
 
     # setup app components (restool, aiop_tool, tsntool, fmc, etc) in poky userland
     echo Building and installing app components for $DISTROTYPE $DISTROVARIANT
-    bld apps -r poky:$DISTROVARIANT -a ${DESTARCH} -p $SOCFAMILY -f $CFGLISTYML
+    bld apps -r poky:$DISTROVARIANT -a ${DESTARCH} -p $SOCFAMILY
     if [ $DISTROVARIANT = tiny ]; then
 	mkdir -p $RFSDIR/usr/bin $RFSDIR/usr/local/bin $RFSDIR/usr/lib
 	[ -f $DESTDIR/usr/local/bin/restool ] && sudo cp -f $DESTDIR/usr/local/bin/{ls-*,restool} $RFSDIR/usr/bin
@@ -51,7 +51,7 @@ build_distro_rfs_poky() {
     elif [ $DISTROVARIANT = devel ]; then
 	sudo cp -Prf --preserve=mode,timestamps $DESTDIR/* $RFSDIR/
 	sudo mkdir -p $RFSDIR/lib/systemd/system
-	sudo cp -f $FBDIR/src/misc/boot.mount $RFSDIR/lib/systemd/system
+	sudo cp -f $FBDIR/src/system/boot.mount $RFSDIR/lib/systemd/system
 	sudo echo DevelLinux | sudo tee $RFSDIR/etc/hostname 1>/dev/null
     fi
     distroinfo="$DISTRIB_NAME $DISTROVARIANT ${DISTRIB_VERSION: -4} (based on Yocto $repo_yocto_poky_tag)"
@@ -65,6 +65,6 @@ build_distro_rfs_poky() {
     sudo find . | sudo cpio --quiet -o -H newc | gzip > $FBOUTDIR/images/$pokyrfs.cpio.gz && fbprint_d $FBOUTDIR/images/$pokyrfs.cpio.gz
     cp -f $pokytmpdir/deploy/images/$MACHINE/${pokyimgtype}-${MACHINE}.rootfs.manifest $FBOUTDIR/rfs/$pokyrfs/$pokyrfs.packages.manifest
 
-    bld packrfs -r poky:$DISTROVARIANT -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld packrfs -r poky:$DISTROVARIANT -a $DESTARCH -p $SOCFAMILY
     ls -goh $FBOUTDIR/images/$pokyrfs*
 }

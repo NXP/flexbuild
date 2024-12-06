@@ -18,7 +18,7 @@ ifeq ($(CONFIG_APITRACE),y)
 	 if [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/apitrace/*.patch && touch .patchdone; \
 	 fi && \
-	 cp -f $(FBDIR)/patch/apitrace/libproc2.pc $(DESTDIR)/usr/lib/pkgconfig && \
+	 cp -f $(FBDIR)/src/system/pkgconfig/libproc2.pc $(DESTDIR)/usr/lib/pkgconfig && \
 	 export CC="$(CROSS_COMPILE)gcc -march=armv8-a+crc+crypto -mbranch-protection=standard --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ -march=armv8-a+crc+crypto -mbranch-protection=standard --sysroot=$(RFSDIR)" && \
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \

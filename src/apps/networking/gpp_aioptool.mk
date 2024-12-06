@@ -5,8 +5,7 @@
 
 
 gpp_aioptool:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o \
-	   $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:3} != lx2 -a $${MACHINE:0:6} != ls2088 ] && exit || \
 	 $(call fbprint_b,"gpp_aioptool") && \
 	 $(call repo-mngr,fetch,gpp_aioptool,apps/networking) && \
 	 cd $(NETDIR)/gpp_aioptool && \

@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=1.24.2406
+FIVERSION=1.27.2412
 DEFAULT_PARTITION_NUMBER=4
 DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
 DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=8192
 DEFAULT_RAW_PARTITION_SIZE_MB=256
-DEFAULT_LINUX_VERSION=6.6.3
-DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2406
+DEFAULT_LINUX_VERSION=6.6.36
+DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2412
 
 
 usage ()
@@ -52,7 +52,7 @@ Examples for various usage scenarios:
   You can specify one or several of '-b <boot> -r <rootfs> -f <firmware> -u <url>' options to override the default settings
 
 - To only partition and format target SD/eMMC card or USB/SATA disk
-  $ flex-installer -i pf -d /dev/sdx                   (default 3 partitions as 3P=512G:8G:-1)
+  $ flex-installer -i pf -d /dev/sdx                   (default 3 partitions as 3P=512M:8G:-1)
   or
   $ flex-installer -i pf -d /dev/sdx -p 4P=800M:6G:8G:-1 (specify custom partitions as 4P=800M:6G:8G:-1)
 
@@ -69,6 +69,9 @@ Examples for various usage scenarios:
 
 - Create the all-in-one sdcard.wic image
   $ flex-installer -i mkwic -m <machine> -f <firmware> -b <boot> -r <rootfs>
+
+- Backup rootfs and bootpartition from target storage device
+  $ flex-installer -i backup -d /dev/sdX
 EOF
     exit
 }
@@ -623,7 +626,7 @@ if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $ins
 fi
 
 ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx93evk '
+imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx93evk imx93frdm '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"
@@ -660,9 +663,9 @@ fi
 [ -n "$distrover" ] && distroversion=$distrover || distroversion=${DEFAULT_DISTRO_SVR_URL##*/}
 
 if [ -z "$diskpartlist" ]; then
-    [ "${devname:0:4}" = loop -o $disksize -le 8 ] && diskpartition=$DEFAULT_LOOP_DEVICE_PARTITION || \
+    [ "${devname:0:4}" = loop -o $disksize -le 16 ] && diskpartition=$DEFAULT_LOOP_DEVICE_PARTITION || \
     diskpartition=$DEFAULT_DISK_PARTITION
-    [ $instruction = auto -o $instruction = pf ] && [ $disksize -le 8 ] && \
+    [ $instruction = auto -o $instruction = pf ] && [ $disksize -le 16 ] && \
     print_w "The capacity of /dev/$devname is only $disksize GB, using partitions: $DEFAULT_LOOP_DEVICE_PARTITION"
 else
    diskpartition=$diskpartlist
@@ -694,7 +697,8 @@ fi
 
 if [ $pnum -le 4 ]; then
     [ -z "$rootpartnum" ] && rootpartnum=$pnum
-    backuppartnum=$[ $pnum - 1 ];
+    # backuppartnum=$[ $pnum - 1 ];
+    backuppartnum=$pnum;
 else
     [ -z "$rootpartnum" ] && rootpartnum=$[ $pnum + 1 ]
     backuppartnum=$pnum;
@@ -729,11 +733,7 @@ sudo mkdir -p $bootpartition $rootpartition $backuppartition $efipartition
 [ -n "$rootfsimg" ] && rootfsimg_n=$rootfsimg || rootfsimg_n=rootfs_${distroversion}_debian_base_${tgtarch}.tar.zst
 [ -n "$firmware" ] && firmware_n=$firmware || firmware_n=firmware_${machine}_sdboot.img
 
-if [ -z "$firmware" ] && [ "$machine" = imx8mpevk -o "$machine" = imx8mmevk -o "$machine" = imx8mnevk -o "$machine" = imx8mqevk ]; then
-    firmware_n=firmware_${machine}_sdboot_lpddr4.img
-elif [ -z "$firmware" -a "$machine" = imx93evk ]; then
-    firmware_n=firmware_${machine}_sdboot_a1.img
-elif [ -z "$firmware" -a "$machine" = imx8qxpmek ]; then
+if [ -z "$firmware" -a "$machine" = imx8qxpmek ]; then
     firmware_n=firmware_${machine}_sdboot_c0.img
 elif [ -z "$firmware" -a "$machine" = ls2088ardb ]; then
     firmware_n=firmware_${machine}_norboot.img
@@ -800,10 +800,8 @@ elif [ $instruction = mkwic ]; then
 elif [ $instruction = backup ]; then
     mount_device
     [ -z "$backupdir" ] && backupdir=$backuppartition; mkdir -p $backupdir; timestamp=$(date +%Y%m%d%H%M)
-    cd $bootpartition && print_n "Backup $backupdir/backup_bootpartition_$timestamp.tgz ..."
-    sudo tar czf $backupdir/backup_bootpartition_$timestamp.tgz *
-    cd $rootpartition && print_n "Backup $backupdir/backup_rootfs_$timestamp.tgz ..."
-    sudo tar czf $backupdir/backup_rootfs_$timestamp.tgz *
-    ls -l $backupdir/backup*.tgz
+    print_n "Backup $backupdir/backup_rootfs_$timestamp.tgz ..."
+    cd $rootpartition && sudo tar --zstd -cf $backupdir/backup_rootfs_$timestamp.tar.zst *
+    du -sh $backupdir/backup*.tar.zst
     print_n "Backup completed successfully"
 fi

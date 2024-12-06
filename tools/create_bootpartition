@@ -8,13 +8,13 @@
 
 generate_bootpartition_tarball() {
     # check kernel image
-    [ -f $KERNEL_PATH/Makefile ] || bld repo-fetch -B linux -f $CFGLISTYML
+    [ -f $KERNEL_PATH/Makefile ] || bld repo-fetch linux
     curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
     [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$curbrch/include/config/kernel.release ] && \
     echo Building the dependent $kernel_img ... && \
-    bld linux -p $SOCFAMILY -a $DESTARCH -f $CFGLISTYML
+    bld linux -p $SOCFAMILY -a $DESTARCH
 
-    bld linux-modules -p $SOCFAMILY -a $DESTARCH -f $CFGLISTYML
+    bld linux-modules -p $SOCFAMILY -a $DESTARCH
 
     bootpartname=boot_${SOCFAMILY}_${DESTARCH}
     bootpartdir=$FBOUTDIR/images/$bootpartname
@@ -46,11 +46,11 @@ generate_bootpartition_tarball() {
     # install /lib/firmware
     mkdir -p $bootpartdir/firmware
     if [ $SOCFAMILY = IMX ]; then
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld imx_sof -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-	[ ! -d $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
-	[ ! -d $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld sof_zephyr -a $DESTARCH -p $SOCFAMILY
+	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY
+	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY
+	[ ! -d $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY
+	[ ! -d $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY
 
 	cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware
 	cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo/imx93-*m33*.elf $DESTDIR/usr/lib/ethosu_firmware $bootpartdir/firmware
@@ -68,16 +68,16 @@ generate_bootpartition_tarball() {
 	socseries=imx*; scrmask='imx6|imx7'
     fi
 
-    bld distroscr -a $DESTARCH -p $SOCFAMILY -f $CFGLISTYML
+    bld distroscr -a $DESTARCH -p $SOCFAMILY
 
-    ls $FBOUTDIR/bsp/u-boot/$socseries*/*boot.scr | grep -E $scrmask | xargs -I {} cp -v {} $bootpartdir
+    ls $FBOUTDIR/bsp/u-boot/$socseries*/*boot.scr | grep -E $scrmask | xargs -I {} cp {} $bootpartdir
 
     # check UEFI
     if [ "$CONFIG_UEFI_BIN" = y -a $SOCFAMILY = LS -a $DESTARCH = arm64 ]; then
 	generate_uefi_grub_cfg
 	mkdir -p $bootpartdir/grub
 	find  $FBOUTDIR/bsp/uefi/ -name "*grub.cfg" | xargs -I {} cp {} $bootpartdir/grub
-	[ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin -f $CFGLISTYML
+	[ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin
 	cp $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI $bootpartdir/grub
     fi
 
@@ -86,7 +86,7 @@ generate_bootpartition_tarball() {
 	[ -n "$BOOTTYPE" ] && boottype=$BOOTTYPE
 	for brd in $machinelist; do
 	    [ ! -f $FBOUTDIR/firmware/secboot_hdrs/${MACHINE:0:10}/hdr_dtb.out ] && \
-	    bld signimg -m $brd -a $DESTARCH -f $CFGLISTYML
+	    bld signimg -m $brd -a $DESTARCH
 	done
 	cp -rf $FBOUTDIR/bsp/secboot_hdrs $bootpartdir
 	ls $FBOUTDIR/bsp/secboot_hdrs/*/*bs.out | grep $scrmask | xargs -I {} cp {} $bootpartdir
@@ -95,7 +95,7 @@ generate_bootpartition_tarball() {
     # check IMA/EVM
     if [ "$IMA_EVM" = y -a $SOCFAMILY = LS ]; then
 	[ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
-	bld rfs -r buildroot:imaevm -a $DESTARCH -f $CFGLISTYML
+	bld rfs -r buildroot:imaevm -a $DESTARCH
 
 	cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $bootpartdir/initramfs.img
 	for brd in $LS_MACHINE_LIST; do
@@ -105,7 +105,7 @@ generate_bootpartition_tarball() {
     fi
 
     # install kernel tools/perf
-    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf -f $CFGLISTYML
+    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf
     [ -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && mkdir -p $bootpartdir/tools && \
     cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf $bootpartdir/tools
 

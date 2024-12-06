@@ -9,8 +9,7 @@
 
 
 imx_dpu_g2d:
-ifeq ($(MACHINE),imx8qmmek)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_dpu_g2d") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/imx_dpu_g2d ]; then \
@@ -22,4 +21,3 @@ ifeq ($(MACHINE),imx8qmmek)
 	 cp -Pf g2d/usr/lib/*.so* $(DESTDIR)/usr/lib/ && \
 	 cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/ && \
 	 $(call fbprint_d,"imx_dpu_g2d")
-endif

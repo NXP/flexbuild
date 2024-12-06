@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -19,7 +19,8 @@ NETDIR = $(PKGDIR)/apps/networking
 SECDIR = $(PKGDIR)/apps/security
 UTILSDIR = $(PKGDIR)/apps/utils
 MLDIR = $(PKGDIR)/apps/ml
-
+GPDIR = $(PKGDIR)/apps/gopoint
+ROBOTDIR = $(PKGDIR)/apps/robotics
 
 all: $(APPS_REPO_LIST)
 	@$(call fbprint_d,"apps components")
@@ -31,6 +32,8 @@ multimedia:   $(MULTIMEDIA_REPO_LIST)
 graphics:     $(GRAPHICS_REPO_LIST)
 security:     $(SECURITY_REPO_LIST)
 utils:        $(UTILS_REPO_LIST)
+gopoint:      $(GOPOINT_REPO_LIST)
+robotics:     $(ROBOTICS_REPO_LIST)
 ml:	      $(ML_REPO_LIST)
 
 

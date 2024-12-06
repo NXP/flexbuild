@@ -1,11 +1,12 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 wayland:
 ifeq ($(CONFIG_WAYLAND),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop -a $(MACHINE) != imx93evk ] && exit || \
+	@[ $(SOCFAMILY) = LS -a $${MACHINE:0:7} != ls1028a -o \
+	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"wayland") && \
 	 $(call repo-mngr,fetch,wayland,apps/graphics) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
@@ -14,8 +15,7 @@ ifeq ($(CONFIG_WAYLAND),y)
 	 cd $(GRAPHICSDIR)/wayland && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@TARGET_ARCH@%aarch64%g' \
 	     -e 's%@TARGET_CPU@%cortex-a72%g' -e 's%@TARGET_ENDIAN@%little%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     $(FBDIR)/src/misc/meson/meson.cross > meson.cross && \
-	 [ $(DISTROTYPE) = ubuntu ] && sed -i 's/1.21/1.20/' meson.build || git checkout meson.build && \
+	     $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Ddocumentation=false \
 		-Dtests=false \

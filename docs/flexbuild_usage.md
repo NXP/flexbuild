@@ -2,10 +2,10 @@
 ------------------
 ```
 $ cd flexbuild
-$ . setup.env
-$ bld docker (create or attach a docker container)
-$ . setup.env
-$ bld -h
+$ . setup.env  (in host environment)
+$ bld docker   (create or attach to docker)
+$ . setup.env  (in docker environment)
+$ bld host-dep (install host dependent packages)
 ```
 
 ```
@@ -22,28 +22,33 @@ Most used example with automated build:
 
 Most used example with separate command:
 ```
- bld bsp -m imx8mpevk            # generate composite firmware (including atf, u-boot, optee_os, kernel, dtb, peripheral firmware, tiny rootfs)
- bld rfs -r debian:desktop       # generate Debian-based desktop rootfs  (with more graphics/multimedia packages for Desktop)
- bld rfs -r debian:server        # generate Debian-based server rootfs   (with more server related packages, no GUI Desktop)
+ bld bsp -m imx93frdm            # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for single machine
+ bld bspall [ -p IMX|LS ]        # generate BSP composite firmware for all i.MX or LS machines
+ bld rfs [ -r debian:desktop ]   # generate Debian-based Desktop rootfs  (with more graphics/multimedia packages for Desktop)
+ bld rfs -r debian:server        # generate Debian-based Server rootfs   (with more server related packages, no GUI Desktop)
  bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
  bld rfs -r poky:tiny            # generate poky-based arm64 tiny rootfs
  bld rfs -r buildroot:tiny       # generate Buildroot-based arm64 tiny rootfs
- bld itb -r debian:base          # generate sdk_debian_base_IMX_arm64.itb including kernel, dtb and rootfs_debian_base_arm64.cpio.gz
+ bld itb -r poky:tiny            # generate poky_tiny_IMX_arm64.itb including kernel, dtb and rootfs_poky_tiny_arm64.cpio.gz
  bld linux [ -p IMX|LS]          # compile linux kernel for all arm64 IMX or LS machines
  bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
  bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
- bld apps -r debian:server -p LS # compile NXP-specific apps against the library dependencies of Debian server rootfs for LS machines
- bld ml                          # compile NXP-specific eIQ AI/ML components against the library dependencies of Debian rootfs
- bld merge-apps                  # merge NXP-specific apps into target Debian rootfs
- bld packrfs                     # pack and compress target rootfs as rootfs_xx.tar.zst
- bld packapps                    # pack and compress target app components as app_components_xx.tar.zst
+ bld apps                        # compile NXP-specific components against the runtime dependencies of Debian Desktop rootfs for i.MX machines
+ bld apps -r debian:server -p LS # compile NXP-specific components against the runtime dependencies of Debian Server rootfs for LS machines
+ bld ml [ -r <type> ]            # compile NXP-specific eIQ AI/ML components against the library dependencies of Debian rootfs
+ bld merge-apps [ -r <type> ]    # merge NXP-specific components into target Debian rootfs (Desktop by default,add '-r debian:server' for Server)
+ bld packrfs [ -r <type> ]       # pack and compress target rootfs as rootfs_xx.tar.zst (or add '-r debian:server' for Server)
+ bld packapps [ -r <type> ]      # pack and compress target app components as apps_xx.tar.zst (add '-p LS' for Layerscape platforms)
  bld repo-fetch [ <component> ]  # fetch git repository of all or specified component from remote repos if not exist locally
  bld docker                      # create or attach docker container to build in docker
- bld clean                       # clean all obsolete firmware/linux/apps image except distro rootfs
- bld clean-rfs -r debian:server  # clean target debian-based server arm64 rootfs
- bld clean-bsp                   # clean obsolete bsp image
+ bld clean                       # clean all obsolete firmware/linux/apps binary images except distro rootfs
+ bld clean-apps [ -r <type> ]    # clean the obsolete NXP-specific apps components binary images
+ bld clean-rfs [ -r <type> ]     # clean target debian-based server arm64 rootfs
+ bld clean-bsp                   # clean obsolete BSP (u-boot/atf/firmware) images
  bld clean-linux                 # clean obsolete linux image
  bld list                        # list enabled machines and supported various components
+ bld host-dep                    # automatically install the depended deb packages on host
+
 ```
 
 The supported options:
@@ -104,7 +109,7 @@ at offset 0x0 in NOR/QSPI/FlexSPI flash device or at offset 4k (LS) or 1k/32k/33
 Usage: bld bsp -m <machine> [-b <boottype>]
 Example:
 $ bld bsp -m imx8mpevk         # generate composite firmware_imx8mpevk_sdboot.img
-$ bld bsp -m imx93evk          # generate composite firmware_imx93evk_sdboot.img
+$ bld bsp -m imx93frdm         # generate composite firmware_imx93frdm_sdboot.img
 $ bld bsp -m ls1046ardb        # generate composite firmware_ls1046ardb_<boottype>.img
 $ bld bsp -m lx2160ardb        # generate composite firmware_lx2160ardb_<boottype>.img
 ```
@@ -152,19 +157,18 @@ $ bld linux:linux-lts-nxp:lf-6.1.36
 $ bld linux:linux:LSDK-21.08
 ```
 
-To customize kernel options with the default repo and current branch in interactive menu
+To build a customized kernel image with menuconfig
 ```
-$ bld linux:custom                 # generate a customized .config
-$ bld linux                        # compile kernel and modules according to the generated .config above
+$ bld linux:menuconfig             # generate a customized .config by changing kernel options in menuconfig
+$ bld linux                        # compile kernel and modules according to the newly generated .config above
 ```
 
-To build custom linux with the specified kernel repo and branch/tag according to default config and the appended fragment config
+To build custom linux with the default kernel config and the appended fragment config specified in configs/linux directory
 ```
-Usage: bld linux [ :<kernel_repo>:<tag|branch> ] -B fragment:<xx.config> [ -a <arch> ]
+Usage: bld linux -B fragment:<xx.config> [ -a <arch> ] [ -p LS|IMX ]
 Examples:
 $ bld linux -B fragment:ima_evm_arm64.config
 $ bld linux -B fragment:"ima_evm_arm64.config lttng.config"
-$ bld linux:linux:LSDK-21.08 -B fragment:lttng.config
 ```
 
 
@@ -192,7 +196,7 @@ Note: If you want to specify different RCW configuration instead of the default 
 Usage:   bld uboot -m <machine>
 Examples:
 $ bld uboot -m imx8mpevk       # build U-Boot image for imx8mpevk
-$ bld uboot -m imx93evk        # build U-Boot image for imx93evk
+$ bld uboot -m imx93frwy       # build U-Boot image for imx93frwy
 $ bld uboot -m ls1046ardb      # build U-Boot image for ls1046ardb
 ```
 

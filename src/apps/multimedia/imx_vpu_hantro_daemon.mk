@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2021-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -21,10 +21,10 @@ imx_vpu_hantro_daemon:
 	     mv imx-vpu-hantro-daemon-* imx_vpu_hantro_daemon; \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libhantro.so ]; then \
-	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/ewl.h ]; then \
-	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
 	 fi && \
 	 cd $(MMDIR)/imx_vpu_hantro_daemon && \
 	 sed -e 's|HANTRO_VC8000E_LIB_DIR =.*|HANTRO_VC8000E_LIB_DIR = $(DESTDIR)/usr/lib|' \
@@ -33,8 +33,8 @@ imx_vpu_hantro_daemon:
 	     -e 's|CTRLSW_HDRPATH =.*|CTRLSW_HDRPATH = $(DESTDIR)/usr/include|' -i Makefile && \
 	 for socplat in $(SOCLIST); do \
 	     $(MAKE) clean && \
-	     $(MAKE) SDKTARGETSYSROOT=$(DESTDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat && \
-	     $(MAKE) SDKTARGETSYSROOT=$(DESTDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat install && \
+	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat && \
+	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat install && \
 	     mv $(DESTDIR)/usr/bin/vsidaemon $(DESTDIR)/usr/bin/vsidaemon-$$socplat; \
 	 done && \
 	 $(call fbprint_d,"imx_vpu_hantro_daemon")

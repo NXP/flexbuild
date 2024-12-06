@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2024 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,21 +7,22 @@
 secure_obj:
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"secure_obj") && \
-	 $(call repo-mngr,fetch,secure_obj,apps/security) && \
+	 $(call repo-mngr,fetch,secure_obj,apps/security)
+ifeq ($(CONFIG_OPTEE),y)
 	 if [ $(CONFIG_OPTEE) != y ]; then \
 	     $(call fbprint_e,"Please enable CONFIG_OPTEE to y in configs/$(CFGLISTYML)"); exit 1; \
 	 fi && \
 	 if [ ! -d $(SECDIR)/optee_os/out/arm-plat-ls ]; then \
-	     bld optee_os -m ls1028ardb -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     CONFIG_OPTEE=y bld optee_os -m ls1028ardb -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libteec.so ]; then \
-	     bld optee_client -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     CONFIG_OPTEE=y bld optee_client -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
 	 kerneloutdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && \
 	 mkdir -p $(DESTDIR)/usr/lib && \
 	 if [ ! -f $$kerneloutdir/.config ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY) -f $(CFGLISTYML); \
+	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 kernelrelease=`cat $$kerneloutdir/include/config/kernel.release` && \
 	 \
@@ -49,3 +50,4 @@ secure_obj:
 	 cp images/{*_app,mp_verify} $(DESTDIR)/usr/local/bin && \
 	 cp -rf securekey_lib/include/* $(DESTDIR)/usr/local/include && \
 	 $(call fbprint_d,"secure_obj")
+endif

@@ -5,14 +5,15 @@
 
 
 optee_test:
+ifeq ($(CONFIG_OPTEE),y)
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"optee_test") && \
 	 $(call repo-mngr,fetch,optee_test,apps/security) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libteec.so.1.0 ]; then \
-	     bld optee_client -m $(MACHINE); \
+	     CONFIG_OPTEE=y bld optee_client -m $(MACHINE); \
 	 fi && \
 	 if [ ! -d $(SECDIR)/optee_os/out/arm-plat-ls/export-ta_arm64 ]; then \
-	     bld optee_os -m ls1028ardb -r $(DISTROTYPE):$(DISTROVARIANT) -f $(CFGLISTYML); \
+	     CONFIG_OPTEE=y bld optee_os -m ls1028ardb -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 \
 	 cd $(SECDIR)/optee_test && \
@@ -25,3 +26,4 @@ optee_test:
 	 mkdir -p $(DESTDIR)/usr/lib/tee-supplicant/plugins && \
 	 cp $(SECDIR)/optee_test/out/supp_plugin/*.plugin $(DESTDIR)/usr/lib/tee-supplicant/plugins/ && \
 	 $(call fbprint_d,"optee_test")
+endif

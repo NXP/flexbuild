@@ -22,10 +22,10 @@ e.g.
 
 2. Create a makefile file src/apps/\<subsystem\>/hello_world.mk to add the build object for this component, e.g.
 ```
-   $ vi src/apps/utils/hello_world.mk
+   $ vi src/apps/gopoint/hello_world.mk
      hello_world:
-            @$(call fetch-git-tree,hello_world,apps/generic) && \
-             cd $(GENDIR)/hello_world && \
+            @$(call fetch-git-tree,hello_world,apps/gopoint) && \
+             cd $(GPDIR)/hello_world && \
              $(MAKE) -j$(JOBS) && \
 	     $(MAKE) install && \
              $(call fbprint_d,"hello_world")
@@ -53,19 +53,25 @@ e.g.
 
 
 ## How to add a custom machine/board in Flexbuild
-1. Run the commands below to fetch the source git repositories of SDK various components for the first time
+1. Run the commands below to enter Flexbuild and fetch the git repositories of components
 ```
    $ git clone https://github.com/nxp/flexbuild
    $ cd flexbuild
-   $ source setup.env
-   $ bld repo-fetch
+   $ . setup.env
+   $ bld docker (build in docker)
+   $ . setup.env
+   $ bld -h
+
+   Fetch the source git repositories of SDK various components for the first time
+   $ bld repo-fetch atf
+   $ bld repo-fetch uboot
+   $ bld repo-fetch linux
 ```
 
-2. Optionally, add BSP related patches for the custom machine if needed
+2. Optionally, modify or add BSP related patches for the custom machine if needed
    - add atf patch for custom machine in components/bsp/atf
    - add u-boot patch for custom machine in components/bsp/uboot
    - add linux patch for custom machine in components/linux/linux
-   - add optee patch for custom machine in components/apps/security/optee_os
 
 3. Add configs for custom machine in flexbuild
    - Add a config file in configs/board/\<machine\>.conf for the new custom machine (copy an existing board with custom modification)
@@ -74,31 +80,32 @@ e.g.
 4. Build the composite firmware image for the custom machine
 ```
    $ bld clean-bsp (optionally, to clean the obsolete bsp images)
-   $ bld atf -m <machine>
    $ bld uboot -m <machine>
+   $ bld atf -m <machine>
    $ bld linux  (or add option '-p LS' for Layerscape platforms)
    $ bld bsp -m <machine>
 ```
 
 5. Optionally, to build application components against Debian userland for the custom machine
 ```
-    $ bld apps [ -r debian:server ]
-    $ bld merge-apps [ -r debian:server ]
-    $ bld packrfs [ -r debian:server ]
+    $ bld apps
+    $ bld merge-apps
+    $ bld packrfs
+    (Note: The omitted option '-r debian:desktop -p IMX' is the default for i.MX boards, add option '-r debian:server -p LS' for Layerscape boards)
 ```
 
 6. Deploy distro image to SD card
    - To only install the composite firmware image into SD card
 ```
-   $ sudo dd if=firmware_<machine>_sdboot.img of=/dev/mmcblk0 bs=1k seek=<offset>
- e.g sudo dd if=firmware_imx8mpevk_sdboot_lpddr4.img of=/dev/mmcblk0 bs=1k seek=32 
+   $ sudo dd if=firmware_<machine>_sdboot.img of=<device> bs=1k seek=<offset>
+ e.g sudo dd if=firmware_imx8mpevk_sdboot.img of=/dev/mmcblk0 bs=1k seek=32
+     sudo dd if=firmware_imx93frdm_sdboot.img of=/dev/mmcblk0 bs=1k seek=32
      sudo dd if=firmware_lx2160ardb_sdboot.img of=/dev/mmcblk0 bs=1k seek=4
 ```
    - To install all the distro images onto SD/eMMC card or USB/SATA storage device
 ```
    $ flex-installer -i pf -d /dev/sdx
    $ flex-installer -b <boot> -r <rootfs> -d <device> -m <machine> [ -f <firmware> ]
-     (the '-f <firmware>' option is only for SD boot, no need it for USB/SATA storage device)
 ```
 
 7. Plug SD card onto the target board and power on, it will automatically boot to Debian system
@@ -108,7 +115,9 @@ e.g.
    - for iMX:
 ```
    => mmc read $load_addr 0x4000 0x1f000 && bootm $load_addr#<board_name>
- e.g. mmc read 0xa0000000 0x4000 0x1f000 && bootm a0000000#imx8mpevk
+   e.g.
+   => setenv tinylinux 'mmc read 0xa0000000 0x4000 0x1f000 && bootm a0000000#imx8mpevk'
+   => saveenv;boot
 ```
    - for LS:
 ```

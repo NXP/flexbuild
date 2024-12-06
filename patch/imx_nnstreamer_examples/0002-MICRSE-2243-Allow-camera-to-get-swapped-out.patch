@@ -1,0 +1,43 @@
+From a30d1e14d64c4c7e4ad284cd19bc7a4a2206fcfb Mon Sep 17 00:00:00 2001
+From: Michael Pontikes <michael.pontikes_1@nxp.com>
+Date: Wed, 28 Aug 2024 14:20:09 -0700
+Subject: [PATCH 2/2] [MICRSE-2243] Allow camera to get swapped out
+
+---
+ pose/example_pose_movenet_tflite.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/pose/example_pose_movenet_tflite.py b/pose/example_pose_movenet_tflite.py
+index 800f778..b1d702c 100755
+--- a/pose/example_pose_movenet_tflite.py
++++ b/pose/example_pose_movenet_tflite.py
+@@ -149,7 +149,7 @@ class PoseExample:
+         if not os.path.exists(self.tflite_path):
+             raise FileExistsError(f'cannot find tflite model [{self.tflite_path}]')
+ 
+-        video_dir = os.path.join(current_folder, '../downloads/media/movies')
++        video_dir = os.path.realpath("/opt/gopoint-apps/downloads")
+         self.video_path = os.path.join(video_dir, self.video_file)
+         if not os.path.exists(self.video_path):
+             raise FileExistsError(f'cannot find video [{self.video_path}]')
+@@ -167,6 +167,7 @@ class PoseExample:
+         self.mainloop = GLib.MainLoop()
+ 
+         self.source = os.getenv('SOURCE', 'VIDEO')
++        device = os.getenv('CAMERA_DEVICE', default = "/dev/video3")
+ 
+         if self.source == 'VIDEO':
+             cmdline = 'filesrc location={:s} ! matroskademux ! vpudec !' \
+@@ -176,7 +177,8 @@ class PoseExample:
+             cmdline += '  video/x-raw,width={:d},height={:d} ! ' \
+                 .format(self.VIDEO_INPUT_HEIGHT, self.VIDEO_INPUT_HEIGHT)
+         elif self.source == 'CAMERA':
+-            cmdline = 'v4l2src name=cam_src device=/dev/video3 num-buffers=-1 !'
++            cmdline = 'v4l2src name=cam_src device={:s} num-buffers=-1 !' \
++            .format(device)
+         else:
+             raise ValueError('Wrong source, must be VIDEO or CAMERA')
+ 
+-- 
+2.34.1
+

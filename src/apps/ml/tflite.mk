@@ -19,6 +19,10 @@ tflite:
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 $(call repo-mngr,fetch,tflite,apps/ml) && \
 	 cd $(MLDIR)/tflite && \
+	 if [ -f .builddone ]; then \
+	     $(call fbprint_n,"TensorFlow-lite has been compiled already.") ; \
+	     $(call fbprint_n,"Skip...") && exit ; \
+	 fi && \
 	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
@@ -53,6 +57,7 @@ tflite:
 	 cd $(MLDIR)/tflite/tensorflow/lite && \
 	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite && \
 	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public && \
+	 rsync -avz $(MLDIR)/tflite/tensorflow/* $(DESTDIR)/usr/include/tensorflow/ && \
 	 cp $(FBDIR)/src/system/pkgconfig/tensorflow2-lite.pc $(DESTDIR)/usr/lib/pkgconfig && \
 	 \
 	 $(call fbprint_n,"install examples") && \
@@ -74,5 +79,6 @@ tflite:
 	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.11/site-packages \
 		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl && \
-	 rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
+	 #rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
+	 touch .builddone && \
 	 $(call fbprint_d,"tflite")

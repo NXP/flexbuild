@@ -29,11 +29,11 @@ repo:
 
   nnstreamer:
     url:    https://github.com/nnstreamer/nnstreamer.git
-    commit: f82789170b8f2696
+    commit: 807060954acfdb6cec1
 
   nnstreamer_edge:
     url:    https://github.com/nnstreamer/nnstreamer-edge.git
-    commit: 2efc10afd1161a02
+    commit: 2bf50d57f0f8d856ae38
 
   nnshark:
     url:    https://github.com/nxp-imx/nnshark.git
@@ -60,7 +60,7 @@ repo:
 
   imx_nnstreamer_examples:
     url:    https://github.com/nxp-imx/nxp-nnstreamer-examples.git
-    commit: 1450073874cf6ef
+    commit: 5d9a7a674e52697
 
   imx_demos_list:
     url:    https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git

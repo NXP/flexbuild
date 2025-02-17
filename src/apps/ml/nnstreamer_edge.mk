@@ -25,7 +25,8 @@ nnstreamer_edge:
 		-DENABLE_TEST=OFF && \
 	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
-	 mv $(DESTDIR)/usr/local/include/nnstreamer-edge.h $(DESTDIR)/usr/include && \
+	 mkdir -p $(RFSDIR)/usr/local/include/nnstreamer && \
+	 mv $(DESTDIR)/usr/local/include/nnstreamer/nnstreamer-edge.h $(DESTDIR)/usr/include && \
 	 mv $(DESTDIR)/pkgconfig/nnstreamer-edge.pc $(DESTDIR)/usr/lib/pkgconfig/ && \
 	 rm -rf $(DESTDIR)/pkgconfig && \
 	 $(call fbprint_d,"nnstreamer_edge")

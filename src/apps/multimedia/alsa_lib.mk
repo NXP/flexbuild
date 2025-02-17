@@ -18,6 +18,7 @@ alsa_lib:
 	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig && \
 	 libtoolize --force --copy --automake && aclocal && \
 	 autoheader && automake --foreign --copy --add-missing && autoconf && \
+	 export CFLAGS="-fPIC -g -O2" && \
 	 ./configure --host=aarch64 CC=aarch64-linux-gnu-gcc 1>/dev/null && \
 	 $(MAKE) -j$(JOBS) install && \
 	 $(call fbprint_d,"alsa_lib")

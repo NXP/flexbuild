@@ -154,5 +154,5 @@ mmdebstrap:
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
-    - 'printf "NXP Linux SDK 2412 Debian Desktop (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
+    - 'printf "NXP Linux SDK 2506 Debian Desktop (optimized with NXP-specific hardware acceleration)\n" >> $1/etc/issue'
     - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

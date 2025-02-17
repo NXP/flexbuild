@@ -25,8 +25,10 @@ imx_nnstreamer_examples:
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
-	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/share/pkgconfig && \
+	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/share/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
+	 bld merge-apps -r $(DISTROTYPE):$(DISTROVARIANT) && \
 	 cmake  -S $(GPDIR)/imx_nnstreamer_examples \
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_BUILD_TYPE=release && \
@@ -34,7 +36,7 @@ imx_nnstreamer_examples:
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
 	 mkdir -p $(DESTDIR)/$(IMX_NNSTREANER_DIR)/{common,classification,detection,pose} && \
 	 cp -r common/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/common/ && \
-	 cp {LICENSE,SCR-1.3.txt} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
+	 cp {LICENSE,SCR-*} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
 	 cp classification/{README.md,*.sh} $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification && \
 	 cp build_$(DISTROTYPE)_$(ARCH)/classification/example_classification_mobilenet_v1_tflite \
 	    $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification && \

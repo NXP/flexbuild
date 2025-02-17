@@ -9,7 +9,7 @@
 
 set -e
 
-FB_VERSION=2.16.2412
+FB_VERSION=2.28.2506
 
 usage () {
 cat <<EOF

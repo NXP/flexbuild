@@ -10,7 +10,7 @@
 
 set -e
 
-DEFAULT_DL_URL=http://www.nxp.com/lgfiles/sdk/lsdk2412
+DEFAULT_DL_URL=http://www.nxp.com/lgfiles/sdk/lsdk2506
 
 NXPAPPSPKG=nxp_apps_arm64_debian_$1.tar.zst
 

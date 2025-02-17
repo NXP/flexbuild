@@ -25,7 +25,7 @@ host_dependent_packages=" \
     texlive-font-utils libglib2.0-dev autoconf-archive valac libcanberra-dev \
     zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
-    rename qt6-declarative-dev \
+    rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
 "
 
 

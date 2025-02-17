@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=1.27.2412
+FIVERSION=1.28.2506
 DEFAULT_PARTITION_NUMBER=4
 DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
 DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=8192
 DEFAULT_RAW_PARTITION_SIZE_MB=256
-DEFAULT_LINUX_VERSION=6.6.36
-DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2412
+DEFAULT_LINUX_VERSION=6.6.52
+DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2506
 
 
 usage ()
@@ -626,7 +626,7 @@ if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $ins
 fi
 
 ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx93evk imx93frdm '
+imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx93evk imx93frdm imx91qsb imx93qsb '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"

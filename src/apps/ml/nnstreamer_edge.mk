@@ -23,7 +23,7 @@ nnstreamer_edge:
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_BUILD_TYPE=release \
 		-DENABLE_TEST=OFF && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
 	 mkdir -p $(RFSDIR)/usr/local/include/nnstreamer && \
 	 mv $(DESTDIR)/usr/local/include/nnstreamer/nnstreamer-edge.h $(DESTDIR)/usr/include && \

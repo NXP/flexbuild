@@ -30,7 +30,7 @@ imx_smart_fitness:
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DLIBRARY_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu \
 		-DCMAKE_BUILD_TYPE=release && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
 	 $(CROSS_COMPILE)strip --remove-section=.comment --remove-section=.note --strip-unneeded \
 	 build_$(DISTROTYPE)_$(ARCH)/src/imx-smart-fitness && \

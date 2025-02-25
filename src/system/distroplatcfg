@@ -48,7 +48,7 @@ else
     soc=unknown
 fi
 
-if [ $soc = imx91 -o $soc = imx93 ]; then
+if [ $soc = imx91 -o $soc = imx93 -o $soc = ls1028a ]; then
     if grep -qi 'Debian Desktop' /etc/issue; then
 	#desktop=weston in 25Q2
 	desktop=gnome

@@ -649,6 +649,7 @@ do_clean() {
     clean_bsp_components
     clean_linux_components
     clean_apps_components
+    rm -rf logs/{*,.[^.]*}
     fbprint_d "clean all old images except distro rootfs"
 }
 
@@ -794,6 +795,7 @@ done
 
 . $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
 . $FBDIR/tools/parse_yaml $FBDIR/configs/ml.yml >> $FBDIR/configs/.sdk.cfg
+chmod 666 $FBDIR/configs/.sdk.cfg
 CONFIGLIST=.sdk.cfg
 export CONFIGLIST CFGLISTYML
 

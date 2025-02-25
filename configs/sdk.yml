@@ -184,7 +184,7 @@ repo:
 
   pktgen_dpdk:
     url:  https://github.com/pktgen/pktgen-dpdk.git
-    tag:  pktgen-24.03.0
+    tag:  pktgen-23.06.1
 
   mtcp_dpdk:
     url:  https://github.com/nxpmicro/mtcp.git

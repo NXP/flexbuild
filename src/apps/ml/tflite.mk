@@ -42,7 +42,7 @@ tflite:
 		-DTFLITE_ENABLE_XNNPACK=on \
 		-DTFLITE_PYTHON_WRAPPER_BUILD_CMAKE2=on \
 		-DTFLITE_ENABLE_EXTERNAL_DELEGATE=on && \
-	 VERBOSE=0 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all -- benchmark_model label_image && \
+	 VERBOSE=0 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all -- benchmark_model label_image && \
 	 cd build_$(DISTROTYPE)_$(ARCH) && \
 	 CI_BUILD_PYTHON=python3 BUILD_NUM_JOBS=$(JOBS) \
 	 $(MLDIR)/tflite/tensorflow/lite/tools/pip_package/build_pip_package_with_cmake2.sh aarch64 && \

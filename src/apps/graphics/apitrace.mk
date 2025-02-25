@@ -40,6 +40,6 @@ ifeq ($(CONFIG_APITRACE),y)
 		-DVivante_INC_SEARCH_PATH=$(RFSDIR)/usr/include \
 		-DVivante_LIB_SEARCH_PATH=$(RFSDIR)/usr/lib \
 		-DCMAKE_BUILD_TYPE=release && \
-	 VERBOSE=1 cmake --build $(GRAPHICSDIR)/apitrace/build_$(DISTROTYPE)_$(ARCH) --target install && \
+	 VERBOSE=1 cmake --build $(GRAPHICSDIR)/apitrace/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target install && \
 	 $(call fbprint_d,"apitrace")
 endif

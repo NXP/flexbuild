@@ -34,7 +34,7 @@ tvm:
 		-DCMAKE_STRIP=strip \
 		-DUSE_VSI_NPU=ON \
 		-DUSE_VSI_NPU_RUNTIME=ON && \
-	 cmake --build $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH) --target all && \
+	 cmake --build $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
 	 cd $(MLDIR)/tvm/python && \
 	 NO_FETCH_BUILD=1 STAGING_INCDIR=$(RFSDIR)/usr/include STAGING_LIBDIR=$(RFSDIR)/usr/lib \

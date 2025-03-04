@@ -1,0 +1,10 @@
+[Unit]
+Description=Mask sleep.target on boot
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+[Install]
+WantedBy=multi-user.target

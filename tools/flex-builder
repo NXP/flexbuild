@@ -547,7 +547,7 @@ flex_auto_build() {
     echo "Time of build: `date`"
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
 
-    [ ! -d $KERNEL_PATH ] && bld repo-fetch -c linux
+    [ ! -d $KERNEL_PATH ] && bld repo-fetch linux
     curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
     [ "$KERNEL_BRANCH" != "$curbrch" ] && cd $KERNEL_PATH && git checkout $KERNEL_BRANCH -b $KERNEL_BRANCH && cd -
 
@@ -649,7 +649,6 @@ do_clean() {
     clean_bsp_components
     clean_linux_components
     clean_apps_components
-    rm -rf logs/{*,.[^.]*}
     fbprint_d "clean all old images except distro rootfs"
 }
 
@@ -915,6 +914,7 @@ initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIA
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
 mkdir -p $PKGDIR/linux $FBDIR/logs $RFSDIR
 mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,connectivity,utils,ml}
+mkdir -p $KERNEL_OUTPUT_PATH
 
 [ -z "$JOBS" ] && JOBS=$(nproc)
 

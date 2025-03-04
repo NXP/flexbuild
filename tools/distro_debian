@@ -73,5 +73,11 @@ build_distro_rfs_debian() {
     # fix ping: socket: Operation not permitted
     $sudopt chmod u+s $RFSDIR/bin/ping
 
+    # fix login issue for desktop
+    if [ $DISTROVARIANT = desktop ]; then
+		sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
+		sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
+    fi
+
     fbprint_d $RFSDIR
 }

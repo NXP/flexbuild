@@ -6,6 +6,8 @@
 
 # build ATF image for Layerscape and i.MX platforms
 
+bldstr = "BUILD_STRING=$(DEFAULT_REPO_TAG)"
+
 atf:
 	@$(call repo-mngr,fetch,atf,bsp) && \
 	 $(call repo-mngr,fetch,uboot,bsp) && \
@@ -111,9 +113,9 @@ atf:
 	     echo $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode RCW=$$rcwbin \
 		  BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt && \
 	     $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode \
-		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt && \
+		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) && \
 	     if [ $${MACHINE:0:5} = lx216 -a "$(SECURE)" = y ] && [ ! -f $$outputdir/ddr_fip_sec.bin ]; then \
-		 $(MAKE) -j$(JOBS) fip_ddr PLAT=$$platform BOOT_MODE=$$bootmode $$secureopt \
+		 $(MAKE) -j$(JOBS) fip_ddr PLAT=$$platform BOOT_MODE=$$bootmode $$secureopt $(bldstr) \
 		 $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a; \
 		 [ "$(COT)" = arm-cot -o "$(COT)" = arm-cot-with-verified-boot ] && cp -f build/$$platform/release/*.pem $$outputdir/; \
 		 cp -f build/$$platform/release/ddr_fip_sec.bin $$outputdir/; \
@@ -133,7 +135,7 @@ atf:
 	 elif [ $(SOCFAMILY) = IMX ]; then \
 	    [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
 	    [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
-	    $(MAKE) -j$(JOBS) PLAT=$$plat bl31 && \
+	    $(MAKE) -j$(JOBS) PLAT=$$plat $(bldstr) bl31 && \
 	    mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE) && \
 	    cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
 	 fi && \

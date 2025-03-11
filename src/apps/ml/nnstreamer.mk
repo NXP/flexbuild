@@ -11,6 +11,7 @@ nnstreamer:
 	 $(call fbprint_b,"nnstreamer") && \
 	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
 	 cd $(MLDIR)/nnstreamer && \
+	 rm -rf build_debian_arm64 && \
 	 if [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/nnstreamer/*.patch && touch .patchdone; \
          fi && \

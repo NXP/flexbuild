@@ -38,7 +38,7 @@ tflite:
 		-DTFLITE_ENABLE_XNNPACK=on \
 		-DTFLITE_PYTHON_WRAPPER_BUILD_CMAKE2=on \
 		-DTFLITE_ENABLE_EXTERNAL_DELEGATE=on && \
-	 VERBOSE=0 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all -- benchmark_model label_image && \
+	 VERBOSE=0 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all -- benchmark_model label_image && \
 	 cd build_$(DISTROTYPE)_$(ARCH) && \
 	 CI_BUILD_PYTHON=python3 BUILD_NUM_JOBS=$(JOBS) \
 	 $(MLDIR)/tflite/tensorflow/lite/tools/pip_package/build_pip_package_with_cmake2.sh aarch64 && \
@@ -53,6 +53,7 @@ tflite:
 	 cd $(MLDIR)/tflite/tensorflow/lite && \
 	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite && \
 	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public && \
+	 rsync -avz $(MLDIR)/tflite/tensorflow/* $(DESTDIR)/usr/include/tensorflow/ && \
 	 cp $(FBDIR)/src/system/pkgconfig/tensorflow2-lite.pc $(DESTDIR)/usr/lib/pkgconfig && \
 	 \
 	 $(call fbprint_n,"install examples") && \
@@ -74,5 +75,5 @@ tflite:
 	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.11/site-packages \
 		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl && \
-	 rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
+	 #rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
 	 $(call fbprint_d,"tflite")

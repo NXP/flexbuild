@@ -21,6 +21,6 @@ flatbuffers:
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
 		-DFLATBUFFERS_BUILD_TESTS=OFF \
 		-DFLATBUFFERS_BUILD_SHAREDLIB=ON && \
-	 cmake --build $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH) --target all && \
+	 cmake --build $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
 	 $(call fbprint_d,"flatbuffers")

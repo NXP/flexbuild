@@ -127,7 +127,7 @@ repo:
 
   imx_firmware:
     url:  https://github.com/NXP/imx-firmware.git
-    tag:  lf-6.6.52-2.2.0
+    tag:  lf-6.12.3_1.0.0
     # firmware for wifi/bt
 
   fw_ele_bin:
@@ -337,7 +337,8 @@ repo:
 
   gst_plugins_ugly:
     url:  https://github.com/GStreamer/gst-plugins-ugly.git
-    tag:  1.24.0
+    #tag:  1.24.0
+    commit: 499d3cd
 
   imx_gst_plugin:
     url:  https://github.com/nxp-imx/imx-gst1.0-plugin.git
@@ -381,6 +382,7 @@ repo:
 # connectivity component repositories
   nxp_wlan_bt:
     url:  https://github.com/nxp-imx/mwifiex.git
+    commit: 0396cfb38ad73a3
 
 
 # generic component repositories

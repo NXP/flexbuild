@@ -13,9 +13,9 @@ GPNT_APPS_FOLDER = /opt/gopoint-apps
 
 IMX_NNSTREANER_DIR = $(GPNT_APPS_FOLDER)/scripts/machine_learning/nnstreamer
 
-
 imx_nnstreamer_examples:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base \
+	   -o $(DISTROVARIANT) = server ] && exit || \
 	 $(call fbprint_b,"imx_nnstreamer_examples") && \
 	 $(call repo-mngr,fetch,imx_nnstreamer_examples,apps/gopoint) && \
 	 cd $(GPDIR)/imx_nnstreamer_examples && \
@@ -24,17 +24,20 @@ imx_nnstreamer_examples:
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	 export CXXFLAGS="-I$(DESTDIR)/usr/include/ -L$(DESTDIR)/usr/lib -lgstreamer-1.0" && \
+	 export CFLAGS="-I$(DESTDIR)/usr/include/ -L$(DESTDIR)/usr/lib -lgstreamer-1.0" && \
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
-	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/share/pkgconfig && \
+	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/share/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cmake  -S $(GPDIR)/imx_nnstreamer_examples \
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_BUILD_TYPE=release && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
 	 mkdir -p $(DESTDIR)/$(IMX_NNSTREANER_DIR)/{common,classification,detection,pose} && \
 	 cp -r common/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/common/ && \
-	 cp {LICENSE,SCR-1.3.txt} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
+	 cp {LICENSE,SCR-*} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
 	 cp classification/{README.md,*.sh} $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification && \
 	 cp build_$(DISTROTYPE)_$(ARCH)/classification/example_classification_mobilenet_v1_tflite \
 	    $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification && \

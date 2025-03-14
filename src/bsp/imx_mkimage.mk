@@ -105,7 +105,7 @@ define imx_mkimage_target
     elif [ $${MACHINE:0:5} = imx93 ]; then \
 	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target; \
     fi && \
-    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target; \
+    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target $${IMX_MKIMAGE_DTBS:+dtbs="$$IMX_MKIMAGE_DTBS"} ; \
     mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
     cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin;
 endef

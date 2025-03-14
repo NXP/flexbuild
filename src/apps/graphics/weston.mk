@@ -11,7 +11,6 @@
 # version：12.0.3
 
 weston:
-ifeq ($(CONFIG_WESTON),y)
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"weston") && \
 	 $(call repo-mngr,fetch,weston,apps/graphics) && \
@@ -31,11 +30,17 @@ ifeq ($(CONFIG_WESTON),y)
 	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
+	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \
+	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
+	 export LD_LIBRARY_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib && \
 	 cd $(GRAPHICSDIR)/weston && \
 	 sed -i 's/0.63/0.61/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
+	 ln -sf $(RFSDIR)/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	 PYTHONNOUSERSITE=y PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
+	 cp -rf $(DESTDIR)/usr/include/drm/drm_fourcc.h $(RFSDIR)/usr/include/libdrm/ && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file=meson.cross \
 		--prefix=/usr --libdir=lib \
@@ -68,16 +73,18 @@ ifeq ($(CONFIG_WESTON),y)
 		-Dbackend-wayland=false \
 		-Dimage-webp=false \
 		-Dbackend-x11=false \
-		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/local/include -I$(RFSDIR)/usr/include" \
-		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu -lgbm" && \
+		-Dc_args="-I$(DESTDIR)/usr/include/drm -I$(DESTDIR)/usr/share/ -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/local/include -I$(RFSDIR)/usr/include" \
+		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu -lgbm -lgbm_viv -lGAL" && \
 	 ninja install -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p $(DESTDIR)/etc/xdg/weston $(DESTDIR)/etc/systemd/system/graphical.target.wants $(DESTDIR)/etc/default && \
 	 mkdir -p $(DESTDIR)/usr/share/applications $(DESTDIR)/usr/share/icons/hicolor/48x48/apps $(DESTDIR)/lib/systemd/system && \
+	 mkdir -p $(DESTDIR)/etc/systemd/system/sockets.target.wants && \
 	 cp $(FBDIR)/src/system/weston/weston.ini $(DESTDIR)/etc/xdg/weston/weston.ini && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston $(DESTDIR)/etc/default/weston && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston.service $(DESTDIR)/lib/systemd/system/ && \
-	 ln -sf /lib/systemd/system/weston.service $(DESTDIR)/etc/systemd/system/graphical.target.wants/weston.service && \
-	 install -m 644 $(FBDIR)/patch/weston/weston.png $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/weston.png && \
-	 install -m 644 $(FBDIR)/patch/weston/weston.desktop $(DESTDIR)/usr/share/applications/weston.desktop && \
+	 install -m 644 $(FBDIR)/src/system/weston/weston.socket $(DESTDIR)/lib/systemd/system/ && \
+	 ln -sf /lib/systemd/system/weston.socket $(DESTDIR)/etc/systemd/system/sockets.target.wants/weston.socket && \
+	 install -m 644 $(FBDIR)/src/system/weston/weston.png $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/weston.png && \
+	 install -m 644 $(FBDIR)/src/system/weston/weston.desktop $(DESTDIR)/usr/share/applications/weston.desktop && \
+	 rm -rf /lib/ld-linux-aarch64.so.1 && \
 	 $(call fbprint_d,"weston")
-endif

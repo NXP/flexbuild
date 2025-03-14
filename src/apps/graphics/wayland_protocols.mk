@@ -18,5 +18,5 @@ wayland_protocols:
 		--prefix=/usr \
 		--buildtype=release \
 		--cross-file meson.cross && \
-	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+	 DESTDIR=$(RFSDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
 	 $(call fbprint_d,"wayland_protocols")

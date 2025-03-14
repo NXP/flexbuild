@@ -111,6 +111,7 @@ mmdebstrap:
     - v4l-utils
     - mesa-utils
     - alsa-utils
+    - locales
     - dmz-cursor-theme
   setup-hooks:
       # Setup NXP board-specific configurations for various platforms
@@ -123,8 +124,8 @@ mmdebstrap:
   customize-hooks:
     - 'chroot "$1" apt purge -y xserver-xorg xserver-xorg-core xserver-xorg-legacy gnome-games gnome-chess apache2-bin'
     - 'chroot "$1" useradd -m -d /home/debian -s /bin/bash debian'
-    - 'chroot "$1" gpasswd -a debian sudo'
-    - 'chroot "$1" usermod -aG sudo debian'
+    - 'chroot "$1" groupadd wayland'
+    - 'chroot "$1" usermod -aG sudo,input,video,wayland,render debian'
     - 'chroot "$1" passwd --delete root'
     - 'chroot "$1" passwd --delete debian'
     - 'chroot "$1" apt-get update'
@@ -152,6 +153,9 @@ mmdebstrap:
     - 'chroot "$1" ln -s /lib/systemd/system/gpuconfig.service /etc/systemd/system/graphical.target.wants/gpuconfig.service'
     - 'chroot "$1" ln -s /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target'
     - 'chroot "$1" ln -sf /etc/systemd/system/mask-sleep.service /etc/systemd/system/multi-user.target.wants/mask-sleep.service'
+    - 'chroot "$1" sed -i -e "s/.*zh_CN.UTF-8.*/zh_CN.UTF-8 UTF-8/" -e "s/.*en_US.UTF-8.*/en_US.UTF-8 UTF-8/"  /etc/locale.gen'
+    - 'chroot "$1" /usr/sbin/locale-gen'
+    - 'chroot "$1" /usr/sbin/update-locale LANG=en_US.UTF-8'
     - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles" >> $1/etc/environment'
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'

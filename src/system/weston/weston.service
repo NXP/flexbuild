@@ -45,7 +45,7 @@ User=root
 Group=root
 
 # Make sure the working directory is the users home directory
-WorkingDirectory=/home/weston
+WorkingDirectory=/home/debian
 
 # Set up a full user session for the user, required by Weston.
 PAMName=weston-autologin
@@ -65,7 +65,7 @@ StandardError=journal
 UtmpIdentifier=tty7
 UtmpMode=user
 
-[Install]
+#[Install]
 # Note: If you only want weston to start on-demand, remove this line with a
 # service drop file
-WantedBy=graphical.target
+#WantedBy=graphical.target

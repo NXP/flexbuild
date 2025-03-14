@@ -1,0 +1,14 @@
+[Unit]
+Description=Weston socket
+RequiresMountsFor=/run
+
+[Socket]
+ListenStream=/run/wayland-0
+SocketMode=0775
+SocketUser=debian
+SocketGroup=debian
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target
+

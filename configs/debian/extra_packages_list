@@ -151,4 +151,6 @@ extra_desktop_devel_packages=" \
     libboost-thread1.74-dev \
     libdbus-glib-1-dev \
     qt6-tools-dev \
+    libfmt-dev \
+    libdevil-dev \
 "

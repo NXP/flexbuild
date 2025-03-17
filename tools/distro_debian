@@ -76,8 +76,9 @@ build_distro_rfs_debian() {
 
     # fix login issue for desktop
     if [ $DISTROVARIANT = desktop ]; then
-	sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
-	sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
+		sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
+		sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
+		sed '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
     fi
 
     fbprint_d $RFSDIR

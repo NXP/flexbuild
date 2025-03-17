@@ -15,6 +15,9 @@ After=systemd-user-sessions.service
 # If Plymouth is used, we want to start when it is on its way out.
 After=plymouth-quit-wait.service
 
+# don't enable it when gdm is used
+Conflicts=gdm3.service gdm.service
+
 # D-Bus is necessary for contacting logind. Logind is required.
 Wants=dbus.socket
 After=dbus.socket
@@ -65,7 +68,7 @@ StandardError=journal
 UtmpIdentifier=tty7
 UtmpMode=user
 
-#[Install]
+[Install]
 # Note: If you only want weston to start on-demand, remove this line with a
 # service drop file
-#WantedBy=graphical.target
+WantedBy=graphical.target

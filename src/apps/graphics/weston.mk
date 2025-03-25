@@ -79,9 +79,11 @@ weston:
 	 mkdir -p $(DESTDIR)/etc/xdg/weston $(DESTDIR)/etc/systemd/system/graphical.target.wants $(DESTDIR)/etc/default && \
 	 mkdir -p $(DESTDIR)/usr/share/applications $(DESTDIR)/usr/share/icons/hicolor/48x48/apps $(DESTDIR)/lib/systemd/system && \
 	 mkdir -p $(DESTDIR)/etc/systemd/system/sockets.target.wants && \
+	 mkdir -p $(DESTDIR)/etc/pam.d/ && \
 	 cp $(FBDIR)/src/system/weston/weston.ini $(DESTDIR)/etc/xdg/weston/weston.ini && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston $(DESTDIR)/etc/default/weston && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston.service $(DESTDIR)/lib/systemd/system/ && \
+	 install -m 644 $(FBDIR)/src/system/weston/weston-autologin $(DESTDIR)/etc/pam.d/ && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston.socket $(DESTDIR)/lib/systemd/system/ && \
 	 ln -sf /lib/systemd/system/weston.socket $(DESTDIR)/etc/systemd/system/sockets.target.wants/weston.socket && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston.png $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/weston.png && \

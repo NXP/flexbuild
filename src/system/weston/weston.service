@@ -25,6 +25,9 @@ After=dbus.socket
 # Ensure the socket is present
 Requires=weston.socket
 
+After=platcfg.service
+Requires=platcfg.service
+
 # Since we are part of the graphical session, make sure we are started before
 # it is complete.
 Before=graphical.target

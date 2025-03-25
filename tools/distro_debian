@@ -9,7 +9,6 @@ build_distro_rfs_debian() {
     [ $DISTROTYPE = debian -a -f $RFSDIR/etc/buildinfo ] && echo $RFSDIR already exists! && exit 0
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
-    set -x
     echo generating $RFSDIR ... && cd $FBDIR
     test -c $RFSDIR/dev/pts/ptmx && $sudopt umount $RFSDIR/dev/pts
     test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
@@ -78,7 +77,9 @@ build_distro_rfs_debian() {
     if [ $DISTROVARIANT = desktop ]; then
 		sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
 		sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
-		sed '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
+		sed -i '$a\[Install]\nWantedBy=graphical.target\n' $RFSDIR/lib/systemd/system/gdm.service
+		rm -rf $RFSDIR/etc/systemd/system/display-manager.service
+		ln -sf /lib/systemd/system/gdm.service $RFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
     fi
 
     fbprint_d $RFSDIR

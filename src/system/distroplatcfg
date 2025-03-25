@@ -104,6 +104,10 @@ if [ $desktop = gnome ] && [ $soc = imx91 -o $soc = imx93 ] && [ -f /usr/lib/lib
     rm -f /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
     rm -f /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
     rm -f /usr/lib/libclutter-gst-3.0.so*
+
+    # default desktop is weston
+    systemctl disable gdm3 --now -f
+    systemctl enable weston
 fi
 
 # fmc service only for DPAA on ls1043/ls1046

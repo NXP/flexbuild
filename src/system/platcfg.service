@@ -1,7 +1,10 @@
 [Unit]
 Description=Runtime Dynamic Configuration for various NXP i.MX/LS platforms
+Before=gdm.service gdm3.service
+Wants=weston.service
 
 [Service]
+Type=oneshot
 ExecStart=/usr/bin/distroplatcfg
 
 [Install]

@@ -107,7 +107,7 @@ if [ $desktop = gnome ] && [ $soc = imx91 -o $soc = imx93 ] && [ -f /usr/lib/lib
 
     # default desktop is weston
     systemctl disable gdm3 --now -f
-    systemctl enable weston
+    systemctl enable weston --now -f
 fi
 
 # fmc service only for DPAA on ls1043/ls1046

@@ -20,7 +20,4 @@ imx_demos_list:
 	 mkdir -p $(DESTDIR)/$(GPNT_APPS_FOLDER) && \
 	 cp -r * $(DESTDIR)/$(GPNT_APPS_FOLDER) && \
 	 chmod 777 $(DESTDIR)/$(GPNT_APPS_FOLDER) && \
-	 if ! grep -q no-check-certificate $(DESTDIR)/opt/gopoint-apps/scripts/utils.py; then \
-	     sed -i 's/wget/wget --no-check-certificate/g' $(DESTDIR)/opt/gopoint-apps/scripts/utils.py; \
-	 fi && \
 	 $(call fbprint_d,"imx_demos_list")

@@ -25,9 +25,6 @@ After=dbus.socket
 # Ensure the socket is present
 Requires=weston.socket
 
-After=platcfg.service
-Requires=platcfg.service
-
 # Since we are part of the graphical session, make sure we are started before
 # it is complete.
 Before=graphical.target
@@ -51,7 +48,7 @@ User=root
 Group=root
 
 # Make sure the working directory is the users home directory
-WorkingDirectory=/home/debian
+WorkingDirectory=/root
 
 # Set up a full user session for the user, required by Weston.
 PAMName=weston-autologin

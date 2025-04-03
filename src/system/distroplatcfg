@@ -119,17 +119,17 @@ fi
 if [[ $soc =~ imx8 ]]; then
 	cp /usr/lib/nxp-afe/libvoiceseekerlight.so.2.0.a53 /usr/lib/nxp-afe/libvoiceseekerlight.so.2.0
 	cp /unit_tests/nxp-afe/voice_ui_app.a53 /unit_tests/nxp-afe/voice_ui_app
-	ln -sf -r libvoiceseekerlight.so.2.0 /usr/lib/nxp-afe/libvoiceseekerlight.so
-	ln -sf -r voice_ui_app.a53 /opt/gopoint-apps/bin/voice_ui_app
-	ln -sf -r voice_ui_app.a53 /opt/gopoint-apps/scripts/multimedia/smart-kitchen/voice_ui_app
+	ln -sf libvoiceseekerlight.so.2.0 /usr/lib/nxp-afe/libvoiceseekerlight.so
+	ln -sf voice_ui_app.a53 /opt/gopoint-apps/bin/voice_ui_app
+	ln -sf voice_ui_app.a53 /opt/gopoint-apps/scripts/multimedia/smart-kitchen/voice_ui_app
 	cp -f /opt/gopoint-apps/scripts/multimedia/imx-voiceplayer/i.MX8M_A53/libvoiceseekerlight.so.2.0 \
 		/opt/gopoint-apps/scripts/multimedia/imx-voiceplayer
 elif [[ $soc =~ imx9 ]]; then
 	cp /usr/lib/nxp-afe/libvoiceseekerlight.so.2.0.a55 /usr/lib/nxp-afe/libvoiceseekerlight.so.2.0
 	cp /unit_tests/nxp-afe/voice_ui_app.a55 /unit_tests/nxp-afe/voice_ui_app
-	ln -sf -r libvoiceseekerlight.so.2.0 /usr/lib/nxp-afe/libvoiceseekerlight.so
-	ln -sf -r voice_ui_app.a55 /opt/gopoint-apps/bin/voice_ui_app
-	ln -sf -r voice_ui_app.a55 /opt/gopoint-apps/scripts/multimedia/smart-kitchen/voice_ui_app
+	ln -sf libvoiceseekerlight.so.2.0 /usr/lib/nxp-afe/libvoiceseekerlight.so
+	ln -sf voice_ui_app.a55 /opt/gopoint-apps/bin/voice_ui_app
+	ln -sf voice_ui_app.a55 /opt/gopoint-apps/scripts/multimedia/smart-kitchen/voice_ui_app
 	cp -f /opt/gopoint-apps/scripts/multimedia/imx-voiceplayer/i.MX9X_A55/libvoiceseekerlight.so.2.0 \
 		/opt/gopoint-apps/scripts/multimedia/imx-voiceplayer
 fi

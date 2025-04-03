@@ -344,7 +344,7 @@ repo:
 
   gst_plugins_ugly:
     url:  https://github.com/GStreamer/gst-plugins-ugly.git
-    tag:  1.24.0
+    commit: 499d3cd
 
   imx_gst_plugin:
     url:  https://github.com/nxp-imx/imx-gst1.0-plugin.git

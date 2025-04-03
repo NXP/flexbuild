@@ -1039,95 +1039,130 @@ export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE K
 
 case "$1" in
     repo-fetch)
-	git_repo_update fetch $2; exit;;
+		git_repo_update fetch $2; exit
+		;;
     repo-update)
-	git_repo_update latest $2; exit;;
+		git_repo_update latest $2; exit
+		;;
     repo-commit)
-	git_repo_update commit $2; exit;;
+		git_repo_update commit $2; exit
+		;;
     repo-tag)
-	git_repo_update tag $2; exit;;
+		git_repo_update tag $2; exit
+		;;
     repo-branch)
-	git_repo_update branch $2; exit;;
+		git_repo_update branch $2; exit
+		;;
     clean)
-	do_clean; exit;;
+		do_clean; exit
+		;;
     clean-rfs)
-	do_clean_rfs; exit;;
+		do_clean_rfs; exit
+		;;
     clean-bsp)
-	clean_bsp_components; exit;;
+		clean_bsp_components; exit
+		;;
     clean-linux)
-	clean_linux_components; exit;;
+		clean_linux_components; exit
+		;;
     clean-apps)
-	clean_apps_components; exit;;
+		clean_apps_components; exit
+		;;
     list)
-	show_lists; exit;;
+		show_lists; exit
+		;;
     fw|bsp)
-	generate_composite_firmware; exit;;
+		generate_composite_firmware; exit
+		;;
     fwall|bspall)
-	for brd in $machinelist; do
-	    bld bsp -m $brd
-	done
-	fbprint_d "Build all composite firmware"; exit;;
+		for brd in $machinelist; do
+			bld bsp -m $brd
+		done
+		fbprint_d "Build all composite firmware"; exit
+		;;
     distroscr)
-	for brd in $machinelist; do
-	    generate_distro_bootscr $brd
-	done
-	exit;;
+		for brd in $machinelist; do
+			generate_distro_bootscr $brd
+		done
+		exit
+		;;
     flashscr)
-	mkimage -T script -C none -d $FBDIR/tools/flash_images $FBOUTDIR/images/flash_images.scr
-	fbprint_d "$FBOUTDIR/images/flash_images.scr"; exit;;
+		mkimage -T script -C none -d $FBDIR/tools/flash_images $FBOUTDIR/images/flash_images.scr
+		fbprint_d "$FBOUTDIR/images/flash_images.scr"; exit
+		;;
     signimg)
-	[ $MACHINE = all ] && brdlist=$machinelist || brdlist=$MACHINE
-	for brd in $brdlist; do
-	    for boottype in $boottypelist; do
-		secure_sign_image $brd $boottype
-	    done
-	done
-	exit;;
+		[ $MACHINE = all ] && brdlist=$machinelist || brdlist=$MACHINE
+		for brd in $brdlist; do
+			for boottype in $boottypelist; do
+			secure_sign_image $brd $boottype
+			done
+		done
+		exit
+		;;
     rfs)
-	generate_distro_rfs; exit;;
+		generate_distro_rfs; exit
+		;;
     download)
-        download_distro_images; exit;;
+		download_distro_images; exit
+		;;
     rfsraw2ext)
-	convert_rfs_raw_to_ext4; exit;;
+		convert_rfs_raw_to_ext4; exit
+		;;
     packrfs)
-	pack_distro_rfs; exit;;
+		pack_distro_rfs; exit
+		;;
     packapp|packapps)
-	pack_app_components; exit;;
+		pack_app_components; exit
+		;;
     itb|mklinux)
-	generate_linux_itb; exit;;
+		generate_linux_itb; exit
+		;;
     cpio)
-        generate_initrd_cpio; exit;;
+		generate_initrd_cpio; exit
+		;;
     toolchain)
-	build_distro_rfs_buildroot toolchain $DESTARCH; exit;;
+		build_distro_rfs_buildroot toolchain $DESTARCH; exit
+		;;
     boot)
-	generate_bootpartition_tarball; exit;;
+		generate_bootpartition_tarball; exit
+		;;
     auto|autobuild)
-	bld auto_build -a $DESTARCH 2>&1 | \
-	tee $FBDIR/logs/autobuild-${MACHINE}-log-`date +%Y%m%d%H%M`.txt
-	exit;;
+		bld auto_build -a $DESTARCH 2>&1 | \
+		tee $FBDIR/logs/autobuild-${MACHINE}-log-`date +%Y%m%d%H%M`.txt
+		exit
+		;;
     auto_build)
-        flex_auto_build; exit;;
+		flex_auto_build; exit
+		;;
     clean-rfs)
-	do_clean_rfs; exit;;
+		do_clean_rfs; exit
+		;;
     clean-bsp)
-	clean_bsp_components
-	fbprint_d "clean BSP components"
-	exit;;
+		clean_bsp_components
+		fbprint_d "clean BSP components"
+		exit
+		;;
     clean-linux)
-	clean_linux_components
-	fbprint_d "clean linux"
-	exit;;
+		clean_linux_components
+		fbprint_d "clean linux"
+		exit
+		;;
     clean-apps)
-	clean_apps_components
-	fbprint_d "clean apps components $DESTDIR"; exit;;
+		clean_apps_components
+		fbprint_d "clean apps components $DESTDIR"; exit
+		;;
     clean)
-	do_clean; exit;;
+		do_clean; exit
+		;;
     merge-apps)
-	merge_apps; exit;;
+		merge_apps; exit
+		;;
     host-dep)
-	check_host_dependent_pkg; exit;;
+		check_host_dependent_pkg; exit
+		;;
     list)
-	show_lists; exit;;
+		show_lists; exit
+		;;
 esac
 
 [ -z "$1" -a -n "$MACHINE" -a "$MACHINE" != all ] && bld auto -m $MACHINE -a $DESTARCH && exit
@@ -1135,27 +1170,36 @@ esac
 # for components
 case $1 in
     rcw|uboot|u-boot|uefi)
-	make -C $FBDIR/src/bsp $1;;
+		make -C $FBDIR/src/bsp $1
+		;;
+
     linux|linux:custom|linux:menuconfig)
-	if echo "$BUILDARG" | grep -q fragment:; then
-	    export FRAGMENT_CFG=$(echo $BUILDARG | cut -d: -f2);
-	fi
-	if echo $1 | grep -qE ':custom|:menuconfig'; then
-           export BUILDARG=custom
-	fi
-	export MAKE="make --no-print-directory"
-	check_linux_config
-	make -C $FBDIR/src/linux linux;; 
+		if echo "$BUILDARG" | grep -q fragment:; then
+			export FRAGMENT_CFG=$(echo $BUILDARG | cut -d: -f2);
+		fi
+		if echo $1 | grep -qE ':custom|:menuconfig'; then
+			   export BUILDARG=custom
+		fi
+		export MAKE="make --no-print-directory"
+		check_linux_config
+		make -C $FBDIR/src/linux linux
+		;;
+
     initrd)
-	get_prebuilt_initrd;;
+		get_prebuilt_initrd
+		;;
+
     app|apps)
-	if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY} ]; then
-	    make -C $FBDIR/src $1 && \
-	    touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
-	else
-	    echo -e "apps for ${DESTARCH} $DISTROTYPE:$DISTROVARIANT was already built, do 'bld clean-apps -r <distro_variant>' to rebuild."
-	fi;;
+		if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY} ]; then
+			make -C $FBDIR/src $1 && \
+			touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
+		else
+			echo -e "apps for ${DESTARCH} $DISTROTYPE:$DISTROVARIANT was already built, do 'bld clean-apps -r <distro_variant>' to rebuild."
+		fi
+		;;
+
     *)
-	check_component_valid $1
-	$MAKE -C $FBDIR/src $1;;
+		check_component_valid $1
+		$MAKE -C $FBDIR/src $1
+		;;
 esac

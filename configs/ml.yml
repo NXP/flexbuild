@@ -90,6 +90,10 @@ repo:
     url: https://github.com/nxp-imx-support/imx-voiceplayer.git
     commit: a70dba74eeff1b
 
+  imx_ebike_vit:
+    url: https://github.com/nxp-imx-support/imx-ebike-vit
+    commit: 7216521
+
   gtec_demo_framework:
     url: https://github.com/nxp-imx/gtec-demo-framework.git
     tag: 6.4.2

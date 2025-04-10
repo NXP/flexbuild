@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 GPNT_APPS_FOLDER = /opt/gopoint-apps
+SMART_KITCHEN_DIR = ${GPNT_APPS_FOLDER}/scripts/multimedia/smart-kitchen
 #POSIX_IPC_PKG = http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.tar.gz
 
 imx_smart_kitchen:
@@ -12,7 +13,6 @@ imx_smart_kitchen:
 	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
-	 echo $(DESTDIR) && \
 	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
 	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
@@ -25,9 +25,9 @@ imx_smart_kitchen:
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 cd $(GPDIR)/imx_smart_kitchen && \
-         if [ -d $(FBDIR)/patch/imx_smart_kitchen ] && [ ! -f .patchdone ]; then \
-             git am $(FBDIR)/patch/imx_smart_kitchen/*.patch && touch .patchdone; \
-         fi && \
+	 if [ -d $(FBDIR)/patch/imx_smart_kitchen ] && [ ! -f .patchdone ]; then \
+		 git am $(FBDIR)/patch/imx_smart_kitchen/*.patch && touch .patchdone; \
+	 fi && \
 	 sed -i 's|/home/root/.nxp-demo-experience|/opt/gopoint-apps|g' \
 	     main.cpp main.cpp misc/scripts/vit-notify/WWCommandNotify && \
 	 if [ ! -f lvgl/.patchdone ]; then \
@@ -37,6 +37,6 @@ imx_smart_kitchen:
 	 fi && \
 	 rm -rf smart-kitchen-deploy && \
 	 $(MAKE) -j$(JOBS) && \
-	 install -d -m 755 $(DESTDIR)$(GPNT_APPS_FOLDER)/scripts/multimedia/smart-kitchen && \
-	 cp -rf smart-kitchen-deploy/* $(DESTDIR)$(GPNT_APPS_FOLDER)/scripts/multimedia/smart-kitchen && \
-	$(call fbprint_d,"imx_smart_kitchen")
+	 install -d -m 755 $(DESTDIR)$(SMART_KITCHEN_DIR) && \
+	 cp -rf smart-kitchen-deploy/* $(DESTDIR)$(SMART_KITCHEN_DIR) && \
+	 $(call fbprint_d,"imx_smart_kitchen")

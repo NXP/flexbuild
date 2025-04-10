@@ -1,7 +1,7 @@
-From 3693aecc770df8c19ca17d8b71c9f60167147e19 Mon Sep 17 00:00:00 2001
+From 40a5c0233eadfe1e7106ebfe70e643def56cb7d7 Mon Sep 17 00:00:00 2001
 From: NXP debian <debian@nxp.com>
 Date: Sat, 1 Feb 2025 20:27:14 -0800
-Subject: [PATCH] Add support for i.MX93 FRDM board
+Subject: [PATCH 1/4] Add support for i.MX93 FRDM board
 
 Signed-off-by: Danwei Luo <danwei.luo@nxp.com>
 ---
@@ -225,5 +225,5 @@ index c33fe6a..e4ba91f 100644
              + videoconvert
              + "video/x-raw,height="
 -- 
-2.39.5
+2.43.0
 

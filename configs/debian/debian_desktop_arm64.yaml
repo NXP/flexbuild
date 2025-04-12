@@ -156,7 +156,7 @@ mmdebstrap:
     - 'chroot "$1" sed -i -e "s/.*zh_CN.UTF-8.*/zh_CN.UTF-8 UTF-8/" -e "s/.*en_US.UTF-8.*/en_US.UTF-8 UTF-8/"  /etc/locale.gen'
     - 'chroot "$1" /usr/sbin/locale-gen'
     - 'chroot "$1" /usr/sbin/update-locale LANG=en_US.UTF-8'
-    - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles" >> $1/etc/environment'
+    - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles\n" >> $1/etc/environment'
     - 'printf "QT_QUICK_BACKEND=software\n" >> $1/etc/environment'
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'

@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -12,6 +12,7 @@ GPNT_APPS_FOLDER = /opt/gopoint-apps
 IMX_VOICE_PLAYER_DIR = $(GPNT_APPS_FOLDER)/scripts/multimedia/imx-voiceplayer
 
 imx_voiceui:
+ifeq ($(CONFIG_IMX_VOICEUI),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"imx_voiceui") && \
 	 $(call repo-mngr,fetch,imx_voiceui,apps/gopoint) && \
@@ -108,3 +109,4 @@ imx_voiceui:
 	 install -m 0755 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX9X_A55 && \
 	 \
 	 $(call fbprint_d,"imx_voiceui")
+endif

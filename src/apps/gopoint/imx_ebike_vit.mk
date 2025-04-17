@@ -9,12 +9,12 @@ imx_ebike_vit:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_ebike_vit") && \
 	 $(call repo-mngr,fetch,imx_ebike_vit,apps/gopoint) && \
-	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
-	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
-	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
+#	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
+#	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	 fi && \
+#	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
+#	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	 fi && \
 	 \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

@@ -1,4 +1,4 @@
-# Copyright 2021-2023 NXP
+# Copyright 2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -6,6 +6,7 @@
 # description: NXP Audio Front End (AFE) for incorporating Voice Assistants
 
 nxp_afe:
+ifeq ($(CONFIG_NXP_AFE),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"nxp_afe") && \
 	 $(call repo-mngr,fetch,nxp_afe,apps/multimedia) && \
@@ -32,3 +33,4 @@ nxp_afe:
 	 install -m 0755 deploy_afe/UAC_VCOM_composite.sh  $(DESTDIR)/unit_tests/nxp-afe && \
 	 \
 	 $(call fbprint_d,"imx_afe")
+endif

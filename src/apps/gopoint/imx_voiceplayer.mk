@@ -1,4 +1,4 @@
-# Copyright 2024 NXP
+# Copyright 2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 # Description: i.MX Video to Texture application
@@ -9,6 +9,7 @@ GPNT_APPS_FOLDER = /opt/gopoint-apps
 IMX_VOICE_PLAYER_DIR = $(GPNT_APPS_FOLDER)/scripts/multimedia/imx-voiceplayer
 
 imx_voiceplayer:
+ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 [ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_voiceplayer") && \
 	 $(call repo-mngr,fetch,imx_voiceplayer,apps/gopoint) && \
@@ -48,3 +49,4 @@ imx_voiceplayer:
 	 cp -rf bridgeVoiceUI/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR} && \
 	 \
 	 $(call fbprint_d,"imx_voiceplayer")
+endif

@@ -7,14 +7,6 @@
 
 # depends on imx-codec imx-parser libdrm gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
 
-ifeq ($${MACHINE:0:4},imx9)
-  SOCPLATFORM = MX9
-else
-  SOCPLATFORM = MX8
-endif
-
-
-
 imx_gst_plugin:
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call fbprint_b,"imx_gst_plugin") && \
@@ -48,14 +40,15 @@ imx_gst_plugin:
 	     sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include; \
 	 fi && \
 	 \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 	      -Dc_args="-O2 -pipe -g -feliminate-unused-debug-types -Wno-unused-variable -Wno-format -Wno-unused-value \
-			-Wno-unused-function -Wno-error=nonnull -Wno-error=implicit-function-declaration \
+			-Wno-unused-function -Wno-error=nonnull -Wno-error=implicit-function-declaration -DNO_G2D=1 \
 			-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include/gstreamer-1.0" \
 	      -Dc_link_args="-L$(RFSDIR)/usr/lib/aarch64-linux-gnu -L$(DESTDIR)/usr/lib  -lasound " \
 	      --prefix=/usr --buildtype=release \
 	      --cross-file meson.cross \
-	      -Dplatform=$(SOCPLATFORM) && \
+	      -Dplatform=$(shell if [ "$${MACHINE:0:4}" = "imx9" ]; then echo "MX9"; else echo "MX8"; fi) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
 	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/beep_registry_1.0.arm.cf && \
 	 $(call fbprint_d,"imx_gst_plugin")

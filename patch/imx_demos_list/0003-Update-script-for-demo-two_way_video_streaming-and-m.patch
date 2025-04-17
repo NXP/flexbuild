@@ -1,7 +1,7 @@
 From 1d9c439d72eaa60c3128cb31c0a163b4d841c8ef Mon Sep 17 00:00:00 2001
 From: Andy Tang <andy.tang@nxp.com>
 Date: Thu, 10 Apr 2025 14:58:30 +0800
-Subject: [PATCH 3/4] Update script for demo two_way_video_streaming and
+Subject: [PATCH 3/5] Update script for demo two_way_video_streaming and
  multi_camera
 
 Signed-off-by: Andy Tang <andy.tang@nxp.com>

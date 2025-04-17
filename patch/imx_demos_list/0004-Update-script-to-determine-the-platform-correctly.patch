@@ -1,0 +1,159 @@
+From 54c4b957452332048b8e9f0ffe998a53f47896b4 Mon Sep 17 00:00:00 2001
+From: Andy Tang <andy.tang@nxp.com>
+Date: Thu, 17 Apr 2025 09:13:18 +0800
+Subject: [PATCH 4/5] Update script to determine the platform correctly
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ scripts/machine_learning/dms/dms_demo.py             | 12 +++++++-----
+ scripts/machine_learning/dms/launcher.py             | 11 +++++++----
+ .../imx_smart_fitness/imx_smart_fitness.py           | 11 +++++++----
+ .../machine_learning/nnstreamer/ml_demo_launcher.py  |  8 +++++++-
+ .../selfie_segmenter/selfie_segmenter.py             | 10 ++++++----
+ 5 files changed, 34 insertions(+), 18 deletions(-)
+
+diff --git a/scripts/machine_learning/dms/dms_demo.py b/scripts/machine_learning/dms/dms_demo.py
+index e4ba91f..372ef23 100644
+--- a/scripts/machine_learning/dms/dms_demo.py
++++ b/scripts/machine_learning/dms/dms_demo.py
+@@ -37,6 +37,7 @@ import argparse
+ import numpy as np
+ import gi
+ import cairo
++import subprocess
+ from face_detection import FaceDetector
+ from face_landmark import FaceLandmark
+ from eye import Eye
+@@ -148,11 +149,12 @@ class DMSDemo:
+         self.safe_value = 0.0
+         self.smk_call_cords = []
+ 
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
+-        else:
++        # Check target (i.MX 8M Plus vs i.MX 93)
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform not in ["i.MX8MP", "i.MX93"]:
+             print("Target is not supported!")
+             sys.exit()
+ 
+diff --git a/scripts/machine_learning/dms/launcher.py b/scripts/machine_learning/dms/launcher.py
+index e2882d6..5ae4886 100644
+--- a/scripts/machine_learning/dms/launcher.py
++++ b/scripts/machine_learning/dms/launcher.py
+@@ -72,14 +72,17 @@ class ImxDMSLauncher:
+         self.cache_enable = ""
+ 
+         # Check target (i.MX 8M Plus vs i.MX 93)
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform == "i.MX8MP":
+             self.cache_enable = (
+                 "VIV_VX_ENABLE_CACHE_GRAPH_BINARY='1' "
+                 + "VIV_VX_CACHE_BINARY_GRAPH_DIR=/opt/gopoint-apps/downloads "
+             )
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
++        elif self.platform == "i.MX93":
++            pass
+         else:
+             print("Target is not supported!")
+             sys.exit()
+diff --git a/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py b/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
+index 57610b7..828da3d 100644
+--- a/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
++++ b/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
+@@ -82,14 +82,17 @@ class ImxSmartFitness:
+         self.output_process = None
+ 
+         # Check target (i.MX 8M Plus vs i.MX 93)
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform == "i.MX8MP":
+             self.cache_enable = (
+                 "VIV_VX_ENABLE_CACHE_GRAPH_BINARY='1' "
+                 + "VIV_VX_CACHE_BINARY_GRAPH_DIR=/opt/gopoint-apps/downloads "
+             )
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
++        elif self.platform == "i.MX93":
++            pass
+         else:
+             print("Target is not supported!")
+             sys.exit()
+diff --git a/scripts/machine_learning/nnstreamer/ml_demo_launcher.py b/scripts/machine_learning/nnstreamer/ml_demo_launcher.py
+index 6b4a204..7683dec 100644
+--- a/scripts/machine_learning/nnstreamer/ml_demo_launcher.py
++++ b/scripts/machine_learning/nnstreamer/ml_demo_launcher.py
+@@ -30,6 +30,7 @@ class MLLaunch(Gtk.Window):
+         """Creates the UI window"""
+         # Initialization
+         self.demo = demo
++        self.platform = None
+         super().__init__(title=demo)
+         self.set_default_size(450, 200)
+         self.set_resizable(False)
+@@ -58,6 +59,10 @@ class MLLaunch(Gtk.Window):
+             devices.append(device)
+ 
+         backends_available = ["CPU"]
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
+         if os.path.exists("/usr/lib/libvx_delegate.so") and self.demo != "pose":
+             backends_available.insert(1, "GPU")
+         if (
+@@ -66,7 +71,8 @@ class MLLaunch(Gtk.Window):
+             and self.platform != "i.MX8QM"
+         ):
+             backends_available.insert(0, "NPU")
+-        if os.path.exists("/usr/lib/libethosu_delegate.so"):
++
++        if self.platform == "i.MX93":
+             backends_available.insert(0, "NPU")
+             # backends_available.pop()
+ 
+diff --git a/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py b/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py
+index 1a9af29..52b80b2 100644
+--- a/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py
++++ b/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py
+@@ -166,16 +166,18 @@ class SelfieSegmenter:
+         self.aspect_ratio = "1/1"
+ 
+         # Check target (i.MX 8M Plus vs i.MX 93)
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform == "i.MX8MP":
+             self.cache_enable = (
+                 "VIV_VX_ENABLE_CACHE_GRAPH_BINARY='1' "
+                 + "VIV_VX_CACHE_BINARY_GRAPH_DIR=/opt/gopoint-apps/downloads "
+             )
+             self.nxp_converter = "imxvideoconvert_g2d"
+             self.nxp_compositor = "imxcompositor_g2d"
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
++        elif self.platform == "i.MX93":
+             self.nxp_converter = "imxvideoconvert_pxp"
+             self.nxp_compositor = "imxcompositor_pxp"
+         else:
+-- 
+2.43.0
+

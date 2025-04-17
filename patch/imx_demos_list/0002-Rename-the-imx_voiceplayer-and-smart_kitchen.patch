@@ -1,7 +1,7 @@
 From 0fa6c565d757f3d34c17b61cb1e732e64f221f3e Mon Sep 17 00:00:00 2001
 From: Andy Tang <andy.tang@nxp.com>
 Date: Thu, 10 Apr 2025 14:40:50 +0800
-Subject: [PATCH 2/4] Rename the imx_voiceplayer and smart_kitchen
+Subject: [PATCH 2/5] Rename the imx_voiceplayer and smart_kitchen
 
 Rename those directory to keep consistent with the demo code
 

@@ -158,6 +158,7 @@ mmdebstrap:
     - 'chroot "$1" /usr/sbin/update-locale LANG=en_US.UTF-8'
     - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles\n" >> $1/etc/environment'
     - 'printf "QT_QUICK_BACKEND=software\n" >> $1/etc/environment'
+    - 'echo -e "\nexport DISPLAY=:0\nexport WAYLAND_DISPLAY=wayland-1" >> $1/root/.bashrc'
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'

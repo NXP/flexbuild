@@ -12,6 +12,9 @@ imx_gst_plugin:
 	 $(call fbprint_b,"imx_gst_plugin") && \
 	 $(call repo-mngr,fetch,imx_gst_plugin,apps/multimedia) && \
 	 cd $(MMDIR)/imx_gst_plugin && \
+	 if [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/imx_gst_plugin/*.patch && touch .patchdone; \
+	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 export PKG_CONFIG_SYSROOT_DIR="" && \

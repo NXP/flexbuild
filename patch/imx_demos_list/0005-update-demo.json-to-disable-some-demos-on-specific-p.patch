@@ -1,16 +1,16 @@
-From baba7528e092559b967815d8b3af8f11e36da68d Mon Sep 17 00:00:00 2001
+From 082fc37f3baa5708d9be839d7710ed6053801920 Mon Sep 17 00:00:00 2001
 From: Andy Tang <andy.tang@nxp.com>
-Date: Thu, 10 Apr 2025 15:28:32 +0800
+Date: Tue, 22 Apr 2025 17:18:18 +0800
 Subject: [PATCH 5/5] update demo.json to disable some demos on specific
  platform
 
 Signed-off-by: Andy Tang <andy.tang@nxp.com>
 ---
- demos.json | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+ demos.json | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/demos.json b/demos.json
-index a046eff..85f045b 100644
+index a046eff..f36d060 100644
 --- a/demos.json
 +++ b/demos.json
 @@ -3,7 +3,7 @@
@@ -62,15 +62,6 @@ index a046eff..85f045b 100644
              "screenshot": "face_recognition.jpg",
              "icon": "ml-icon.svg",
              "description": "An OpenCV application example of how to use machine learning to recognize faces. The user can save multiple profiles and the application will recognize the identity of each person by their names. An internet connection is required."
-@@ -69,7 +69,7 @@
-             "name": "DMS",
-             "id": "dms",
-             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/dms/launcher.py",
--            "compatible": "imx8mp, imx93, imx93frdm",
-+            "compatible": "imx8mp",
-             "screenshot": "dms.jpg",
-             "icon": "ml-icon.svg",
-             "description": "An example over how to implement a Driver Monitoring System (DMS) using the NPU. An internet connection is required."
 @@ -78,7 +78,7 @@
              "name": "LP Baby Cry Detection",
              "id": "lp_baby_cry",

@@ -1,7 +1,7 @@
-From 124b408015664b8cdf8ab26d3475dadac3d73345 Mon Sep 17 00:00:00 2001
+From 41bd76b93341cbce5ab0f853af8f0024bb3f941c Mon Sep 17 00:00:00 2001
 From: Yuantian Tang <andy.tang@nxp.com>
 Date: Thu, 26 Dec 2024 08:54:18 +0800
-Subject: [PATCH 2/4] imx: imx93_frdm: Add basic board support
+Subject: [PATCH 2/7] imx: imx93_frdm: Add basic board support
 
 Add support for i.MX93 11x11 FRDM board.
 
@@ -40,7 +40,7 @@ Signed-off-by: haidong.zheng <haidong.zheng@nxp.com>
  create mode 100644 include/configs/imx93_frdm.h
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 737e959a..365772ab 100644
+index 737e959a6b5..365772ab421 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
 @@ -1193,6 +1193,7 @@ dtb-$(CONFIG_ARCH_IMX9) += \
@@ -53,7 +53,7 @@ index 737e959a..365772ab 100644
  	imx93-9x9-qsb-tianma-wvga-panel.dtb \
 diff --git a/arch/arm/dts/imx93-11x11-frdm-u-boot.dtsi b/arch/arm/dts/imx93-11x11-frdm-u-boot.dtsi
 new file mode 100644
-index 00000000..bb1b600b
+index 00000000000..bb1b600b89b
 --- /dev/null
 +++ b/arch/arm/dts/imx93-11x11-frdm-u-boot.dtsi
 @@ -0,0 +1,222 @@
@@ -281,7 +281,7 @@ index 00000000..bb1b600b
 +};
 diff --git a/arch/arm/dts/imx93-11x11-frdm.dts b/arch/arm/dts/imx93-11x11-frdm.dts
 new file mode 100644
-index 00000000..57817bb3
+index 00000000000..57817bb312b
 --- /dev/null
 +++ b/arch/arm/dts/imx93-11x11-frdm.dts
 @@ -0,0 +1,594 @@
@@ -880,7 +880,7 @@ index 00000000..57817bb3
 +	};
 +};
 diff --git a/arch/arm/mach-imx/imx9/Kconfig b/arch/arm/mach-imx/imx9/Kconfig
-index 6e825014..6ae83a5d 100644
+index 6e82501499e..6ae83a5d294 100644
 --- a/arch/arm/mach-imx/imx9/Kconfig
 +++ b/arch/arm/mach-imx/imx9/Kconfig
 @@ -55,6 +55,11 @@ config TARGET_IMX93_11X11_EVK
@@ -905,7 +905,7 @@ index 6e825014..6ae83a5d 100644
  source "board/freescale/imx93_qsb/Kconfig"
 diff --git a/board/freescale/imx93_frdm/Kconfig b/board/freescale/imx93_frdm/Kconfig
 new file mode 100644
-index 00000000..639cb610
+index 00000000000..639cb61047f
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/Kconfig
 @@ -0,0 +1,19 @@
@@ -930,7 +930,7 @@ index 00000000..639cb610
 +endif
 diff --git a/board/freescale/imx93_frdm/MAINTAINERS b/board/freescale/imx93_frdm/MAINTAINERS
 new file mode 100644
-index 00000000..6d443f15
+index 00000000000..6d443f15a1c
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/MAINTAINERS
 @@ -0,0 +1,5 @@
@@ -941,7 +941,7 @@ index 00000000..6d443f15
 +F:	configs/imx93_11x11_frdm_defconfig
 diff --git a/board/freescale/imx93_frdm/Makefile b/board/freescale/imx93_frdm/Makefile
 new file mode 100644
-index 00000000..9b77380e
+index 00000000000..9b77380ec16
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/Makefile
 @@ -0,0 +1,16 @@
@@ -963,7 +963,7 @@ index 00000000..9b77380e
 +endif
 diff --git a/board/freescale/imx93_frdm/imx93_frdm.c b/board/freescale/imx93_frdm/imx93_frdm.c
 new file mode 100644
-index 00000000..37667d0c
+index 00000000000..37667d0c06b
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/imx93_frdm.c
 @@ -0,0 +1,305 @@
@@ -1274,7 +1274,7 @@ index 00000000..37667d0c
 +#endif /*CONFIG_FSL_FASTBOOT*/
 diff --git a/board/freescale/imx93_frdm/lpddr4x_1gb_timing.c b/board/freescale/imx93_frdm/lpddr4x_1gb_timing.c
 new file mode 100644
-index 00000000..bd45bb5e
+index 00000000000..bd45bb5ea8e
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/lpddr4x_1gb_timing.c
 @@ -0,0 +1,1997 @@
@@ -3277,7 +3277,7 @@ index 00000000..bd45bb5e
 +};
 diff --git a/board/freescale/imx93_frdm/lpddr4x_2gb_timing.c b/board/freescale/imx93_frdm/lpddr4x_2gb_timing.c
 new file mode 100644
-index 00000000..f9da1c6b
+index 00000000000..f9da1c6b5f4
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/lpddr4x_2gb_timing.c
 @@ -0,0 +1,1996 @@
@@ -5279,7 +5279,7 @@ index 00000000..f9da1c6b
 +};
 diff --git a/board/freescale/imx93_frdm/lpddr4x_ecc_1gb_timing.c b/board/freescale/imx93_frdm/lpddr4x_ecc_1gb_timing.c
 new file mode 100644
-index 00000000..7fe8891c
+index 00000000000..7fe8891c68c
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/lpddr4x_ecc_1gb_timing.c
 @@ -0,0 +1,1997 @@
@@ -7282,7 +7282,7 @@ index 00000000..7fe8891c
 +};
 diff --git a/board/freescale/imx93_frdm/lpddr4x_ecc_2gb_timing.c b/board/freescale/imx93_frdm/lpddr4x_ecc_2gb_timing.c
 new file mode 100644
-index 00000000..c04e3444
+index 00000000000..c04e34449d8
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/lpddr4x_ecc_2gb_timing.c
 @@ -0,0 +1,1997 @@
@@ -9285,7 +9285,7 @@ index 00000000..c04e3444
 +};
 diff --git a/board/freescale/imx93_frdm/spl.c b/board/freescale/imx93_frdm/spl.c
 new file mode 100644
-index 00000000..18b313d4
+index 00000000000..18b313d4c10
 --- /dev/null
 +++ b/board/freescale/imx93_frdm/spl.c
 @@ -0,0 +1,238 @@
@@ -9529,7 +9529,7 @@ index 00000000..18b313d4
 +#endif
 diff --git a/configs/imx93_11x11_frdm_defconfig b/configs/imx93_11x11_frdm_defconfig
 new file mode 100644
-index 00000000..bdfe6d90
+index 00000000000..bdfe6d905b9
 --- /dev/null
 +++ b/configs/imx93_11x11_frdm_defconfig
 @@ -0,0 +1,200 @@
@@ -9735,7 +9735,7 @@ index 00000000..bdfe6d90
 +CONFIG_EFI_CAPSULE_ESL_FILE="CRT.esl"
 diff --git a/configs/imx93_11x11_frdm_inline_ecc_defconfig b/configs/imx93_11x11_frdm_inline_ecc_defconfig
 new file mode 100644
-index 00000000..9d8a89a4
+index 00000000000..9d8a89a46fd
 --- /dev/null
 +++ b/configs/imx93_11x11_frdm_inline_ecc_defconfig
 @@ -0,0 +1,201 @@
@@ -9942,7 +9942,7 @@ index 00000000..9d8a89a4
 +CONFIG_EFI_CAPSULE_ESL_FILE="CRT.esl"
 diff --git a/include/configs/imx93_frdm.h b/include/configs/imx93_frdm.h
 new file mode 100644
-index 00000000..547835f7
+index 00000000000..547835f748b
 --- /dev/null
 +++ b/include/configs/imx93_frdm.h
 @@ -0,0 +1,185 @@

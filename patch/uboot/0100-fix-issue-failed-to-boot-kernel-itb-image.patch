@@ -1,7 +1,7 @@
-From 5390c2a706569a5349c60e8c972fa9d4e74263db Mon Sep 17 00:00:00 2001
+From 130efd65575fed663767075d0f411163b565b39f Mon Sep 17 00:00:00 2001
 From: Shengzhou <shengzhou.liu@nxp.com>
 Date: Tue, 6 Aug 2024 16:48:47 +0900
-Subject: [PATCH] fix issue failed to boot kernel itb image
+Subject: [PATCH 6/7] fix issue failed to boot kernel itb image
 
 ---
  configs/imx8mm_evk_defconfig      | 1 +

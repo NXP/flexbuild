@@ -1,7 +1,7 @@
-From 2e17d19d94633e0575c98130af2f43394b604a60 Mon Sep 17 00:00:00 2001
+From 6f231a271b2c9b6a7747af145ba444a026405070 Mon Sep 17 00:00:00 2001
 From: nxa22691 <andy.tang@nxp.com>
 Date: Wed, 19 Feb 2025 16:06:26 +0900
-Subject: [PATCH] Add othbootargs so that the customer can change the
+Subject: [PATCH 7/7] Add othbootargs so that the customer can change the
  resolution
 
 Signed-off-by: Andy Tang <andy.tang@nxp.com>

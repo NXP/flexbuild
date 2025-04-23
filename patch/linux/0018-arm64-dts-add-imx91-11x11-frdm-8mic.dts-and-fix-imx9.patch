@@ -1,22 +1,25 @@
-From eff96b687db09c76fff7b7a91711cccb85051a0a Mon Sep 17 00:00:00 2001
+From eef78d7127199c9bee51c76677c0e164302a8889 Mon Sep 17 00:00:00 2001
 From: Lei Xu <lei.xu@nxp.com>
 Date: Tue, 15 Oct 2024 16:58:47 +0800
-Subject: [PATCH 18/19] arm64: dts: add imx91-11x11-frdm-8mic.dts
+Subject: [PATCH 18/30] arm64: dts: add imx91-11x11-frdm-8mic.dts and fix
+ imx93-11x11-frdm-8mic.dts
 
 Add 8mic board support for imx91 frdm.
+Fix pca9555 interrupts pin in imx93-11x11-frdm-8mic.dts.
 
 Signed-off-by: Lei Xu <lei.xu@nxp.com>
 ---
  arch/arm64/boot/dts/freescale/Makefile        |   2 +-
  .../dts/freescale/imx91-11x11-frdm-8mic.dts   | 188 ++++++++++++++++++
- 2 files changed, 189 insertions(+), 1 deletion(-)
+ .../dts/freescale/imx93-11x11-frdm-8mic.dts   |   2 +-
+ 3 files changed, 190 insertions(+), 2 deletions(-)
  create mode 100644 arch/arm64/boot/dts/freescale/imx91-11x11-frdm-8mic.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 27a6ebc5c50f..9ed5c0925e53 100644
+index a1d1ca0affca..13102e211573 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -401,7 +401,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
+@@ -404,7 +404,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
  			  imx91-11x11-evk-i3c.dtb \
  			  imx91-11x11-frdm.dtb imx91-11x11-frdm-ld.dtb \
  			  imx91-11x11-frdm-tianma-wvga-panel.dtb imx91-11x11-frdm-mt9m114.dtb \
@@ -27,7 +30,7 @@ index 27a6ebc5c50f..9ed5c0925e53 100644
  imx93-11x11-evk-pmic-pf0900-root-dtbs := imx93-11x11-evk-root.dtb imx93-11x11-evk-pmic-pf0900.dtbo
 diff --git a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-8mic.dts b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-8mic.dts
 new file mode 100644
-index 000000000000..239dc8a33b3e
+index 000000000000..da1edcbcd79f
 --- /dev/null
 +++ b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-8mic.dts
 @@ -0,0 +1,188 @@
@@ -183,7 +186,7 @@ index 000000000000..239dc8a33b3e
 +		interrupt-controller;
 +		#interrupt-cells = <2>;
 +		interrupt-parent = <&gpio2>;
-+		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
++		interrupts = <17 IRQ_TYPE_LEVEL_LOW>;
 +		vcc-supply = <&exp_3v3_switch>;
 +		status = "okay";
 +	};
@@ -219,6 +222,19 @@ index 000000000000..239dc8a33b3e
 +		>;
 +	};
 +};
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-8mic.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-8mic.dts
+index 419cfb92f510..afd03b78af5f 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-8mic.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-8mic.dts
+@@ -158,7 +158,7 @@ pca9555: gpio@21 {
+ 		interrupt-controller;
+ 		#interrupt-cells = <2>;
+ 		interrupt-parent = <&gpio2>;
+-		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
++		interrupts = <17 IRQ_TYPE_LEVEL_LOW>;
+ 		vcc-supply = <&exp_3v3_switch>;
+ 		status = "okay";
+ 	};
 -- 
-2.25.1
+2.34.1
 

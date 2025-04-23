@@ -1,7 +1,7 @@
-From 837f578eda64396a780c0d0d4db04b5f0c0a2738 Mon Sep 17 00:00:00 2001
+From ce12bd79f8e857003130ff40719405c0a86ae1c3 Mon Sep 17 00:00:00 2001
 From: Lei Xu <lei.xu@nxp.com>
 Date: Tue, 24 Sep 2024 18:23:31 +0800
-Subject: [PATCH 13/19] arm64: dts: add imx93-11x11-frdm-lpuart.dts
+Subject: [PATCH 13/30] arm64: dts: add imx93-11x11-frdm-lpuart.dts
 
 Add a new dts file for uart test on imx93-11x11-frdm board.
 
@@ -13,10 +13,10 @@ Signed-off-by: Lei Xu <lei.xu@nxp.com>
  create mode 100644 arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 1fb3f3cf545d..87f149fb2fb1 100644
+index 501021b3eed4..9dab9b680379 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -387,7 +387,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
+@@ -390,7 +390,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
  			  imx93-11x11-frdm.dtb imx93-11x11-frdm-mt9m114.dtb \
  			  imx93-11x11-frdm-dsi.dtb imx93-11x11-frdm-tianma-wvga-panel.dtb \
  			  imx93-11x11-frdm-aud-hat.dtb imx93-11x11-frdm-ov5640.dtb \
@@ -79,5 +79,5 @@ index 000000000000..cbb67ddaf9c2
 +	};
 +};
 -- 
-2.25.1
+2.34.1
 

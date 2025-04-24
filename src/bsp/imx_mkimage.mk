@@ -5,10 +5,10 @@
 
 define imx_mkimage_target
     if [ ! -d $(BSPDIR)/imx_mkimage ]; then \
-	$(call repo-mngr,fetch,imx_mkimage,bsp); \
+        $(call repo-mngr,fetch,imx_mkimage,bsp); \
     fi && \
     if [ -d $(FBDIR)/patch/imx_mkimage ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_mkimage/*.patch && touch .patchdone; \
+        git am $(FBDIR)/patch/imx_mkimage/*.patch && touch .patchdone; \
     fi && \
     \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \
@@ -84,6 +84,9 @@ define imx_mkimage_target
 	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 	$$opdir/arch/arm/dts/*$${plat}*.dtb \
 	$$opdir/u-boot-nodtb.bin && \
+	if [ $${MACHINE} = imx8mpfrdm ]; then \
+        cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
+	fi && \
     if [ $(CONFIG_OPTEE) = y -a -f $$bl32 ]; then \
 	cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
     fi && \

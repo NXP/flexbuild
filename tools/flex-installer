@@ -626,7 +626,7 @@ if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $ins
 fi
 
 ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx93evk imx93frdm imx91qsb imx93qsb '
+imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx93evk imx93frdm imx91qsb imx93qsb imx8mpfrdm '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"

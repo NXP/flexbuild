@@ -494,15 +494,14 @@ build_rfs_and_apps() {
     fi
 
     if [ "$BUILD_DEBIAN_DESKTOP" = y ] && \
-       [ ${MACHINE:0:4} = imx8 -o ${MACHINE:0:5} = imx93 -o ${MACHINE:0:7} = ls1028a -o $MACHINE = all ]; then
+       [ ${MACHINE:0:4} = imx8 -o ${MACHINE:0:4} = imx9 -o ${MACHINE:0:7} = ls1028a -o $MACHINE = all ]; then
         bld rfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY
         bld apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY
         bld merge-apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY
         bld packrfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY
     fi
 
-    if [ "$BUILD_DEBIAN_SERVER" = y ] && \
-       [ $SOCFAMILY = LS -o ${MACHINE:0:5} = imx91 -o ${MACHINE:0:5} = imx93 -o $MACHINE = all ]; then
+    if [ "$BUILD_DEBIAN_SERVER" = y ] && [ $SOCFAMILY = LS -o $MACHINE = all ]; then
         bld rfs -r debian:server -a $DESTARCH -p $SOCFAMILY
         bld apps -r debian:server -a $DESTARCH -p $SOCFAMILY
         bld merge-apps -r debian:server -a $DESTARCH -p $SOCFAMILY

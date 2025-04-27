@@ -1134,34 +1134,11 @@ case "$1" in
     auto_build)
         flex_auto_build; exit
         ;;
-    clean-rfs)
-        do_clean_rfs; exit
-        ;;
-    clean-bsp)
-        clean_bsp_components
-        fbprint_d "clean BSP components"
-        exit
-        ;;
-    clean-linux)
-        clean_linux_components
-        fbprint_d "clean linux"
-        exit
-        ;;
-    clean-apps)
-        clean_apps_components
-        fbprint_d "clean apps components $DESTDIR"; exit
-        ;;
-    clean)
-        do_clean; exit
-        ;;
     merge-apps)
         merge_apps; exit
         ;;
     host-dep)
         check_host_dependent_pkg; exit
-        ;;
-    list)
-        show_lists; exit
         ;;
 esac
 

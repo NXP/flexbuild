@@ -10,7 +10,6 @@
 
 imx_vpu_hantro:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_vpu_hantro") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_vpu_hantro ]; then \
 	     wget -q $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin && chmod +x vpu_hantro.bin && \
@@ -21,6 +20,7 @@ imx_vpu_hantro:
 	 if [ ! -f $(DESTDIR)/usr/include/linux/hantrodec.h ]; then \
 	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"imx_vpu_hantro") && \
 	 cd imx_vpu_hantro && \
 	 sed -i 's/\/imx//' Makefile_G1G2 Makefile_H1 && \
 	 sed -i 's/dma-buf.h/dma-buf-imx.h/' decoder_sw/software/linux/dwl/dwl_linux.c \

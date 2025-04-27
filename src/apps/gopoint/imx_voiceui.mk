@@ -14,7 +14,6 @@ IMX_VOICE_PLAYER_DIR = $(GPNT_APPS_FOLDER)/scripts/multimedia/imx-voiceplayer
 imx_voiceui:
 ifeq ($(CONFIG_IMX_VOICEUI),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_voiceui") && \
 	 $(call repo-mngr,fetch,imx_voiceui,apps/gopoint) && \
 	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
@@ -24,6 +23,7 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 fi && \
 	 \
 	 [ -d $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX8M_A53 ] && exit || \
+	 $(call fbprint_b,"imx_voiceui") && \
 	 cd $(GPDIR)/imx_voiceui && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

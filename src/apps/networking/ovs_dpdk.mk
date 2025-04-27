@@ -5,7 +5,6 @@
 
 ovs_dpdk:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"ovs_dpdk") && \
 	 $(call repo-mngr,fetch,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
@@ -18,6 +17,7 @@ ovs_dpdk:
              sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/; \
          fi && \
 	 \
+	 $(call fbprint_b,"ovs_dpdk") && \
 	 cd $(NETDIR)/ovs_dpdk && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" && \

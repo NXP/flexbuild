@@ -8,7 +8,6 @@
 
 fmc:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"fmc") && \
 	 $(call repo-mngr,fetch,fmc,apps/networking) && \
 	 $(call repo-mngr,fetch,eth_config,apps/networking) && \
 	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then \
@@ -29,6 +28,7 @@ fmc:
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
+	 $(call fbprint_b,"fmc") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \

@@ -8,11 +8,11 @@
 
 imx_vpuwrap:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_vpuwrap") && \
 	 $(call repo-mngr,fetch,imx_vpuwrap,apps/multimedia) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libcodec.so ]; then \
 	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
+	 $(call fbprint_b,"imx_vpuwrap") && \
 	 cd $(MMDIR)/imx_vpuwrap && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/hantro_dec -I$(DESTDIR)/usr/include/hantro_enc" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-O2" && \

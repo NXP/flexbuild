@@ -11,12 +11,12 @@ IMX_VOICE_PLAYER_DIR = $(GPNT_APPS_FOLDER)/scripts/multimedia/imx-voiceplayer
 imx_voiceplayer:
 ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 [ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"imx_voiceplayer") && \
 	 $(call repo-mngr,fetch,imx_voiceplayer,apps/gopoint) && \
 	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
 	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 \
+	 $(call fbprint_b,"imx_voiceplayer") && \
 	 cd $(GPDIR)/imx_voiceplayer && \
 	 if [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/imx_voiceplayer/* && touch .patchdone; \

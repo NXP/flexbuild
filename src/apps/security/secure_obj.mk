@@ -6,7 +6,6 @@
 
 secure_obj:
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"secure_obj") && \
 	 $(call repo-mngr,fetch,secure_obj,apps/security)
 ifeq ($(CONFIG_OPTEE),y)
 	 if [ $(CONFIG_OPTEE) != y ]; then \
@@ -26,6 +25,7 @@ ifeq ($(CONFIG_OPTEE),y)
 	 fi && \
 	 kernelrelease=`cat $$kerneloutdir/include/config/kernel.release` && \
 	 \
+	 $(call fbprint_b,"secure_obj") && \
 	 cd $(SECDIR)/secure_obj && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export DESTDIR=${DESTDIR}/usr/local && \

@@ -8,12 +8,12 @@
 nxp_afe:
 ifeq ($(CONFIG_NXP_AFE),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"nxp_afe") && \
 	 $(call repo-mngr,fetch,nxp_afe,apps/multimedia) && \
 	 if  [ ! -f $(DESTDIR)/usr/lib/pkgconfig/alsa.pc ]; then \
 	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 [ -f $(DESTDIR)/unit_tests/nxp-afe ] && exit || \
+	 $(call fbprint_b,"nxp_afe") && \
 	 cd $(MMDIR)/nxp_afe && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

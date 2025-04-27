@@ -6,7 +6,6 @@
 
 pktgen_dpdk:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"pktgen_dpdk") && \
 	 $(call repo-mngr,fetch,pktgen_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -15,6 +14,7 @@ pktgen_dpdk:
 	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 \
+	 $(call fbprint_b,"pktgen_dpdk") && \
 	 cd $(NETDIR)/pktgen_dpdk && \
 	 export RTE_SDK=$(NETDIR)/dpdk && \
 	 export RTE_TARGET=arm64-dpaa-linuxapp-gcc && \

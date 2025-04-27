@@ -8,7 +8,6 @@
 
 nnstreamer:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"nnstreamer") && \
 	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
 	 cd $(MLDIR)/nnstreamer && \
 	 rm -rf build_debian_arm64 && \
@@ -35,6 +34,7 @@ nnstreamer:
 	     bld tvm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 \
+	 $(call fbprint_b,"nnstreamer") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
 	 export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -fcanon-prefix-map" && \

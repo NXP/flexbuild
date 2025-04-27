@@ -16,7 +16,6 @@ DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool"
 
 dpdk:
 	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"dpdk") && \
 	 $(call repo-mngr,fetch,dpdk,apps/networking) && \
 	 $(call repo-mngr,fetch,linux,linux) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
@@ -27,6 +26,7 @@ dpdk:
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 \
+	 $(call fbprint_b,"dpdk") && \
 	 cd $(NETDIR)/dpdk && \
 	 build_dir=build_$(DISTROTYPE)_$(ARCH) && \
 	 meson setup $$build_dir \

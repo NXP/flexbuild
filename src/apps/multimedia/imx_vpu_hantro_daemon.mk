@@ -14,7 +14,6 @@ SOCLIST = IMX8MM IMX8MQ IMX8MP
 
 imx_vpu_hantro_daemon:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_vpu_hantro_daemon") && \
 	 if [ ! -d $(MMDIR)/imx_vpu_hantro_daemon ]; then \
 	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_daemon_tar_url) -O imx_vpu_hantro_daemon.tar.gz && \
 	     tar xf imx_vpu_hantro_daemon.tar.gz && rm -rf imx_vpu_hantro_daemon.tar.gz && \
@@ -26,6 +25,7 @@ imx_vpu_hantro_daemon:
 	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/ewl.h ]; then \
 	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
 	 fi && \
+	 $(call fbprint_b,"imx_vpu_hantro_daemon") && \
 	 cd $(MMDIR)/imx_vpu_hantro_daemon && \
 	 sed -e 's|HANTRO_VC8000E_LIB_DIR =.*|HANTRO_VC8000E_LIB_DIR = $(DESTDIR)/usr/lib|' \
 	     -e 's|HANTRO_G1G2_LIB_DIR =.*|HANTRO_G1G2_LIB_DIR = $(DESTDIR)/usr/lib|' \

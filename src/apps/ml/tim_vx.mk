@@ -12,11 +12,11 @@
 
 tim_vx:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"tim_vx") && \
 	 $(call repo-mngr,fetch,tim_vx,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libOpenVX.so ]; then \
 	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"tim_vx") && \
 	 cd $(MLDIR)/tim_vx && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(DESTDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(DESTDIR)" && \

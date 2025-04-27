@@ -16,7 +16,6 @@
 gstreamer:
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"gstreamer") && \
 	 $(call repo-mngr,fetch,gstreamer,apps/multimedia) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -25,6 +24,7 @@ gstreamer:
 	 if [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/gstreamer/*.patch && touch .patchdone; \
 	 fi && \
+	 $(call fbprint_b,"gstreamer") && \
 	 export HAVE_PTP_HELPER_CAPABILITIES=0 && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \

@@ -12,7 +12,6 @@
 
 weston:
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"weston") && \
 	 $(call repo-mngr,fetch,weston,apps/graphics) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
@@ -33,6 +32,7 @@ weston:
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \
 	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
 	 export LD_LIBRARY_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib && \
+	 $(call fbprint_b,"weston") && \
 	 cd $(GRAPHICSDIR)/weston && \
 	 sed -i 's/0.63/0.61/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \

@@ -6,11 +6,11 @@
 
 libpkcs11:
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"libpkcs11") && \
 	 $(call repo-mngr,fetch,libpkcs11,apps/security) && \
 	 if [ ! -d $(SECDIR)/secure_obj/securekey_lib/include ]; then \
 	     bld secure_obj -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
+	 $(call fbprint_b,"libpkcs11") && \
 	 cd $(SECDIR)/libpkcs11 && \
 	 sed -e 's/^CC/#CC/' -e 's/^LD/#LD/' -e 's/s -Werror/s/' -i flags.mk && \
 	 sed -i 's/-g -Iinclude/-g -fcommon -Iinclude/' Makefile && \

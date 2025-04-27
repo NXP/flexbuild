@@ -8,7 +8,6 @@
 
 nnshark:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"nnshark") && \
 	 $(call repo-mngr,fetch,nnshark,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
 	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -16,6 +15,7 @@ nnshark:
 	 if [ ! -f $(DESTDIR)/usr/lib/libgpuperfcnt.so ]; then \
 	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"nnshark") && \
 	 sudo cp -rf $(DESTDIR)/usr/lib/libgpuperfcnt.so* $(RFSDIR)/usr/lib/ && \
 	 sudo cp -rf $(DESTDIR)/usr/include/gpuperfcnt $(RFSDIR)/usr/include/ && \
 	 cd $(MLDIR)/nnshark && \

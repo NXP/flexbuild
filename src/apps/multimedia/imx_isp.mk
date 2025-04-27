@@ -11,7 +11,6 @@
 
 imx_isp:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_isp") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/imx_isp ]; then \
 	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin && \
@@ -31,6 +30,7 @@ imx_isp:
              bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
          fi && \
 	 \
+	 $(call fbprint_b,"imx_isp") && \
 	 cd imx_isp/appshell && \
 	 sed -i '/v4l_drm_test/d' CMakeLists.txt && \
 	 sed -i 's/imx\///' display/DrmDisplay.cpp display/WlDisplay.cpp v4l_drm_test/video_test.cpp && \

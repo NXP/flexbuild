@@ -7,12 +7,12 @@
 
 openssl:
 	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"OpenSSL") && \
 	 $(call repo-mngr,fetch,openssl,apps/security) && \
 	 if [ ! -d $(DESTDIR)/usr/local/include/crypto ]; then \
 	     bld cryptodev_linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 export MAKE=make && \
+	 $(call fbprint_b,"OpenSSL") && \
 	 cd $(SECDIR)/openssl && \
 	 if [ -d $(FBDIR)/patch/openssl ] && [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/openssl/*.patch && touch .patchdone; \

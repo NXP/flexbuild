@@ -14,6 +14,7 @@ spc:
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"SPC")
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CFLAGS="-fpermissive -I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \

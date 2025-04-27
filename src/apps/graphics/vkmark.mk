@@ -12,9 +12,9 @@ repo_vkmark_commit=ab6e6f3407
 vkmark:
 ifeq ($(CONFIG_VKMARK),y)
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"vkmark") && \
 	 $(call repo-mngr,fetch,vkmark,apps/graphics) && \
 	 bld vulkan_headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	 $(call fbprint_b,"vkmark") && \
 	 cd $(GRAPHICSDIR)/vkmark && \
 	 if [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/vkmark/*.patch && touch .patchdone; \

@@ -8,11 +8,11 @@
 
 gputop:
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"gputop") && \
 	 $(call repo-mngr,fetch,gputop,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/gpuperfcnt/gpuperfcnt.h ]; then \
 	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"gputop") && \
 	 cd $(GRAPHICSDIR)/gputop && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cd build_$(DISTROTYPE)_$(ARCH) && \

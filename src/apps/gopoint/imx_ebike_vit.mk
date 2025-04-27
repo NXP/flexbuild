@@ -7,7 +7,6 @@ EBIKE_DIR = ${GPNT_APPS_FOLDER}/scripts/multimedia/ebike-vit
 
 imx_ebike_vit:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"imx_ebike_vit") && \
 	 $(call repo-mngr,fetch,imx_ebike_vit,apps/gopoint) && \
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 #	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
@@ -16,6 +15,7 @@ imx_ebike_vit:
 #	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
 #	 fi && \
 	 \
+	 $(call fbprint_b,"imx_ebike_vit") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 cd $(GPDIR)/imx_ebike_vit && \

@@ -12,11 +12,11 @@ IMX_SMART_FITNESS_DIR = $(GPNT_APPS_FOLDER)/scripts/machine_learning/imx_smart_f
 
 imx_smart_fitness:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"imx_smart_fitness") && \
 	 $(call repo-mngr,fetch,imx_smart_fitness,apps/gopoint) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libnnstreamer.so ]; then \
 	     bld nnstreamer -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"imx_smart_fitness") && \
 	 sudo cp -rf $(DESTDIR)//usr/include/nnstreamer $(RFSDIR)//usr/include && \
 	 cd $(GPDIR)/imx_smart_fitness && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

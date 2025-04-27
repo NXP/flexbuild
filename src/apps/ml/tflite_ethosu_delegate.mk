@@ -9,7 +9,6 @@
 
 tflite_ethosu_delegate:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"tflite_ethosu_delegate") && \
 	 $(call repo-mngr,fetch,tflite_ethosu_delegate,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
 	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -17,6 +16,7 @@ tflite_ethosu_delegate:
 	 if [ ! -f $(DESTDIR)/usr/lib/libethosu.so ]; then \
 	     bld ethosu_driver_stack -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"tflite_ethosu_delegate") && \
 	 cd $(MLDIR)/tflite_ethosu_delegate && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

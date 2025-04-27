@@ -9,7 +9,6 @@
 
 imx_gst_plugin:
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"imx_gst_plugin") && \
 	 $(call repo-mngr,fetch,imx_gst_plugin,apps/multimedia) && \
 	 cd $(MMDIR)/imx_gst_plugin && \
 	 if [ ! -f .patchdone ]; then \
@@ -43,6 +42,7 @@ imx_gst_plugin:
 	     sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include; \
 	 fi && \
 	 \
+	 $(call fbprint_b,"imx_gst_plugin") && \
 	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 	      -Dc_args="-O2 -pipe -g -feliminate-unused-debug-types -Wno-unused-variable -Wno-format -Wno-unused-value \

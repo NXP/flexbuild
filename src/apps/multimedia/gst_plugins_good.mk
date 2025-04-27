@@ -8,7 +8,6 @@
 gst_plugins_good:
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"gst_plugins_good") && \
 	 $(call repo-mngr,fetch,gst_plugins_good,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_good && \
 	 if [ ! -f .patchdone ]; then \
@@ -25,6 +24,7 @@ gst_plugins_good:
 	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
 	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"gst_plugins_good") && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 \
 			  -I$(DESTDIR)/usr/lib/gstreamer-1.0/include -I$(DESTDIR)/usr/include" \

@@ -7,11 +7,11 @@
 
 fmlib:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"fmlib") && \
 	 $(call repo-mngr,fetch,fmlib,apps/networking) && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
+	 $(call fbprint_b,"fmlib") && \
 	 cd $(NETDIR)/fmlib && \
 	 export PREFIX=/usr && \
 	 export KERNEL_SRC=$(KERNEL_PATH) && \

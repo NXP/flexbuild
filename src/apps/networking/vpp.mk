@@ -10,7 +10,6 @@
 
 vpp:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"vpp") && \
 	 $(call repo-mngr,fetch,vpp,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -18,6 +17,7 @@ vpp:
 	 if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
 	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
+	 $(call fbprint_b,"vpp") && \
 	 export CROSS_PREFIX=aarch64-linux-gnu && \
 	 export CROSS_TOOLCHAIN=/usr && \
 	 export CROSS_SYSROOT=$(RFSDIR) && \

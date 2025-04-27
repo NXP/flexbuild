@@ -13,7 +13,6 @@
 
 cheese:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"cheese") && \
 	 $(call repo-mngr,fetch,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \
 	 if [ ! -f .patchdone ]; then \
@@ -27,6 +26,7 @@ cheese:
 	 if [ ! -f $(DESTDIR)/usr/lib/libclutter-gst-3.0.so ]; then \
 	     bld clutter_gst -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"cheese") && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstallocators-1.0.so.0 && \
 	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
 	 \

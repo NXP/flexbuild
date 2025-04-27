@@ -9,11 +9,11 @@
 imx_smw:
 ifeq ($(CONFIG_SMW),y)
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_smw") && \
 	 $(call repo-mngr,fetch,imx_smw,apps/security) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libteec.so ]; then \
 	     CONFIG_OPTEE=y bld optee_client -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"imx_smw") && \
 	 cd $(SECDIR)/imx_smw && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \

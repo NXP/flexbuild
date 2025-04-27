@@ -10,7 +10,6 @@ gst_plugins_ugly:
 ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"gst_plugins_ugly") && \
 	 $(call repo-mngr,fetch,gst_plugins_ugly,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_ugly && \
 	 export CROSS=$(CROSS_COMPILE) && \
@@ -19,6 +18,7 @@ ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstvolume.so ]; then \
 	     bld gst_plugins_base -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"gst_plugins_ugly") && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(RFSDIR)/usr/include/gstreamer-1.0 -I$(DESTDIR)/usr/include" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -ludev \

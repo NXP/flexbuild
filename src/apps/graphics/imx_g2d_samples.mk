@@ -24,12 +24,12 @@ endif
 
 imx_g2d_samples:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_g2d_samples for $(BUILD_IMPLEMENTATION)") && \
 	 $(call repo-mngr,fetch,imx_g2d_samples,apps/graphics) && \
 	 \
 	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so.2 ]; then \
 	     bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"imx_g2d_samples for $(BUILD_IMPLEMENTATION)") && \
 	 cd $(GRAPHICSDIR)/imx_g2d_samples && \
 	 sudo cp $(DESTDIR)/usr/lib/{libOpenCL.so*,libSPIRV_viv.so*} $(RFSDIR)/usr/lib && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

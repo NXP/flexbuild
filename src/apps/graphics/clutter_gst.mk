@@ -13,7 +13,6 @@
 
 clutter_gst:
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"clutter_gst") && \
 	 $(call repo-mngr,fetch,clutter_gst,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
 	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -24,6 +23,7 @@ clutter_gst:
 	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
 	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"clutter_gst") && \
 	 sudo cp -Pf $(DESTDIR)/usr/lib/{libGLESv2.so*,libVSC.so,libEGL.so*,libGAL.so*,libgbm.so*,libcogl.so*,libdrm.so*,libgst*.so*} \
 	 $(RFSDIR)/usr/lib && \
 	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \

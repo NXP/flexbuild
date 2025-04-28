@@ -10,6 +10,6 @@ ifeq ($(CONFIG_OPENSSL),y)
 	 $(call repo-mngr,fetch,keyctl_caam,apps/security) && \
 	 cd $(SECDIR)/keyctl_caam && \
 	 export OPENSSL_PATH=$(SECDIR)/openssl && \
-	 $(MAKE) CC=$(CROSS_COMPILE)gcc DESTDIR=$(DESTDIR) install && \
+	 $(MAKE) CC=$(CROSS_COMPILE)gcc DESTDIR=$(DESTDIR) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"keyctl_caam")
 endif

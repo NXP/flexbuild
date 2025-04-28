@@ -21,7 +21,7 @@ ifeq ($(CONFIG_NXP_AFE),y)
 	 sed -i '/^INSTALLDIR/c INSTALLDIR := ./deploy_afe' makefile && \
 	 \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) all && \
+	 $(MAKE) -j$(JOBS) all $(LOG_MUTE) && \
 	 \
 	 install -d $(DESTDIR)/usr/lib/nxp-afe && \
 	 install -d $(DESTDIR)/unit_tests/nxp-afe && \

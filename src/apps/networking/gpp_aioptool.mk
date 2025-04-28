@@ -11,7 +11,7 @@ gpp_aioptool:
 	 cd $(NETDIR)/gpp_aioptool && \
 	 sed -i '/libio.h/d' flib/mc/fsl_mc_sys.h && \
 	 sed -i 's/= -Wall/= -fcommon -Wall/' Makefile && \
-	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	 $(MAKE) clean $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gpp_aioptool")

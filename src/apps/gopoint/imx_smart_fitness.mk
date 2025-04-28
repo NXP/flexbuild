@@ -29,9 +29,9 @@ imx_smart_fitness:
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DLIBRARY_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-		-DCMAKE_BUILD_TYPE=release && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+		-DCMAKE_BUILD_TYPE=release $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip --remove-section=.comment --remove-section=.note --strip-unneeded \
 	 build_$(DISTROTYPE)_$(ARCH)/src/imx-smart-fitness && \
 	 install -m 0755 build_$(DISTROTYPE)_$(ARCH)/src/imx-smart-fitness $(DESTDIR)/$(IMX_SMART_FITNESS_DIR) && \

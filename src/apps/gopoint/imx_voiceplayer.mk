@@ -29,7 +29,7 @@ ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 #### BUILD APP GUI #### && \
 	 rm -rf app/build && mkdir -p app/build && cd app/build && \
 	 qmake6 ../VoicePlayer.pro && \
-	 make -j$(JOBS) && \
+	 make -j$(JOBS) $(LOG_MUTE) && \
 	 install -d -m 755 $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR) && \
 	 install $(GPDIR)/imx_voiceplayer/app/build/VoicePlayer $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/ && \
 	 cp -fp $(GPDIR)/imx_voiceplayer/scripts/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR}/ && \
@@ -37,14 +37,14 @@ ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 ####  BUILD APP COMPONENTS#### && \
 	 cd $(GPDIR)/imx_voiceplayer && \
 	 rm -rf msgq/build && mkdir -p msgq/build && cd msgq/build && \
-	 cmake .. && make -j$(JOBS) && \
+	 cmake .. && make -j$(JOBS) $(LOG_MUTE) && \
 	 install MsgQ $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR) && \
 	 \
 	 #### VOICE_UI was built in imx_voiceui #### && \
 	 #### BUILD VOICE ACTION COMPONENTS #### && \
 	 \
 	 cd $(GPDIR)/imx_voiceplayer/voiceAction && \
-	 rm -rf build && make -j$(JOBS) && \
+	 rm -rf build && make -j$(JOBS) $(LOG_MUTE) && \
 	 install -m 0755 build/btp $(DESTDIR)/${IMX_VOICE_PLAYER_DIR} && \
 	 cp -rf bridgeVoiceUI/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR} && \
 	 \

@@ -37,8 +37,8 @@ dpdk:
 		-Dexamples=$(DPDK_EXAMPLES) \
 		-Dc_args="-Ofast -fPIC -ftls-model=local-dynamic -Wno-error=implicit-function-declaration -I$(DESTDIR)/usr/include" \
 		-Doptimization=3 \
-		--cross-file=config/arm/arm64_dpaa_linux_gcc && \
-	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir install && \
+		--cross-file=config/arm/arm64_dpaa_linux_gcc $(LOG_MUTE) && \
+	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir install $(LOG_MUTE) && \
 	 cd $$build_dir/examples && find . -perm -111 -a -type f | xargs -I {} cp {} $(DESTDIR)/usr/local/bin && \
 	 cd - && mkdir -p $(DESTDIR)/usr/local/dpdk && \
 	 cp -rf $(NETDIR)/dpdk/nxp/* $(DESTDIR)/usr/local/dpdk && \

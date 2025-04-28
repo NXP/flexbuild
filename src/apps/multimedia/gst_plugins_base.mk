@@ -95,6 +95,6 @@ gst_plugins_base:
 		-Dvorbis=enabled \
 		-Dx11=enabled \
 		-Dxvideo=enabled \
-		-Dxshm=enabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dxshm=enabled $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gst_plugins_base")

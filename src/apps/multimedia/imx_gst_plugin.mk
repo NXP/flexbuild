@@ -51,7 +51,7 @@ imx_gst_plugin:
 	      -Dc_link_args="-L$(RFSDIR)/usr/lib/aarch64-linux-gnu -L$(DESTDIR)/usr/lib  -lasound " \
 	      --prefix=/usr --buildtype=release \
 	      --cross-file meson.cross \
-	      -Dplatform=$(shell if [ "$${MACHINE:0:4}" = "imx9" ]; then echo "MX9"; else echo "MX8"; fi) && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+	      -Dplatform=$(shell if [ "$${MACHINE:0:4}" = "imx9" ]; then echo "MX9"; else echo "MX8"; fi) $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/beep_registry_1.0.arm.cf && \
 	 $(call fbprint_d,"imx_gst_plugin")

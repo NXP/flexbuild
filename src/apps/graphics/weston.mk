@@ -74,8 +74,8 @@ weston:
 		-Dimage-webp=false \
 		-Dbackend-x11=false \
 		-Dc_args="-I$(DESTDIR)/usr/include/drm -I$(DESTDIR)/usr/share/ -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/local/include -I$(RFSDIR)/usr/include" \
-		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu -lgbm -lgbm_viv -lGAL" && \
-	 ninja install -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) && \
+		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu -lgbm -lgbm_viv -lGAL" $(LOG_MUTE) && \
+	 ninja install -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/etc/xdg/weston $(DESTDIR)/etc/systemd/system/graphical.target.wants $(DESTDIR)/etc/default && \
 	 mkdir -p $(DESTDIR)/usr/share/applications $(DESTDIR)/usr/share/icons/hicolor/48x48/apps $(DESTDIR)/lib/systemd/system && \
 	 mkdir -p $(DESTDIR)/etc/systemd/system/sockets.target.wants && \

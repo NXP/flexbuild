@@ -16,6 +16,6 @@ ceetm:
 	 fi && \
 	 export IPROUTE2_DIR=$(NETDIR)/ceetm/iproute2-4.15.0 && \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"CEETM")

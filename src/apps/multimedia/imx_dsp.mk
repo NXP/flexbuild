@@ -31,9 +31,9 @@ imx_dsp:
 	   --bindir=/unit_tests \
 	   -datadir=/lib/firmware \
 	   --enable-armv8 \
-	   --prefix=/usr && \
+	   --prefix=/usr $(LOG_MUTE) && \
 	 export DESTDIR=$(FBOUTDIR)/bsp/imx_firmware && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 ln -sf hifi4_$(HIFI4_PLATFORM).bin $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/imx/dsp/hifi4.bin && \
 	 $(call fbprint_d,"imx_dsp")

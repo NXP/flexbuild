@@ -21,7 +21,7 @@ imx_dspc_asrc:
 	   --enable-armv8 \
 	   --libdir=/usr/lib \
 	   --bindir=/unit_tests \
-	   --prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	   --prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_dspc_asrc")

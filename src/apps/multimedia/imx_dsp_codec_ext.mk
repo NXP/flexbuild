@@ -33,7 +33,7 @@ imx_dsp_codec_ext:
 	 cd imx_dsp_codec_ext && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	   $(EXTRA_CONF) \
-	   --prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	   --prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_dsp_codec_ext")

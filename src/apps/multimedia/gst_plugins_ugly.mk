@@ -29,7 +29,7 @@ ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 		-Dx264=enabled \
 		-Dmpeg2dec=enabled \
 		-Dsidplay=disabled \
-		-Dorc=enabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dorc=enabled $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gst_plugins_ugly")
 endif

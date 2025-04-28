@@ -20,12 +20,12 @@ nnshark:
 	 sudo cp -rf $(DESTDIR)/usr/include/gpuperfcnt $(RFSDIR)/usr/include/ && \
 	 cd $(MLDIR)/nnshark && \
 	 sed -i 's/--exclude=gtkdocize//' autogen.sh && \
-	 ./autogen.sh --noconfigure --prefix=/usr --host=aarch64-linux-gnu && \
+	 ./autogen.sh --noconfigure --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--disable-graphviz \
 		--disable-gtk-doc \
-		--prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+		--prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"nnshark")

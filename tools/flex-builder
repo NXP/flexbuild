@@ -172,7 +172,7 @@ generate_linux_itb() {
     cp -f $FBDIR/configs/linux/linux_${DESTARCH}_${SOCFAMILY}.its $tmpits
     sed -i "s|../../build|${FBOUTDIR}|g" $tmpits
     sed -i "s/rootfs_poky_tiny_${DESTARCH}/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}/" $tmpits
-    mkimage -f $tmpits $linux_itb && rm -f $tmpits && fbprint_d $linux_itb
+    mkimage -f $tmpits $linux_itb >/dev/null && rm -f $tmpits && fbprint_d $linux_itb
 }
 
 
@@ -687,6 +687,24 @@ show_lists() {
     echo -e "\t$ML_REPO_LIST $GOPOINT_REPO_LIST"
 }
 
+set_loglevel() {
+	case "${LOG_LEVEL:-2}" in
+    0)
+        LOG_MUTE=""
+        ;;
+    1)
+        LOG_MUTE=" 1>/dev/null "
+        ;;
+    2)
+        LOG_MUTE=' 1>/dev/null 2>${FBDIR}/logs/err.log || { echo "Error: please set LOG_LEVEL=0 and retry or check ${FBDIR}/logs/err.log for details." ;   exit 1; } '
+        ;;
+    *)
+        echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
+        exit 1
+        ;;
+	esac
+}
+
 fbprint_e() {
     echo -e "${RED}$1 ${NC}"
 }
@@ -1021,6 +1039,7 @@ fi
 
 [ "$BUILDARG" = uefi ] && BL33TYPE=uefi || BL33TYPE=uboot
 
+set_loglevel
 check_toolchain
 
 MAKE="make -s"
@@ -1033,9 +1052,7 @@ export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE K
        CFGLISTYML BUILDARG DISTROTYPE DISTROVARIANT DISTROVARIANTOPT HOSTARCH SYSARCH SECURE \
        SOCFAMILY BL33TYPE DISTRIB_NAME SOCARCH COT DISTRIB_VERSION BOARD_VARIANTS \
        UBOOT_CONFIG CODENAME DISTRO_VERSION UBUNTU_VERSION FORCE LD_LIBRARY_PATH \
-       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH DEFAULT_REPO_TAG
-
-
+       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH DEFAULT_REPO_TAG LOG_MUTE
 
 case "$1" in
     repo-fetch)

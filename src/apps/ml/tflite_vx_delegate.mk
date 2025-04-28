@@ -30,8 +30,8 @@ tflite_vx_delegate:
 		-DFETCHCONTENT_FULLY_DISCONNECTED=OFF \
 		-DTIM_VX_INSTALL=$(DESTDIR)/usr \
 		-DFETCHCONTENT_SOURCE_DIR_TENSORFLOW=$(MLDIR)/tflite \
-		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so && \
-	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate && \
+		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so && \
 	 cp -f build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so $(DESTDIR)/usr/lib && \
 	 install -d $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate && \

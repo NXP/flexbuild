@@ -14,7 +14,7 @@ ifeq ($(CONFIG_GRUB),y)
 	 cd $(BSPDIR)/grub && \
 	 ./bootstrap && ./autogen.sh && \
 	 ./configure --target=aarch64-linux-gnu && \
-	 $(MAKE) && \
+	 $(MAKE) $(LOG_MUTE) && \
 	 echo 'configfile ${cmdpath}/grub.cfg' > grub.cfg && \
 	 grub-mkstandalone --directory=./grub-core -O arm64-efi -o BOOTAA64.EFI \
 	 		   --modules "part_gpt part_msdos" /boot/grub/grub.cfg=./grub.cfg && \

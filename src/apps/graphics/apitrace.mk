@@ -39,7 +39,7 @@ ifeq ($(CONFIG_APITRACE),y)
 		-DENABLE_X11=OFF \
 		-DVivante_INC_SEARCH_PATH=$(RFSDIR)/usr/include \
 		-DVivante_LIB_SEARCH_PATH=$(RFSDIR)/usr/lib \
-		-DCMAKE_BUILD_TYPE=release && \
-	 VERBOSE=1 cmake --build $(GRAPHICSDIR)/apitrace/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target install && \
+		-DCMAKE_BUILD_TYPE=release $(LOG_MUTE) && \
+	 VERBOSE=1 cmake --build $(GRAPHICSDIR)/apitrace/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target install $(LOG_MUTE) && \
 	 $(call fbprint_d,"apitrace")
 endif

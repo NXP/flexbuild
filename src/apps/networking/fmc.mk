@@ -43,7 +43,7 @@ fmc:
 		 FMD_USPACE_LIB_PATH=$(DESTDIR)/usr/lib \
 		 TCLAP_HEADER_PATH=$(RFSDIR)/usr/include \
 		 CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" \
-		 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+		 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/usr/local/bin && \
 	 install -m 755 source/fmc $(DESTDIR)/usr/local/bin/fmc && \
 	 install -d $(DESTDIR)/etc/fmc/config && \

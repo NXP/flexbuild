@@ -29,7 +29,7 @@ ifeq ($(CONFIG_VKMARK),y)
 		--cross-file=meson.cross \
 		--prefix=/usr \
 		--buildtype=release \
-		-Dc_args="-I$(DESTDIR)/usr/include/vulkan" && \
-	 ninja -j$(JOBS) install -C build_$(DISTROTYPE)_$(ARCH) && \
+		-Dc_args="-I$(DESTDIR)/usr/include/vulkan" $(LOG_MUTE) && \
+	 ninja -j$(JOBS) install -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
 	 $(call fbprint_d,"vkmark")
 endif

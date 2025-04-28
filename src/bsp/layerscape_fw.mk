@@ -39,7 +39,7 @@ mc_utils:
 	 if [ ! -h $(FBOUTDIR)/bsp/mc_utils ]; then \
 	     ln -s $(BSPDIR)/mc_utils $(FBOUTDIR)/bsp/mc_utils; \
 	 fi && \
-	 $(MAKE) -C mc_utils/config && \
+	 $(MAKE) -C mc_utils/config $(LOG_MUTE) && \
 	 $(call fbprint_d,"mc_utils")
 
 

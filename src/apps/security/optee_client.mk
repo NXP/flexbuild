@@ -17,6 +17,6 @@ ifeq ($(CONFIG_OPTEE),y)
 	 \
 	 $(call fbprint_b,"optee_client") && \
 	 cd $(SECDIR)/optee_client && \
-	 $(MAKE) ARCH=arm64 CFLAGS="-I$(RFSDIR)/usr/include/uuid" && \
+	 $(MAKE) ARCH=arm64 CFLAGS="-I$(RFSDIR)/usr/include/uuid" $(LOG_MUTE) && \
 	 $(call fbprint_d,"optee_client")
 endif

@@ -22,11 +22,11 @@ ethosu_vela:
 	 NO_FETCH_BUILD=1 ARCH=arm64 \
 	 STAGING_INCDIR=$(RFSDIR)/usr/include \
 	 STAGING_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-	 python3 setup.py bdist_wheel --verbose --dist-dir build/dist && \
+	 python3 setup.py bdist_wheel --verbose --dist-dir build/dist $(LOG_MUTE) && \
 	 pip3 install --ignore-installed --disable-pip-version-check -t $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) \
-	      --no-cache-dir --no-deps build/dist/ethos_u_vela*.whl && \
+	      --no-cache-dir --no-deps build/dist/ethos_u_vela*.whl $(LOG_MUTE) && \
 	 cp -rfa build/lib.linux-*cpython*/ethosu $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) && \
-	 rename "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so && \
+	 rename -f "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so && \
 	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela ]; then \
 	     mv $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela $(DESTDIR)/usr/bin/; \
 	 fi && \

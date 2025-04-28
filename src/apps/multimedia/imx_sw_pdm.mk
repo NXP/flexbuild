@@ -18,7 +18,7 @@ imx_sw_pdm:
 	 cd imx_sw_pdm && \
 	 ./configure CC=aarch64-linux-gnu-gcc \
 	   --enable-armv8 \
-	   --prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	   --prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_sw_pdm")

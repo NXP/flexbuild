@@ -38,6 +38,6 @@ imx_g2d_samples:
 	 export CFLAGS="-I$(DESTDIR)/usr/include" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib" && \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_g2d_samples")

@@ -27,7 +27,7 @@ imx_ebike_vit:
 		 cp -fr wayland-client/* lv_drivers/wayland/ ; \
 	 fi && \
 	 \
-	 $(MAKE) clean && $(MAKE) -j$(JOBS) && \
+	 $(MAKE) clean && $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d -m 755 $(DESTDIR)$(EBIKE_DIR) && \
 	 cp -rf ebike-vit-deploy/* $(DESTDIR)$(EBIKE_DIR) && \
 	 $(call fbprint_d,"imx_ebike_vit")

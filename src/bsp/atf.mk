@@ -17,7 +17,7 @@ atf:
 	 cd $(BSPDIR)/atf && \
 	 curbrch=`git branch | grep ^* | cut -d' ' -f2` && \
 	 $(call fbprint_n,"Building ATF $$curbrch" for $(MACHINE)) && \
-	 $(MAKE) realclean && mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
+	 $(MAKE) realclean $(LOG_MUTE) && mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
 	 platform=$(MACHINE); \
 	 [ $${platform:0:6} = ls1012 -o $${platform:0:5} = ls104 ] && chassistype=ls104x_1012 || chassistype=ls2088_1088; \
 	 if [ "$(SECURE)" = y -a "$(BL33TYPE)" = uboot ]; then \
@@ -113,10 +113,10 @@ atf:
 	     echo $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode RCW=$$rcwbin \
 		  BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt && \
 	     $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode \
-		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) && \
+		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) $(LOG_MUTE) && \
 	     if [ $${MACHINE:0:5} = lx216 -a "$(SECURE)" = y ] && [ ! -f $$outputdir/ddr_fip_sec.bin ]; then \
 		 $(MAKE) -j$(JOBS) fip_ddr PLAT=$$platform BOOT_MODE=$$bootmode $$secureopt $(bldstr) \
-		 $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a; \
+		 $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a $(LOG_MUTE) ; \
 		 [ "$(COT)" = arm-cot -o "$(COT)" = arm-cot-with-verified-boot ] && cp -f build/$$platform/release/*.pem $$outputdir/; \
 		 cp -f build/$$platform/release/ddr_fip_sec.bin $$outputdir/; \
 	     fi && \
@@ -135,7 +135,7 @@ atf:
 	 elif [ $(SOCFAMILY) = IMX ]; then \
 	    [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
 	    [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
-	    $(MAKE) -j$(JOBS) PLAT=$$plat $(bldstr) bl31 && \
+	    $(MAKE) -j$(JOBS) PLAT=$$plat $(bldstr) bl31 $(LOG_MUTE) && \
 	    mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE) && \
 	    cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
 	 fi && \

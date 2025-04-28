@@ -52,6 +52,6 @@ gstreamer:
 		-Dtests=disabled \
 		-Dtools=enabled \
 		-Dtracer_hooks=true \
-		-Dlibunwind=disabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dlibunwind=disabled $(LOG_MUTE) && \
+	 ninja -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gstreamer")

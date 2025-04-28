@@ -35,18 +35,19 @@ clutter_gst:
 	    git am $(FBDIR)/patch/clutter_gst/*.patch && touch .patchdone; \
 	 fi && \
 	 sed -i 's/noinst_PROGRAMS/bin_PROGRAMS/' examples/Makefile.am && \
+	 sed -i 's/autoreconf -v --install/autoreconf --install/g' autogen.sh && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0 \
 			-I$(DESTDIR)/usr/include/clutter-1.0 -I$(RFSDIR)/usr/include" && \
 	 export GST_PLUGIN_SCANNER_1_0=$(GRAPHICSDIR)/clutter_gst/gst-plugin-scanner-dummy && \
 	 \
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu && \
+	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--enable-introspection=no \
 		--disable-gtk-doc \
 		--disable-static \
 		--enable-nls \
-		--prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+		--prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"clutter_gst")

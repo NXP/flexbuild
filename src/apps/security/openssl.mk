@@ -20,10 +20,10 @@ openssl:
 	 ./Configure enable-devcryptoeng linux-aarch64 shared \
 		     -I$(DESTDIR)/usr/include -I$(PKGDIR)/linux/cryptodev_linux \
 		     --prefix=/usr \
-		     --openssldir=lib/ssl && \
-	 $(MAKE) -j$(JOBS) depend && \
-	 $(MAKE) -j$(JOBS) 1>/dev/null && \
-	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) MANSUFFIX=ssl 1>/dev/null && \
+		     --openssldir=lib/ssl $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) depend $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) MANSUFFIX=ssl $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/local/bin && \
 	 mv $(DESTDIR)/usr/bin/openssl $(DESTDIR)/usr/local/bin && \
 	 rm -rf $(DESTDIR)/usr/lib/ssl/certs && \

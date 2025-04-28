@@ -19,8 +19,8 @@ imx_lib:
              SOCPLATFORM="MX8"; \
          fi && \
 	 $(MAKE) clean && \
-         # to enable PXP, IMX8ULP must be assigned && \
-	 PLATFORM=IMX8ULP $(MAKE) -j$(nproc) all && \
-	 #PLATFORM=$${SOCPLATFORM} $(MAKE) -j$(nproc) all && \
-	 $(MAKE) install DEST_DIR=$(DESTDIR) && \
+     # to enable PXP, IMX8ULP must be assigned && \
+	 PLATFORM=IMX8ULP $(MAKE) -j$(JOBS) all $(LOG_MUTE) && \
+	 #PLATFORM=$${SOCPLATFORM} $(MAKE) -j$(JOBS) all && \
+	 $(MAKE) install DEST_DIR=$(DESTDIR) $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_lib")

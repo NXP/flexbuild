@@ -28,7 +28,7 @@ gtec_demo_framework:
 	 # Compiling GLES2 DemoApp && \
 	 for demoapp in Bloom Blur EightLayerBlend FractalShader LineBuilder101 ModelLoaderBasics S03_Transform S04_Projection S06_Texturing S07_EnvMapping S08_EnvMappingRefraction ; do \
 		cd $(GPDIR)/gtec_demo_framework/DemoApps/GLES2/$${demoapp}; \
-		FslBuild.py --BuildThreads $(JOBS) --platform yocto --Variants [config=Release,FSL_GLES_NAME=vivante,WindowSystem=Wayland] --UseExtensions [$${EXTENSIONS}] --UseFeatures [$${FEATURES}]; \
+		FslBuild.py --BuildThreads $(JOBS) --platform yocto --Variants [config=Release,FSL_GLES_NAME=vivante,WindowSystem=Wayland] --UseExtensions [$${EXTENSIONS}] --UseFeatures [$${FEATURES}] $(LOG_MUTE) ; \
 		mkdir -p $(DESTDIR)/opt/imx-gpu-sdk/GLES2/$${demoapp}___Wayland/Content; \
 		cp -arf $(GPNT_GPU_SOURDIR)/$${demoapp}___Wayland/Content/* $(DESTDIR)/$(GPNT_GPU_DESTDIR)/$${demoapp}___Wayland/Content/; \
 		cp -arf $(GPNT_GPU_SOURDIR)/$${demoapp}___Wayland/GLES2.$${demoapp}___Wayland $(DESTDIR)/$(GPNT_GPU_DESTDIR)/$${demoapp}___Wayland/; \

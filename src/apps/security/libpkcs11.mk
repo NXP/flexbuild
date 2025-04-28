@@ -19,7 +19,7 @@ libpkcs11:
 	 $(MAKE) clean && \
 	 $(MAKE) all OPENSSL_PATH=$(SECDIR)/openssl \
 	 EXPORT_DIR=$(DESTDIR)/usr/local CURDIR=$(SECDIR)/libpkcs11 \
-	 SECURE_OBJ_PATH=$(SECDIR)/secure_obj/securekey_lib && \
+	 SECURE_OBJ_PATH=$(SECDIR)/secure_obj/securekey_lib $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/local/bin && \
 	 mv $(DESTDIR)/usr/local/app/pkcs11_app $(DESTDIR)/usr/local/bin && \
 	 cp -f images/thread_test $(DESTDIR)/usr/local/bin && \

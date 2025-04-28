@@ -33,8 +33,8 @@ imx_vpu_hantro_daemon:
 	     -e 's|CTRLSW_HDRPATH =.*|CTRLSW_HDRPATH = $(DESTDIR)/usr/include|' -i Makefile && \
 	 for socplat in $(SOCLIST); do \
 	     $(MAKE) clean && \
-	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat && \
-	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat install && \
+	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat $(LOG_MUTE) && \
+	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat install $(LOG_MUTE) && \
 	     mv $(DESTDIR)/usr/bin/vsidaemon $(DESTDIR)/usr/bin/vsidaemon-$$socplat; \
 	 done && \
 	 $(call fbprint_d,"imx_vpu_hantro_daemon")

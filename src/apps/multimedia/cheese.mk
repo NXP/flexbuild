@@ -40,8 +40,8 @@ cheese:
 		--strip \
 		-Dintrospection=false \
 		-Dgtk_doc=false \
-		-Dman=false && \
-	 ninja -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dman=false $(LOG_MUTE) && \
+	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/org.gnome.Cheese.svg && \
 	 rm -f $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/org.gnome.Cheese-symbolic.svg && \
 	 $(call fbprint_d,"cheese")

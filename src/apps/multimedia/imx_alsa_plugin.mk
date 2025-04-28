@@ -20,12 +20,12 @@ imx_alsa_plugin:
 	 cd $(MMDIR)/imx_alsa_plugin && \
 	 sed -i 's/imx\///' asrc/asrc_pair.h asrc/asrc_pair.c && \
 	 libtoolize --force --copy --automake && \
-	 aclocal && autoheader && \
-	 automake --foreign --copy --add-missing && \
-	 touch depcomp && autoconf && \
+	 aclocal $(LOG_MUTE) && autoheader $(LOG_MUTE) && \
+	 automake --foreign --copy --add-missing $(LOG_MUTE) && \
+	 touch depcomp && autoconf $(LOG_MUTE) && \
 	 ./configure --host=aarch64 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	   --with-libtool-sysroot=$(RFSDIR) \
 	   --disable-silent-rules --disable-static --enable-swpdm \
-	   CFLAGS="-O2 -Wall -W -pipe -g -I$(DESTDIR)/usr/include" 1>/dev/null && \
-	 $(MAKE) install && \
+	   CFLAGS="-O2 -Wall -W -pipe -g -I$(DESTDIR)/usr/include" $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_alsa_plugin")

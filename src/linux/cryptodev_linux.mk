@@ -22,6 +22,6 @@ cryptodev_linux:
 	    git am $(FBDIR)/patch/cryptodev_linux/*.patch && touch .patchdone; \
 	 fi && \
 	 export KERNEL_MAKE_OPTS="-lcrypto -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
-	 $(MAKE) KERNEL_DIR=$(KERNEL_PATH) O=$$opdir && \
-	 $(MAKE) install KERNEL_DIR=$(KERNEL_PATH) O=$$opdir INSTALL_MOD_PATH=$$opdir/tmp && \
+	 $(MAKE) KERNEL_DIR=$(KERNEL_PATH) O=$$opdir -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install KERNEL_DIR=$(KERNEL_PATH) O=$$opdir INSTALL_MOD_PATH=$$opdir/tmp -j$(JOBS) $(LOG_MUTE) && \
 	 $(call fbprint_d,"cryptodev_linux")

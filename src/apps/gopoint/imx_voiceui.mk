@@ -32,14 +32,14 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 install -d $(DESTDIR)/unit_tests/nxp-afe && \
 	 $(MAKE) clean && \
 	 $(MAKE) -j$(JOBS) all enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-		BUILD_ARCH=CortexA55 && \
+		BUILD_ARCH=CortexA55 $(LOG_MUTE) && \
 	 install -m 0644 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0.a55 && \
 	 install -m 0644 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/usr/lib/nxp-afe && \
 	 install -m 0755 release/voice_ui_app    $(DESTDIR)/unit_tests/nxp-afe/voice_ui_app.a55 && \
 	 \
 	 $(MAKE) clean && \
 	 $(MAKE) -j$(JOBS) all enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-		BUILD_ARCH=CortexA53 && \
+		BUILD_ARCH=CortexA53 $(LOG_MUTE) && \
 	 install -m 0644 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0.a53 && \
 	 install -m 0755 release/voice_ui_app    $(DESTDIR)/unit_tests/nxp-afe/voice_ui_app.a53 && \
 	 install -m 0644 release/Config.ini    $(DESTDIR)/unit_tests/nxp-afe && \
@@ -51,12 +51,12 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 		vit/platforms/iMX9_CortexA55/lib/VIT_Model_en.h && \
 	 $(MAKE) clean && \
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA53 && \
+	 	BUILD_ARCH=CortexA53 $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/$(GPNT_APPS_FOLDER)/bin && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/bin/voice_ui_app.a53 && \
 	 $(MAKE) clean && \
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA55 && \
+	 	BUILD_ARCH=CortexA55 $(LOG_MUTE) && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/bin/voice_ui_app.a55 && \
 	 \
 # The following is for smart-kitchen &&\
@@ -66,12 +66,12 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 		vit/platforms/iMX9_CortexA55/lib/VIT_Model_en.h && \
 	 $(MAKE) clean && \
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA53 && \
+	 	BUILD_ARCH=CortexA53 $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/smart-kitchen && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/smart-kitchen/voice_ui_app.a53 && \
 	 $(MAKE) clean && \
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA55 && \
+	 	BUILD_ARCH=CortexA55 $(LOG_MUTE) && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/smart-kitchen/voice_ui_app.a55 && \
 	 \
 # The following is for demo-experience-ebike-vit &&\
@@ -81,12 +81,12 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 		vit/platforms/iMX9_CortexA55/lib/VIT_Model_en.h && \
 	 $(MAKE) clean && \
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA53 && \
+	 	BUILD_ARCH=CortexA53 $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/ebike-vit && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/ebike-vit/voice_ui_app.a53 && \
 	 $(MAKE) clean && \
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA55 && \
+	 	BUILD_ARCH=CortexA55 $(LOG_MUTE) && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/ebike-vit/voice_ui_app.a55 && \
 	 \
 # The following is for demo-experience-voice-player &&\
@@ -96,7 +96,7 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 		vit/platforms/iMX9_CortexA55/lib/VIT_Model_en.h && \
 	 $(MAKE) clean && \
 	 $(MAKE) all enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA53 && \
+	 	BUILD_ARCH=CortexA53 $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR) && \
 	 install -d $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX8M_A53 && \
 	 install -d $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX9X_A55 && \
@@ -104,7 +104,7 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 install -m 0755 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX8M_A53 && \
 	 $(MAKE) clean && \
 	 $(MAKE) all enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
-	 	BUILD_ARCH=CortexA55 && \
+	 	BUILD_ARCH=CortexA55 $(LOG_MUTE) && \
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX9X_A55 && \
 	 install -m 0755 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX9X_A55 && \
 	 \

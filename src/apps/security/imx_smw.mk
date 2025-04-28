@@ -23,8 +23,8 @@ ifeq ($(CONFIG_SMW),y)
 		-DTA_DEV_KIT_ROOT=$(DESTDIR)/usr/include/optee/export-user_ta \
 		-DTEEC_ROOT=$(RFSDIR) \
 		-DJSONC_ROOT=$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-		-DTEE_TA_DESTDIR=/usr/lib && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+		-DTEE_TA_DESTDIR=/usr/lib $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_smw")
 endif

@@ -70,8 +70,8 @@ define imx_mkimage_target
     cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
     \
     cd $(BSPDIR)/imx_mkimage && \
-    $(MAKE) clean && $(MAKE) bin && \
-    $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 && \
+    $(MAKE) clean && $(MAKE) bin $(LOG_MUTE) && \
+    $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 $(LOG_MUTE) && \
     \
     bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \
     if [ $(CONFIG_OPTEE) = y -a ! -f $$bl32 ]; then \
@@ -94,15 +94,15 @@ define imx_mkimage_target
     cp -f $(BSPDIR)/atf/build/$$plat/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/ && \
     \
     if [ $${MACHINE:0:6} = imx8qm ];  then \
-	$(MAKE) SOC=iMX8QM -C iMX8QM -f soc.mak $$target; \
+	$(MAKE) SOC=iMX8QM -C iMX8QM -f soc.mak $$target $(LOG_MUTE) ; \
     elif [ $${MACHINE:0:6} = imx8qx ]; then \
-	$(MAKE) SOC=iMX8QX REV=B0 -C iMX8QX -f soc.mak $$target; \
+	$(MAKE) SOC=iMX8QX REV=B0 -C iMX8QX -f soc.mak $$target $(LOG_MUTE) ; \
     elif [ $${MACHINE:0:5} = imx91 ]; then \
-        $(MAKE) SOC=iMX91 REV=A0 -C iMX91 -f soc.mak $$target; \
+        $(MAKE) SOC=iMX91 REV=A0 -C iMX91 -f soc.mak $$target $(LOG_MUTE) ; \
     elif [ $${MACHINE:0:5} = imx93 ]; then \
-	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target; \
+	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target $(LOG_MUTE) ; \
     fi && \
-    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target; \
+    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target $(LOG_MUTE); \
     mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
     cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin;
 endef

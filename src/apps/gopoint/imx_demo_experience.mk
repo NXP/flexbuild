@@ -27,8 +27,8 @@ imx_demo_experience:
 	     -e "s|/usr/lib/x86_64-linux-gnu|$(RFSDIR)/usr/lib/aarch64-linux-gnu|g" \
 	     -e "s|/usr/include/x86_64-linux-gnu|$(RFSDIR)/usr/include/aarch64-linux-gnu|g" \
 	     -e '/-spec linux-aarch64-gnu-g++/d' -i Makefile && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) -j$(JOBS) install && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) install $(LOG_MUTE) && \
 	 mv $(DESTDIR)/opt/demoexperience/bin/demoexperience $(DESTDIR)/usr/bin/ && \
 	 rm -rf $(DESTDIR)/opt/demoexperience && \
 	 ln -sf demoexperience $(DESTDIR)/usr/bin/gopoint && \

@@ -29,8 +29,8 @@ tflite_ethosu_delegate:
 		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so \
 		-DPython_INCLUDE_DIRS=$(RFSDIR)/usr/include/python3.11 \
 		-DPython_EXECUTABLE=$(RFSDIR)/usr/bin/python3.11 \
-		-DPython_LIBRARY=$(RFSDIR)/usr/lib/aarch64-linux-gnu/libpython3.11.so && \
-	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) ethosu_delegate && \
+		-DPython_LIBRARY=$(RFSDIR)/usr/lib/aarch64-linux-gnu/libpython3.11.so $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) ethosu_delegate $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so && \
 	 install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so $(DESTDIR)/usr/lib && \
 	 $(call fbprint_d,"tflite_ethosu_delegate")

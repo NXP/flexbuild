@@ -16,6 +16,6 @@ imx_pxp_g2d:
 	 $(call fbprint_b,"imx_pxp_g2d") && \
 	 cd $(GRAPHICSDIR)/imx_pxp_g2d && \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) PLATFORM=IMX93 INCLUDE='-I$(DESTDIR)/usr/include' DEST_DIR=$(DESTDIR) && \
-	 $(MAKE) -j$(JOBS)  DEST_DIR=$(DESTDIR) install && \
+	 $(MAKE) -j$(JOBS) PLATFORM=IMX93 INCLUDE='-I$(DESTDIR)/usr/include' DEST_DIR=$(DESTDIR) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS)  DEST_DIR=$(DESTDIR) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_pxp_g2d")

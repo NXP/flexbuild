@@ -28,7 +28,7 @@ cogl:
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 sudo cp $(DESTDIR)/usr/lib/{libVSC.so,libgbm_viv.so,libGLESv2.so*} $(RFSDIR)/usr/lib && \
 	 \
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu && \
+	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--prefix=/usr \
@@ -50,7 +50,7 @@ cogl:
 		--enable-gl \
 		--enable-glx \
 		--enable-wayland-egl-server \
-		--enable-nls && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+		--enable-nls $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"cogl")

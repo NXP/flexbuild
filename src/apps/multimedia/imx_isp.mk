@@ -60,8 +60,8 @@ imx_isp:
 		-DCMAKE_C_FLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/libdrm \
 			-I$(MMDIR)/imx_isp/utils3rd/3rd/jsoncpp/include -Wno-error=variadic-macros -Wno-error=pedantic" \
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/libdrm \
-			-I$(MMDIR)/imx_isp/utils3rd/3rd/jsoncpp/include -Wno-error=variadic-macros -Wno-error=pedantic" && \
-	 $(MAKE) -j$(JOBS) && \
+			-I$(MMDIR)/imx_isp/utils3rd/3rd/jsoncpp/include -Wno-error=variadic-macros -Wno-error=pedantic" $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/opt/imx8-isp/bin && \
 	 install -d $(DESTDIR)/usr/lib/systemd/system && \
 	 install -d $(DESTDIR)/etc/systemd/system/multi-user.target.wants && \

@@ -22,9 +22,9 @@ imx_codec:
 	   --enable-armv8 \
 	   --disable-static \
 	   --disable-vpu \
-	   --prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	   --prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 rm -rf $(DESTDIR)/usr/share/imx-mm/*-codec/build $(DESTDIR)/usr/lib/imx-mm/video-codec && \
 	 find $(DESTDIR)/usr/*/imx-mm -name *arm12* -o -name *arm11* -o -name *arm9* | xargs rm -f && \
 	 for p in lib_aac_dec_arm_elinux.so.3 lib_mp3_dec_arm_elinux.so.2 lib_oggvorbis_dec_arm_elinux.so.2; do \

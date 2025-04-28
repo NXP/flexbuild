@@ -24,7 +24,7 @@ nxp_wlan_bt:
 	     git am $(FBDIR)/patch/nxp_wlan_bt/*.patch && touch .patchdone; \
 	 fi && \
 	 \
-	 make build KERNELDIR=$(KERNEL_PATH) O=$$kerneloutdir && \
+	 make build KERNELDIR=$(KERNEL_PATH) O=$$kerneloutdir -j$(JOBS) $(LOG_MUTE) && \
 	 kernelrelease=`cat $(KERNEL_OUTPUT_PATH)/$$curbrch/include/config/kernel.release` && \
 	 mkdir -p $(DESTDIR)/usr/share/nxp_wireless && \
 	 install -d $$kerneloutdir/tmp/lib/modules/$$kernelrelease/kernel/drivers/net/wireless/nxp && \

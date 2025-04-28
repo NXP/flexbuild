@@ -160,6 +160,6 @@ gst_plugins_bad:
 		-Dwebrtcdsp=disabled \
 		-Dx11=enabled \
 		-Dx265=disabled \
-		-Dzbar=disabled && \
-	ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dzbar=disabled $(LOG_MUTE) && \
+	ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	$(call fbprint_d,"gst_plugins_bad")

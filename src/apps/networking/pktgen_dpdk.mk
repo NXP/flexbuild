@@ -30,7 +30,7 @@ pktgen_dpdk:
 			  -Wno-error=nonnull -Wno-error=implicit-function-declaration -Wno-error=unused-variable" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" \
 		--prefix=$(DESTDIR)/usr --buildtype=release \
-		--cross-file meson.cross && \
-	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir && \
+		--cross-file meson.cross $(LOG_MUTE) && \
+	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir $(LOG_MUTE) && \
 	 install -m 755 $$build_dir/app/pktgen Pktgen.lua ${DESTDIR}/usr/bin && \
 	 $(call fbprint_d,"pktgen_dpdk")

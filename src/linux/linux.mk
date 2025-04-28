@@ -40,7 +40,7 @@ linux:
 	    sed -i 's/# CONFIG_CPU_BIG_ENDIAN is not set/CONFIG_CPU_BIG_ENDIAN=y/' $$opdir/.config; \
 	    echo Big-Endian enabled!; \
 	fi && \
-	$(MAKE) -j$(JOBS) all -C $(KERNEL_PATH) O=$$opdir && \
+	$(MAKE) -j$(JOBS) all -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	if [ $(DESTARCH) = arm32 ]; then \
 	    $(MAKE) -j$(JOBS) uImage LOADADDR=80008000 -C $(KERNEL_PATH) O=$$opdir; \
 	fi && \
@@ -54,10 +54,10 @@ linux:
 	    cp -f $$opdir/arch/$$locarch/boot/uImage $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY); \
 	    cp -f $$opdir/arch/$$locarch/boot/zImage $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY); \
 	fi && \
-	$(MAKE) -j$(JOBS) modules -C $(KERNEL_PATH) O=$$opdir && \
-	$(MAKE) -j$(JOBS) modules_install INSTALL_MOD_PATH=$$opdir/tmp -C $(KERNEL_PATH) O=$$opdir && \
+	$(MAKE) -j$(JOBS) modules -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
+	$(MAKE) -j$(JOBS)  modules_install INSTALL_MOD_PATH=$$opdir/tmp -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	ls $$opdir/arch/$$locarch/boot/dts/$$dtbstr | xargs -I {} cp {} $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY) && \
-	ls -l $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY) && \
+	# ls -l $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY) && \
 	$(call fbprint_d,"$(KERNEL_TREE) $$curbrch in $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY)")
 
 
@@ -74,12 +74,12 @@ linux-headers:
 	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir/tmp && \
 	 mkdir -p $(DESTDIR)/usr && \
-	 $(MAKE) -j$(JOBS) headers_install INSTALL_HDR_PATH=$(DESTDIR)/usr -C $(KERNEL_PATH) O=$$opdir && \
+	 $(MAKE) -j$(JOBS) headers_install INSTALL_HDR_PATH=$(DESTDIR)/usr -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	 $(call fbprint_d,"linux-headers")
 
 
 
 linux-deb: linux
 	opdir=$(KERNEL_OUTPUT_PATH)/`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	$(MAKE) -j$(JOBS) bindeb-pkg -C $(KERNEL_PATH) O=$$opdir && \
+	$(MAKE) -j$(JOBS) bindeb-pkg -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	$(call fbprint_d,"linux-deb")

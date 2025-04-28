@@ -36,7 +36,7 @@ imx_smart_kitchen:
 	     cd lvgl && git am *.patch && touch .patchdone && cd ..; \
 	 fi && \
 	 rm -rf smart-kitchen-deploy && \
-	 $(MAKE) -j$(JOBS) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d -m 755 $(DESTDIR)$(SMART_KITCHEN_DIR) && \
 	 cp -rf smart-kitchen-deploy/* $(DESTDIR)$(SMART_KITCHEN_DIR) && \
 	 $(call fbprint_d,"imx_smart_kitchen")

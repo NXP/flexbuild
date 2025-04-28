@@ -42,8 +42,8 @@ define build-uboot-target
 	unset PKG_CONFIG_SYSROOT_DIR && \
 	\
 	$(call fbprint_n,"config = $1") && \
-	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 && \
-	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir && \
+	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 $(LOG_MUTE) && \
+	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $(LOG_MUTE) && \
 	\
 	if echo $1 | grep -iqE 'sdcard|nand'; then \
 	   [ -f $$opdir/u-boot-with-spl-pbl.bin ] && srcbin=u-boot-with-spl-pbl.bin || srcbin=u-boot-with-spl.bin; \

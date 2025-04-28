@@ -80,6 +80,6 @@ gst_plugins_good:
 		-Dosxvideo=disabled \
 		-Dshout2=disabled \
 		-Dtwolame=disabled \
-		-Dwaveform=disabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dwaveform=disabled $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gst_plugins_good")

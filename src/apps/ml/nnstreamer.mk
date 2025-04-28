@@ -9,15 +9,6 @@
 nnstreamer:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
-	 cd $(MLDIR)/nnstreamer && \
-	 rm -rf build_debian_arm64 && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/nnstreamer/*.patch && touch .patchdone; \
-         fi && \
-	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
-	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
@@ -33,6 +24,15 @@ nnstreamer:
 	 if [ ! -f $(DESTDIR)/usr/lib/libtvm.so ]; then \
 	     bld tvm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 cd $(MLDIR)/nnstreamer && \
+	 rm -rf build_debian_arm64 && \
+	 if [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/nnstreamer/*.patch && touch .patchdone; \
+     fi && \
+	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
+	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 \
 	 $(call fbprint_b,"nnstreamer") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \

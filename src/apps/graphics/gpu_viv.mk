@@ -8,7 +8,7 @@
 gpu_viv:
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 echo Building gpu_viv ... && \
+	 $(call fbprint_b,"gpu_viv ") && \
 	 if [ ! -d $(GRAPHICSDIR)/gpu_viv ]; then \
 	     mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR) && \
 	     echo Downloading $(repo_gpu_viv_bin_url) && \

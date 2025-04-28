@@ -14,7 +14,7 @@ imx_isp:
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/imx_isp ]; then \
 	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin && \
-	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept && \
+	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept $(LOG_MUTE) && \
 	     mv isp-imx-* imx_isp && rm -f imxisp.bin; \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so ]; then \

@@ -27,7 +27,7 @@ imx_dsp_codec_ext:
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp_codec_ext ]; then \
 	     wget -q $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin && \
-	     chmod +x imx_dsp_codec_ext.bin && ./imx_dsp_codec_ext.bin --auto-accept && \
+	     chmod +x imx_dsp_codec_ext.bin && ./imx_dsp_codec_ext.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-dsp-codec-ext* imx_dsp_codec_ext && rm -f imx_dsp_codec_ext.bin; \
 	 fi && \
 	 cd imx_dsp_codec_ext && \

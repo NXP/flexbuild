@@ -18,7 +18,7 @@ mcore_demo:
 	     cd $(BSPDIR)/imx_mcore_demos && \
 	     for soc in $(MCORE_LIST); do \
 		wget -q $(FW_DOWNLOAD_URL)/$${soc}-demo-$(IMX_MCORE_VERSION).bin -O $${soc}.bin && \
-		chmod +x $${soc}.bin && ./$${soc}.bin --auto-accept && \
+		chmod +x $${soc}.bin && ./$${soc}.bin --auto-accept $(LOG_MUTE) && \
 		mv $${soc}-demo-$(IMX_MCORE_VERSION) $${soc}-demo && \
 		rm -f $${soc}.bin; \
 	     done; \

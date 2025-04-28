@@ -13,7 +13,7 @@ imx_vpu_hantro_vc:
 	 if [ ! -d imx_vpu_hantro_vc ]; then \
 	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_vc_bin_url) -O vpu_hantro_vc.bin && \
 	     chmod +x vpu_hantro_vc.bin && \
-	     ./vpu_hantro_vc.bin --auto-accept && \
+	     ./vpu_hantro_vc.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-vpu-hantro-vc-* imx_vpu_hantro_vc && rm -f vpu_hantro_vc.bin; \
 	 fi && \
 	 cp -Prf $(MMDIR)/imx_vpu_hantro_vc/usr $(DESTDIR)/ && \

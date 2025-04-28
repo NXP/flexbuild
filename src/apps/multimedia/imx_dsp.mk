@@ -23,7 +23,7 @@ imx_dsp:
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp ]; then \
 	     wget -q $(repo_imx_dsp_bin_url) -O imx_dsp.bin && \
-	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept && \
+	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-dsp* imx_dsp && rm -f imx_dsp.bin; \
 	 fi && \
 	 cd imx_dsp && \

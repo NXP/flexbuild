@@ -66,7 +66,7 @@ dp_fw_cadence:
 	@if [ ! -d $(BSPDIR)/firmware-imx/firmware/hdmi/cadence ]; then \
              cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin && \
              chmod +x firmware_imx.bin && \
-             ./firmware_imx.bin --auto-accept && \
+             ./firmware_imx.bin --auto-accept $(LOG_MUTE) && \
 	     mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
 	 fi && \
 	 if [ ! -L $(FBOUTDIR)/bsp/dp_fw_cadence ]; then \

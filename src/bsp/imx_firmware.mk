@@ -24,7 +24,7 @@ imx_firmware:
 	 if [ ! -d $(BSPDIR)/firmware-imx ]; then \
 	     cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin && \
 	     chmod +x firmware_imx.bin && \
-	     ./firmware_imx.bin --auto-accept && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
+	     ./firmware_imx.bin --auto-accept $(LOG_MUTE) && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
 	 fi && \
 	 cp -Prf $(BSPDIR)/firmware-imx/firmware/* $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/imx/ && \
 	 $(call fbprint_d,"imx_firmware")

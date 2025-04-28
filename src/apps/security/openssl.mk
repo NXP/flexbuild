@@ -11,7 +11,6 @@ openssl:
 	 if [ ! -d $(DESTDIR)/usr/local/include/crypto ]; then \
 	     bld cryptodev_linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
-	 export MAKE=make && \
 	 $(call fbprint_b,"OpenSSL") && \
 	 cd $(SECDIR)/openssl && \
 	 if [ -d $(FBDIR)/patch/openssl ] && [ ! -f .patchdone ]; then \

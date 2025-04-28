@@ -560,7 +560,7 @@ flex_auto_build() {
     bld boot -a $DESTARCH -p $SOCFAMILY
     build_rfs_and_apps
     cp -f $FBDIR/tools/flex-installer $FBOUTDIR/images
-    ls -goh $FBOUTDIR/images ${LOG_MUTE}
+	#ls -goh $FBOUTDIR/images
 
     fbprint_n "Build Done: `date`"
     endtime=`date +'%Y-%m-%d %H:%M:%S'`
@@ -696,8 +696,7 @@ set_loglevel() {
         LOG_MUTE=" 1>/dev/null "
         ;;
     2)
-        LOG_MUTE=' 1>/dev/null 2>${FBDIR}/logs/err.log '
-        #LOG_MUTE=' 1>/dev/null 2>${FBDIR}/logs/err.log || { echo "Error: please set LOG_LEVEL=0 and retry or check ${FBDIR}/logs/err.log for details." ;   exit 1; } '
+        LOG_MUTE=' 1>/dev/null 2>${FBDIR}/logs/err.log || { echo "Error: please set LOG_LEVEL=0 and retry or check ${FBDIR}/logs/err.log for details." ;   exit 1; } '
         ;;
     *)
         echo "Error LOG_LEVEL must be 0, 1 or 2" >&2

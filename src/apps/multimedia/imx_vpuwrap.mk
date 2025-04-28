@@ -27,5 +27,5 @@ imx_vpuwrap:
 	     -e 's/^include /#include /' -i Makefile && \
 	 $(MAKE) DEST_DIR=$(DESTDIR) SDKTARGETSYSROOT=$(DESTDIR) CC=aarch64-linux-gnu-gcc $(LOG_MUTE) && \
 	 $(MAKE) DEST_DIR=$(DESTDIR) SDKTARGETSYSROOT=$(DESTDIR) install $(LOG_MUTE) && \
-	 echo installed examples in $(DESTDIR)/usr/share/imx-mm/video-codec/examples && \
+	#echo installed examples in $(DESTDIR)/usr/share/imx-mm/video-codec/examples && \
 	 $(call fbprint_d,"imx_vpuwrap")

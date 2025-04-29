@@ -12,7 +12,7 @@ libgpuperfcnt:
 	 $(call fbprint_b,"libgpuperfcnt") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d libgpuperfcnt ]; then \
-	     wget -q $(repo_libgpuperfcnt_bin_url) -O libgpuperfcnt.bin && \
+	     wget -q $(repo_libgpuperfcnt_bin_url) -O libgpuperfcnt.bin $(LOG_MUTE) && \
 	     chmod +x libgpuperfcnt.bin && ./libgpuperfcnt.bin --auto-accept $(LOG_MUTE) && \
 	     mv libgpuperfcnt-* libgpuperfcnt && rm -f libgpuperfcnt.bin; \
 	 fi && \

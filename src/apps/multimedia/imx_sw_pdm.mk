@@ -11,7 +11,7 @@ imx_sw_pdm:
 	 $(call fbprint_b,"imx_sw_pdm") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_sw_pdm ]; then \
-	     wget -q $(repo_imx_sw_pdm_bin_url) -O imx_sw_pdm.bin && \
+	     wget -q $(repo_imx_sw_pdm_bin_url) -O imx_sw_pdm.bin $(LOG_MUTE) && \
 	     chmod +x imx_sw_pdm.bin && ./imx_sw_pdm.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-sw-pdm* imx_sw_pdm && rm -f imx_sw_pdm.bin; \
 	 fi && \

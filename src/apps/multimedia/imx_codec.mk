@@ -13,7 +13,7 @@ imx_codec:
 	 $(call fbprint_b,"imx_codec") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_codec ]; then \
-	     wget -q $(repo_imx_codec_bin_url) -O imx_codec.bin && \
+	     wget -q $(repo_imx_codec_bin_url) -O imx_codec.bin $(LOG_MUTE) && \
 	     chmod +x imx_codec.bin && ./imx_codec.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-codec* imx_codec && rm -f imx_codec.bin; \
 	 fi && \

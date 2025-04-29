@@ -12,7 +12,7 @@ ifeq ($(CONFIG_BASLER_CAMERA),y)
 	 $(call fbprint_b,"basler_camera") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/basler_camera ]; then \
-	     wget -q $(repo_basler_camera_bin_url) -O basler_camera.bin && \
+	     wget -q $(repo_basler_camera_bin_url) -O basler_camera.bin $(LOG_MUTE) && \
 	     chmod +x basler_camera.bin && ./basler_camera.bin --auto-accept $(LOG_MUTE) && \
 	     mv basler-camera-* basler_camera && rm -f basler_camera.bin; \
 	 fi && \

@@ -12,7 +12,7 @@ imx_vpu_hantro:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_vpu_hantro ]; then \
-	     wget -q $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin && chmod +x vpu_hantro.bin && \
+	     wget -q $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin $(LOG_MUTE) && chmod +x vpu_hantro.bin && \
 	     ./vpu_hantro.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-vpu-hantro-* imx_vpu_hantro && rm -f vpu_hantro.bin; \
 	 fi && \

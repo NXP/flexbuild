@@ -26,7 +26,7 @@ imx_dsp_codec_ext:
 	 $(call fbprint_b,"imx_dsp_codec_ext $(EXTRA_CONF)") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp_codec_ext ]; then \
-	     wget -q $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin && \
+	     wget -q $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin $(LOG_MUTE) && \
 	     chmod +x imx_dsp_codec_ext.bin && ./imx_dsp_codec_ext.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-dsp-codec-ext* imx_dsp_codec_ext && rm -f imx_dsp_codec_ext.bin; \
 	 fi && \

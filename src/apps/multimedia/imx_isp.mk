@@ -13,7 +13,7 @@ imx_isp:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/imx_isp ]; then \
-	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin && \
+	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin $(LOG_MUTE) && \
 	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept $(LOG_MUTE) && \
 	     mv isp-imx-* imx_isp && rm -f imxisp.bin; \
 	 fi && \

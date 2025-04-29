@@ -11,7 +11,7 @@ imx_parser:
 	 $(call fbprint_b,"imx_parser") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_parser ]; then \
-	     wget -q $(repo_imx_parser_bin_url) -O imx_parser.bin && \
+	     wget -q $(repo_imx_parser_bin_url) -O imx_parser.bin $(LOG_MUTE) && \
 	     chmod +x imx_parser.bin && ./imx_parser.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-parser* imx_parser && rm -f imx_parser.bin; \
 	 fi && \

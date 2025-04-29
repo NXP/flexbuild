@@ -12,7 +12,7 @@ gpu_viv:
 	 if [ ! -d $(GRAPHICSDIR)/gpu_viv ]; then \
 	     mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR) && \
 	     echo Downloading $(repo_gpu_viv_bin_url) && \
-	     wget -q $(repo_gpu_viv_bin_url) -O gpu_viv.bin && chmod +x gpu_viv.bin && \
+	     wget -q $(repo_gpu_viv_bin_url) -O gpu_viv.bin $(LOG_MUTE) && chmod +x gpu_viv.bin && \
 	     ./gpu_viv.bin --auto-accept $(LOG_MUTE) && mv imx-gpu-* gpu_viv && rm -f gpu_viv.bin; \
 	 fi && \
 	 cd $(GRAPHICSDIR)/gpu_viv && \

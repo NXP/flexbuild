@@ -15,7 +15,7 @@ SOCLIST = IMX8MM IMX8MQ IMX8MP
 imx_vpu_hantro_daemon:
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 if [ ! -d $(MMDIR)/imx_vpu_hantro_daemon ]; then \
-	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_daemon_tar_url) -O imx_vpu_hantro_daemon.tar.gz && \
+	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_daemon_tar_url) -O imx_vpu_hantro_daemon.tar.gz $(LOG_MUTE) && \
 	     tar xf imx_vpu_hantro_daemon.tar.gz && rm -rf imx_vpu_hantro_daemon.tar.gz && \
 	     mv imx-vpu-hantro-daemon-* imx_vpu_hantro_daemon; \
 	 fi && \

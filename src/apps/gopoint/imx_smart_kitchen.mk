@@ -17,7 +17,7 @@ imx_smart_kitchen:
 #	 fi && \
 #	 \
 #	 cd $(GPDIR)/imx_smart_kitchen && \
-#	 [ ! -f posix_ipc.tar.gz ] && wget -q $(POSIX_IPC_PKG) -O posix_ipc.tar.gz && tar xf posix_ipc.tar.gz || true && \
+#	 [ ! -f posix_ipc.tar.gz ] && wget -q $(POSIX_IPC_PKG) -O posix_ipc.tar.gz $(LOG_MUTE) && tar xf posix_ipc.tar.gz || true && \
 #	 cd posix_ipc-1.1.1 && export CC="$(CROSS_COMPILE)gcc -DMESSAGE_QUEUE_SUPPORT_EXISTS --sysroot=$(RFSDIR)" && \
 #	 python3 setup.py build && python3 setup.py install --prefix=$(DESTDIR)/usr && \
 	 \

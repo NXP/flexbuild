@@ -280,7 +280,7 @@ get_prebuilt_initrd() {
     tfile=rootfs_${DISTRIB_VERSION}_poky_tiny_${DESTARCH}.cpio.gz
     if [ ! -f $FBOUTDIR/images/$tfile ]; then
         [ $HOSTARCH = x86_64 ] && check_http_request $initrd_bin_url/$tfile
-        wget --progress=bar:force $DISTRO_SVR_URL/$DISTRIB_VERSION/$tfile -O $FBOUTDIR/images/$tfile
+        log_mute wget --progress=bar:force $DISTRO_SVR_URL/$DISTRIB_VERSION/$tfile -O $FBOUTDIR/images/$tfile
     fi
 }
 

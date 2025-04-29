@@ -11,7 +11,7 @@ ceetm:
 	 $(call repo-mngr,fetch,ceetm,apps/networking) && \
 	 cd $(NETDIR)/ceetm && \
 	 if [ ! -f iproute2-4.15.0/tc/tc_util.h ]; then \
-	     wget --no-check-certificate $(iproute2_src_url) && \
+	     wget --no-check-certificate $(iproute2_src_url) $(LOG_MUTE) && \
 	     tar xzf iproute2-4.15.0.tar.gz; \
 	 fi && \
 	 export IPROUTE2_DIR=$(NETDIR)/ceetm/iproute2-4.15.0 && \

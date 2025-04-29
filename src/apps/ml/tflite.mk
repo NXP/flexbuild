@@ -19,7 +19,7 @@ tflite:
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 $(call repo-mngr,fetch,tflite,apps/ml) && \
 	 cd $(MLDIR)/tflite && \
-	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz && tar xf mobilenet.tgz || true && \
+	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \

@@ -501,7 +501,7 @@ build_rfs_and_apps() {
         bld packrfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY
     fi
 
-    if [ "$BUILD_DEBIAN_SERVER" = y ] && [ $SOCFAMILY = LS -o $MACHINE = all ]; then
+    if [ "$BUILD_DEBIAN_SERVER" = y ] && [ $SOCFAMILY = LS -o $MACHINE = all ] && [ ${MACHINE:0:7} != "ls1028a"  ]; then
         bld rfs -r debian:server -a $DESTARCH -p $SOCFAMILY
         bld apps -r debian:server -a $DESTARCH -p $SOCFAMILY
         bld merge-apps -r debian:server -a $DESTARCH -p $SOCFAMILY
@@ -774,9 +774,9 @@ do
              [ "$DISTROVARIANT" != tiny -a "$DISTROVARIANT" != devel -a "$DISTROVARIANT" != imaevm ]; then
             fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: tiny, devel, devel:custom, imaevm" && exit 1
         fi
-        echo DISTRO TYPE:  $DISTROTYPE
-        [ -n "$DISTROVARIANT" ] && echo DISTRO VARIANT: $DISTROVARIANT
-        [ -n "$CODENAME" ] && echo DISTRO CODENAME: $CODENAME
+        #echo DISTRO TYPE:  $DISTROTYPE
+        #[ -n "$DISTROVARIANT" ] && echo DISTRO VARIANT: $DISTROVARIANT
+        #[ -n "$CODENAME" ] && echo DISTRO CODENAME: $CODENAME
         shift;;
     -i|--instruction)
         INSTRUCTION=$2; echo INSTRUCTION: $2; shift;;

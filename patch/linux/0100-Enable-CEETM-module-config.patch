@@ -1,28 +1,32 @@
-From bdaf2c820298447dfc84d359e8d93e6252d1cb6c Mon Sep 17 00:00:00 2001
-From: nxa22691 <andy.tang@nxp.com>
-Date: Wed, 19 Feb 2025 18:21:49 +0900
+From 059f82c48b3d9646fb9f2f3ece172d10119d1f96 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 28 Apr 2025 18:25:03 -0700
 Subject: [PATCH] Enable CEETM module config
 
 Signed-off-by: Andy Tang <andy.tang@nxp.com>
 ---
- arch/arm64/configs/lsdk.config | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/configs/lsdk.config | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/configs/lsdk.config b/arch/arm64/configs/lsdk.config
-index d97ef5280ed2..09285da5fc85 100644
+index d97ef5280ed2..4dbf5e3b2b5b 100644
 --- a/arch/arm64/configs/lsdk.config
 +++ b/arch/arm64/configs/lsdk.config
-@@ -201,3 +201,10 @@ CONFIG_FSL_DPAA2_SWITCH=y
+@@ -89,7 +89,6 @@ CONFIG_SFP=y
+ CONFIG_PHY_FSL_LYNX_10G=y
+ CONFIG_PHY_FSL_LYNX_28G=y
+ CONFIG_MTIP_BACKPLANE_PHY=y
+-CONFIG_BPF_SYSCALL=y
+ CONFIG_BPF_JIT_ALWAYS_ON=y
+ CONFIG_XDP_SOCKETS=y
+ 
+@@ -201,3 +200,6 @@ CONFIG_FSL_DPAA2_SWITCH=y
  CONFIG_QORIQ_THERMAL=y
  CONFIG_FSL_IFC=y
  CONFIG_MTD_NAND_FSL_IFC=y
 +
-+# for CEETM modules
 +CONFIG_FSL_DPAA_CEETM=y
 +CONFIG_FSL_DPAA2_ETH_CEETM=y
-+CONFIG_FSL_DPAA_CEETM_CCS_THRESHOLD_10G=y
-+CONFIG_FSL_DPAA_CEETM_CCS_THRESHOLD_1G=y
-+CONFIG_FSL_DPAA_CEETM=y
 -- 
 2.34.1
 

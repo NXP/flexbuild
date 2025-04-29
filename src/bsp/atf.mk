@@ -111,7 +111,7 @@ atf:
 	 if [ $(BOOTTYPE) = xspi ]; then bootmode=flexspi_nor; else bootmode=$(BOOTTYPE); fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 	     echo $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode RCW=$$rcwbin \
-		  BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt && \
+		  BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt ${LOG_MUTE} && \
 	     $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode \
 		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) $(LOG_MUTE) && \
 	     if [ $${MACHINE:0:5} = lx216 -a "$(SECURE)" = y ] && [ ! -f $$outputdir/ddr_fip_sec.bin ]; then \
@@ -139,5 +139,5 @@ atf:
 	    mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE) && \
 	    cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
 	 fi && \
-	 ls -l $(FBOUTDIR)/bsp/atf/$(MACHINE)/* && \
+	 ls -l $(FBOUTDIR)/bsp/atf/$(MACHINE)/* ${LOG_MUTE} && \
 	 $(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot")

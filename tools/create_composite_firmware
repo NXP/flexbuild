@@ -94,7 +94,7 @@ create_composite_firmware() {
 
 			if [ -n "${img_file}" ]; then
 			    if [ -e "$FBOUTDIR/${img_file}" ]; then
-				echo " Writing ${img_offset} <---> ${FBOUTDIR##*/}/${img_file}"
+				log_mute echo " Writing ${img_offset} <---> ${FBOUTDIR##*/}/${img_file}"
 				if [ $i != 1 ] && [ "${boottype}" = "sd" -o "${boottype}" = "emmc" ]; then
 				    img_offset=`printf "%d - %d\n" ${img_offset} ${DISK_BOOTLOADER_OFFSET} | bc`
 				fi

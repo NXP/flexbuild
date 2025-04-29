@@ -687,16 +687,40 @@ show_lists() {
     echo -e "\t$ML_REPO_LIST $GOPOINT_REPO_LIST"
 }
 
+log_mute() {
+  case "${LOG_LEVEL:-2}" in
+    0)
+      "$@"
+      ;;
+    1)
+      "$@" >/dev/null
+      ;;
+    2)
+      "$@" >/dev/null 2>&1 || {
+        echo "Error: Command '$*' failed. Please export LOG_LEVEL=0 and retry."
+        exit 1
+      }
+      ;;
+	*)
+		echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
+		exit 1
+		;;
+  esac
+}
+
 set_loglevel() {
 	case "${LOG_LEVEL:-2}" in
     0)
         LOG_MUTE=""
         ;;
     1)
-        LOG_MUTE=" 1>/dev/null "
+        LOG_MUTE=">/dev/null"
         ;;
     2)
-        LOG_MUTE=' 1>/dev/null 2>${FBDIR}/logs/err.log || { echo "Error: please set LOG_LEVEL=0 and retry or check ${FBDIR}/logs/err.log for details." ;   exit 1; } '
+        LOG_MUTE=">/dev/null 2>&1" || {
+			echo "Error: please export LOG_LEVEL=0 and retry."
+			exit 1
+		}
         ;;
     *)
         echo "Error LOG_LEVEL must be 0, 1 or 2" >&2

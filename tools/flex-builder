@@ -67,7 +67,7 @@ check_toolchain() {
         [ -f /usr/bin/arm-linux-gnueabihf-gcc ] && gccversion=$(arm-linux-gnueabihf-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
         if [ $gccversion = 0 ]; then
             fbprint_w "Installing toolchain for arm32 ..."
-            sudo apt-get install -y crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            log_mute sudo apt-get install -y crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf g++-arm-linux-gnueabihf
         elif ! echo $tc_version | grep -q `echo $gccversion|cut -d. -f1` && [ $DISTROTYPE != buildroot ]; then
             fbprint_w "Please build on Debian $DEBIAN_VERSION host or build in docker (run 'bld docker') to use the verified toolchain"
             exit
@@ -78,7 +78,7 @@ check_toolchain() {
         [ -f /usr/bin/aarch64-linux-gnu-gcc ] && gccversion=$(aarch64-linux-gnu-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
         if [ $gccversion = 0 ]; then
             fbprint_w "Installing toolchain for arm64 ..."
-            sudo apt-get install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+            log_mute sudo apt-get install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
         elif ! echo $tc_version | grep -q `echo $gccversion | cut -d. -f1` &&  [ $DISTROTYPE != buildroot ]; then
             fbprint_w "The existing toolchain version $gccversion on this host may result in build failure for some components."
             fbprint_w "Please build on Debian $DEBIAN_VERSION or Ubuntu 22.04 host or build in docker (run 'bld docker') to use the verified toolchain version $tc_version"
@@ -391,7 +391,7 @@ check_component_valid() {
 check_binfmt_qemu() {
     if grep -q Ubuntu /etc/issue; then
         [ -f /usr/bin/qemu-aarch64-static ] || \
-        sudo apt-get install -y binfmt-support qemu-system-common qemu-user-static
+        log_mute sudo apt-get install -y binfmt-support qemu-system-common qemu-user-static
     fi
     if ! grep -q binfmt_misc /proc/filesystems; then
         sudo modprobe binfmt_misc
@@ -428,7 +428,7 @@ host_connect_target(){
     fi
     if ! echo $1 | grep -q @; then optuser=root@; fi
     if ! echo $1 | grep -q :; then optdir=":/"; fi
-    [ -f /usr/bin/sshfs ] || sudo apt-get install -y sshfs
+    [ -f /usr/bin/sshfs ] || log_mute sudo apt-get install -y sshfs
     mkdir -p $localmntdir
     sshfs -o nonempty,reconnect,exec,allow_other -o idmap=user,uid=`id -u`,gid=`id -g` \
       -p22 ${optuser}${1}$optdir $localmntdir && \
@@ -597,7 +597,7 @@ check_debian_version() {
             fbprint_w "The host is not Debian 12 system, please install docker (refer to docs/FAQ-docker-setup.md) and run 'bld docker' to build in docker" && exit
         fi
     else
-        [ -f /usr/bin/lsb_release ] || sudo apt-get install -y lsb-release
+        [ -f /usr/bin/lsb_release ] || log_mute sudo apt-get install -y lsb-release
         [ ! -f /usr/bin/lsb_release ] && fbprint_e "lsb_release command is not found" && exit
         releaseVersion=$(lsb_release -rs)
         result=$(echo "$releaseVersion < $DEBIAN_VERSION" | bc)
@@ -613,8 +613,8 @@ check_debian_version() {
 check_host_dependent_pkg() {
     for pkg in $host_dependent_packages; do
     if ! dpkg-query -l $pkg | grep -q ii; then
-        [ "$aptupdatedone" != y ] && sudo apt autoclean && sudo apt-get update && aptupdatedone=y
-        echo installing $pkg ... && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
+        [ "$aptupdatedone" != y ] && log_mute sudo apt autoclean && log_mute sudo apt-get update && aptupdatedone=y
+        log_mute echo installing $pkg ... && log_mute sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
     fi
     done
 

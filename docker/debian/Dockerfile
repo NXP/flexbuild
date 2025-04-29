@@ -1,13 +1,13 @@
 FROM debian:bookworm
 
 ARG http_proxy
-ENV http_proxy $http_proxy
+ENV http_proxy=$http_proxy
 ARG https_proxy
-ENV https_proxy $https_proxy
+ENV https_proxy=$https_proxy
 ARG no_proxy
-ENV no_proxy $no_proxy
-ENV DEBIAN_FRONTEND noninteractive
-ENV DEBCONF_NONINTERACTIVE_SEEN true
+ENV no_proxy=$no_proxy
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
 RUN echo "Acquire::http::proxy \"$http_proxy\";" | tee -a /etc/apt/apt.conf && \
     echo "Acquire::https::proxy \"$https_proxy\";" | tee -a /etc/apt/apt.conf && \
     echo 'PS1="[\u@\h \W]\$ "' | tee -a /root/.bashrc 1>/dev/null && \

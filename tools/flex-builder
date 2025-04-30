@@ -147,7 +147,7 @@ generate_composite_firmware() {
 
 generate_initrd_cpio() {
     [ -f $RFSDIR/etc/buildinfo ] || bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH
-    echo generating ${initrdimg##*/} ...
+    fbprint_n generating ${initrdimg##*/} ...
     if [ -d $RFSDIR/sys/devices ]; then
         [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
         sudo umount $RFSDIR/sys
@@ -155,7 +155,7 @@ generate_initrd_cpio() {
     [ -f $RFSDIR/proc/uptime ] && sudo umount $RFSDIR/proc
     [ -c $RFSDIR/dev/pts/0 ] && sudo umount $RFSDIR/dev/pts
     cd $RFSDIR && sudo find . | sudo cpio --quiet -o -H newc | gzip > $FBOUTDIR/images/${initrdimg##*/} && \
-    ls -lh $FBOUTDIR/images/${initrdimg##*/} && fbprint_d "$FBOUTDIR/images/${initrdimg##*/}"
+    log_mute ls -lh $FBOUTDIR/images/${initrdimg##*/} && fbprint_d "$FBOUTDIR/images/${initrdimg##*/}"
 }
 
 
@@ -404,7 +404,7 @@ flexbuild_launch_docker() {
     containername=${username}_fbdebian_${DEBIAN_VERSION}_${dnum}
     if ! docker ps -a | grep -q $containername; then
         if ! docker ps -a | grep -q ' fbdebian_${DEBIAN_VERSION}'; then
-            make -C $FBDIR/docker/debian
+            $MAKE -C $FBDIR/docker/debian
         fi && \
         docker run -t -i -h fbdebian --name="$containername" --privileged=true --net=host \
                -v $HOME:$HOME -v $FBDIR:$FBDIR -v /lib/modules:/lib/modules -v /dev:/dev \
@@ -1188,7 +1188,7 @@ esac
 # for components
 case $1 in
     rcw|uboot|u-boot|uefi)
-        make -C $FBDIR/src/bsp $1
+        $MAKE -C $FBDIR/src/bsp $1
         ;;
 
     linux|linux:custom|linux:menuconfig)
@@ -1198,9 +1198,8 @@ case $1 in
         if echo $1 | grep -qE ':custom|:menuconfig'; then
                export BUILDARG=custom
         fi
-        export MAKE="make --no-print-directory"
         check_linux_config
-        make -C $FBDIR/src/linux linux
+        $MAKE -C $FBDIR/src/linux linux
         ;;
 
     initrd)
@@ -1209,7 +1208,7 @@ case $1 in
 
     app|apps)
         if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY} ]; then
-            make -C $FBDIR/src $1 && \
+            $MAKE -C $FBDIR/src $1 && \
             touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
         else
             echo -e "apps for ${DESTARCH} $DISTROTYPE:$DISTROVARIANT was already built, do 'bld clean-apps -r <distro_variant>' to rebuild."

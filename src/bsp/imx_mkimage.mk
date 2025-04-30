@@ -70,7 +70,7 @@ define imx_mkimage_target
     cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
     \
     cd $(BSPDIR)/imx_mkimage && \
-    $(MAKE) clean && $(MAKE) bin $(LOG_MUTE) && \
+    $(MAKE) clean $(LOG_MUTE) && $(MAKE) bin $(LOG_MUTE) && \
     $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 $(LOG_MUTE) && \
     \
     bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \

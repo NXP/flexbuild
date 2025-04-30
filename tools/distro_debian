@@ -29,7 +29,7 @@ build_distro_rfs_debian() {
     fi
 
     if [ ! -f $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH/rootfs/etc/buildinfo ]; then
-	[ -f /usr/bin/bdebstrap ] || $sudopt apt install -qq -y bdebstrap
+	[ -f /usr/bin/bdebstrap ] || log_mute $sudopt apt install -y bdebstrap
 	[ -f $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH ] || \
 	log_mute $sudopt bdebstrap -c $FBDIR/configs/debian/${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.yaml --name \
 	     $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH $mirroropt -f

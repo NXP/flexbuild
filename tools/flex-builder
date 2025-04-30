@@ -333,10 +333,10 @@ pack_distro_rfs() {
     rname=${RFSDIR##*/}
 
     tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
-    echo Generating $tarname ...
+    fbprint_n Generating $tarname ...
     cd $RFSDIR && sudo tar --zstd -cf $FBOUTDIR/images/$tarname *
     cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
-    ls -lh $FBOUTDIR/images/${rname}*
+    log_mute ls -lh $FBOUTDIR/images/${rname}*
     fbprint_d $FBOUTDIR/images/$tarname
 }
 
@@ -560,7 +560,7 @@ flex_auto_build() {
     bld boot -a $DESTARCH -p $SOCFAMILY
     build_rfs_and_apps
     cp -f $FBDIR/tools/flex-installer $FBOUTDIR/images
-	#ls -goh $FBOUTDIR/images
+	log_mute ls -goh $FBOUTDIR/images
 
     fbprint_n "Build Done: `date`"
     endtime=`date +'%Y-%m-%d %H:%M:%S'`

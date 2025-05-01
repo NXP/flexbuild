@@ -22,7 +22,7 @@ git_repo_update() {
     [ "$PKG_GROUPS_MULTIMEDIA" = y ] && mmdir=apps/multimedia
     [ "$PKG_GROUPS_GOPOINT" = y ] && gpdir=apps/gopoint
     [ "$PKG_GROUPS_ROBOTICS" = y ] && robotdir=apps/robotics
-    dirlist="bsp linux apps/utils $netdir $graphdir $mmdir apps/security apps/connectivity $mldir $gpdir $robotdir"
+    dirlist="bsp linux apps/utils $netdir $graphdir $mmdir apps/security $mldir $gpdir $robotdir"
     for pdn in $dirlist; do
 	[ ! -d $PKGDIR/$pdn ] && mkdir -p $PKGDIR/$pdn
 	rn=$(echo $pdn | xargs basename -s /)

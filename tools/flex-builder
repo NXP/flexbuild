@@ -372,7 +372,7 @@ merge_apps() {
 
 
 check_component_valid() {
-    if ! echo $APPS_REPO_LIST utils security networking graphics multimedia connectivity ml gopoint robotics | grep -q $1 && \
+    if ! echo $APPS_REPO_LIST utils security networking graphics multimedia ml gopoint robotics | grep -q $1 && \
        ! echo "$LINUX_REPO_LIST linux-headers linux-deb linux-modules" | grep -q $1 && \
        ! echo $ML_REPO_LIST | grep -q $1 && \
        ! echo $BSP_REPO_LIST | grep -q $1; then
@@ -956,7 +956,7 @@ initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIA
 [ $DISTROVARIANT != base ] && mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
 mkdir -p $PKGDIR/linux $FBDIR/logs $RFSDIR
-mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,connectivity,utils,ml}
+mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}
 mkdir -p $KERNEL_OUTPUT_PATH
 
 [ -z "$JOBS" ] && JOBS=$(nproc)

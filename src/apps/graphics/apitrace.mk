@@ -16,7 +16,7 @@ ifeq ($(CONFIG_APITRACE),y)
 	 $(call repo-mngr,fetch,apitrace,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/apitrace && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/apitrace/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/apitrace/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 cp -f $(FBDIR)/src/system/pkgconfig/libproc2.pc $(DESTDIR)/usr/lib/pkgconfig && \
 	 export CC="$(CROSS_COMPILE)gcc -march=armv8-a+crc+crypto -mbranch-protection=standard --sysroot=$(RFSDIR)" && \

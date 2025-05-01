@@ -9,7 +9,7 @@ build_distro_rfs_debian() {
     [ $DISTROTYPE = debian -a -f $RFSDIR/etc/buildinfo ] && echo $RFSDIR already exists! && exit 0
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
-    fbprint_n "generating $RFSDIR ..." && cd $FBDIR
+    fbprint_n "Generating initial rootfs: $RFSDIR ..." && cd $FBDIR
     test -c $RFSDIR/dev/pts/ptmx && $sudopt umount $RFSDIR/dev/pts
     test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
     [ -n "$RFSDIR" ] && $sudopt rm -rf $RFSDIR/*

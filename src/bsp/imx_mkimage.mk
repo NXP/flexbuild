@@ -8,7 +8,7 @@ define imx_mkimage_target
         $(call repo-mngr,fetch,imx_mkimage,bsp); \
     fi && \
     if [ -d $(FBDIR)/patch/imx_mkimage ] && [ ! -f .patchdone ]; then \
-        git am $(FBDIR)/patch/imx_mkimage/*.patch && touch .patchdone; \
+        git am $(FBDIR)/patch/imx_mkimage/*.patch $(LOG_MUTE) && touch .patchdone; \
     fi && \
     \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \

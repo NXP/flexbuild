@@ -19,7 +19,7 @@ cryptodev_linux:
 	 cd $(PKGDIR)/linux/cryptodev_linux && \
 	 $(call fbprint_b,"cryptodev_linux") && \
 	 if [ -d $(FBDIR)/patch/cryptodev_linux ] && [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/cryptodev_linux/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/cryptodev_linux/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 export KERNEL_MAKE_OPTS="-lcrypto -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 $(MAKE) KERNEL_DIR=$(KERNEL_PATH) O=$$opdir -j$(JOBS) $(LOG_MUTE) && \

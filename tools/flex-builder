@@ -147,7 +147,7 @@ generate_composite_firmware() {
 
 generate_initrd_cpio() {
     [ -f $RFSDIR/etc/buildinfo ] || bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH
-    fbprint_n generating ${initrdimg##*/} ...
+    fbprint_n "Generating ${initrdimg##*/} ..."
     if [ -d $RFSDIR/sys/devices ]; then
         [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
         sudo umount $RFSDIR/sys
@@ -333,7 +333,7 @@ pack_distro_rfs() {
     rname=${RFSDIR##*/}
 
     tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
-    fbprint_n Generating $tarname ...
+    fbprint_n "Generating $tarname ..."
     cd $RFSDIR && sudo tar --zstd -cf $FBOUTDIR/images/$tarname *
     cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
     log_mute ls -lh $FBOUTDIR/images/${rname}*

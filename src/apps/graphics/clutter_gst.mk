@@ -32,7 +32,7 @@ clutter_gst:
 	 \
 	 cd $(GRAPHICSDIR)/clutter_gst && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/clutter_gst/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/clutter_gst/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -i 's/noinst_PROGRAMS/bin_PROGRAMS/' examples/Makefile.am && \
 	 sed -i 's/autoreconf -v --install/autoreconf --install/g' autogen.sh && \

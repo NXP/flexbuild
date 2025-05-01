@@ -27,7 +27,7 @@ nnstreamer:
 	 cd $(MLDIR)/nnstreamer && \
 	 rm -rf build_debian_arm64 && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/nnstreamer/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/nnstreamer/*.patch $(LOG_MUTE) && touch .patchdone; \
      fi && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
 	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \

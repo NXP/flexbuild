@@ -15,7 +15,7 @@ imx_demos_list:
 	 $(call repo-mngr,fetch,imx_demos_list,apps/gopoint) && \
 	 cd $(GPDIR)/imx_demos_list && \
 	 if [ -d $(FBDIR)/patch/imx_demos_list ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_demos_list/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/imx_demos_list/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 mkdir -p $(DESTDIR)/$(GPNT_APPS_FOLDER) && \
 	 cp -r * $(DESTDIR)/$(GPNT_APPS_FOLDER) && \

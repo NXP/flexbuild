@@ -15,7 +15,7 @@ gst_plugins_bad:
 	 $(call repo-mngr,fetch,gst_plugins_bad,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_bad && \
          if [ ! -f .patchdone ]; then \
-             git am $(FBDIR)/patch/gst_plugins_bad/*.patch && touch .patchdone; \
+             git am $(FBDIR)/patch/gst_plugins_bad/*.patch $(LOG_MUTE) && touch .patchdone; \
          fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \

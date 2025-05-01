@@ -13,7 +13,7 @@ linux:
 	    $(call fbprint_w,"Please set proper tag/branch name in kernel repo $(KERNEL_PATH)") && exit 1; \
 	fi && \
 	if [ -d $(FBDIR)/patch/linux ] && [ ! -f .patchdone ]; then \
-            git am $(FBDIR)/patch/linux/*.patch && touch .patchdone; \
+            git am $(FBDIR)/patch/linux/*.patch $(LOG_MUTE) && touch .patchdone; \
         fi && \
 	$(call fbprint_n,"Building $(KERNEL_TREE) with $$curbrch") && \
 	$(call fbprint_n,"Compiler = `$(CROSS_COMPILE)gcc --version | head -1`") && \

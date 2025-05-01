@@ -17,7 +17,7 @@ cogl:
 	 fi && \
 	 $(call fbprint_b,"cogl") && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/cogl/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/cogl/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)  \

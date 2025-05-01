@@ -26,7 +26,7 @@ imx_smart_kitchen:
 	 $(call fbprint_b,"imx_smart_kitchen") && \
 	 cd $(GPDIR)/imx_smart_kitchen && \
 	 if [ -d $(FBDIR)/patch/imx_smart_kitchen ] && [ ! -f .patchdone ]; then \
-		 git am $(FBDIR)/patch/imx_smart_kitchen/*.patch && touch .patchdone; \
+		 git am $(FBDIR)/patch/imx_smart_kitchen/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -i 's|/home/root/.nxp-demo-experience|/opt/gopoint-apps|g' \
 	     main.cpp main.cpp misc/scripts/vit-notify/WWCommandNotify && \

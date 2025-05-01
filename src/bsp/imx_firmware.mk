@@ -9,7 +9,7 @@ imx_firmware:
 	 $(call repo-mngr,fetch,imx_firmware,bsp) && \
 	 cd $(BSPDIR)/imx_firmware && \
 	 if [ -d $(FBDIR)/patch/imx_firmware ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_firmware/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/imx_firmware/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 mkdir -p $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/{nxp,imx,brcm} && \
 	 echo Installing NXP WIFI/BT firmware && \

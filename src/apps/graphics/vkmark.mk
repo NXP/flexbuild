@@ -17,7 +17,7 @@ ifeq ($(CONFIG_VKMARK),y)
 	 $(call fbprint_b,"vkmark") && \
 	 cd $(GRAPHICSDIR)/vkmark && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/vkmark/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/vkmark/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 [ `hostname` = fbdebian ] && export PKG_CONFIG_SYSROOT_DIR="" || true && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \

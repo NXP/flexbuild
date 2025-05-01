@@ -22,7 +22,7 @@ gstreamer:
 	 fi && \
 	 cd $(MMDIR)/gstreamer && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/gstreamer/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/gstreamer/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 $(call fbprint_b,"gstreamer") && \
 	 export HAVE_PTP_HELPER_CAPABILITIES=0 && \

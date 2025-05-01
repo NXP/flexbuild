@@ -19,7 +19,7 @@ ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 $(call fbprint_b,"imx_voiceplayer") && \
 	 cd $(GPDIR)/imx_voiceplayer && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_voiceplayer/* && touch .patchdone; \
+	     git am $(FBDIR)/patch/imx_voiceplayer/* $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

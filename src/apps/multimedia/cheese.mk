@@ -16,7 +16,7 @@ cheese:
 	 $(call repo-mngr,fetch,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \
 	 if [ ! -f .patchdone ]; then \
-	      git am $(FBDIR)/patch/cheese/*.patch && touch .patchdone; \
+	      git am $(FBDIR)/patch/cheese/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

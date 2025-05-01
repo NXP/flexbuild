@@ -14,7 +14,7 @@ openssl:
 	 $(call fbprint_b,"OpenSSL") && \
 	 cd $(SECDIR)/openssl && \
 	 if [ -d $(FBDIR)/patch/openssl ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/openssl/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/openssl/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 ./Configure enable-devcryptoeng linux-aarch64 shared \
 		     -I$(DESTDIR)/usr/include -I$(PKGDIR)/linux/cryptodev_linux \

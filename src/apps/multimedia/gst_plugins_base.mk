@@ -17,7 +17,7 @@ gst_plugins_base:
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
 	 if [ ! -f .patchdone ] && [ $${MACHINE:0:6} = imx8qm -o $${MACHINE:0:7} = imx8qxp ]; then \
-	     git am $(FBDIR)/patch/gst_plugins_base/*g2d-into-playsink.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/gst_plugins_base/*g2d-into-playsink.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \

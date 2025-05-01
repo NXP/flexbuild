@@ -14,7 +14,7 @@ uboot u-boot:
 	 $(call fbprint_n,"Building u-boot $$curbrch for $(MACHINE)") && \
 	 cd $(BSPDIR)/uboot && \
 	 if [ -d $(FBDIR)/patch/uboot ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/uboot/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/uboot/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 if [ "$(BOOTTYPE)" = tfa -a "$(COT)" = arm-cot-with-verified-boot ]; then \
 	     uboot_cfg=$(MACHINE)_tfa_verified_boot_defconfig; \

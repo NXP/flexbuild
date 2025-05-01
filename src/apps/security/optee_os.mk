@@ -11,7 +11,7 @@ ifeq ($(CONFIG_OPTEE),y)
 	 $(call repo-mngr,fetch,optee_os,apps/security) && \
 	 cd $(SECDIR)/optee_os && \
 	 if [ -d $(FBDIR)/patch/optee_os ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/optee_os/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/optee_os/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 		 if [ $(MACHINE) = lx2162aqds ]; then \

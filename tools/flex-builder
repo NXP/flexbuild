@@ -404,7 +404,7 @@ flexbuild_launch_docker() {
     containername=${username}_fbdebian_${DEBIAN_VERSION}_${dnum}
     if ! docker ps -a | grep -q $containername; then
         if ! docker ps -a | grep -q ' fbdebian_${DEBIAN_VERSION}'; then
-            $MAKE -C $FBDIR/docker/debian
+            make -C $FBDIR/docker/debian
         fi && \
         docker run -t -i -h fbdebian --name="$containername" --privileged=true --net=host \
                -v $HOME:$HOME -v $FBDIR:$FBDIR -v /lib/modules:/lib/modules -v /dev:/dev \
@@ -611,6 +611,7 @@ check_debian_version() {
 }
 
 check_host_dependent_pkg() {
+	fbprint_n "Prepare the build environment on host ..."
     for pkg in $host_dependent_packages; do
     if ! dpkg-query -l $pkg 2>/dev/null | grep -q ii; then
         [ "$aptupdatedone" != y ] && log_mute sudo apt autoclean && log_mute sudo apt-get update && aptupdatedone=y

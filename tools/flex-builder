@@ -195,7 +195,7 @@ generate_distro_bootscr() {
                 if [ $bootscript_dec != null ]; then
                     echo $securevalidate_dec > $FBOUTDIR/$bootscript_dec.tmp
                     echo $distroboot >> $FBOUTDIR/$bootscript_dec.tmp
-                    mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" \
+                    log_mute mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" \
                         -d $FBOUTDIR/$bootscript_dec.tmp $FBOUTDIR/$bootscript_dec
                     rm -f $FBOUTDIR/$bootscript_dec.tmp
                 fi
@@ -205,7 +205,7 @@ generate_distro_bootscr() {
                 if [ -n "$bootscript_enforce" ] ; then
                     echo $securevalidate_enforce > $bootscript_enforce.tmp
                     echo $distroboot_ima >> $bootscript_enforce.tmp
-                    mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" \
+                    log_mute mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" \
                         -d $bootscript_enforce.tmp $bootscript_enforce
                     rm -f $bootscript_enforce.tmp
                 fi
@@ -216,7 +216,7 @@ generate_distro_bootscr() {
         fi
         mkdir -p $FBOUTDIR/bsp/u-boot/$1
         [ "$IMA_EVM" = "y" ] && echo $distroboot_ima >> $FBOUTDIR/${distro_bootscript}.tmp || echo $distroboot >> $FBOUTDIR/${distro_bootscript}.tmp
-        mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" -d $FBOUTDIR/${distro_bootscript}.tmp $FBOUTDIR/$distro_bootscript
+        log_mute mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" -d $FBOUTDIR/${distro_bootscript}.tmp $FBOUTDIR/$distro_bootscript
         rm -f $FBOUTDIR/${distro_bootscript}.tmp
         fbprint_d $distro_bootscript
     fi

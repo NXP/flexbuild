@@ -10,7 +10,7 @@
 
 # version：12.0.3
 
-weston:
+weston: libdrm wayland wayland_protocols gpu_viv
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call repo-mngr,fetch,weston,apps/graphics) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \

@@ -7,7 +7,7 @@
 
 # depends on imx-codec imx-parser libdrm gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
 
-imx_gst_plugin:
+imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call repo-mngr,fetch,imx_gst_plugin,apps/multimedia) && \
 	 cd $(MMDIR)/imx_gst_plugin && \

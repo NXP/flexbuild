@@ -6,7 +6,7 @@
 # https://gstreamer.freedesktop.org
 
 
-gst_plugins_ugly:
+gst_plugins_ugly: gst_plugins_base
 ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \

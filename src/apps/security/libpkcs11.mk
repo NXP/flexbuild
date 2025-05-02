@@ -4,7 +4,7 @@
 
 
 
-libpkcs11:
+libpkcs11: secure_obj
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call repo-mngr,fetch,libpkcs11,apps/security) && \
 	 if [ ! -d $(SECDIR)/secure_obj/securekey_lib/include ]; then \

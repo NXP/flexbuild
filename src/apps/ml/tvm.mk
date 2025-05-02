@@ -16,7 +16,7 @@
 
 PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
 
-tvm:
+tvm: tim_vx
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call repo-mngr,fetch,tvm,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtim-vx.so ]; then \

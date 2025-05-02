@@ -22,7 +22,7 @@ else
 endif
 
 
-imx_g2d_samples:
+imx_g2d_samples: imx_gpu_g2d
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call repo-mngr,fetch,imx_g2d_samples,apps/graphics) && \
 	 \

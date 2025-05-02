@@ -6,7 +6,7 @@
 # NNStreamer - Stream Pipeline Paradigm for Neural Network Applications
 # NNStreamer is a GStreamer plugin allowing to construct neural network applications with stream pipeline paradigm.
 
-nnstreamer:
+nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \

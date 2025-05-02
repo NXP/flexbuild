@@ -5,7 +5,7 @@
 
 
 
-gst_plugins_good:
+gst_plugins_good: gst_plugins_base libdrm
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call repo-mngr,fetch,gst_plugins_good,apps/multimedia) && \

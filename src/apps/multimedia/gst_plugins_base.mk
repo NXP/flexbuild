@@ -10,7 +10,7 @@
 
 # gst version 1.24.0
 
-gst_plugins_base:
+gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocols
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call repo-mngr,fetch,gst_plugins_base,apps/multimedia) && \

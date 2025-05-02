@@ -7,7 +7,7 @@
 # DEPEND: tensorflow-lite ethosu-driver-stack libpython3.11-dev
 
 
-tflite_ethosu_delegate:
+tflite_ethosu_delegate: tflite ethosu_driver_stack
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call repo-mngr,fetch,tflite_ethosu_delegate,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \

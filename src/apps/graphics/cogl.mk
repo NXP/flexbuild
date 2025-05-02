@@ -8,7 +8,7 @@
 
 # clutter-1.0 depends on cogl-1.0
 
-cogl:
+cogl: gpu_viv
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call repo-mngr,fetch,cogl,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/cogl && \

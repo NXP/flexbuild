@@ -10,7 +10,7 @@
 # DEPEND: gpu_viv
 
 
-tim_vx:
+tim_vx: gpu_viv
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call repo-mngr,fetch,tim_vx,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libOpenVX.so ]; then \

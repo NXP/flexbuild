@@ -11,7 +11,7 @@
 #	  libclutter-gtk-1.0-dev vala-native gnome-desktop libxml2-native gdk-pixbuf-native itstool-native
 
 
-cheese:
+cheese: clutter_gst gst_plugins_bad
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call repo-mngr,fetch,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \

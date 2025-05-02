@@ -6,7 +6,7 @@
 # Sample program to monitor i.MX GPU performance data
 
 
-gputop:
+gputop: libgpuperfcnt
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call repo-mngr,fetch,gputop,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/gpuperfcnt/gpuperfcnt.h ]; then \

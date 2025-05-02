@@ -6,7 +6,7 @@
 
 # Depend: gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad libgpuperfcnt perf
 
-nnshark:
+nnshark: gst_plugins_bad libgpuperfcnt
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call repo-mngr,fetch,nnshark,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \

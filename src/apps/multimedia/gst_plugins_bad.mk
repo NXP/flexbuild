@@ -9,7 +9,7 @@
 # depends on libsbc-dev libsndfile1-dev libwebp-dev
 
 
-gst_plugins_bad:
+gst_plugins_bad: gst_plugins_base
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call repo-mngr,fetch,gst_plugins_bad,apps/multimedia) && \

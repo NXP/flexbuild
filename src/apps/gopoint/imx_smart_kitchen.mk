@@ -33,7 +33,7 @@ imx_smart_kitchen:
 	 if [ ! -f lvgl/.patchdone ]; then \
 	     cp misc/patches/*.patch lvgl/ && \
 	     cp -r wayland-client/* lv_drivers/wayland/ && \
-	     cd lvgl && git am *.patch && touch .patchdone && cd ..; \
+	     cd lvgl && git am *.patch $(LOG_MUTE) && touch .patchdone && cd ..; \
 	 fi && \
 	 rm -rf smart-kitchen-deploy && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \

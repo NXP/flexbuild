@@ -799,7 +799,7 @@ do
     -i|--instruction)
         INSTRUCTION=$2; echo INSTRUCTION: $2; shift;;
     -p|--portfolio)
-        SOCFAMILY=$2; echo "SOCFAMILY: $SOCFAMILY"; shift;;
+        SOCFAMILY=$2; log_mute echo "SOCFAMILY: $SOCFAMILY"; shift;;
     -B|--buildarg)
         BUILDARG=$2; echo "BUILDARG: $BUILDARG"; shift;;
     -s|--secure)

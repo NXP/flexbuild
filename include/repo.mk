@@ -41,11 +41,11 @@ define repo-mngr
 	    elif [ -n "$$repourl" -a $1 = fetch ]; then \
 	        if [ "$${repo_en}" = "n" ]; then echo $$tree disabled!; \
 		elif [ -n "$$tag" -a $(UPDATE_REPO_PER_TAG) = y ] || [ -n "$$tag" -a -z "$$branch" -a -z "$$commit" ]; then \
-		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout -f $$tag -b $$tag && cd -; \
+		    git clone --recurse-submodules $$repourl $$tree $(LOG_MUTE) && cd $$tree && git checkout -f $$tag -b $$tag $(LOG_MUTE) && cd - $(LOG_MUTE); \
 		elif [ -n "$$commit" -a $(UPDATE_REPO_PER_COMMIT) = y ] || [ -n "$$commit" -a -z "$$branch" -a -z "$$tag" ]; then \
-		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout -f $$commit -b $$commit && cd -; \
+		    git clone --recurse-submodules $$repourl $$tree $(LOG_MUTE) && cd $$tree && git checkout -f $$commit -b $$commit $(LOG_MUTE) && cd - $(LOG_MUTE); \
 		elif [ -n "$$branch" -a $(UPDATE_REPO_PER_BRANCH) = y ] || [ -z "$$tag" -a -n "$$branch" -a $(UPDATE_REPO_PER_TAG) = y ]; then \
-		    git clone --recurse-submodules $$repourl $$tree -b $$branch; \
+		    git clone --recurse-submodules $$repourl $$tree -b $$branch $(LOG_MUTE); \
 		else \
 		    $(call fbprint_w,"`basename $$tree`: missing repo branch/tag info in configs/$(CFGLISTYML)"); \
 		fi; \

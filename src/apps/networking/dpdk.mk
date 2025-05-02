@@ -40,7 +40,7 @@ dpdk:
 		--cross-file=config/arm/arm64_dpaa_linux_gcc $(LOG_MUTE) && \
 	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir install $(LOG_MUTE) && \
 	 cd $$build_dir/examples && find . -perm -111 -a -type f | xargs -I {} cp {} $(DESTDIR)/usr/local/bin && \
-	 cd - && mkdir -p $(DESTDIR)/usr/local/dpdk && \
+	 cd - $(LOG_MUTE) && mkdir -p $(DESTDIR)/usr/local/dpdk && \
 	 cp -rf $(NETDIR)/dpdk/nxp/* $(DESTDIR)/usr/local/dpdk && \
 	 cp -f $(NETDIR)/dpdk/drivers/bus/pci/bus_pci_driver.h $(DESTDIR)/usr/include && \
 	 $(CROSS_COMPILE)strip $(DESTDIR)/usr/local/bin/dpdk-* && \

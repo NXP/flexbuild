@@ -23,7 +23,7 @@ endif
 
 imx_dsp_codec_ext:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"imx_dsp_codec_ext $(EXTRA_CONF)") && \
+	 $(call fbprint_b,"imx_dsp_codec_ext") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp_codec_ext ]; then \
 	     wget -q $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin $(LOG_MUTE) && \

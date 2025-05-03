@@ -16,7 +16,7 @@ fmlib:
 	 export PREFIX=/usr && \
 	 export KERNEL_SRC=$(KERNEL_PATH) && \
 	 export CFLAGS="-O2 -pipe -I$(RFSDIR)/usr/include -I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 $(MAKE) install-libfm-arm $(LOG_MUTE) && \
 	 $(call fbprint_d,"fmlib")

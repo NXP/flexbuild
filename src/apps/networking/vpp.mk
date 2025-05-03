@@ -41,6 +41,6 @@ vpp:
 	 $(MAKE) -j$(JOBS) distclean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) V=0 PLATFORM=dpaa TAG=dpaa vpp-package-deb $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/local/vpp ${DESTDIR}/etc/vpp && \
-	 cp -vf *.deb $(DESTDIR)/usr/local/vpp && \
+	 cp -f *.deb $(DESTDIR)/usr/local/vpp && \
 	 cp -f $(NETDIR)/vpp/src/vpp/conf/startup.conf $(DESTDIR)/etc/vpp/startup.conf && \
 	 $(call fbprint_d,"vpp")

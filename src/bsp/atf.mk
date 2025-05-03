@@ -77,7 +77,7 @@ atf:
 	 if [ -n "$(rcw_bin)" ]; then rcwbin=$(FBOUTDIR)/bsp/rcw/$(rcw_bin); fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 	    if [ ! -f $$rcwbin ] || `cd $(BSPDIR)/rcw && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null`; then \
-		echo building dependent rcw ...; \
+		echo building dependent rcw ... $(LOG_MUTE); \
 		bld rcw -m $(MACHINE); \
 		test -f $$rcwbin || { $(call fbprint_e,"$$rcwbin not exist"); exit;} \
 	    fi; \
@@ -99,7 +99,7 @@ atf:
 	 fi; \
 	 if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
 	    if [ ! -f $$bl33 ] || [[ `cd $(BSPDIR)/uboot && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null` ]]; then \
-		echo building dependent $$bl33 ...; \
+		echo building dependent $$bl33 ... $(LOG_MUTE); \
 		if [ ! -f $$ubootcfg ]; then \
 		    $(call fbprint_e,Not found the dependent $$ubootcfg) && exit; \
 		fi; \

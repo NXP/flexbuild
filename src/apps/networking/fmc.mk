@@ -6,7 +6,7 @@
 
 # depend on libtclap-dev for tclap/CmdLine.h
 
-fmc:
+fmc: fmlib
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call repo-mngr,fetch,fmc,apps/networking) && \
 	 $(call repo-mngr,fetch,eth_config,apps/networking) && \

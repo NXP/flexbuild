@@ -34,7 +34,7 @@ imx_nnstreamer_examples:
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_BUILD_TYPE=release $(LOG_MUTE) && \
 	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
 	 cp -rf {LICENSE,SCR-*} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
 	 for EXAM in classification depth detection face mixed pose segmentation ; do \

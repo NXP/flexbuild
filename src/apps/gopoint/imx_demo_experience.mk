@@ -22,7 +22,7 @@ imx_demo_experience:
 	     echo qtchooser: qt6 already exists; \
 	 fi && \
 	 cd $(GPDIR)/imx_demo_experience && \
-	 qmake -makefile -o Makefile demoexperience.pro -spec linux-aarch64-gnu-g++ && \
+	 qmake -makefile -o Makefile demoexperience.pro -spec linux-aarch64-gnu-g++ $(LOG_MUTE) && \
 	 sed -e "s|aarch64-linux-gnu-g++|aarch64-linux-gnu-g++ --sysroot=$(RFSDIR)|g" \
 	     -e "s|/usr/lib/x86_64-linux-gnu|$(RFSDIR)/usr/lib/aarch64-linux-gnu|g" \
 	     -e "s|/usr/include/x86_64-linux-gnu|$(RFSDIR)/usr/include/aarch64-linux-gnu|g" \

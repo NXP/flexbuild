@@ -761,13 +761,13 @@ while true
 do
     case "$1" in
     -m|--machine)
-        MACHINE=$2; echo "MACHINE: $MACHINE"; shift;;
+        MACHINE=$2; log_mute echo MACHINE: $MACHINE; shift;;
     -j|--jobs)
         JOBS=$2; echo JOBS: $JOBS; shift;;
     -a|--arch)
         DESTARCH=$(echo $2 | cut -d: -f1); shift;;
     -b|boottype)
-        BOOTTYPE=$2; echo "BOOTTYPE: $BOOTTYPE"; shift;;
+        BOOTTYPE=$2; log_mute echo BOOTTYPE: $BOOTTYPE; shift;;
     -c|--component)
         COMPONENT=$2; echo "COMPONENT: $2"; shift;;
     -f|--cfgfile)
@@ -799,7 +799,7 @@ do
     -i|--instruction)
         INSTRUCTION=$2; echo INSTRUCTION: $2; shift;;
     -p|--portfolio)
-        SOCFAMILY=$2; log_mute echo "SOCFAMILY: $SOCFAMILY"; shift;;
+        SOCFAMILY=$2; log_mute echo SOCFAMILY: $SOCFAMILY; shift;;
     -B|--buildarg)
         BUILDARG=$2; echo "BUILDARG: $BUILDARG"; shift;;
     -s|--secure)

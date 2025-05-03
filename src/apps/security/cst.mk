@@ -17,7 +17,7 @@ cst:
 	     cp -f $(SECURE_PRI_KEY) $(SECDIR)/cst/srk.pri; \
 	     cp -f $(SECURE_PUB_KEY) $(SECDIR)/cst/srk.pub; \
 	 elif [ ! -f srk.pri -o ! -f srk.pub ]; then \
-	     ./gen_keys 1024 $(LOG_MUTE) && echo "Generated new keys!"; \
+	     ./gen_keys 1024 $(LOG_MUTE) && echo "Generated new keys!" $(LOG_MUTE); \
 	 else \
 	     echo "Using default keys srk.pri and srk.pub"; \
 	 fi && \

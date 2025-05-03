@@ -794,7 +794,7 @@ do
              [ "$DISTROVARIANT" != tiny -a "$DISTROVARIANT" != devel -a "$DISTROVARIANT" != imaevm ]; then
             fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: tiny, devel, devel:custom, imaevm" && exit 1
         fi
-        #echo DISTRO TYPE:  $DISTROTYPE
+        log_mute echo DISTRO TYPE:  $DISTROTYPE
         #[ -n "$DISTROVARIANT" ] && echo DISTRO VARIANT: $DISTROVARIANT
         #[ -n "$CODENAME" ] && echo DISTRO CODENAME: $CODENAME
         shift;;
@@ -864,6 +864,8 @@ fi
 [ "$1" = mkitb -a -z "$DISTROTYPE" ] && DISTROTYPE=poky && DISTROVARIANT=tiny
 [ -z "$DISTROTYPE" ] && DISTROTYPE=debian
 if [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $SOCFAMILY = IMX -a $DESTARCH = arm64 ]; then
+    DISTROVARIANT=desktop
+elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $SOCFAMILY = LS -a "${MACHINE:0:7}" = ls1028a  ]; then
     DISTROVARIANT=desktop
 elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ]; then
     DISTROVARIANT=server
@@ -941,7 +943,7 @@ else
     DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}_${DISTROVARIANT}
 fi
 
-[ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && echo $DISTROTYPE desktop supports only arm64 && exit
+[ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && log_mute echo $DISTROTYPE desktop supports only arm64 && exit
 
 linux_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${SOCFAMILY}_${DESTARCH}.itb
 tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb

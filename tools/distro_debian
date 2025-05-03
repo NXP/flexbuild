@@ -6,7 +6,7 @@
 
 
 build_distro_rfs_debian() {
-    [ $DISTROTYPE = debian -a -f $RFSDIR/etc/buildinfo ] && echo $RFSDIR already exists! && exit 0
+    [ $DISTROTYPE = debian -a -f $RFSDIR/etc/buildinfo ] && log_mute echo $RFSDIR already exists! && exit 0
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
     fbprint_n "Generating initial rootfs: $RFSDIR ..." && cd $FBDIR

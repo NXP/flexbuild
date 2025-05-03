@@ -1,0 +1,31 @@
+From 116be9e26b9be196cb30c185abb713642ef103cd Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Fri, 2 May 2025 21:01:54 -0700
+Subject: [PATCH] Suppress the tip and warning information
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ prepare.sh | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/prepare.sh b/prepare.sh
+index d64d279a..0b648f59 100755
+--- a/prepare.sh
++++ b/prepare.sh
+@@ -18,13 +18,4 @@ fi
+ 
+ if [ ! -n "${FSL_GRAPHICS_SDK_THIRD_PARTY_LIBS_DIR+1}" ]; then
+ export FSL_GRAPHICS_SDK_THIRD_PARTY_LIBS_DIR=$FSL_GRAPHICS_SDK/.Thirdparty
+-echo WARNING: Environment variable FSL_GRAPHICS_SDK_THIRD_PARTY_LIBS_DIR was not defined, so we force defined it.
+-echo          Its highly recommended to manually define this variable so you can reuse the thirdparty libs between builds and repositories.
+-echo          Read Doc\BuildingExternals.md for detailed information about this environment variable.
+ fi
+-
+-echo FSL_GRAPHICS_SDK=$FSL_GRAPHICS_SDK
+-echo FSL_GRAPHICS_SDK_ANDROID_PROJECT_DIR=$FSL_GRAPHICS_SDK_ANDROID_PROJECT_DIR
+-echo FSL_GRAPHICS_SDK_THIRD_PARTY_LIBS_DIR=$FSL_GRAPHICS_SDK_THIRD_PARTY_LIBS_DIR
+-echo ROOTFS=$ROOTFS
+-echo FSL_HOST_ROOTFS=\'$FSL_HOST_ROOTFS\'
+-- 
+2.34.1
+

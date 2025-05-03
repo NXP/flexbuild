@@ -20,6 +20,9 @@ gtec_demo_framework:
 	 \
 	 ln -sf $(RFSDIR)/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	 cd $(GPDIR)/gtec_demo_framework && \
+	 if [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/gtec_demo_framework/*.patch $(LOG_MUTE) && touch .patchdone; \
+	 fi && \
 	 source ./prepare.sh && export DESTDIR='' && \
 	 # *DESTDIR* is for compiling, it is not the *DESTDIR* of flexbuild && \
 	 # FslBuild.py -vvvvv -c install --BuildThreads $(JOBS) --CMakeInstallPrefix . && \

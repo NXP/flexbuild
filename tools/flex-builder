@@ -356,7 +356,7 @@ merge_apps() {
         fi
         [ $DESTARCH = arm64 ] && tgtarch=aarch64 || tgtarch=arm
         if update-binfmts --display qemu-$tgtarch | grep -q disabled; then
-            sudo update-binfmts --enable qemu-$tgtarch
+            log_mute sudo update-binfmts --enable qemu-$tgtarch
         fi
         sudo chroot $RFSDIR ldconfig
     fi
@@ -489,6 +489,7 @@ build_rfs_and_apps() {
     if [ "$BUILD_DEBIAN_DESKTOP" = y ] && \
        [ ${MACHINE:0:4} = imx8 -o ${MACHINE:0:4} = imx9 -o ${MACHINE:0:7} = ls1028a -o $MACHINE = all ]; then
         bld rfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY
+        bld linux-headers -r debian:desktop -a $DESTARCH
         bld apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY
         bld merge-apps -r debian:desktop -a $DESTARCH -p $SOCFAMILY
         bld packrfs -r debian:desktop -a $DESTARCH -p $SOCFAMILY
@@ -496,6 +497,7 @@ build_rfs_and_apps() {
 
     if [ "$BUILD_DEBIAN_SERVER" = y ] && [ $SOCFAMILY = LS -o $MACHINE = all ] && [ ${MACHINE:0:7} != "ls1028a"  ]; then
         bld rfs -r debian:server -a $DESTARCH -p $SOCFAMILY
+        bld linux-headers -r debian:server -a $DESTARCH
         bld apps -r debian:server -a $DESTARCH -p $SOCFAMILY
         bld merge-apps -r debian:server -a $DESTARCH -p $SOCFAMILY
         bld packrfs -r debian:server -a $DESTARCH -p $SOCFAMILY

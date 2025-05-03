@@ -74,8 +74,8 @@ define imx_mkimage_target
     $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 $(LOG_MUTE) && \
     \
     bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \
-    if [ $(CONFIG_OPTEE) = y -a ! -f $$bl32 ]; then \
-	CONFIG_OPTEE=y bld optee_os -m $$brd; \
+    if [ "$(CONFIG_OPTEE)" = "y" -a ! -f "$$bl32" ]; then \
+		bld optee_os -m $$brd; \
     fi && \
     [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
     [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
@@ -87,7 +87,7 @@ define imx_mkimage_target
 	if [ $${MACHINE} = imx8mpfrdm ]; then \
         cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
 	fi && \
-    if [ $(CONFIG_OPTEE) = y -a -f $$bl32 ]; then \
+    if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 	cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
     fi && \
     cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot && \

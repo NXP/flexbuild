@@ -730,7 +730,7 @@ fbprint_e() {
 }
 
 fbprint_n() {
-    echo -e "${green}$1 ${NC}"
+    echo -e "${green}\n$1 ${NC}"
 }
 
 fbprint_w() {

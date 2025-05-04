@@ -15,7 +15,7 @@ linux:
 	if [ -d $(FBDIR)/patch/linux ] && [ ! -f .patchdone ]; then \
             git am $(FBDIR)/patch/linux/*.patch $(LOG_MUTE) && touch .patchdone; \
         fi && \
-	$(call fbprint_n,"Building $(KERNEL_TREE) with $$curbrch") && \
+	$(call fbprint_b,"$(KERNEL_TREE) with $$curbrch") && \
 	$(call fbprint_n,"Compiler = `$(CROSS_COMPILE)gcc --version | head -1`") && \
 	if [ $(DESTARCH) = arm64 -a $(SOCFAMILY) = IMX ]; then \
 	    locarch=arm64; dtbstr=freescale/imx*.dtb; \

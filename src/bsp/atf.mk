@@ -16,7 +16,7 @@ atf:
 	 if [ -z "$(BOOTTYPE)" ]; then $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; fi && \
 	 cd $(BSPDIR)/atf && \
 	 curbrch=`git branch | grep ^* | cut -d' ' -f2` && \
-	 $(call fbprint_n,"Building ATF $$curbrch" for $(MACHINE)) && \
+	 $(call fbprint_b,"ATF $$curbrch for $(MACHINE)") && \
 	 $(MAKE) realclean $(LOG_MUTE) && mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
 	 platform=$(MACHINE); \
 	 [ $${platform:0:6} = ls1012 -o $${platform:0:5} = ls104 ] && chassistype=ls104x_1012 || chassistype=ls2088_1088; \
@@ -77,7 +77,7 @@ atf:
 	 if [ -n "$(rcw_bin)" ]; then rcwbin=$(FBOUTDIR)/bsp/rcw/$(rcw_bin); fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 	    if [ ! -f $$rcwbin ] || `cd $(BSPDIR)/rcw && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null`; then \
-		echo building dependent rcw ... $(LOG_MUTE); \
+	 	$(call fbprint_b,"RCW  for $(MACHINE)");  \
 		bld rcw -m $(MACHINE); \
 		test -f $$rcwbin || { $(call fbprint_e,"$$rcwbin not exist"); exit;} \
 	    fi; \

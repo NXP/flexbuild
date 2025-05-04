@@ -11,7 +11,7 @@ include imx_mkimage.mk
 uboot u-boot:
 	@$(call repo-mngr,fetch,uboot,bsp) && \
 	 curbrch=`cd $(BSPDIR)/uboot && git branch | grep ^* | cut -d' ' -f2` && \
-	 $(call fbprint_n,"Building u-boot $$curbrch for $(MACHINE)") && \
+	 $(call fbprint_b,"u-boot $$curbrch for $(MACHINE)") && \
 	 cd $(BSPDIR)/uboot && \
 	 if [ -d $(FBDIR)/patch/uboot ] && [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/uboot/*.patch $(LOG_MUTE) && touch .patchdone; \

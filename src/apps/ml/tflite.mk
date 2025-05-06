@@ -18,10 +18,6 @@ tflite:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 $(call repo-mngr,fetch,tflite,apps/ml) && \
-	 if [ -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
-		 echo "tensorflow-lite has already been compiled" $(LOG_MUTE); \
-		 exit; \
-	 fi && \
 	 cd $(MLDIR)/tflite && \
 	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

@@ -1,0 +1,29 @@
+From ed41ad2adb7d4c7a5da5e7be5b2d99250ec974db Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Tue, 15 Apr 2025 16:35:15 +0800
+Subject: [PATCH 31/40] arm64: dts: imx8mp-frdm: using green led instead of
+ blue
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx8mp-frdm.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+index 389ffcedce77..2cc300e28daf 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+@@ -21,8 +21,8 @@ gpio-leds {
+ 		compatible = "gpio-leds";
+ 
+ 		status {
+-			label = "blue:status";
+-			gpios = <&pcal6416 15 GPIO_ACTIVE_HIGH>;
++			label = "green:status";
++			gpios = <&pcal6416 14 GPIO_ACTIVE_HIGH>;
+ 			default-state = "on";
+ 		};
+ 	};
+-- 
+2.34.1
+

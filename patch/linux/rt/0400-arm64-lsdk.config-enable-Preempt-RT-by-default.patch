@@ -1,0 +1,24 @@
+From e50d6558d4558e9782e4dd00dba5caba1e224bfd Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Thu, 8 May 2025 23:01:23 -0700
+Subject: [PATCH] arm64: lsdk.config: enable Preempt RT by default
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ arch/arm64/configs/lsdk.config | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/lsdk.config b/arch/arm64/configs/lsdk.config
+index 4dbf5e3b2b5b..b304de557a00 100644
+--- a/arch/arm64/configs/lsdk.config
++++ b/arch/arm64/configs/lsdk.config
+@@ -203,3 +203,6 @@ CONFIG_MTD_NAND_FSL_IFC=y
+ 
+ CONFIG_FSL_DPAA_CEETM=y
+ CONFIG_FSL_DPAA2_ETH_CEETM=y
++
++# Preempt RT, depend on CONFIG_EXPERT
++CONFIG_PREEMPT_RT=y
+-- 
+2.34.1
+

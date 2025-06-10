@@ -22,8 +22,8 @@ imx_dsp:
 	 $(call fbprint_b,"imx_dsp") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp ]; then \
-	     wget -q $(repo_imx_dsp_bin_url) -O imx_dsp.bin && \
-	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept && \
+	     wget -q $(repo_imx_dsp_bin_url) -O imx_dsp.bin $(LOG_MUTE) && \
+	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-dsp* imx_dsp && rm -f imx_dsp.bin; \
 	 fi && \
 	 cd imx_dsp && \
@@ -31,9 +31,9 @@ imx_dsp:
 	   --bindir=/unit_tests \
 	   -datadir=/lib/firmware \
 	   --enable-armv8 \
-	   --prefix=/usr && \
+	   --prefix=/usr $(LOG_MUTE) && \
 	 export DESTDIR=$(FBOUTDIR)/bsp/imx_firmware && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 ln -sf hifi4_$(HIFI4_PLATFORM).bin $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/imx/dsp/hifi4.bin && \
 	 $(call fbprint_d,"imx_dsp")

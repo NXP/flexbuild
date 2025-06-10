@@ -1,0 +1,29 @@
+From 73c0c96282798d1c2d5d4aa5a25dd0c9a9a75747 Mon Sep 17 00:00:00 2001
+From: Xiaofeng Wei <xiaofeng.wei@nxp.com>
+Date: Fri, 21 Feb 2025 15:00:24 +0800
+Subject: [PATCH 47/51] media: imx: parallel: Fix OV5640 DVP mode capture color
+ issue
+
+Set sensor media bus format to YUYV_2X8 in order to support both OV5640 and MT9M114.
+
+Signed-off-by: Xiaofeng Wei <xiaofeng.wei@nxp.com>
+---
+ drivers/staging/media/imx/imx8-parallel-csi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/imx/imx8-parallel-csi.c b/drivers/staging/media/imx/imx8-parallel-csi.c
+index fe12df0a6168..b39e220f1304 100644
+--- a/drivers/staging/media/imx/imx8-parallel-csi.c
++++ b/drivers/staging/media/imx/imx8-parallel-csi.c
+@@ -657,7 +657,7 @@ static int mxc_pcsi_set_fmt(struct v4l2_subdev *sd,
+ 	}
+ 
+ 	fmt->pad = source_pad->index;
+-	fmt->format.code = MEDIA_BUS_FMT_UYVY8_2X8;
++	fmt->format.code = MEDIA_BUS_FMT_YUYV8_2X8;
+ 	ret = v4l2_subdev_call(sen_sd, pad, set_fmt, NULL, fmt);
+ 	if (ret < 0 && ret != -ENOIOCTLCMD)
+ 		return ret;
+-- 
+2.34.1
+

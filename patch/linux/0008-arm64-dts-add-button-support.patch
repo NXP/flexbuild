@@ -1,7 +1,7 @@
-From d277001dc50e99f4fe517c7331c7dec6618df91e Mon Sep 17 00:00:00 2001
+From cda17b4a240c8015ce3d3f5ceff20c48201913bd Mon Sep 17 00:00:00 2001
 From: Yuantian Tang <andy.tang@nxp.com>
 Date: Fri, 21 Jun 2024 10:59:52 +0800
-Subject: [PATCH 08/19] arm64: dts: add button support
+Subject: [PATCH 08/30] arm64: dts: add button support
 
 FRDM board was equipped 3 buttons.
 K1 is onoff button to power on/off the board.
@@ -46,5 +46,5 @@ index 0f3d483c16f0..4ef8e729f3f5 100644
  
  &sai1 {
 -- 
-2.25.1
+2.34.1
 

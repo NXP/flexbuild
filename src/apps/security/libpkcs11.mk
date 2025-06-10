@@ -4,22 +4,22 @@
 
 
 
-libpkcs11:
+libpkcs11: secure_obj
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"libpkcs11") && \
 	 $(call repo-mngr,fetch,libpkcs11,apps/security) && \
 	 if [ ! -d $(SECDIR)/secure_obj/securekey_lib/include ]; then \
 	     bld secure_obj -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
+	 $(call fbprint_b,"libpkcs11") && \
 	 cd $(SECDIR)/libpkcs11 && \
 	 sed -e 's/^CC/#CC/' -e 's/^LD/#LD/' -e 's/s -Werror/s/' -i flags.mk && \
 	 sed -i 's/-g -Iinclude/-g -fcommon -Iinclude/' Makefile && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
-	 $(MAKE) clean && \
-	 $(MAKE) all OPENSSL_PATH=$(SECDIR)/openssl \
+	 $(MAKE) clean $(LOG_MUTE) && \
+	 $(MAKE) all OPENSSL_PATH=$(SECDIR)/openssl $(LOG_MUTE) \
 	 EXPORT_DIR=$(DESTDIR)/usr/local CURDIR=$(SECDIR)/libpkcs11 \
-	 SECURE_OBJ_PATH=$(SECDIR)/secure_obj/securekey_lib && \
+	 SECURE_OBJ_PATH=$(SECDIR)/secure_obj/securekey_lib $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/local/bin && \
 	 mv $(DESTDIR)/usr/local/app/pkcs11_app $(DESTDIR)/usr/local/bin && \
 	 cp -f images/thread_test $(DESTDIR)/usr/local/bin && \

@@ -1,7 +1,9 @@
 [Unit]
 Description=Configuration for NXP i.MX/LS GPU (Former rc_gpu.S)
+Before=gdm.service gdm3.service weston.service
 
 [Service]
+Type=oneshot
 ExecStart=/etc/gpuconfig
 
 [Install]

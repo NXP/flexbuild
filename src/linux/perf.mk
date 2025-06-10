@@ -14,7 +14,7 @@ perf:
 	     $(MAKE) $(KERNEL_CFG) -C $(KERNEL_PATH) O=$$opdir 1>/dev/null; \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 $(MAKE) -j$(JOBS) tools/perf -C $(KERNEL_PATH) O=$$opdir NO_LIBELF=1 NO_LIBTRACEEVENT=1 && \
+	 $(MAKE) -j$(JOBS) tools/perf -C $(KERNEL_PATH) O=$$opdir NO_LIBELF=1 NO_LIBTRACEEVENT=1 $(LOG_MUTE) && \
 	 cp $$opdir/tools/perf/perf $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY) && \
-	 ls -l $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY)/perf && \
+	 ls -l $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY)/perf $(LOG_MUTE) && \
 	 $(call fbprint_d,"kernel tools/perf")

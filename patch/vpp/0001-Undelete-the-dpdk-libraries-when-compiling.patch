@@ -1,0 +1,40 @@
+From e5c1bbd5e1307139b8692b221b807d17ee56dba6 Mon Sep 17 00:00:00 2001
+From: nxa22691 <andy.tang@nxp.com>
+Date: Mon, 9 Jun 2025 10:36:59 +0900
+Subject: [PATCH] Undelete the dpdk libraries when compiling
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ build-data/packages/dpaa.mk     | 3 +--
+ build/external/packages/dpdk.mk | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/build-data/packages/dpaa.mk b/build-data/packages/dpaa.mk
+index 9a42453e9..d7526627e 100644
+--- a/build-data/packages/dpaa.mk
++++ b/build-data/packages/dpaa.mk
+@@ -15,8 +15,7 @@ prep-dpdk-lib:
+ ifneq ($(DPDK_PATH),)
+ 	@echo "@@@@ Creating libdpdk.a in $(DPDK_PATH)/lib"
+ 	@cd $(DPDK_PATH)/lib && \
+-	 echo "GROUP ( $$(ls librte*.a) )" > libdpdk.a && \
+-	 rm -rf librte*.so librte*.so.* dpdk/*/librte*.so dpdk/*/librte*.so.*
++	 echo "GROUP ( $$(ls librte*.a) )" > libdpdk.a
+ else
+ 	@echo "DPDK Install Path not defined"
+ endif
+diff --git a/build/external/packages/dpdk.mk b/build/external/packages/dpdk.mk
+index 9519b2845..86427ff2e 100644
+--- a/build/external/packages/dpdk.mk
++++ b/build/external/packages/dpdk.mk
+@@ -210,7 +210,6 @@ define dpdk_install_cmds
+ 	meson install && \
+ 	cd $(dpdk_install_dir)/lib && \
+ 	echo "GROUP ( $$(ls librte*.a ) )" > libdpdk.a && \
+-	rm -rf librte*.so librte*.so.* dpdk/*/librte*.so dpdk/*/librte*.so.* && \
+ 	deactivate
+ endef
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,59 @@
+From e7fc1a17419e10ef1c76adb0d1f2c5c5a5efd390 Mon Sep 17 00:00:00 2001
+From: Steven Yang <zhao.yang_1@nxp.com>
+Date: Thu, 15 May 2025 12:06:21 +0800
+Subject: [PATCH 41/51] arm64: dts: imx8mp-frdm: add imx8mp-frdm-iw612-otbr dts
+
+This dts supports M.2 Wifi Bt module 2EL with IW612 chip.
+
+Signed-off-by: Steven Yang <zhao.yang_1@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |  4 +++-
+ .../dts/freescale/imx8mp-frdm-iw612-otbr.dts  | 21 +++++++++++++++++++
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mp-frdm-iw612-otbr.dts
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index adefb5ee80e4..45d4dffb4c40 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -144,7 +144,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-evk-ndm.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mp-frdm.dtb imx8mp-frdm-os08a20.dtb imx8mp-frdm-dual-os08a20.dtb \
+ 			  imx8mp-frdm-boe-wxga-lvds0-panel.dtb imx8mp-frdm-boe-wxga-lvds1-panel.dtb \
+ 			  imx8mp-frdm-dual-ap1302.dtb imx8mp-frdm-8mic.dtb \
+-			  imx8mp-frdm-waveshare.dtb imx8mp-frdm-rpmsg.dtb
++			  imx8mp-frdm-waveshare.dtb imx8mp-frdm-rpmsg.dtb \
++			  imx8mp-frdm-iw612-otbr.dtb
++
+ 
+ imx8mp-evk-revb4-dtbs := imx8mp-evk.dtb imx8mp-evk-revb4.dtbo
+ imx8mp-evk-revb4-rm67191-dtbs := imx8mp-evk-rm67191.dtb imx8mp-evk-revb4.dtbo
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm-iw612-otbr.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm-iw612-otbr.dts
+new file mode 100644
+index 000000000000..8845291df4f1
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm-iw612-otbr.dts
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++#include "imx8mp-frdm.dts"
++
++&i2c2 {
++	pcal6408: gpio@20 {
++		compatible = "nxp,pcal9554b";
++		reg = <0x20>;
++		gpio-controller;
++		#gpio-cells = <2>;
++		vcc-supply = <&reg_usdhc1_vmmc>;
++		status = "okay";
++	};
++};
++
++&ecspi2 {
++	pinctrl-assert-gpios = <&pcal6408 0 GPIO_ACTIVE_HIGH>;
++};
+-- 
+2.34.1
+

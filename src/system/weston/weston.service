@@ -15,6 +15,9 @@ After=systemd-user-sessions.service
 # If Plymouth is used, we want to start when it is on its way out.
 After=plymouth-quit-wait.service
 
+# don't enable it when gdm is used
+Conflicts=gdm3.service gdm.service
+
 # D-Bus is necessary for contacting logind. Logind is required.
 Wants=dbus.socket
 After=dbus.socket
@@ -24,7 +27,7 @@ Requires=weston.socket
 
 # Since we are part of the graphical session, make sure we are started before
 # it is complete.
-Before=graphical.target
+After=graphical.target
 
 # Prevent starting on systems without virtual consoles, Weston requires one
 # for now.
@@ -45,7 +48,7 @@ User=root
 Group=root
 
 # Make sure the working directory is the users home directory
-WorkingDirectory=/home/weston
+WorkingDirectory=/root
 
 # Set up a full user session for the user, required by Weston.
 PAMName=weston-autologin

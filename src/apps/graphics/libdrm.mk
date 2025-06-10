@@ -34,7 +34,7 @@ libdrm:
 		-Dvc4=enabled \
 		-Dvivante=true \
 		-Dvmwgfx=enabled \
-		-Dc_link_args="-pthread" && \
+		-Dc_link_args="-pthread" $(LOG_MUTE) && \
 	 PYTHONNOUSERSITE=y DESTDIR=$(DESTDIR) \
-	 ninja -j$(JOBS) install -C build_$(DISTROTYPE)_$(ARCH) && \
+	 ninja -j$(JOBS) install -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
 	 $(call fbprint_d,"libdrm")

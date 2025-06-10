@@ -12,7 +12,7 @@ bsp_repo_update_branch:
 	@$(call repo-mngr,branch,$(BSP_REPO_LIST),bsp)
 
 bsp_repo_update_tag:
-	@echo -e "\nbsp repositories update for tag"
+	@echo -e "\nbsp repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(BSP_REPO_LIST),bsp)
 
 bsp_repo_update_latest:
@@ -32,7 +32,7 @@ linux_repo_update_branch:
 	@$(call repo-mngr,branch,$(LINUX_REPO_LIST),linux)
 
 linux_repo_update_tag:
-	@echo -e "\nlinux repositories update for tag"
+	@echo -e "\nlinux repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(LINUX_REPO_LIST),linux)
 
 linux_repo_update_latest:
@@ -52,7 +52,7 @@ networking_repo_update_branch:
 	@$(call repo-mngr,branch,$(NETWORKING_REPO_LIST),apps/networking)
 
 networking_repo_update_tag:
-	@echo -e "\nnetworking repositories update for tag"
+	@echo -e "\nnetworking repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(NETWORKING_REPO_LIST),apps/networking)
 
 networking_repo_update_latest:
@@ -72,7 +72,7 @@ graphics_repo_update_branch:
 	@$(call repo-mngr,branch,$(GRAPHICS_REPO_LIST),apps/graphics)
 
 graphics_repo_update_tag:
-	@echo -e "\ngraphics repositories update for tag"
+	@echo -e "\ngraphics repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(GRAPHICS_REPO_LIST),apps/graphics)
 
 graphics_repo_update_latest:
@@ -92,7 +92,7 @@ multimedia_repo_update_branch:
 	@$(call repo-mngr,branch,$(MULTIMEDIA_REPO_LIST),apps/multimedia)
 
 multimedia_repo_update_tag:
-	@echo -e "\nmultimedia repositories update for tag"
+	@echo -e "\nmultimedia repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(MULTIMEDIA_REPO_LIST),apps/multimedia)
 
 multimedia_repo_update_latest:
@@ -112,7 +112,7 @@ security_repo_update_branch:
 	@$(call repo-mngr,branch,$(SECURITY_REPO_LIST),apps/security)
 
 security_repo_update_tag:
-	@echo -e "\nsecurity repositories update for tag"
+	@echo -e "\nsecurity repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(SECURITY_REPO_LIST),apps/security)
 
 security_repo_update_latest:
@@ -132,7 +132,7 @@ connectivity_repo_update_branch:
 	@$(call repo-mngr,branch,$(CONNECTIVITY_REPO_LIST),apps/connectivity)
 
 connectivity_repo_update_tag:
-	@echo -e "\nconnectivity repositories update for tag"
+	@echo -e "\nconnectivity repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(CONNECTIVITY_REPO_LIST),apps/connectivity)
 
 connectivity_repo_update_latest:
@@ -152,7 +152,7 @@ utils_repo_update_branch:
 	@$(call repo-mngr,branch,$(UTILS_REPO_LIST),apps/utils)
 
 utils_repo_update_tag:
-	@echo -e "\nutils repositories update for tag"
+	@echo -e "\nutils repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(UTILS_REPO_LIST),apps/utils)
 
 utils_repo_update_latest:
@@ -172,7 +172,7 @@ ml_repo_update_branch:
 	@$(call repo-mngr,branch,$(ML_REPO_LIST),apps/ml)
 
 ml_repo_update_tag:
-	@echo -e "\neIQ repositories update for tag"
+	@echo -e "\neIQ repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(ML_REPO_LIST),apps/ml)
 
 ml_repo_update_latest:
@@ -184,21 +184,21 @@ ml_repo_update_commit:
 	@$(call repo-mngr,commit,$(ML_REPO_LIST),apps/ml)
 
 gopoint_repo_fetch:
-	@echo -e "\nfetch eIQ repositories: $(GOPOINT_REPO_LIST)"
+	@echo -e "\nfetch GoPoint repositories: $(GOPOINT_REPO_LIST)"
 	@$(call repo-mngr,fetch,$(GOPOINT_REPO_LIST),apps/gopoint)
 
 gopoint_repo_update_branch:
-	@echo -e "\neIQ repositories update for branch"
+	@echo -e "\nGoPoint repositories update for branch"
 	@$(call repo-mngr,branch,$(GOPOINT_REPO_LIST),apps/gopoint)
 
 gopoint_repo_update_tag:
-	@echo -e "\neIQ repositories update for tag"
+	@echo -e "\nGoPoint repositories update for tag" $(LOG_MUTE)
 	@$(call repo-mngr,tag,$(GOPOINT_REPO_LIST),apps/gopoint)
 
 gopoint_repo_update_latest:
-	@echo -e "\neIQ repositories update to latest HEAD commit"
+	@echo -e "\nGoPoint repositories update to latest HEAD commit"
 	@$(call repo-mngr,update,$(GOPOINT_REPO_LIST),apps/gopoint)
 
 gopoint_repo_update_commit:
-	@echo -e "\neIQ repositories update to specified commit ID"
+	@echo -e "\nGoPoint repositories update to specified commit ID"
 	@$(call repo-mngr,commit,$(GOPOINT_REPO_LIST),apps/gopoint)

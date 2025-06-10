@@ -1,0 +1,20 @@
+From 3f95a7723d8390c0ebcc68d3be9477d257f290aa Mon Sep 17 00:00:00 2001
+From: Clark Williams <clark.williams@gmail.com>
+Date: Sun, 22 Sep 2024 14:33:12 -0500
+Subject: [PATCH 200/200] Linux 6.6.52-rt43 REBASE
+
+Signed-off-by: Clark Williams <clark.williams@gmail.com>
+---
+ localversion-rt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/localversion-rt b/localversion-rt
+index 49bae8d6aa67..41f7b993a830 100644
+--- a/localversion-rt
++++ b/localversion-rt
+@@ -1 +1 @@
+--rt38
++-rt43
+-- 
+2.46.0
+

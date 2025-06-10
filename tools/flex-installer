@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2017-2024 NXP
+# Copyright 2017-2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=1.27.2412
+FIVERSION=1.28.2506
 DEFAULT_PARTITION_NUMBER=4
 DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
 DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=8192
 DEFAULT_RAW_PARTITION_SIZE_MB=256
-DEFAULT_LINUX_VERSION=6.6.36
-DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2412
+DEFAULT_LINUX_VERSION=6.6.52
+DEFAULT_DISTRO_SVR_URL=http://www.nxp.com/lgfiles/sdk/lsdk2506
 
 
 usage ()
@@ -310,14 +310,30 @@ flex_install_distro() {
 
     # install boot partition
     if [ -n "$bootimg" -o $instruction = auto ] && [ -d $bootimg_n -o -f $bootimg_n ]; then
-	[ -f $bootpartition/buildinfo ] && echo Cleaning the existing data in $bootdev && \
-	sudo rm -rf $bootpartition/*
-	echo Installing $bootimg_n to $bootdev  ...
-	[ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
-	[ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
-	[ $bootimgtype = zst ] && zstd -d -f $bootimg_n && sudo tar xfm ${bootimg_n%.*} -C $bootpartition
-	[ -n "$machine" ] && sudo ln -sf ${machine}_boot.scr $bootpartition/boot.scr
-	print_d "Install $bootimg_n in $bootdev"
+        [ -f $bootpartition/buildinfo ] && echo Cleaning the existing data in $bootdev && \
+        sudo rm -rf $bootpartition/*
+        echo Installing $bootimg_n to $bootdev  ...
+        [ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
+        [ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
+        [ $bootimgtype = zst ] && zstd -d -f $bootimg_n && sudo tar xfm ${bootimg_n%.*} -C $bootpartition
+
+        prefix_to_keep=""
+        case "$machine" in
+            imx8*)
+                prefix_to_keep="${machine:0:6}" ;;
+            imx9*)
+                prefix_to_keep="${machine:0:5}" ;;
+            lx*|ls*)
+                prefix_to_keep="fsl-${machine:0:6}" ;;
+            *)
+                echo "Unsupported machine type: $machine"
+                exit 1 ;;
+        esac
+        sudo find "$bootpartition" -maxdepth 1 -type f -name "*.dtb" ! -name "${prefix_to_keep}*.dtb" -delete 2>/dev/null || true
+        sudo find "$bootpartition" -maxdepth 1 -type f -name "*.scr" ! -name "${machine}_boot.scr" -delete 2>/dev/null || true
+
+        [ -n "$machine" ] && sudo ln -sf ${machine}_boot.scr $bootpartition/boot.scr
+        print_d "Install $bootimg_n in $bootdev"
     fi
 
     # install system rootfs
@@ -626,7 +642,7 @@ if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $ins
 fi
 
 ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx93evk imx93frdm '
+imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91frdmstorm imx93evk imx93frdm '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"
@@ -765,6 +781,7 @@ if [ $instruction = auto ]; then
     [ $intinyrfs = y ] && cd $rootpartition
     download_distro
     check_images_format
+    [ -z "$machine" ] && { print_e "Please specify '-m <machine>' for installation"; exit ; }
     flex_install_distro
 elif [ $instruction = download ]; then
     check_network_access
@@ -775,6 +792,8 @@ elif [ $instruction = install -o $instruction = null ] && \
 	print_e "Please specify '-m <machine>' for UEFI installation"; exit
     fi
     check_images_format
+
+    [ -z "$machine" ] && { print_e "Please specify '-m <machine>' for installation"; exit ; }
     flex_install_distro
 elif [ $instruction = mkwic ]; then
     if mount | grep $mntdir/$devname; then sudo umount $mntdir/$devname* 1>/dev/null 2>&1 || true; fi

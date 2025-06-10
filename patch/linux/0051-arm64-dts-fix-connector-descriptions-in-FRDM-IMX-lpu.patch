@@ -1,0 +1,98 @@
+From 7fb9c223af4875a668ad46b7d7a87687765773fe Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Fri, 23 May 2025 08:46:39 +0800
+Subject: [PATCH 51/51] arm64: dts: fix connector descriptions in FRDM-IMX
+ lpuart dts comment
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx91-11x11-frdm-lpuart.dts   | 6 +++---
+ .../boot/dts/freescale/imx91-11x11-frdm-storm-lpuart.dts    | 4 ++--
+ arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts   | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-lpuart.dts b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-lpuart.dts
+index 8eb6c230b13f..baf6047ca20a 100644
+--- a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-lpuart.dts
++++ b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-lpuart.dts
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+ /*
+- * Copyright 2024 NXP
++ * Copyright 2024-2025 NXP
+  */
+ 
+ #include "imx91-11x11-frdm.dts"
+@@ -18,7 +18,7 @@ &lpuart6 {
+ 
+ /*
+  * uart test port1. Note: don't use Bluetooth at the sametime.
+- * J1001: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
++ * P11: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
+  */
+ &pinctrl_uart5 {
+ 	fsl,pins = <
+@@ -30,7 +30,7 @@ MX91_PAD_GPIO_IO03__LPUART5_RTS_B   0x31e
+ };
+ 
+ &iomuxc {
+-/* uart test port2: J1001: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
++/* uart test port2: P11: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
+ 	pinctrl_uart6: uart6grp {
+ 		fsl,pins = <
+ 			MX91_PAD_GPIO_IO04__LPUART6_TX		0x31e
+diff --git a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-storm-lpuart.dts b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-storm-lpuart.dts
+index 57337f4d1cd3..a35acd675ed6 100644
+--- a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-storm-lpuart.dts
++++ b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm-storm-lpuart.dts
+@@ -18,7 +18,7 @@ &lpuart6 {
+ 
+ /*
+  * uart test port1. Note: don't use Bluetooth at the sametime.
+- * J1001: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
++ * J12: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
+  */
+ &pinctrl_uart5 {
+ 	fsl,pins = <
+@@ -30,7 +30,7 @@ MX91_PAD_GPIO_IO03__LPUART5_RTS_B   0x31e
+ };
+ 
+ &iomuxc {
+-/* uart test port2: J1001: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
++/* uart test port2: J12: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
+ 	pinctrl_uart6: uart6grp {
+ 		fsl,pins = <
+ 			MX91_PAD_GPIO_IO04__LPUART6_TX		0x31e
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
+index cbb67ddaf9c2..33e5554732cb 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-lpuart.dts
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+ /*
+- * Copyright 2024 NXP
++ * Copyright 2024-2025 NXP
+  */
+ 
+ #include "imx93-11x11-frdm.dts"
+@@ -22,7 +22,7 @@ &lpuart6 {
+ 
+ /*
+  * uart test port1. Note: don't use Bluetooth at the sametime.
+- * J1001: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
++ * P11: Pin27--TX Pin28--RX Pin3--CTS Pin5--RTS
+  */
+ &pinctrl_uart5 {
+ 	fsl,pins = <
+@@ -34,7 +34,7 @@ MX93_PAD_GPIO_IO03__LPUART5_RTS_B   0x31e
+ };
+ 
+ &iomuxc {
+-/* uart test port2: J1001: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
++/* uart test port2: P11: Pin7--TX Pin29--RX Pin31--CTS Pin26--RTS */
+ 	pinctrl_uart6: uart6grp {
+ 		fsl,pins = <
+ 			MX93_PAD_GPIO_IO04__LPUART6_TX		0x31e
+-- 
+2.34.1
+

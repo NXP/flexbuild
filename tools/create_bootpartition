@@ -14,7 +14,7 @@ generate_bootpartition_tarball() {
     echo Building the dependent $kernel_img ... && \
     bld linux -p $SOCFAMILY -a $DESTARCH
 
-    bld linux-modules -p $SOCFAMILY -a $DESTARCH
+    [ ! -d $PKGDIR/linux/cryptodev_linux ] && bld linux-modules -p $SOCFAMILY -a $DESTARCH
 
     bootpartname=boot_${SOCFAMILY}_${DESTARCH}
     bootpartdir=$FBOUTDIR/images/$bootpartname

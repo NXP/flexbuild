@@ -5,28 +5,31 @@
 
 define imx_mkimage_target
     if [ ! -d $(BSPDIR)/imx_mkimage ]; then \
-	$(call repo-mngr,fetch,imx_mkimage,bsp); \
+        $(call repo-mngr,fetch,imx_mkimage,bsp); \
+    fi && \
+    if [ -d $(FBDIR)/patch/imx_mkimage ] && [ ! -f .patchdone ]; then \
+        git am $(FBDIR)/patch/imx_mkimage/*.patch $(LOG_MUTE) && touch .patchdone; \
     fi && \
     \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \
-	cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin && chmod +x firmware_imx.bin && \
-	./firmware_imx.bin --auto-accept && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
+	cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && chmod +x firmware_imx.bin && \
+	./firmware_imx.bin --auto-accept $(LOG_MUTE) && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
-	cd $(BSPDIR) && wget -q $(repo_seco_bin_url) -O imx-seco.bin && chmod +x imx-seco.bin && \
-	./imx-seco.bin --auto-accept && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
+	cd $(BSPDIR) && wget -q $(repo_seco_bin_url) -O imx-seco.bin $(LOG_MUTE) && chmod +x imx-seco.bin && \
+	./imx-seco.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/fw_ele ]; then \
-	cd $(BSPDIR) && wget -q $(repo_fw_ele_bin_url) -O fw_ele.bin && chmod +x fw_ele.bin && \
-	./fw_ele.bin --auto-accept && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele && rm -f fw_ele.bin; \
+	cd $(BSPDIR) && wget -q $(repo_fw_ele_bin_url) -O fw_ele.bin $(LOG_MUTE) && chmod +x fw_ele.bin && \
+	./fw_ele.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele && rm -f fw_ele.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/fw_upower ]; then \
-	cd $(BSPDIR) && wget -q $(repo_fw_upower_bin_url) -O fw_upower.bin && chmod +x fw_upower.bin && \
-	./fw_upower.bin --auto-accept && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower && rm -f fw_upower.bin; \
+	cd $(BSPDIR) && wget -q $(repo_fw_upower_bin_url) -O fw_upower.bin $(LOG_MUTE) && chmod +x fw_upower.bin && \
+	./fw_upower.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower && rm -f fw_upower.bin; \
     fi && \
     if [ ! -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin ]; then \
-	wget -q $(repo_scfw_bin_url) -O imx-scfw.bin && chmod +x imx-scfw.bin && \
-	./imx-scfw.bin --auto-accept && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
+	wget -q $(repo_scfw_bin_url) -O imx-scfw.bin $(LOG_MUTE) && chmod +x imx-scfw.bin && \
+	./imx-scfw.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/imx_mcore_demos ]; then \
 	bld mcore_demo; \
@@ -67,12 +70,12 @@ define imx_mkimage_target
     cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
     \
     cd $(BSPDIR)/imx_mkimage && \
-    $(MAKE) clean && $(MAKE) bin && \
-    $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 && \
+    $(MAKE) clean $(LOG_MUTE) && $(MAKE) bin $(LOG_MUTE) && \
+    $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 $(LOG_MUTE) && \
     \
     bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \
-    if [ $(CONFIG_OPTEE) = y -a ! -f $$bl32 ]; then \
-	CONFIG_OPTEE=y bld optee_os -m $$brd; \
+    if [ "$(CONFIG_OPTEE)" = "y" -a ! -f "$$bl32" ]; then \
+		bld optee_os -m $$brd; \
     fi && \
     [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
     [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
@@ -81,22 +84,25 @@ define imx_mkimage_target
 	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 	$$opdir/arch/arm/dts/*$${plat}*.dtb \
 	$$opdir/u-boot-nodtb.bin && \
-    if [ $(CONFIG_OPTEE) = y -a -f $$bl32 ]; then \
+	if [ $${MACHINE} = imx8mpfrdm ]; then \
+        cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
+	fi && \
+    if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 	cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
     fi && \
     cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot && \
     cp -f $(BSPDIR)/atf/build/$$plat/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/ && \
     \
     if [ $${MACHINE:0:6} = imx8qm ];  then \
-	$(MAKE) SOC=iMX8QM -C iMX8QM -f soc.mak $$target; \
+	$(MAKE) SOC=iMX8QM -C iMX8QM -f soc.mak $$target $(LOG_MUTE) ; \
     elif [ $${MACHINE:0:6} = imx8qx ]; then \
-	$(MAKE) SOC=iMX8QX REV=B0 -C iMX8QX -f soc.mak $$target; \
+	$(MAKE) SOC=iMX8QX REV=B0 -C iMX8QX -f soc.mak $$target $(LOG_MUTE) ; \
     elif [ $${MACHINE:0:5} = imx91 ]; then \
-        $(MAKE) SOC=iMX91 REV=A0 -C iMX91 -f soc.mak $$target; \
+        $(MAKE) SOC=iMX91 REV=A0 -C iMX91 -f soc.mak $$target $(LOG_MUTE) ; \
     elif [ $${MACHINE:0:5} = imx93 ]; then \
-	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target; \
+	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target $(LOG_MUTE) ; \
     fi && \
-    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target; \
+    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target $(LOG_MUTE); \
     mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
     cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin;
 endef

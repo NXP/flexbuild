@@ -19,7 +19,7 @@ device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
 - Native-build on ARM board running Debian for arm64 target
 
 ## Host system requirement
-- Docker hosted on Ubuntu LTS host (e.g. 22.04, 20.04) or other any distro
+- Docker hosted on Ubuntu LTS host (e.g. 22.04, 24.04) or other any distro
   Refer to [docker-setup](docs/FAQ-docker-setup.md)
   User can run 'bld docker' to create a Debian docker and build it in docker.
 - Debian 12 host
@@ -29,19 +29,15 @@ device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
 ## Supported distro for target arm64
 ------------------------------------------
 - Debian-based userland    (base, desktop, server)
-- Yocto-based userland     (tiny, devel)
-- Buildroot-based userland (tiny, devel)
 
 
 ## Supported platforms
 ----------------------
 - __iMX platform__:  
-imx6qpsabresd, imx6qsabresd, imx6sllevk, imx7ulpevk, imx8mmevk, imx8mnevk, imx8mpevk,  
-imx8mqevk, imx8qmmek, imx8qxpmek, imx8ulpevk, imx93evk, imx91frdm, imx93frdm, etc
+imx8mmevk, imx8mpevk, imx8mpfrdm, imx8mqevk, imx8ulpevk, imx93evk, imx93frdm, imx91evk, imx91frdm
 
 - __Layerscape platform__:  
-ls1012ardb, ls1012afrwy, ls1028ardb, ls1043ardb, ls1046ardb, ls1046afrwy,
-ls1088ardb, ls2088ardb, ls2160ardb, lx2162aqds, etc
+ls1028ardb, ls1043ardb, ls1046ardb, ls2160ardb
 
 
 ## Flexbuild Usage
@@ -72,19 +68,14 @@ Most used example with separate command:
  bld rfs [ -r debian:desktop ]   # generate Debian-based Desktop rootfs  (with more graphics/multimedia packages for Desktop)
  bld rfs -r debian:server        # generate Debian-based Server rootfs   (with more server related packages, no GUI Desktop)
  bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
- bld rfs -r poky:tiny            # generate poky-based arm64 tiny rootfs
- bld rfs -r buildroot:tiny       # generate Buildroot-based arm64 tiny rootfs
- bld itb -r poky:tiny            # generate poky_tiny_IMX_arm64.itb including kernel, dtb and rootfs_poky_tiny_arm64.cpio.gz
  bld linux [ -p IMX|LS]          # compile linux kernel for all arm64 IMX or LS machines
  bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
  bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
  bld apps                        # compile NXP-specific components against the runtime dependencies of Debian Desktop rootfs for i.MX machines
  bld apps -r debian:server -p LS # compile NXP-specific components against the runtime dependencies of Debian Server rootfs for LS machines
- bld ml [ -r <type> ]            # compile NXP-specific eIQ AI/ML components against the library dependencies of Debian rootfs
  bld merge-apps [ -r <type> ]    # merge NXP-specific components into target Debian rootfs (Desktop by default,add '-r debian:server' for Server)
  bld packrfs [ -r <type> ]       # pack and compress target rootfs as rootfs_xx.tar.zst (or add '-r debian:server' for Server)
  bld packapps [ -r <type> ]      # pack and compress target app components as apps_xx.tar.zst (add '-p LS' for Layerscape platforms)
- bld repo-fetch [ <component> ]  # fetch git repository of all or specified component from remote repos if not exist locally
  bld docker                      # create or attach docker container to build in docker
  bld clean                       # clean all obsolete firmware/linux/apps binary images except distro rootfs
  bld clean-apps [ -r <type> ]    # clean the obsolete NXP-specific apps components binary images
@@ -97,8 +88,7 @@ Most used example with separate command:
 
 ## More info
 ------------
-Please refer to https://nxp.com/nxpdebian for more information about NXP Debian Linux SDK Distribution for i.MX and Layerscape.
-[i.MX Debian Linux SDK User's Guide](https://nxp.com/docs/en/user-guide/UG10155.pdf).
-[Layerscape Debian Linux SDK User's Guide](https://nxp.com/docs/en/user-guide/UG10143.pdf).
+Please refer to https://nxp.com/nxpdebian for more information about NXP Debian Linux SDK Distribution.
+[Debian Linux SDK User's Guide]((https://docs.nxp.com/bundle/UG10155).
 
 [flexbuild_usage](docs/flexbuild_usage.md), [build_and_deploy_distro](docs/build_and_deploy_distro.md), [nxp_linux_sdk](docs/nxp_linux_sdk.md) for detailed information.

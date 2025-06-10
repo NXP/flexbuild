@@ -32,15 +32,13 @@ imx_nnstreamer_examples:
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cmake  -S $(GPDIR)/imx_nnstreamer_examples \
 		-B build_$(DISTROTYPE)_$(ARCH) \
-		-DCMAKE_BUILD_TYPE=release && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
-	 mkdir -p $(DESTDIR)/$(IMX_NNSTREANER_DIR)/{common,classification,detection,pose} && \
-	 cp -r common/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/common/ && \
-	 cp {LICENSE,SCR-*} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
-	 cp classification/{README.md,*.sh} $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification && \
-	 cp build_$(DISTROTYPE)_$(ARCH)/classification/example_classification_mobilenet_v1_tflite \
-	    $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification && \
-	 cp detection/{README.md,*.sh} $(DESTDIR)/$(IMX_NNSTREANER_DIR)/detection && \
-	 cp pose/{README.md,example_pose_movenet_tflite.py} $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose && \
+		-DCMAKE_BUILD_TYPE=release $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
+	 mkdir -p $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
+	 cp -rf {LICENSE,SCR-*} $(DESTDIR)/$(IMX_NNSTREANER_DIR) && \
+	 for EXAM in classification depth detection face mixed pose segmentation ; do \
+		 mkdir -p $(DESTDIR)/$(IMX_NNSTREANER_DIR)/$${EXAM}; \
+		 cp -rf build_$(DISTROTYPE)_$(ARCH)/$${EXAM}/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/$${EXAM}; \
+	 done && \
 	 $(call fbprint_d,"imx_nnstreamer_examples")

@@ -18,14 +18,6 @@ define repo-mngr
 	    if [ -z "$$tag" -a -z "$$commit" -a $(UPDATE_REPO_PER_TAG) = y ]; then tag=$(DEFAULT_REPO_TAG); fi; \
 	    repo_en=`grep -iE "^CONFIG_BUILD_$${tree}" $(FBDIR)/configs/$(CONFIGLIST) | cut -d= -f2`; \
 	    if [ $$tree = linux ]; then tree=$(KERNEL_TREE); fi; \
-	    if [ -n "$$repourl" ]; then echo -e "repo: $$tree"; fi && \
-	    if [ $(UPDATE_REPO_PER_TAG) = y ]; then \
-		if [ -n "$$repourl" -a -n "$$tag" ]; then echo tag: $$tag; fi; \
-	    elif [ $(UPDATE_REPO_PER_BRANCH) = y ]; then \
-		if [ -n "$$repourl" -a -n "$$branch" ]; then echo branch: $$branch; fi; \
-	    elif [ $(UPDATE_REPO_PER_COMMIT) = y ]; then \
-		if [ -n "$$repourl" -a -n "$$commit" ]; then echo commit: $$commit; fi; \
-	    fi && \
 	    tree=$(PKGDIR)/$3/$$tree && \
 	    if [ -n "$$repourl" ] && [ -d $$tree -o -L $$tree ]; then \
 	        if [ $1 = update -a -n "$$branch" ]; then if [ "$${repo_en}" = "n" ]; then echo $$tree disabled!; \
@@ -49,11 +41,11 @@ define repo-mngr
 	    elif [ -n "$$repourl" -a $1 = fetch ]; then \
 	        if [ "$${repo_en}" = "n" ]; then echo $$tree disabled!; \
 		elif [ -n "$$tag" -a $(UPDATE_REPO_PER_TAG) = y ] || [ -n "$$tag" -a -z "$$branch" -a -z "$$commit" ]; then \
-		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout -f $$tag -b $$tag && cd -; \
+		    git clone --recurse-submodules $$repourl $$tree $(LOG_MUTE) && cd $$tree && git checkout -f $$tag -b $$tag $(LOG_MUTE) && cd - $(LOG_MUTE); \
 		elif [ -n "$$commit" -a $(UPDATE_REPO_PER_COMMIT) = y ] || [ -n "$$commit" -a -z "$$branch" -a -z "$$tag" ]; then \
-		    git clone --recurse-submodules $$repourl $$tree && cd $$tree && git checkout -f $$commit -b $$commit && cd -; \
+		    git clone --recurse-submodules $$repourl $$tree $(LOG_MUTE) && cd $$tree && git checkout -f $$commit -b $$commit $(LOG_MUTE) && cd - $(LOG_MUTE); \
 		elif [ -n "$$branch" -a $(UPDATE_REPO_PER_BRANCH) = y ] || [ -z "$$tag" -a -n "$$branch" -a $(UPDATE_REPO_PER_TAG) = y ]; then \
-		    git clone --recurse-submodules $$repourl $$tree -b $$branch; \
+		    git clone --recurse-submodules $$repourl $$tree -b $$branch $(LOG_MUTE); \
 		else \
 		    $(call fbprint_w,"`basename $$tree`: missing repo branch/tag info in configs/$(CFGLISTYML)"); \
 		fi; \

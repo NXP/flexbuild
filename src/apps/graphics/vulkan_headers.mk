@@ -15,6 +15,6 @@ vulkan_headers:
 	 $(call repo-mngr,fetch,vulkan_headers,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/vulkan_headers && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
-	 cmake -S . -B build_$(DISTROTYPE)_$(ARCH) && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+	 cmake -S . -B build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 $(call fbprint_d,"vulkan_headers")

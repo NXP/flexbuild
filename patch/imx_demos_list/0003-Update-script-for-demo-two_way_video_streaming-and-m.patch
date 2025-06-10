@@ -1,0 +1,111 @@
+From 1d9c439d72eaa60c3128cb31c0a163b4d841c8ef Mon Sep 17 00:00:00 2001
+From: Andy Tang <andy.tang@nxp.com>
+Date: Thu, 10 Apr 2025 14:58:30 +0800
+Subject: [PATCH 3/5] Update script for demo two_way_video_streaming and
+ multi_camera
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ .../gstreamer/multi_cameras/imx8mp_camera_demo.py      |  2 +-
+ .../multimedia/gstreamer/two_way_video_streaming.py    | 10 +++++-----
+ .../multimedia/gstreamer/two_way_video_streaming.sh    |  6 ++++++
+ scripts/utils.py                                       |  4 ++--
+ 4 files changed, 14 insertions(+), 8 deletions(-)
+ create mode 100755 scripts/multimedia/gstreamer/two_way_video_streaming.sh
+
+diff --git a/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py b/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py
+index c69824d..e67b774 100644
+--- a/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py
++++ b/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py
+@@ -10,10 +10,10 @@ from subprocess import Popen
+ import sys
+ import gi
+ 
+-from gi.repository import Gst, Gtk
+ 
+ gi.require_version("Gst", "1.0")
+ gi.require_version("Gtk", "3.0")
++from gi.repository import Gst, Gtk
+ 
+ 
+ CAM_PIPELINE = "gst-launch-1.0 v4l2src device={} ! waylandsink"
+diff --git a/scripts/multimedia/gstreamer/two_way_video_streaming.py b/scripts/multimedia/gstreamer/two_way_video_streaming.py
+index 5c76ecd..561a5aa 100644
+--- a/scripts/multimedia/gstreamer/two_way_video_streaming.py
++++ b/scripts/multimedia/gstreamer/two_way_video_streaming.py
+@@ -18,11 +18,11 @@ import json
+ from threading import Thread
+ 
+ import gi
+-from gi.repository import Gtk, Gst, Gio, GLib, Gdk
+ 
+ gi.require_version("Gtk", "3.0")
+ gi.require_version("Gst", "1.0")
+ gi.require_version("Gdk", "3.0")
++from gi.repository import Gtk, Gst, Gio, GLib, Gdk
+ sys.path.append("/opt/gopoint-apps/scripts/")
+ import utils
+ 
+@@ -496,17 +496,17 @@ class ClientWindow(Gtk.Window):
+         )
+         video_pipeline += "sink_1::width={wd} sink_1::height={ht} sink_1::zorder=0 "
+         video_pipeline += "sink_0::width={wdd} sink_0::height={htt} sink_0::zorder=1 ! "
+-        video_pipeline += "waylandsink sync=false "
++        video_pipeline += " queue ! waylandsink sync=false "
+         video_pipeline += "udpsrc ! application/x-rtp,media=video,clock-rate=90000,"
+         video_pipeline += "encoding-name=H264 ! rtpjitterbuffer latency=100 "
+         video_pipeline += "! queue max-size-buffers=0 ! rtph264depay ! "
+         video_pipeline += (
+-            "h264parse ! queue ! v4l2h264dec ! queue ! imxvideoconvert_g2d ! c.sink_1 "
++            "h264parse ! queue ! v4l2h264dec ! queue ! imxvideoconvert_g2d ! queue ! c.sink_1 "
+         )
+         video_pipeline += "v4l2src device={sel} ! video/x-raw,"
+         video_pipeline += "width=1920,height=1080,framerate=30/1 ! "
+         video_pipeline += (
+-            "tee allow-not-linked=true name=a a. ! imxvideoconvert_g2d ! c.sink_0 "
++            "tee allow-not-linked=true name=a a. ! queue ! imxvideoconvert_g2d ! queue ! c.sink_0 "
+         )
+         video_pipeline += "a. ! v4l2h264enc ! queue ! rtph264pay ! "
+         video_pipeline += "udpsink host={ip} port=5004 sync=false async=false"
+@@ -526,7 +526,7 @@ class ClientWindow(Gtk.Window):
+         # message callback
+         bus = self.pipeline.get_bus()
+         bus.add_signal_watch()
+-        bus.connect("message", self.on_message)
++        bus.connect("message", lambda bus, message: self.on_message(message))
+         if monitor_status == Gst.StateChangeReturn.FAILURE:
+             print("ERROR: Unable to set the pipeline to the playing state")
+             sys.exit(1)
+diff --git a/scripts/multimedia/gstreamer/two_way_video_streaming.sh b/scripts/multimedia/gstreamer/two_way_video_streaming.sh
+new file mode 100755
+index 0000000..9c3ed90
+--- /dev/null
++++ b/scripts/multimedia/gstreamer/two_way_video_streaming.sh
+@@ -0,0 +1,6 @@
++#!/bin/bash
++
++python3 -m venv ~/myenv
++source ~/myenv/bin/activate
++python3 /opt/gopoint-apps/scripts/multimedia/gstreamer/two_way_video_streaming.py
++deactivate
+diff --git a/scripts/utils.py b/scripts/utils.py
+index 52c1816..e19ef8c 100755
+--- a/scripts/utils.py
++++ b/scripts/utils.py
+@@ -51,11 +51,11 @@ def download_file(file_name):
+         path = DOWNLOAD_FOLDER + "/" + file_name
+     else:
+         out = subprocess.getstatusoutput(
+-            "wget -O  /opt/gopoint-apps/downloads/" + file_name + " " + url
++            "wget --no-check-certificate -O  /opt/gopoint-apps/downloads/" + file_name + " " + url
+         )[0]
+         if out != 0:
+             out = subprocess.getstatusoutput(
+-                "wget -O  /opt/gopoint-apps/downloads/" + file_name + " " + alt_url
++                "wget --no-check-certificate -O  /opt/gopoint-apps/downloads/" + file_name + " " + alt_url
+             )[0]
+         if out != 0:
+             return -2
+-- 
+2.43.0
+

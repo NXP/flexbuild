@@ -6,9 +6,8 @@
 
 # depend on libtclap-dev for tclap/CmdLine.h
 
-fmc:
+fmc: fmlib
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"fmc") && \
 	 $(call repo-mngr,fetch,fmc,apps/networking) && \
 	 $(call repo-mngr,fetch,eth_config,apps/networking) && \
 	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then \
@@ -29,6 +28,7 @@ fmc:
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
+	 $(call fbprint_b,"fmc") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
@@ -43,7 +43,7 @@ fmc:
 		 FMD_USPACE_LIB_PATH=$(DESTDIR)/usr/lib \
 		 TCLAP_HEADER_PATH=$(RFSDIR)/usr/include \
 		 CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" \
-		 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+		 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/usr/local/bin && \
 	 install -m 755 source/fmc $(DESTDIR)/usr/local/bin/fmc && \
 	 install -d $(DESTDIR)/etc/fmc/config && \
@@ -58,5 +58,4 @@ fmc:
 	 install -d $(DESTDIR)/usr/lib/systemd/system/ && \
 	 install -d $(DESTDIR)/etc/systemd/system/multi-user.target.wants/ && \
 	 install -m 644 $(FBDIR)/src/system/fmc.service $(DESTDIR)/usr/lib/systemd/system/ && \
-	 ln -sf /lib/systemd/system/fmc.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/fmc.service && \
 	 $(call fbprint_d,"fmc")

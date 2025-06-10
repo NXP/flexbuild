@@ -13,7 +13,6 @@ include $(FBDIR)/include/repo.mk
 
 
 GRAPHICSDIR = $(PKGDIR)/apps/graphics
-CONNDIR = $(PKGDIR)/apps/connectivity
 MMDIR = $(PKGDIR)/apps/multimedia
 NETDIR = $(PKGDIR)/apps/networking
 SECDIR = $(PKGDIR)/apps/security
@@ -26,7 +25,6 @@ all: $(APPS_REPO_LIST)
 	@$(call fbprint_d,"apps components")
 
 
-connectivity: $(CONNECTIVITY_REPO_LIST)
 networking:   $(NETWORKING_REPO_LIST)
 multimedia:   $(MULTIMEDIA_REPO_LIST)
 graphics:     $(GRAPHICS_REPO_LIST)

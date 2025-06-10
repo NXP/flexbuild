@@ -3,9 +3,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-ovs_dpdk:
+ovs_dpdk: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call fbprint_b,"ovs_dpdk") && \
 	 $(call repo-mngr,fetch,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
@@ -18,16 +17,17 @@ ovs_dpdk:
              sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/; \
          fi && \
 	 \
+	 $(call fbprint_b,"ovs_dpdk") && \
 	 cd $(NETDIR)/ovs_dpdk && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" && \
 	 export LIBS="$(shell PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig $(CROSS)pkg-config --libs libdpdk)" && \
-	 ./boot.sh && \
+	 ./boot.sh $(LOG_MUTE) && \
 	 ./configure --prefix=/usr \
 	   --host=aarch64-linux-gnu \
 	   --with-dpdk=static \
 	   --disable-ssl \
-	   --disable-libcapng && \
-	 $(MAKE) -j$(JOBS) --no-print-directory CFLAGS='-g -Ofast' install && \
+	   --disable-libcapng $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) --no-print-directory CFLAGS='-g -Ofast' install $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip $(DESTDIR)/usr/sbin/{ovs-vswitchd,ovsdb-server} && \
 	 $(call fbprint_d,"ovs_dpdk")

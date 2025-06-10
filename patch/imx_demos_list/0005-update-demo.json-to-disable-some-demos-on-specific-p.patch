@@ -1,0 +1,193 @@
+From 082fc37f3baa5708d9be839d7710ed6053801920 Mon Sep 17 00:00:00 2001
+From: Andy Tang <andy.tang@nxp.com>
+Date: Tue, 22 Apr 2025 17:18:18 +0800
+Subject: [PATCH 5/5] update demo.json to disable some demos on specific
+ platform
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ demos.json | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/demos.json b/demos.json
+index a046eff..f36d060 100644
+--- a/demos.json
++++ b/demos.json
+@@ -3,7 +3,7 @@
+         "NNStreamer":[{
+              "name": "Image Classification",
+              "id": "obj_class_nn",
+-             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/classification/image_classification.py",
++             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/classification/image_classification.py && killall example_classification_mobilenet_v1_tflite example_classification_two_cameras_tflite",
+              "compatible": "imx8mp, imx93, imx8mm, imx8qmmek, imx95, imx93frdm",
+              "screenshot": "image_classification.jpg",
+              "icon": "ml-icon.svg",
+@@ -11,7 +11,7 @@
+          },{
+              "name": "Object Detection",
+              "id": "obj_detect_nn",
+-             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/detection/object_detection.py",
++             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/detection/object_detection.py && killall example_detection_mobilenet_ssd_v2_tflite",
+              "compatible": "imx8mp, imx93, imx8mm, imx8qmmek, imx95, imx93frdm",
+              "screenshot": "ml_detect.jpg",
+              "icon": "ml-icon.svg",
+@@ -19,8 +19,8 @@
+          },{
+              "name": "Pose Estimation",
+              "id": "pose_detect_nn",
+-             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/pose/pose_estimation.py",
+-             "compatible": "imx8mp, imx8mm, imx8qmmek, imx93, imx95, imx93frdm",
++             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/pose/pose_estimation.py && killall example_pose_movenet_tflite",
++             "compatible": "imx8mp, imx8mm, imx8qmmek, imx93, imx95",
+              "screenshot": "pose-estimation.jpg",
+              "icon": "ml-icon.svg",
+              "description": "Pose estimation example using NNStreamer. The goal of pose estimation is to detect the position and orientation of a person or object. In human pose estimation, this is usually done with specific keypoints such as hands, head, legs, etc. An internet connection may be required."
+@@ -28,7 +28,7 @@
+              "name": "ML Gateway",
+              "id": "ml_gate_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/ml_gateway/ml_gateway.py",
+-             "compatible": "imx8mp, imx8mm, imx93, imx93frdm",
++             "compatible": "imx8mp, imx8mm, imx93",
+              "screenshot": "ml_gateway.jpg",
+              "icon": "ml-icon.svg",
+              "description": "ML Gateway easily configures the i.MX 8M Plus and i.MX 93 EVKs as machine learning accelerator servers and allows resource-constrained MPU systems (clients) without NPUs to connect and run ML inference. This is currently enabled for i.MX 8M Mini on the client side."
+@@ -60,8 +60,8 @@
+         "OpenCV":[{
+             "name": "Face Recognition",
+             "id": "face_recog",
+-            "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/face_recognition.py",
+-            "compatible": "imx8mp, imx93frdm",
++            "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/face_recognition.py --gui=0 --camera=3",
++            "compatible": "imx8mp",
+             "screenshot": "face_recognition.jpg",
+             "icon": "ml-icon.svg",
+             "description": "An OpenCV application example of how to use machine learning to recognize faces. The user can save multiple profiles and the application will recognize the identity of each person by their names. An internet connection is required."
+@@ -78,7 +78,7 @@
+             "name": "LP Baby Cry Detection",
+             "id": "lp_baby_cry",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/low_power_ml/lp_baby_cry_detection.py",
+-            "compatible": "imx93, imx93frdm",
++            "compatible": "imx",
+             "screenshot": "LP-baby-cry-detection.jpg",
+             "icon": "ml-icon.svg",
+             "description": "Note: To run this example, append 'clk_ignore_unused' in u-boot 'mmcargs' env, before booting linux. An application example showing how to implement baby crying and glass breaking detection in Cortex-M33 core when Linux is in suspend mode. When the application is started, Linux enters suspend mode, and users must enter the timeout value in Cortex-M33 console. Then Cortex-M33 records one second audio input from MIC array on the i.MX 93 EVK board, and try to identify whether there is baby crying or glass breaking sound in the audio by running ML model inference. If baby crying or glass breaking sound is detected, it will wake up Cortex-A55 core and send the result to Linux through rpmsg-tty. If baby crying or glass breaking sound is not detected, it will suspend Cortex-M33 core for the configured timeout and wake up Cortex-M33 core to record one second audio again, and run the same process in an infinite loop until a baby crying or glass breaking sound is detected. An internet connection is required."
+@@ -86,7 +86,7 @@
+             "name": "LP KWS Detection",
+             "id": "lp_kws",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/low_power_ml/lp_kws_detection.py",
+-            "compatible": "imx93, imx93frdm",
++            "compatible": "imx",
+             "screenshot": "LP-kws-detection.jpg",
+             "icon": "ml-icon.svg",
+             "description": "Note: To run this example, append 'clk_ignore_unused' in u-boot 'mmcargs' env, before booting linux. An application example showing how to implement key word detection in Cortex-M33 core when Linux is in suspend mode. When the application is started, Linux enters suspend mode. Cortex-M33 will record one second audio input from MIC array on the i.MX 93 EVK board, and try to identify whether there is key word UP in the audio by running ML model inference. If key word is detected, it will wake up Cortex-A55 core and stop. If no key word is detected, it will record one second audio again, and run the same process in an infinite loop until a key word is detected. An internet connection is required."
+@@ -110,7 +110,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "camera-vpu.jpg",
+-            "compatible": "imx8mp, imx93frdm",
++            "compatible": "imx8mp",
+             "description": "This is a GStreamer pipeline able to create a camera preview example using VPU to encode and decode the image."
+         },{
+             "name": "Video To Texture Demo",
+@@ -119,16 +119,16 @@
+             "source": "",
+             "icon": "photo-video-solid.svg",
+             "screenshot": "video_to_texture.png",
+-            "compatible": "imx95, imx8qmmek, imx93frdm",
++            "compatible": "imx95, imx8qmmek",
+             "description": "Demonstrates Video to texturing functionality of gstreamer within a QT video player application"
+         },{
+             "name": "2Way Video Streaming",
+             "id": "video_streaming",
+-            "executable": "python3 /opt/gopoint-apps/scripts/multimedia/gstreamer/two_way_video_streaming.py",
++            "executable": "/opt/gopoint-apps/scripts/multimedia/gstreamer/two_way_video_streaming.sh",
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "two-way-video-streaming.jpg",
+-            "compatible": "imx8mp, imx8mm, imx93frdm",
++            "compatible": "imx8mp, imx8mm",
+             "description": "Allows user to implement a two way video streaming demo that displays video encode and decode capabilities between i.MX devices in local network."
+         },{
+             "name": "Multi Cameras Preview",
+@@ -137,7 +137,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "multi_cameras.jpg",
+-            "compatible": "imx8mp, imx93frdm",
++            "compatible": "imx8mp",
+             "description": "This is a GStreamer pipeline able to create a camera preview example using a Basler/OS08A20 camera and an OV5640 camera simultaneously."
+         }],
+         "ISP":[{
+@@ -147,7 +147,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "isp_demo.png",
+-            "compatible": "imx8mp, imx93frdm",
++            "compatible": "imx8mp",
+             "description": "This program opens a GStreamer pipeline and allows the user to change various parameters of the ISP in real time. This example application works with Basler and OS08A20 cameras."
+         },{
+             "name": "Video Dump",
+@@ -156,7 +156,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "video-dump.jpg",
+-            "compatible": "imx8mp, imx93frdm",
++            "compatible": "imx",
+             "description": "This program allows users to dump the raw frame data from a camera onto a connected drive. This demo will only work with a compatible Basler camera."
+         }],
+         "Audio":[{
+@@ -186,7 +186,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "voice-control.jpg",
+-            "compatible": "imx8mp, imx8mm, imx93frdm",
++            "compatible": "imx",
+             "description": "See NXP's Voice Technology in action! Use your voice to open and close various applications. This requires 8-MIC Array Board (8MIC-RPI-MX8) installed on the i.MX hardware (Visit NXP.com for help). Please note that this will override '/etc/asound.conf' file. It will be restored if this application is gracefully terminated."
+         },
+         {
+@@ -196,13 +196,13 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "multimedia-player.jpg",
+-            "compatible": "imx8mm, imx8mp, imx93, imx93frdm",
++            "compatible": "imx",
+             "description": "This is an application for controlling an audio player using the Bluetooth communication protocol by the use of voice commands. WakeWord supported:'HEY NXP'. Voice commands supported : PLAY MUSIC, PAUSE, PREVIOUS SONG, NEXT SONG, VOLUME UP, VOLUME DOWN, MUTE, STOP, STOP PLAYER. This application requires 8-MIC Array Board (8MIC-RPI-MX8) installed on the i.MX hardware (Visit NXP.com for help)."
+         },
+         {
+             "name": "Smart Kitchen",
+             "id": "smart-kitchen",
+-            "executable": "/opt/gopoint-apps/scripts/multimedia/smart-kitchen/run.sh",
++            "executable": "/opt/gopoint-apps/scripts/multimedia/smart-kitchen/smart-kitchen-gui",
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "smart-kitchen-screenshot.jpg",
+@@ -212,7 +212,7 @@
+         {
+              "name": "E-Bike VIT",
+              "id": "ebike-vit",
+-             "executable": "/opt/gopoint-apps/scripts/multimedia/ebike-vit/run.sh",
++             "executable": "/opt/gopoint-apps/scripts/multimedia/ebike-vit/ebike-vit-gui",
+              "source": "",
+              "icon": "ebike-vit-icon.svg",
+              "screenshot": "ebike-vit-screenshot.jpg",
+@@ -229,7 +229,7 @@
+             "source": "",
+             "icon": "tsn.svg",
+             "screenshot": "tsn.jpg",
+-            "compatible": "imx8mm, imx8mp",
++            "compatible": "imx",
+             "description": "Enhancements to Traffic Scheduling: Time-Aware Shaper. It separates communication on the Ethernet network into configurable length, repeating time cycles, thereby contributing to the delivery of time-critical traffic. Each network node's egress ports have per-queue traffic windows which may be opened/closed at specified times.The talker-to-listener path across the network may be dedicated to this priority traffic alone, at real-time (T), causing the talker's traffic to be delivered reliably and deterministically across the network."
+         }]
+     }]
+@@ -242,7 +242,7 @@
+             "source": "",
+             "icon": "ele-demo-icon.svg",
+             "screenshot": "ele-demo-screenshot.jpg",
+-            "compatible": "imx93",
++            "compatible": "imx",
+             "description": "The EdgeLock® Secure Enclave (ELE) is an independent security domain that provides security services, which include key management, random number generation, data storage, execution of cryptographic services, etc.This application is developed to make some of the ELE functionalities visible."
+         }]
+     }]
+-- 
+2.43.0
+

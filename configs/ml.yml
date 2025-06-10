@@ -29,11 +29,11 @@ repo:
 
   nnstreamer:
     url:    https://github.com/nnstreamer/nnstreamer.git
-    commit: f82789170b8f2696
+    commit: 807060954acfdb6cec1
 
   nnstreamer_edge:
     url:    https://github.com/nnstreamer/nnstreamer-edge.git
-    commit: 2efc10afd1161a02
+    commit: 2bf50d57f0f8d856ae38
 
   nnshark:
     url:    https://github.com/nxp-imx/nnshark.git
@@ -60,7 +60,7 @@ repo:
 
   imx_nnstreamer_examples:
     url:    https://github.com/nxp-imx/nxp-nnstreamer-examples.git
-    commit: 1450073874cf6ef
+    commit: 5d9a7a674e52697
 
   imx_demos_list:
     url:    https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git
@@ -72,3 +72,28 @@ repo:
   imx_smart_fitness:
     url:    https://github.com/nxp-imx-support/imx-smart-fitness.git
     commit: 5ac9a93c6c651e
+
+  nxp_afe:
+    url:  https://github.com/nxp-imx/nxp-afe.git
+
+  imx_voiceui:
+    url:    https://github.com/nxp-imx/imx-voiceui.git
+
+  nxp_demo_experience_assets:
+    url: https://github.com/nxp-imx-support/nxp-demo-experience-assets.git
+
+  imx_video_to_texture:
+    url: https://github.com/nxp-imx-support/imx-video-to-texture.git
+    commit: 5d55728b5c562f1
+
+  imx_voiceplayer:
+    url: https://github.com/nxp-imx-support/imx-voiceplayer.git
+    commit: a70dba74eeff1b
+
+  imx_ebike_vit:
+    url: https://github.com/nxp-imx-support/imx-ebike-vit
+    commit: 7216521
+
+  gtec_demo_framework:
+    url: https://github.com/nxp-imx/gtec-demo-framework.git
+    tag: 6.4.2

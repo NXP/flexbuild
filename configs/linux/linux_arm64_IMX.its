@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 NXP
+ * Copyright 2018-2025 NXP
  *
  * Shengzhou Liu <Shengzhou.Liu@nxp.com>
  *
@@ -34,7 +34,6 @@
 			entry = <0x00000000>;
 		};
 
-
 		imx8mqevk-dtb {
 			description = "Flattened Device Tree blob";
 			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mq-evk.dtb");
@@ -47,6 +46,15 @@
 		imx8mpevk-dtb {
 			description = "Flattened Device Tree blob";
 			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mp-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mpfrdm-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mp-frdm.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";
@@ -116,6 +124,15 @@
 			compression = "none";
 			load = <0x90000000>;
 		};
+		imx91frdmstorm-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx91-11x11-frdm-storm.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
 		imx93evk-dtb {
 			description = "Flattened Device Tree blob";
 			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx93-11x11-evk.dtb");
@@ -147,6 +164,12 @@
 			description = "Boot Linux kernel";
 			kernel = "kernel";
 			fdt = "imx8mpevk-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mpfrdm {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx8mpfrdm-dtb";
 			ramdisk = "initrd";
 		};
 		imx8mmevk {
@@ -189,6 +212,12 @@
 			description = "Boot Linux kernel";
 			kernel = "kernel";
 			fdt = "imx91frdm-dtb";
+			ramdisk = "initrd";
+		};
+		imx91frdmstorm {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx91frdmstorm-dtb";
 			ramdisk = "initrd";
 		};
 		imx93evk {

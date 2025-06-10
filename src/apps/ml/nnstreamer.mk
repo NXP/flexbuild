@@ -6,19 +6,9 @@
 # NNStreamer - Stream Pipeline Paradigm for Neural Network Applications
 # NNStreamer is a GStreamer plugin allowing to construct neural network applications with stream pipeline paradigm.
 
-nnstreamer:
+nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"nnstreamer") && \
 	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
-	 cd $(MLDIR)/nnstreamer && \
-	 rm -rf build_debian_arm64 && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/nnstreamer/*.patch && touch .patchdone; \
-         fi && \
-	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
-	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
@@ -34,7 +24,17 @@ nnstreamer:
 	 if [ ! -f $(DESTDIR)/usr/lib/libtvm.so ]; then \
 	     bld tvm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 cd $(MLDIR)/nnstreamer && \
+	 rm -rf build_debian_arm64 && \
+	 if [ ! -f .patchdone ]; then \
+	     git am $(FBDIR)/patch/nnstreamer/*.patch $(LOG_MUTE) && touch .patchdone; \
+     fi && \
+	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
+	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 \
+	 $(call fbprint_b,"nnstreamer") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
 	 export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -fcanon-prefix-map" && \
@@ -58,6 +58,6 @@ nnstreamer:
 		-Dpython3-support=enabled \
 		-Dnnstreamer-edge-support=enabled \
 		-Dtflite2-support=enabled \
-		-Dtvm-support=enabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dtvm-support=enabled $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"nnstreamer")

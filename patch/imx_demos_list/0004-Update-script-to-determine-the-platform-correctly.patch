@@ -1,0 +1,221 @@
+From 2b33cf67e195e71b552ef014fad36025b9a2e684 Mon Sep 17 00:00:00 2001
+From: Andy Tang <andy.tang@nxp.com>
+Date: Tue, 22 Apr 2025 17:16:18 +0800
+Subject: [PATCH 4/5] Update script to determine the platform correctly
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ scripts/machine_learning/dms/dms_demo.py      | 50 ++++++++++++++++---
+ scripts/machine_learning/dms/launcher.py      | 11 ++--
+ .../imx_smart_fitness/imx_smart_fitness.py    | 11 ++--
+ .../nnstreamer/ml_demo_launcher.py            |  8 ++-
+ .../selfie_segmenter/selfie_segmenter.py      | 10 ++--
+ 5 files changed, 70 insertions(+), 20 deletions(-)
+
+diff --git a/scripts/machine_learning/dms/dms_demo.py b/scripts/machine_learning/dms/dms_demo.py
+index e4ba91f..aeb1b4d 100644
+--- a/scripts/machine_learning/dms/dms_demo.py
++++ b/scripts/machine_learning/dms/dms_demo.py
+@@ -37,6 +37,7 @@ import argparse
+ import numpy as np
+ import gi
+ import cairo
++import subprocess
+ from face_detection import FaceDetector
+ from face_landmark import FaceLandmark
+ from eye import Eye
+@@ -148,14 +149,19 @@ class DMSDemo:
+         self.safe_value = 0.0
+         self.smk_call_cords = []
+ 
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
+-        else:
++        # Check target (i.MX 8M Plus vs i.MX 93)
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform not in ["i.MX8MP", "i.MX93"]:
+             print("Target is not supported!")
+             sys.exit()
+ 
++        hostname = subprocess.check_output(
++            ["cat", "/etc/hostname"]
++        ).decode("utf-8")[:-1]
++
+         if self.platform == "i.MX8MP":
+             videoconvert = "imxvideoconvert_g2d ! "
+             videocrop = (
+@@ -176,7 +182,7 @@ class DMSDemo:
+             + "height=480,width=640,format=YUY2 ! "
+             + videocrop
+             + videoconvert
+-            + "video/x-raw,height=1072,width=1072,format=RGB16 ! "
++            + "video/x-raw,height=1080,width=1080,format=RGB16 ! "
+             + "tee name=cam !  queue max-size-buffers=2 leaky=2 ! comp.sink_0  filesrc "
+             + "location="
+             + model_path
+@@ -187,7 +193,7 @@ class DMSDemo:
+             + "name=comp sink_1::xpos=0 sink_1::ypos=0 "
+             + "sink_0::xpos=840 sink_0::ypos=4 ! cairooverlay name=drawer ! "
+             + "queue max-size-buffers=2 leaky=2 ! waylandsink "
+-            + "window_width=1280 window-height=720 "
++            + "window_width=1920 window-height=1080 "
+             + "cam. ! queue max-size-buffers=2 leaky=2 ! "
+             + videoconvert
+             + "video/x-raw,height="
+@@ -197,6 +203,36 @@ class DMSDemo:
+             + ",format=RGB16 ! videoconvert ! video/x-raw,format=RGB ! "
+             + "appsink emit-signals=true drop=true max-buffers=2 name=ml_sink"
+         )
++        if hostname == "imx93frdm":
++            cam_pipeline = (
++                "v4l2src device="
++                + video_device
++                + " ! video/x-raw,framerate=30/1,"
++                + "height=480,width=640,format=YUY2 ! "
++                + videocrop
++                + videoconvert
++                + "video/x-raw,height=1080,width=1080,format=RGB16 ! "
++                + "tee name=cam !  queue max-size-buffers=2 leaky=2 ! comp.sink_0  filesrc "
++                + "location="
++                + model_path
++                + info_image
++                + " ! jpegdec ! video/x-raw,"
++                + "height=1080,width=840 ! imagefreeze ! comp.sink_1 "
++                + compositor
++                + "name=comp sink_1::xpos=0 sink_1::ypos=0 "
++                + "sink_0::xpos=840 sink_0::ypos=4 ! cairooverlay name=drawer ! "
++                + "queue max-size-buffers=2 leaky=2 ! waylandsink "
++                + "window_width=1280 window-height=720 "
++                + "cam. ! queue max-size-buffers=2 leaky=2 ! "
++                + videoconvert
++                + "video/x-raw,height="
++                + str(FRAME_HEIGHT)
++                + ",width="
++                + str(FRAME_WIDTH)
++                + ",format=RGB16 ! videoconvert ! video/x-raw,format=RGB ! "
++                + "appsink emit-signals=true drop=true max-buffers=2 name=ml_sink"
++            )
++
+         pipeline = Gst.parse_launch(cam_pipeline)
+         pipeline.set_state(Gst.State.PLAYING)
+ 
+diff --git a/scripts/machine_learning/dms/launcher.py b/scripts/machine_learning/dms/launcher.py
+index e2882d6..5ae4886 100644
+--- a/scripts/machine_learning/dms/launcher.py
++++ b/scripts/machine_learning/dms/launcher.py
+@@ -72,14 +72,17 @@ class ImxDMSLauncher:
+         self.cache_enable = ""
+ 
+         # Check target (i.MX 8M Plus vs i.MX 93)
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform == "i.MX8MP":
+             self.cache_enable = (
+                 "VIV_VX_ENABLE_CACHE_GRAPH_BINARY='1' "
+                 + "VIV_VX_CACHE_BINARY_GRAPH_DIR=/opt/gopoint-apps/downloads "
+             )
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
++        elif self.platform == "i.MX93":
++            pass
+         else:
+             print("Target is not supported!")
+             sys.exit()
+diff --git a/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py b/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
+index 57610b7..828da3d 100644
+--- a/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
++++ b/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
+@@ -82,14 +82,17 @@ class ImxSmartFitness:
+         self.output_process = None
+ 
+         # Check target (i.MX 8M Plus vs i.MX 93)
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform == "i.MX8MP":
+             self.cache_enable = (
+                 "VIV_VX_ENABLE_CACHE_GRAPH_BINARY='1' "
+                 + "VIV_VX_CACHE_BINARY_GRAPH_DIR=/opt/gopoint-apps/downloads "
+             )
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
++        elif self.platform == "i.MX93":
++            pass
+         else:
+             print("Target is not supported!")
+             sys.exit()
+diff --git a/scripts/machine_learning/nnstreamer/ml_demo_launcher.py b/scripts/machine_learning/nnstreamer/ml_demo_launcher.py
+index 6b4a204..7683dec 100644
+--- a/scripts/machine_learning/nnstreamer/ml_demo_launcher.py
++++ b/scripts/machine_learning/nnstreamer/ml_demo_launcher.py
+@@ -30,6 +30,7 @@ class MLLaunch(Gtk.Window):
+         """Creates the UI window"""
+         # Initialization
+         self.demo = demo
++        self.platform = None
+         super().__init__(title=demo)
+         self.set_default_size(450, 200)
+         self.set_resizable(False)
+@@ -58,6 +59,10 @@ class MLLaunch(Gtk.Window):
+             devices.append(device)
+ 
+         backends_available = ["CPU"]
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
+         if os.path.exists("/usr/lib/libvx_delegate.so") and self.demo != "pose":
+             backends_available.insert(1, "GPU")
+         if (
+@@ -66,7 +71,8 @@ class MLLaunch(Gtk.Window):
+             and self.platform != "i.MX8QM"
+         ):
+             backends_available.insert(0, "NPU")
+-        if os.path.exists("/usr/lib/libethosu_delegate.so"):
++
++        if self.platform == "i.MX93":
+             backends_available.insert(0, "NPU")
+             # backends_available.pop()
+ 
+diff --git a/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py b/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py
+index 1a9af29..52b80b2 100644
+--- a/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py
++++ b/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py
+@@ -166,16 +166,18 @@ class SelfieSegmenter:
+         self.aspect_ratio = "1/1"
+ 
+         # Check target (i.MX 8M Plus vs i.MX 93)
+-        if os.path.exists("/usr/lib/libvx_delegate.so"):
+-            self.platform = "i.MX8MP"
++        self.platform = subprocess.check_output(
++            ["cat", "/sys/devices/soc0/soc_id"]
++        ).decode("utf-8")[:-1]
++
++        if self.platform == "i.MX8MP":
+             self.cache_enable = (
+                 "VIV_VX_ENABLE_CACHE_GRAPH_BINARY='1' "
+                 + "VIV_VX_CACHE_BINARY_GRAPH_DIR=/opt/gopoint-apps/downloads "
+             )
+             self.nxp_converter = "imxvideoconvert_g2d"
+             self.nxp_compositor = "imxcompositor_g2d"
+-        elif os.path.exists("/usr/lib/libethosu_delegate.so"):
+-            self.platform = "i.MX93"
++        elif self.platform == "i.MX93":
+             self.nxp_converter = "imxvideoconvert_pxp"
+             self.nxp_compositor = "imxcompositor_pxp"
+         else:
+-- 
+2.43.0
+

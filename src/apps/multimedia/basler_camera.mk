@@ -7,12 +7,13 @@
 
 
 basler_camera:
+ifeq ($(CONFIG_BASLER_CAMERA),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"basler_camera") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/basler_camera ]; then \
-	     wget -q $(repo_basler_camera_bin_url) -O basler_camera.bin && \
-	     chmod +x basler_camera.bin && ./basler_camera.bin --auto-accept && \
+	     wget -q $(repo_basler_camera_bin_url) -O basler_camera.bin $(LOG_MUTE) && \
+	     chmod +x basler_camera.bin && ./basler_camera.bin --auto-accept $(LOG_MUTE) && \
 	     mv basler-camera-* basler_camera && rm -f basler_camera.bin; \
 	 fi && \
 	 cd basler_camera && \
@@ -20,3 +21,4 @@ basler_camera:
 	 cp -rfv ./opt/imx8-isp/bin/* $(DESTDIR)/opt/imx8-isp/bin && \
 	 cp -rfv ./usr/lib/* $(DESTDIR)/usr/lib/ && \
 	 $(call fbprint_d,"basler_camera")
+endif

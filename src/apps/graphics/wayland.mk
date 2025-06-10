@@ -23,7 +23,7 @@ ifeq ($(CONFIG_WAYLAND),y)
 		-Dc_link_args="-L$(DESTDIR)/usr/local/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" \
 		--prefix=/usr \
 		--buildtype=release \
-		--cross-file=meson.cross && \
-	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		--cross-file=meson.cross $(LOG_MUTE) && \
+	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"wayland")
 endif

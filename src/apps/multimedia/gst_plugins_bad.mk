@@ -9,14 +9,13 @@
 # depends on libsbc-dev libsndfile1-dev libwebp-dev
 
 
-gst_plugins_bad:
+gst_plugins_bad: gst_plugins_base
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"gst_plugins_bad") && \
 	 $(call repo-mngr,fetch,gst_plugins_bad,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_bad && \
          if [ ! -f .patchdone ]; then \
-             git am $(FBDIR)/patch/gst_plugins_bad/*.patch && touch .patchdone; \
+             git am $(FBDIR)/patch/gst_plugins_bad/*.patch $(LOG_MUTE) && touch .patchdone; \
          fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
@@ -28,6 +27,7 @@ gst_plugins_bad:
 	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstopengl.so ]; then \
 	     bld gst_plugins_base -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"gst_plugins_bad") && \
 	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1} && \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} && \
@@ -160,6 +160,6 @@ gst_plugins_bad:
 		-Dwebrtcdsp=disabled \
 		-Dx11=enabled \
 		-Dx265=disabled \
-		-Dzbar=disabled && \
-	ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dzbar=disabled $(LOG_MUTE) && \
+	ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	$(call fbprint_d,"gst_plugins_bad")

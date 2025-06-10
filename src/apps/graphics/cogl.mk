@@ -8,16 +8,16 @@
 
 # clutter-1.0 depends on cogl-1.0
 
-cogl:
+cogl: gpu_viv
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"cogl") && \
 	 $(call repo-mngr,fetch,cogl,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/cogl && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libGLESv2.so ]; then \
 	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
+	 $(call fbprint_b,"cogl") && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/cogl/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/cogl/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)  \
@@ -28,7 +28,7 @@ cogl:
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 sudo cp $(DESTDIR)/usr/lib/{libVSC.so,libgbm_viv.so,libGLESv2.so*} $(RFSDIR)/usr/lib && \
 	 \
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu && \
+	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--prefix=/usr \
@@ -50,7 +50,7 @@ cogl:
 		--enable-gl \
 		--enable-glx \
 		--enable-wayland-egl-server \
-		--enable-nls && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+		--enable-nls $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"cogl")

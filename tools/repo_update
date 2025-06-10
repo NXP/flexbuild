@@ -22,7 +22,7 @@ git_repo_update() {
     [ "$PKG_GROUPS_MULTIMEDIA" = y ] && mmdir=apps/multimedia
     [ "$PKG_GROUPS_GOPOINT" = y ] && gpdir=apps/gopoint
     [ "$PKG_GROUPS_ROBOTICS" = y ] && robotdir=apps/robotics
-    dirlist="bsp linux apps/utils $netdir $graphdir $mmdir apps/security apps/connectivity $mldir $gpdir $robotdir"
+    dirlist="bsp linux apps/utils $netdir $graphdir $mmdir apps/security $mldir $gpdir $robotdir"
     for pdn in $dirlist; do
 	[ ! -d $PKGDIR/$pdn ] && mkdir -p $PKGDIR/$pdn
 	rn=$(echo $pdn | xargs basename -s /)
@@ -45,7 +45,7 @@ git_repo_update() {
 		fbprint_n "$2 in $PKGDIR/$pdn"
 		break
 	    else
-		make -C $obj ${rn}_repo_fetch
+		$MAKE -C $obj ${rn}_repo_fetch
 	    fi
 	elif [ $1 = latest ]; then
 	    if [ -n "$2" -a -z "$branch" -a -n "$commit" ]; then
@@ -57,7 +57,7 @@ git_repo_update() {
 	    elif [ -n "$2" ] && [ ! -d $PKGDIR/$pdn/$reponame ]; then
 		continue
 	    else
-		make -C $obj ${rn}_repo_update_latest
+		$MAKE -C $obj ${rn}_repo_update_latest
 	    fi
         else
             if [ -n "$2" -a -z "$(eval echo '$'$1)" ]; then
@@ -67,7 +67,7 @@ git_repo_update() {
             elif [ -n "$2" -a -n "$(eval echo '$'$1)" ] && [ -d $PKGDIR/$pdn/$2 ]; then
                 git_repo_checkout $PKGDIR/$pdn $2 $1 $(eval echo '$'$1)
             else
-                make -C $obj ${rn}_repo_update_$1
+                $MAKE -C $obj ${rn}_repo_update_$1
             fi
 	fi
     done

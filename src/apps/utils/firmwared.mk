@@ -24,14 +24,14 @@ firmwared:
 	 export CFLAGS="-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 \
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu && \
+	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--prefix=/usr \
 		--disable-silent-rules \
-		--with-libtool-sysroot=$(RFSDIR) && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+		--with-libtool-sysroot=$(RFSDIR) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/lib/systemd/system $(DESTDIR)/etc/systemd/system/multi-user.target.wants && \
 	 install -m 0644 $(FBDIR)/src/system/firmwared.service $(DESTDIR)/usr/lib/systemd/system/ && \
 	 ln -sf /usr/lib/systemd/system/firmwared.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/firmwared.service && \

@@ -13,8 +13,8 @@ imx_dpu_g2d:
 	 $(call fbprint_b,"imx_dpu_g2d") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/imx_dpu_g2d ]; then \
-	     wget -q $(repo_imx_dpu_g2d_bin_url) -O imx_dpu_g2d.bin && \
-	     chmod +x imx_dpu_g2d.bin && ./imx_dpu_g2d.bin --auto-accept && \
+	     wget -q $(repo_imx_dpu_g2d_bin_url) -O imx_dpu_g2d.bin $(LOG_MUTE) && \
+	     chmod +x imx_dpu_g2d.bin && ./imx_dpu_g2d.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-dpu-g2d-* imx_dpu_g2d && rm -f imx_dpu_g2d.bin; \
 	 fi && \
 	 cd imx_dpu_g2d && \

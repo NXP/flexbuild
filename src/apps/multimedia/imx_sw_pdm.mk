@@ -11,14 +11,14 @@ imx_sw_pdm:
 	 $(call fbprint_b,"imx_sw_pdm") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_sw_pdm ]; then \
-	     wget -q $(repo_imx_sw_pdm_bin_url) -O imx_sw_pdm.bin && \
-	     chmod +x imx_sw_pdm.bin && ./imx_sw_pdm.bin --auto-accept && \
+	     wget -q $(repo_imx_sw_pdm_bin_url) -O imx_sw_pdm.bin $(LOG_MUTE) && \
+	     chmod +x imx_sw_pdm.bin && ./imx_sw_pdm.bin --auto-accept $(LOG_MUTE) && \
 	     mv imx-sw-pdm* imx_sw_pdm && rm -f imx_sw_pdm.bin; \
 	 fi && \
 	 cd imx_sw_pdm && \
 	 ./configure CC=aarch64-linux-gnu-gcc \
 	   --enable-armv8 \
-	   --prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	   --prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_sw_pdm")

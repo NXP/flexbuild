@@ -29,7 +29,7 @@ openssl_provider_se05x:
 		-DPTMW_Applet=$(APPLET) \
 		-DPTMW_SE05X_Ver=$(APPLET_VERSION) \
 		-DPTMW_SE05X_Auth=$(APPLET_AUTH) \
-		-DPTMW_HostCrypto=OPENSSL && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+		-DPTMW_HostCrypto=OPENSSL $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 $(call fbprint_d,"openssl_provider_se05x")

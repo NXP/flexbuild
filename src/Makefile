@@ -17,5 +17,5 @@ $(LINUX_REPO_LIST) linux-headers linux-deb linux-modules:
 	@$(MAKE) -C $(FBDIR)/src/linux $@
 
 $(APPS_REPO_LIST) utils security ml gopoint robotics \
-networking graphics multimedia connectivity:
+networking graphics multimedia:
 	@$(MAKE) -C $(FBDIR)/src/apps $@

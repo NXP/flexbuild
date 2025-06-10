@@ -11,13 +11,12 @@
 #	  libclutter-gtk-1.0-dev vala-native gnome-desktop libxml2-native gdk-pixbuf-native itstool-native
 
 
-cheese:
+cheese: clutter_gst gst_plugins_bad
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"cheese") && \
 	 $(call repo-mngr,fetch,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \
 	 if [ ! -f .patchdone ]; then \
-	      git am $(FBDIR)/patch/cheese/*.patch && touch .patchdone; \
+	      git am $(FBDIR)/patch/cheese/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
@@ -27,9 +26,11 @@ cheese:
 	 if [ ! -f $(DESTDIR)/usr/lib/libclutter-gst-3.0.so ]; then \
 	     bld clutter_gst -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"cheese") && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstallocators-1.0.so.0 && \
 	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
 	 \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 -I$(DESTDIR)/usr/include \
 			  -I$(DESTDIR)/usr/include/clutter-gst-3.0" \
@@ -40,8 +41,8 @@ cheese:
 		--strip \
 		-Dintrospection=false \
 		-Dgtk_doc=false \
-		-Dman=false && \
-	 ninja -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dman=false $(LOG_MUTE) && \
+	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/org.gnome.Cheese.svg && \
 	 rm -f $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/org.gnome.Cheese-symbolic.svg && \
 	 $(call fbprint_d,"cheese")

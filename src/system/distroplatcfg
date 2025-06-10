@@ -10,103 +10,114 @@
 
 set -e
 
-file=/proc/device-tree/model
+source /usr/bin/board_id.sh
+board_id=$(get_board_id)
 
-if grep -iq mx8mp $file; then
-   soc=imx8mp
-elif grep -iq mx8mm $file; then
-    soc=imx8mm
-elif grep -iq mx8mn $file; then
-    soc=imx8mn
-elif grep -iq mx8mq $file; then
-    soc=imx8mq
-elif grep -iq mx8qm $file; then
-    soc=imx8qm
-elif grep -iq mx8qxp $file; then
-    soc=imx8qxp
-elif grep -iq mx8ulp $file; then
-    soc=imx8ulp
-elif grep -iq mx91 $file; then
-    soc=imx91
-elif grep -iq mx93 $file; then
-    soc=imx93
-elif grep -iq ls1012 $file; then
-    soc=ls1012a
-elif grep -iq ls1028 $file; then
-    soc=ls1028a
-elif grep -iq ls1043 $file; then
-    soc=ls1043a
-elif grep -iq ls1046 $file; then
-    soc=ls1046a
-elif grep -iq ls1088 $file; then
-    soc=ls1088a
-elif grep -iq ls2088 $file; then
-    soc=ls2088a
-elif grep -iq lx2160 $file; then
-    soc=lx2160a
-else
-    soc=unknown
-fi
+issue_content=$(tr '[:upper:]' '[:lower:]' < /etc/issue)
+case "$issue_content" in
+    *"debian desktop"*)
+        distro_type="desktop"
+        ;;
+    *"debian server"*)
+        distro_type="server"
+        ;;
+    *"debian base"*)
+        distro_type="base"
+        ;;
+    *)
+        echo "unknown distro" >&2
+        ;;
+esac
 
-if [ $soc = imx91 -o $soc = imx93 ]; then
-    if grep -qi 'Debian Desktop' /etc/issue; then
-	#desktop=weston in 25Q2
-	desktop=gnome
-    else
-	desktop=none
-    fi
-else
-    desktop=gnome
-fi
+: ${board_id:?}
+: ${distro_type:=unknown}
 
-if grep -iq evk $file; then
-   brd=evk
-elif grep -iq frdm $file; then
-    brd=frdm
-elif grep -iq frwy $file; then
-    brd=frwy
-elif grep -iq mek $file; then
-    brd=mek
-elif grep -iqE 'qsb|Quick Start Board' $file; then
-    brd=qsb
-elif grep -iq rdb $file; then
-    brd=rdb
-elif grep -iq qds $file; then
-    brd=qds
-fi
+/usr/bin/hostnamectl set-hostname "$board_id"
 
-[ $soc = unknown ] && plat=localhost || plat=${soc}${brd}
-
-echo $plat > /etc/hostname
-
-if [ $soc != imx8mp ]; then
-    rm -f /etc/systemd/system/multi-user.target.wants/imx8-isp.service
+if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx8mp* ]]; then
+    systemctl enable imx8-isp.service
 fi
 
 # vpu hantro daemon
-if [ $soc = imx8mp ]; then
+if [[ "$board_id" == imx8mp* ]]; then
     ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
-    rm -f /etc/systemd/system/multi-user.target.wants/firmwared.service
-elif [ $soc = imx8mq ]; then
+#    rm -rf /etc/systemd/system/multi-user.target.wants/firmwared.service
+elif [[ "$board_id" == imx8mq* ]]; then
     ln -sf vsidaemon-IMX8MQ /usr/bin/vsidaemon
-elif [ $soc = imx8mm ]; then
+elif [[ "$board_id" == imx8mm* ]]; then
     ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
     ln -sf libg2d-viv-mx8mm.so.2.2.0 /usr/lib/libg2d.so.2
-elif [ $soc = imx93 ]; then
+    [ -f /usr/lib/libg2d-viv.so.2.2.0 ] && rm -f /usr/lib/libg2d-viv.so.2.2.0
+elif [[ "$board_id" == imx93* ]]; then
     ln -sf libg2d-pxp.so.2.2.0 /usr/lib/libg2d.so.2
+    [ -f /usr/lib/libg2d-viv.so.2.2.0 ] && rm -f /usr/lib/libg2d-viv.so.2.2.0
 fi
 
-if [ $soc = imx8qm -o $soc = imx8qxp ] && [ ! -L /lib/firmware/vpu ]; then
+if [[ "$board_id" == imx8qm* || "$board_id" == imx8qxp* ]] && [[ ! -L /lib/firmware/vpu ]]; then
     ln -sf imx/vpu /lib/firmware/vpu
 fi
 
-if [ $desktop = gnome ] && [ $soc = imx91 -o $soc = imx93 ] && [ -f /usr/lib/libGLESv2.so ]; then
-    rm -f /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
-    rm -f /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
-    rm -f /usr/lib/libclutter-gst-3.0.so*
+# imx91 don't have g2d
+if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx91* ]]; then
+    /usr/bin/sed -i '/^use-g2d=true/s/^/# /' /etc/xdg/weston/weston.ini
+    /usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
+    /usr/bin/sed -i '/gopoint/d' /etc/xdg/weston/weston.ini
 fi
 
+# for imx8mm
+if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx8mm* ]]; then
+    /usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
+    /usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
+fi
+
+# for imx93
+if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx93* ]]; then
+    /usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
+fi
+
+if [[ "$distro_type" == "desktop" ]]; then
+    sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+    sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+    sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
+    rm -rf /etc/systemd/system/display-manager.service
+fi
+
+# ap1302 firmware need it
+/usr/bin/sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
+
+# wifi module need it
+/usr/sbin/depmod -a
+/usr/sbin/update-initramfs -u
+
+if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx8* || "$board_id" == ls1028* ]]; then
+    systemctl enable gdm.service
+fi
+
+if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx91* || "$board_id" == imx93* ]]; then
+    rm -rf /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
+    rm -rf /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
+    rm -rf /usr/lib/libclutter-gst-3.0.so*
+
+    # default desktop is weston
+    systemctl disable gdm --now
+    systemctl enable weston
+fi
+
+
 # fmc service only for DPAA on ls1043/ls1046
-if [ $soc != ls1043a -a $soc != ls1046a ]; then
-    rm -f /etc/systemd/system/multi-user.target.wants/fmc.service
+if [[ "$board_id" == ls1043a* || "$board_id" == ls1046a* ]]; then
+    systemctl enable fmc.service
+fi
+
+# for server and imx93/imx91, wifi will use 3 ports
+if [[ "$board_id" == imx9* ]] || ( [[ "$distro_type" == server ]] && ! ([[ "$board_id" == ls* ]] || [[ "$board_id" == lx* ]] )); then
+    /usr/bin/sed -i '/drv_mode=1/d' /boot/firmware/nxp/wifi_mod_para.conf
+fi
+
+systemctl disable platcfg.service
+
+systemctl daemon-reload
+
+if [[ $PPID -eq 1 ]] && [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx91* || "$board_id" == imx93* ]]; then
+    systemctl start weston
 fi

@@ -1,0 +1,26 @@
+From d759a0d7727223f35a07ae60f60dd7ae5ed24536 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Tue, 15 Apr 2025 16:44:31 +0800
+Subject: [PATCH 6/6] imx: FRDM-IMX8MP: Use green led instead of blue
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ arch/arm/dts/imx8mp-frdm.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/dts/imx8mp-frdm.dts b/arch/arm/dts/imx8mp-frdm.dts
+index 95ca15dfbf6..2517b8aaf74 100644
+--- a/arch/arm/dts/imx8mp-frdm.dts
++++ b/arch/arm/dts/imx8mp-frdm.dts
+@@ -22,7 +22,7 @@
+ 		compatible = "gpio-leds";
+ 
+ 		led-0 {
+-			gpios = <&pcal6416 15 GPIO_ACTIVE_HIGH>;
++			gpios = <&pcal6416 14 GPIO_ACTIVE_HIGH>;
+ 			default-state = "on";
+ 		};
+ 	};
+-- 
+2.34.1
+

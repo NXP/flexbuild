@@ -1,7 +1,7 @@
-From 8913432378008561ea697a94af8b25d4f0e6322b Mon Sep 17 00:00:00 2001
+From bc8b4c42eab8881ea39c69580c714857c716b05e Mon Sep 17 00:00:00 2001
 From: Hongting Ting <hongting.dong@nxp.com>
 Date: Thu, 25 Jul 2024 16:45:40 +0800
-Subject: [PATCH 07/19] arm64: dts: add imx93-11x11-frdm-aud-hat dts
+Subject: [PATCH 07/30] arm64: dts: add imx93-11x11-frdm-aud-hat dts
 
 Add CS42448 CODEC node
 Add XCVR node
@@ -17,10 +17,10 @@ Signed-off-by: Lei Xu <Lei.Xu@nxp.com>
  create mode 100644 arch/arm64/boot/dts/freescale/imx93-11x11-frdm-aud-hat.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 68f81cdc2308..9c243f7798be 100644
+index 6542dbd6702a..cc7aebe3a2a6 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -385,7 +385,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
+@@ -388,7 +388,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk.dtb \
  			  imx93-11x11-evk-iw612-otbr.dtb \
  			  imx93-11x11-evk-rpmsg.dtb imx93-11x11-evk-rpmsg-lpv.dtb \
  			  imx93-11x11-frdm.dtb imx93-11x11-frdm-mt9m114.dtb \
@@ -353,5 +353,5 @@ index 000000000000..8e6386df97c7
 +	};
 +};
 -- 
-2.25.1
+2.34.1
 

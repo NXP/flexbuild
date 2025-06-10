@@ -10,9 +10,8 @@
 
 
 
-tflite_vx_delegate:
+tflite_vx_delegate: tflite tim_vx
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"tflite_vx_delegate") && \
 	 $(call repo-mngr,fetch,tflite_vx_delegate,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
 	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -20,6 +19,7 @@ tflite_vx_delegate:
 	 if [ ! -f $(DESTDIR)/usr/lib/libtim-vx.so ]; then \
 	     bld tim_vx -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"tflite_vx_delegate") && \
 	 cd $(MLDIR)/tflite_vx_delegate && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
@@ -30,8 +30,8 @@ tflite_vx_delegate:
 		-DFETCHCONTENT_FULLY_DISCONNECTED=OFF \
 		-DTIM_VX_INSTALL=$(DESTDIR)/usr \
 		-DFETCHCONTENT_SOURCE_DIR_TENSORFLOW=$(MLDIR)/tflite \
-		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so && \
-	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate && \
+		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so && \
 	 cp -f build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so $(DESTDIR)/usr/lib && \
 	 install -d $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate && \

@@ -16,7 +16,6 @@ DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool"
 
 dpdk:
 	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"dpdk") && \
 	 $(call repo-mngr,fetch,dpdk,apps/networking) && \
 	 $(call repo-mngr,fetch,linux,linux) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
@@ -27,6 +26,7 @@ dpdk:
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 \
+	 $(call fbprint_b,"dpdk") && \
 	 cd $(NETDIR)/dpdk && \
 	 build_dir=build_$(DISTROTYPE)_$(ARCH) && \
 	 meson setup $$build_dir \
@@ -37,10 +37,10 @@ dpdk:
 		-Dexamples=$(DPDK_EXAMPLES) \
 		-Dc_args="-Ofast -fPIC -ftls-model=local-dynamic -Wno-error=implicit-function-declaration -I$(DESTDIR)/usr/include" \
 		-Doptimization=3 \
-		--cross-file=config/arm/arm64_dpaa_linux_gcc && \
-	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir install && \
+		--cross-file=config/arm/arm64_dpaa_linux_gcc $(LOG_MUTE) && \
+	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C $$build_dir install $(LOG_MUTE) && \
 	 cd $$build_dir/examples && find . -perm -111 -a -type f | xargs -I {} cp {} $(DESTDIR)/usr/local/bin && \
-	 cd - && mkdir -p $(DESTDIR)/usr/local/dpdk && \
+	 cd - $(LOG_MUTE) && mkdir -p $(DESTDIR)/usr/local/dpdk && \
 	 cp -rf $(NETDIR)/dpdk/nxp/* $(DESTDIR)/usr/local/dpdk && \
 	 cp -f $(NETDIR)/dpdk/drivers/bus/pci/bus_pci_driver.h $(DESTDIR)/usr/include && \
 	 $(CROSS_COMPILE)strip $(DESTDIR)/usr/local/bin/dpdk-* && \

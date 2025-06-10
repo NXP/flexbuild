@@ -22,6 +22,6 @@ isp_vvcam_module:
 	 cd $(PKGDIR)/linux/isp_vvcam_module/vvcam/v4l2 && \
 	 $(call fbprint_b,"isp_vvcam_module") && \
 	 export INSTALL_MOD_PATH=$$opdir/tmp && \
-	 make KERNEL_SRC=$(KERNEL_PATH) O=$$opdir ENABLE_IRQ=yes && \
-	 make KERNEL_SRC=$(KERNEL_PATH) O=$$opdir ENABLE_IRQ=yes modules_install && \
+	 $(MAKE) KERNEL_SRC=$(KERNEL_PATH) O=$$opdir ENABLE_IRQ=yes $(LOG_MUTE) && \
+	 $(MAKE) KERNEL_SRC=$(KERNEL_PATH) O=$$opdir ENABLE_IRQ=yes modules_install $(LOG_MUTE) && \
 	 $(call fbprint_d,"isp_vvcam_module")

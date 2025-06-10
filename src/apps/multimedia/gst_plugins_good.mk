@@ -5,14 +5,13 @@
 
 
 
-gst_plugins_good:
+gst_plugins_good: gst_plugins_base libdrm
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"gst_plugins_good") && \
 	 $(call repo-mngr,fetch,gst_plugins_good,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_good && \
 	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/gst_plugins_good/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/gst_plugins_good/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -i 's/1\.1/0.61/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
@@ -25,6 +24,7 @@ gst_plugins_good:
 	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
 	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"gst_plugins_good") && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 \
 			  -I$(DESTDIR)/usr/lib/gstreamer-1.0/include -I$(DESTDIR)/usr/include" \
@@ -80,6 +80,6 @@ gst_plugins_good:
 		-Dosxvideo=disabled \
 		-Dshout2=disabled \
 		-Dtwolame=disabled \
-		-Dwaveform=disabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dwaveform=disabled $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gst_plugins_good")

@@ -10,9 +10,12 @@
 
 set -e
 
-DEFAULT_DL_URL=http://www.nxp.com/lgfiles/sdk/lsdk2412
+DEFAULT_DL_URL=https://www.nxp.com/lgfiles/sdk/lsdk2506
 
 NXPAPPSPKG=nxp_apps_arm64_debian_$1.tar.zst
+
+source /usr/bin/board_id.sh
+board_id=$(get_board_id)
 
 if [ "$1" != server -a "$1" != desktop ]; then
 cat <<EOF
@@ -23,7 +26,7 @@ EOF
 fi
 
 
-pkglist_server="ntpdate bridge-utils tcpdump mtd-utils pciutils hdparm psmisc libssl-dev usbutils
+pkglist_server="base-files dnsutils ntpdate bridge-utils tcpdump mtd-utils pciutils hdparm psmisc libssl-dev usbutils
 	sysstat lsb-release kexec-tools iptables libhugetlbfs0 strongswan libcharon-extra-plugins
 	dmidecode flex rdate initramfs-tools fbset mmc-utils usbutils i2c-tools lm-sensors rt-tests
 	linuxptp mosquitto xterm bluez pipewire pipewire-audio pipewire-pulse wireplumber libspa-0.2-bluetooth"
@@ -43,8 +46,8 @@ pkglist_server_dev="libxml2-dev libtinyxml2-9 libjsoncpp-dev libssl-dev libsbc-d
 	libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev uuid-dev libpython3.11-dev
 	python3-pip python3-pybind11 python3-numpy python3-pillow python3-flatbuffers python3-decorator python3-numpy
 	python3-attr python3-psutil python3-lxml libflatbuffers-dev libcpuinfo-dev libwaffle-dev libpciaccess-dev
-	liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev libjpeg62-turbo-dev
-	dh-autoreconf"
+    liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev libjpeg62-turbo-dev
+    dh-autoreconf rsync dbus-user-session hostapd "
 
 
 pkglist_desktop_dev="libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev libbsd-dev
@@ -53,8 +56,9 @@ pkglist_desktop_dev="libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev lib
 	libgnome-desktop-3-dev libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev libx264-dev
 	libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev libpulse-dev libspeex-dev x264 libtag1-dev
 	libvulkan-dev libglm-dev libassimp-dev libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev
-	libtheora-dev libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv libgtest-dev libboost-system1.74-dev
-	libboost-thread1.74-dev"
+    libtheora-dev libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging python3-venv
+    libgtest-dev libboost-system1.74-dev libboost-thread1.74-dev libdbus-glib-1-dev qt6-tools-dev libqt6svg6
+    libqt6svg6-dev libfmt-dev libdevil-dev nfs-common "
 
 
 if ! `ping deb.debian.org -c 2 1>/dev/null 2>&1`; then
@@ -70,37 +74,49 @@ if [ -n "$http_proxy" ]; then
   fi
 fi
 
-sudo apt update -y
+[ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
+
+echo -e "\e[0;32mPreparing to install packages ...\e[0m"
+sudo apt-get update -y 1>/dev/null
 
 [ "$1" = server ] && pkglist_desktop="" && pkglist_desktop_dev=""
 
-for pkg in $pkglist_server $pkglist_server_dev $pkglist_desktop $pkglist_desktop_dev; do
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $pkg
-done
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q apt-utils $pkglist_server $pkglist_server_dev $pkglist_desktop $pkglist_desktop_dev
 
-if ! grep -iq mx93 /proc/device-tree/model && [ "$1" = desktop ]; then
+if [[ "$board_id" == imx93* && "$1" == "desktop" ]]; then
     sudo rm -f /usr/lib/aarch64-linux-gnu/{libGLESv2.so,libEGL.so,libgbm.so,libcogl.so,libgstallocators-1.0.so,libvulkan.so}
 fi
 
-echo Installation of extra debian packages done.
+echo -e "\e[0;32mInstalling Debian packages successfully.\e[0m"
 
 [ -n "$2" ] && pkglink=$2 || pkglink=$DEFAULT_DL_URL
 
-rm -f ${NXPAPPSPKG}*
-wget $pkglink/$NXPAPPSPKG
-sudo tar -I zstd -xf $NXPAPPSPKG -C /
-rm -f $NXPAPPSPKG
+echo -e "\e[0;32mDownloading and installing NXP-specific packages ...\e[0m"
+rm -rf /tmp/dl
+mkdir -p /tmp/dl
+rm -rf ${NXPAPPSPKG}*
+wget $pkglink/$NXPAPPSPKG -q --show-progress || { echo "Downloading ${NXPAPPSPKG} failed "; exit 1; }
+sudo tar -I zstd -xf $NXPAPPSPKG -C /tmp/dl
+rsync -a --exclude='/lib/' /tmp/dl/ /
+[ -d /tmp/dl/lib/ ] && rsync -a /tmp/dl/lib/ /usr/lib/
+rm -rf ${NXPAPPSPKG}*
 
-echo Successfully installed NXP-specific packages for Debian $1.
+echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
 
-sed -i "s/Debian base/Debian $1/" /etc/issue
-
-if ! grep -iq mx93 /proc/device-tree/model && [ "$1" = desktop ]; then
-    for pkg in $pkglist_desktop; do
-	sudo apt-get reinstall -y $pkg
-    done
+if [[ "$1" == "desktop" ]]; then
+	sudo DEBIAN_FRONTEND=noninteractive apt-get reinstall -y $pkglist_desktop 1>/dev/null
 fi
 
-echo
-echo Successfully installed NXP-specific packages and extra deb packages for Debian $1.
-echo Please reboot the system now.
+sudo apt-get clean
+sudo apt-get autoclean
+sudo apt-get autoremove -y
+
+[ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
+sed -i "s/Debian base/Debian $1/" /etc/issue
+
+echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
+
+echo -e "\e[0;32m\nStart to configure the system ...\e[0m"
+/usr/bin/distroplatcfg
+
+echo -e "\nSystem is ready, please reboot the system now."

@@ -1,7 +1,7 @@
-From d28d5e119a6719b32581f31be1800fabc132b5e8 Mon Sep 17 00:00:00 2001
+From ceb6552f314ae149e6a81aa7ee7fdc9808032bf0 Mon Sep 17 00:00:00 2001
 From: Steven <zhao.yang_1@nxp.com>
 Date: Sun, 28 Jul 2024 11:51:40 +0800
-Subject: [PATCH 11/19] arm64: dts: add pwm function of the LED
+Subject: [PATCH 11/30] arm64: dts: add pwm function of the LED
 
 Needs to disable tpm3 and tpm4 node to avoid gpio setting confilcts
 in imx93-11x11-frdm-aud-hat.dts/imx93-11x11-frdm-mt9m114.dts
@@ -114,5 +114,5 @@ index 4ef8e729f3f5..d219e244d53b 100644
  
  &epxp {
 -- 
-2.25.1
+2.34.1
 

@@ -7,7 +7,6 @@
 optee_client:
 ifeq ($(CONFIG_OPTEE),y)
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"optee_client") && \
 	 $(call repo-mngr,fetch,optee_client,apps/security) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -16,7 +15,8 @@ ifeq ($(CONFIG_OPTEE),y)
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 export PKG_CONFIG=pkg-config && \
 	 \
+	 $(call fbprint_b,"optee_client") && \
 	 cd $(SECDIR)/optee_client && \
-	 $(MAKE) ARCH=arm64 CFLAGS="-I$(RFSDIR)/usr/include/uuid" && \
+	 $(MAKE) ARCH=arm64 CFLAGS="-I$(RFSDIR)/usr/include/uuid" $(LOG_MUTE) && \
 	 $(call fbprint_d,"optee_client")
 endif

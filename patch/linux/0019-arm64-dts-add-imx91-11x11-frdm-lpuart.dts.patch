@@ -1,7 +1,7 @@
-From 321247578d99c689346668d2885c61d55fdc49ea Mon Sep 17 00:00:00 2001
+From 8520709bef018bfd656fe5a8f97b0025b685a571 Mon Sep 17 00:00:00 2001
 From: Lei Xu <lei.xu@nxp.com>
 Date: Tue, 22 Oct 2024 17:04:38 +0800
-Subject: [PATCH 19/19] arm64: dts: add imx91-11x11-frdm-lpuart.dts
+Subject: [PATCH 19/30] arm64: dts: add imx91-11x11-frdm-lpuart.dts
 
 Add a new dts file for uart test.
 
@@ -13,10 +13,10 @@ Signed-off-by: Lei Xu <lei.xu@nxp.com>
  create mode 100644 arch/arm64/boot/dts/freescale/imx91-11x11-frdm-lpuart.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 9ed5c0925e53..f9ffcde14d73 100644
+index 13102e211573..a594c98f1a64 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -401,7 +401,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
+@@ -404,7 +404,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
  			  imx91-11x11-evk-i3c.dtb \
  			  imx91-11x11-frdm.dtb imx91-11x11-frdm-ld.dtb \
  			  imx91-11x11-frdm-tianma-wvga-panel.dtb imx91-11x11-frdm-mt9m114.dtb \
@@ -75,5 +75,5 @@ index 000000000000..8eb6c230b13f
 +	};
 +};
 -- 
-2.25.1
+2.34.1
 

@@ -13,6 +13,6 @@ crconf:
 	 export CC=$(CROSS_COMPILE)gcc && \
 	 export DESTDIR=${DESTDIR}/usr/local && \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"crconf")

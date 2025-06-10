@@ -1,7 +1,7 @@
 NXP Software Content Register
 
-Release - NXP Debian Linux SDK Release with Linux 6.6.36 components for i.MX and Layerscape MPU platforms
- December 2024
+Release - NXP Debian Linux SDK Release with Linux 6.6.52 components for i.MX and Layerscape MPU platforms
+ June 2025
 
 Outgoing License: LA_OPT_NXP_Software_License v57 July 2024 - Additional distribution license granted - Section 2.3 applies
 License File: LICENSE_SDK.txt
@@ -9,7 +9,7 @@ License File: LICENSE_SDK.txt
 Flexbuild Debian Project:
 git clone https://github.com/nxp/flexbuild
 
-Release tag: LSDK-24.12_DEBIAN-12_LF-6.6.36
+Release tag: LSDK-25.06_DEBIAN-12_LF-6.6.52
 Release Location: https://github.com/nxp/flexbuild
                   https://www.nxp.com/nxpdebian
 
@@ -26,7 +26,7 @@ License File:                COPYING
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    The Linux kernel with i.MX-specific drivers
-Release Location:            https://github.com/nxp-imx/linux-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/linux-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0)
                              kernel.org (GPL-2.0) - https://www.kernel.org/
 
@@ -39,7 +39,7 @@ License File:                Licenses/gpl-2.0.txt
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Bootloader with i.MX-specific capabilities
-Release Location:            https://github.com/nxp-imx/uboot-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/uboot-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0)
                              Das U-Boot - Universal Bootloader (GPL-2.0) - http://www.denx.de/wiki/U-Boot/WebHome
                              Android Open Source Project (BSD-2-Clause) - https://source.android.com/
@@ -54,7 +54,7 @@ License File:                docs/license.rst
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    ARM Trusted Firmware
-Release Location:            https://github.com/nxp-imx/imx-atf -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-atf -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-clause)
                              arm-trusted-firmware - ARM Limited (BSD-3-clause) - http://github.com/ARM-software/arm-trusted-firmware/
 
@@ -138,7 +138,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Make Image BootLoader
-Release Location:            https://github.com/nxp-imx/imx-mkimage -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-mkimage -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0)
                              Das U-Boot - Universal Bootloader (GPL-2.0) - http://www.denx.de/wiki/U-Boot/WebHome
 
@@ -163,7 +163,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Linux unit test applications
-Release Location:            https://github.com/nxp-imx/imx-test -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-test -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0)
                              module_test: NXP (GPL-2.0+)
                                   Hantro Products Oy. (GPL-2.0+)
@@ -248,7 +248,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    NXP Wi-Fi linux SDK
-Release Location:            https://github.com/nxp-imx/mwifiex -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/mwifiex -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0)
 
 --------------------------------------------
@@ -285,7 +285,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Open Portable Trusted Execution Environment for TEE Client library
-Release Location:            https://github.com/nxp-imx/imx-optee-client -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-optee-client -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-2-Clause)
                              optee_client (BSD-2-Clause) - https://github.com/OP-TEE/optee_client
 
@@ -298,7 +298,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Open Portable Trusted Execution Environment for Linux on ARM
-Release Location:            https://github.com/nxp-imx/imx-optee-os -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-optee-os -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-2-Clause)
                              OP-TEE Trusted OS (BSD-2-Clause) - https://github.com/OP-TEE/optee_os
                              Mbed TLS (Apache-2.0) - https://github.com/ARMmbed/mbedtls/
@@ -312,7 +312,7 @@ License File:                LICENSE.md
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Open Portable Trusted Execution Environment sanity tests
-Release Location:            https://github.com/nxp-imx/imx-optee-test -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-optee-test -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-2-Clause)
                              optee_test (BSD-2-Clause) - https://github.com/OP-TEE/optee_test
 
@@ -325,7 +325,7 @@ License File:                COPYING
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    A partitioning Hypervisor based on Linux
-Release Location:            https://github.com/nxp-imx/imx-jailhouse -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-jailhouse -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0)
                              Siemens AG (GPL-2.0) - https://github.com/siemens/jailhouse
 
@@ -338,7 +338,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    NXP i.MX crypto af alg tool to perform symmetric operation
-Release Location:            https://github.com/nxp-imx/crypto_af_alg.git -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/crypto_af_alg.git -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
 
 --------------------------------------------
@@ -350,7 +350,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    NXP i.MX keyctl tool to manage CAAM Keys
-Release Location:            https://github.com/nxp-imx/keyctl_caam -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/keyctl_caam -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
 
 --------------------------------------------
@@ -362,7 +362,7 @@ License File:                license/bsd-3-clause.txt
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Data Plane Development Kit
-Release Location:            https://github.com/nxp-qoriq/dpdk -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-qoriq/dpdk -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
                              DPDK - Intel Corporation (BSD-3-Clause) - https://github.com/DPDK/dpdk
                              KNI Linux Device driver - Intel Corporation (GPL-2.0) Separate component of DPDK
@@ -378,7 +378,7 @@ License File:                LICENSE
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Kernel module for dpdk
-Release Location:            https://github.com/nxp-qoriq/dpdk-extras -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-qoriq/dpdk-extras -b lf-6.6.52-2.2.0
 Origin:                      NXP (GPL-2.0 or BSD-3-Clause)
                              DPDK-kmods (GPL-2.0) - http://git.dpdk.org/dpdk-kmods/
 
@@ -393,12 +393,12 @@ License File:                vvcam/LICENSE
 Package Category:            Graphics
 Type of Content:             ISP Kernel Module source
 Description and comments:    Kernel Loadable Module for ISP
-Release Location:            https://github.com/nxp-imx/isp-vvcam -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/isp-vvcam -b lf-6.6.52-2.2.0
 Origin:                      VeriSilicon Holdings Co., Ltd. (GPL-2.0)
 
 --------------------------------------------
 
-Package:                     isp-imx-4.2.2.24.3d.bin
+Package:                     isp-imx-4.2.2.24-6.6.52.bin
 Version:                     4.2.2.24.3
 Outgoing License:            LA_OPT_NXP_Software_License v57 July 2024 Additional distribution license granted - Section 2.3 applies
 License File:                COPYING
@@ -430,14 +430,14 @@ License File:                LICENSE
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    GPU Core IP and test application source
-Release Location:            https://github.com/nxp-imx/apitrace-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/apitrace-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (MIT)
                              apitrace (MIT) - https://github.com/apitrace/apitrace
 
 
 --------------------------------------------
 
-Package:                     imx-gpu-viv-6.4.11.p2.4d-aarch64.bin
+Package:                     imx-gpu-viv-6.4.11.p2.10-aarch64-6.6.52.bin
 Version:                     6.4.11.p2.4d
 Outgoing License:            LA_OPT_NXP_Software_License v56 April 2024 - Additional distribution license granted - Section 2.3 applies
 License File:                COPYING
@@ -454,6 +454,46 @@ Origin:                      NXP (LA_OPT_NXP_Software_License)
                              The Android Open Source Project (Apache-2.0) - https://source.android.com/
                              LLVM Compiler (BSD-3-clause) - https://github.com/prof123/llvm/
 
+--------------------------------------------
+
+Package:                     gtec-demo-framework.git
+Version:                     6.4.2
+Outgoing License:            BSD-3-Clause 
+License File:                License.md
+Package Category:            Graphics
+Type of Content:             source
+Description and comments:    Graphics sample applications
+Release Location:            https://github.com/nxp-imx/gtec-demo-framework -b lf-6.6.52-2.2.0
+Origin:                      NXP (BSD-3-clause)
+                         Demo Framework
+                             Sascha Willems - Vulkan demo (MIT) - https://github.com/SaschaWillems/Vulkan
+                             MonoXNA - The Mono Xna Team (MIT) - https://code.google.com/archive/p/monoxna/
+                             MonoGame - The MonoGame Team - (MS-PL) - https://github.com/MonoGame/MonoGame
+                             Wayland - Benjamin Franzke (Seetex License) - http://cgit.freedesktop.org/~krh/wayland/
+                             Open Sans - Steve Matteson (Apache-2.0) - https://fonts.google.com/specimen/Open+Sans
+                         Demo Apps
+                             Vivante Corporation (MIT)
+                             "OpenGL(R) ES 3.0 Programming Guide" book samples (MIT) - http://github.com/zemanel/opengles-book-samples/
+                             Norbert Nopper VKTS Examples (MIT) - https://github.com/McNopper/Vulkan
+                             Sascha Willems - Vulkan demo (MIT) - https://github.com/SaschaWillems/Vulkan
+                          Imagery Sources in Demo Apps:
+                             Emil Persson (CC-BY-3.0) - http://www.humus.name
+                             CDmir (CC0-1.0) - http://opengameart.org/content/old-deer-male
+                             Questquest Game icons - Justin Nichol (CC-BY-SA-4.0) - http://freeforall.cc/works/questquest-game-icons/
+                             piacenti (CC-BY-3.0) - http://opengameart.org/content/knight-2
+                          Third Party Apps Included:
+                             Open Asset Import Library [assimp] (BSD-3-Clause) - https://sourceforge.net/projects/assimp/
+                             DevIL (LGPL-2.1+) - https://sourceforge.net/projects/openil/
+                             G-Truc Creation [GLI] (MIT) - https://www.g-truc.net/
+                             Khronos Group OpenVG (MIT) - https://www.khronos.org/openvg/
+                             libpng (libpng) - https://sourceforge.net/projects/libpng/
+                             libjpeg (IJG) - http://www.ijg.org/
+                             OpenGL Mathematics [GLM] (MIT) - https://sourceforge.net/projects/ogl-math/
+                             RapidJSON (MIT) - https://github.com/miloyip/rapidjson/
+                             SRA/SKC gettimeofday (MIT) - https://doxygen.postgresql.org/gettimeofday_8c_source.htm
+                             Templatized C++ Command Line Parser [tclap] (MIT) - http://sourceforge.net/projects/tclap/
+                             zlib (zlib) - http://www.zlib.net/
+
 
 --------------------------------------------
 
@@ -464,7 +504,7 @@ License File:                LICENSE
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    i.MX DRM Direct Rendering Manager
-Release Location:            https://github.com/nxp-imx/libdrm-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/libdrm-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (MIT)
 
 --------------------------------------------
@@ -476,7 +516,7 @@ License File:                LICENSE
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    Wayland protocol development
-Release Location:            https://github.com/nxp-imx/wayland-protocols-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/wayland-protocols-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (MIT)
                              Weston (MIT) - https://anongit.freedesktop.org/git/wayland/wayland-protocols.git
 
@@ -489,7 +529,7 @@ License File:                LICENSE
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    A reference implementation of a Wayland compositor
-Release Location:            https://github.com/nxp-imx/weston-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/weston-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (MIT)
                              Weston (MIT) - http://github.com/wayland-project/weston/
 
@@ -503,7 +543,7 @@ License File:                LICENSE.txt
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    Sample program to monitor i.MX GPU performance data
-Release Location:            https://github.com/nxp-imx/imx-gputop -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-gputop -b lf-6.6.52-2.2.0
 Origin:                      NXP (MIT)
 
 --------------------------------------------
@@ -551,7 +591,7 @@ License File:                LICENSE.txt
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    G2D implementation using PXP
-Release Location:            https://github.com/nxp-imx/imx-g2d-pxp -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-g2d-pxp -b lf-6.6.52-2.2.0
 Origin:                      NXP (Proprietary)
 
 --------------------------------------------
@@ -563,12 +603,12 @@ License File:                LICENSE
 Package Category:            Graphics
 Type of Content:             source
 Description and comments:    Graphics G2D sample applications
-Release Location:            https://github.com/nxp-imx/g2d-samples -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/g2d-samples -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
 
 --------------------------------------------
 
-Package:                     libgpuperfcnt-6.4.11.p2.4-aarch64-wayland-e4ba456.bin
+Package:                     libgpuperfcnt-6.4.11.p2-6.6.52.bin
 Version:                     6.4.11.p2.4
 Outgoing License:            LA_OPT_NXP_Software_License v57 July 2024 Additional distribution license granted - Section 2.3 applies
 License File:                COPYING
@@ -619,7 +659,7 @@ License File:                LICENSE.txt
 Package Category:            Multimedia
 Type of Content:             source
 Description and comments:    i.MX Gstreamer 1.0 plugins
-Release Location:            https://github.com/nxp-imx/imx-gst1.0-plugin -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/imx-gst1.0-plugin -b lf-6.6.52-2.2.0
 Origin:                      NXP (LGPL-2.1)
                              Gstreamer plugins-Base (LGPL-2.1+) - http://gstreamer.freedesktop.org/src/gst-plugins-base/
                              Gstreamer plugins-Good (LGPL-2.1+) - http://gstreamer.freedesktop.org/src/gst-plugins-good/
@@ -634,7 +674,7 @@ License File:                LICENSE.txt
 Package Category:            Multimedia
 Type of Content:             source
 Description and comments:    Open Source Multimedia Farmework
-Release Location:            https://github.com/nxp-imx/gstreamer -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/gstreamer -b lf-6.6.52-2.2.0
 Origin:                      NXP (LGPL-2.1)
                              GStreamer (LGPL-2.1+) - http://gstreamer.freedesktop.org/src/gstreamer/
 
@@ -647,7 +687,7 @@ License File:                LICENSE.txt
 Package Category:            Multimedia
 Type of Content:             source
 Description and comments:    Gstreamer plugins with good quality code and correct functionality
-Release Location:            https://github.com/nxp-imx/gst-plugins-good -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/gst-plugins-good -b lf-6.6.52-2.2.0
 Origin:                      NXP (LGPL-2.1)
                              Gstreamer plugins-Good (LGPL-2.1+) - http://gstreamer.freedesktop.org/src/gst-plugins-good/
 
@@ -660,7 +700,7 @@ License File:                LICENSE.txt
 Package Category:            Multimedia
 Type of Content:             source
 Description and comments:    Collection of well-groomed and well-maintained Gstreamer plugins
-Release Location:            https://github.com/nxp-imx/gst-plugins-base -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/gst-plugins-base -b lf-6.6.52-2.2.0
 Origin:                      NXP (LGPL-2.1)
                              Gstreamer plugins-Base (LGPL-2.1+) - http://gstreamer.freedesktop.org/src/gst-plugins-base/
 
@@ -673,7 +713,7 @@ License File:                LICENSE.txt
 Package Category:            Multimedia
 Type of Content:             source
 Description and comments:    Gstreamer plug-ins that aren't up to par compared to the rest. Close to good quality but missing something.
-Release Location:            https://github.com/nxp-imx/gst-plugins-bad -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/gst-plugins-bad -b lf-6.6.52-2.2.0
 Origin:                      NXP (LGPL-2.1)
                              Gstreamer plugins-Bad (LGPL-2.1+) - http://gstreamer.freedesktop.org/src/gst-plugins-bad/
 
@@ -711,7 +751,7 @@ License File:                LICENSE.txt
 Package Category:            Multimedia
 Type of Content:             source
 Description and comments:    i.MX VPU wrapper library
-Release Location:            https://github.com/NXP/imx-vpuwrap.git -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/NXP/imx-vpuwrap.git -b lf-6.6.52-2.2.0
 Origin:                      NXP (LA_OPT_NXP_Software_License)
                              sqlite (Public Domain) - http://www.hwaci.com/sw/sqlite/index.html
 
@@ -759,7 +799,7 @@ Origin:                      NXP (MIT)
 
 --------------------------------------------
 
-Package:                     imx-vpu-hantro-vc-1.9.1.1d.bin
+Package:                     imx-vpu-hantro-vc-1.10.1-6.6.52.bin
 Version:                     1.9.1.1d
 Outgoing License:            LA_OPT_NXP_Software_License v57 July 2024 Additional distribution license granted - Section 2.3 applies
 License File:                COPYING
@@ -1008,7 +1048,7 @@ License File:                LICENSE
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    eIQ examples based on TensorFlow Lite
-Release Location:            https://github.com/nxp-imx/eiq-examples -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/eiq-examples -b lf-6.6.52-2.2.0
 Origin:                      NXP (Apache-2.0)
                              tensorflow v2.10.0 (Apache-2.0) - https://github.com/tensorflow/tensorflow
                              hand_tracking (Apache-2.0) - https://github.com/wolterlw/hand_tracking
@@ -1021,7 +1061,7 @@ License File:                LICENSE
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    Open Deep Learning Compiler Stack
-Release Location:            https://github.com/nxp-imx/eiq-tvm-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/eiq-tvm-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (Apache-2.0)
                              Apache TVM (Apache-2.0) - https://github.com/apache/tvm
 
@@ -1034,7 +1074,7 @@ License File:                LICENSE.txt
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    ethos-u-driver-stack is the user space driver library for ethos-u NPU on iMX93 platform
-Release Location:            https://github.com/nxp-imx/ethos-u-driver-stack-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/ethos-u-driver-stack-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
                              ARM Limited ethos-u-linux-driver-stack v22.02 (Apache-2.0) - https://git.mlplatform.org/ml/ethos-u/ethos-u-linux-driver-stack.git
                              FlatBuffers (Apache-2.0)
@@ -1049,7 +1089,7 @@ License File:                LICENSE.txt
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    ethos-u-firmware is the binary NPU driver running on cortex-m33 core of NXP iMX93 platform
-Release Location:            https://github.com/nxp-imx/ethos-u-firmware -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/ethos-u-firmware -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
                              ARM Limited ethos-u-linux-driver-stack v22.02 (Apache-2.0) - https://git.mlplatform.org/ml/ethos-u/ethos-u-core-software.git
                              Amazon.com, Inc. FreeRTOS (MIT) - https://git.mlplatform.org/ml/ethos-u/ethos-u-core-software.git/tree/rtos/freertos_config/FreeRTOSConfig.h.in
@@ -1063,7 +1103,7 @@ License File:                LICENSE.txt
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    Tool to compile a TensorFlow Lite for Microcontrollers neural network model
-Release Location:            https://github.com/nxp-imx/ethos-u-vela -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/ethos-u-vela -b lf-6.6.52-2.2.0
 Origin:                      NXP (BSD-3-Clause)
                              ARM Limited ethos-u-vela v22.02 (Apache-2.0) - https://git.mlplatform.org/ml/ethos-u/ethos-u-vela.git
                              FlatBuffers (Apache-2.0)
@@ -1077,7 +1117,7 @@ License File:                LICENSE
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    TensorFlow Lite C++ Library
-Release Location:            https://github.com/nxp-imx/tensorflow-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/tensorflow-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (Apache-2.0)
                              TensorFlow (Apache-2.0) - https://github.com/tensorflow/tensorflow/
 
@@ -1090,7 +1130,7 @@ License File:                LICENSE
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    TensorFlow Lite Ethos-u Delegate
-Release Location:            https://github.com/nxp-imx/tflite-ethosu-delegate-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/tflite-ethosu-delegate-imx -b lf-6.6.52-2.2.0
 Origin:                      NXP (Apache-2.0)
                              tensorflow v2.10.0 (Apache-2.0) - https://github.com/tensorflow/tensorflow
                              ARM ethos-u-linux-driver-stack v22.08 (Apache-2.0) - https://git.mlplatform.org/ml/ethos-u/ethos-u-linux-driver-stack.git
@@ -1104,7 +1144,7 @@ License File:                LICENSE
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    TensorFlow Lite VX Delegate
-Release Location:            https://github.com/nxp-imx/tflite-vx-delegate-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/tflite-vx-delegate-imx -b lf-6.6.52-2.2.0
 Origin:                      VeriSilicon Inc. (Apache-2.0) - https://github.com/VeriSilicon/tflite-vx-delegate.git
                              The TensorFlow Authors (Apache-2.0) - https://cs.opensource.google/tensorflow/tensorflow/+/master:tensorflow/lite/examples/minimal/
 
@@ -1117,9 +1157,75 @@ License File:                LICENSE
 Package Category:            MachineLearning
 Type of Content:             source
 Description and comments:    Tensor Interface Module for OpenVX
-Release Location:            https://github.com/nxp-imx/tim-vx-imx -b lf-6.6.36-2.1.0
+Release Location:            https://github.com/nxp-imx/tim-vx-imx -b lf-6.6.52-2.2.0
 Origin:                      Vivante Corporation (MIT)
                              The Khronos Group Inc. (Apache-2.0) - https://www.khronos.org/
                              The Android Open Source Project (Apache 2.0) - https://developer.android.com/index.html
 
 --------------------------------------------
+GoPoint Packages
+--------------------------------------------
+
+Package:                    meta-nxp-demo-experience
+Release branch:             scarthgap-6.6.52-2.2.0
+Outgoing License:           MIT
+License File:               ./licenses/MIT.txt
+Package Category:           Software build scripts
+Type of content:            Bitbake recipes
+Description and comments:   Yocto Project meta layer used to integrate GoPoint into the i.MX BSP
+Release Location:           https://github.com/nxp-imx-support/meta-nxp-demo-experience
+Origin:                     NXP (MIT) Yocto Recipes
+
+---------- OTHER REQUIRED PACKAGES ---------
+
+Package:                    nxp-demo-experience
+Release branch:             lf-6.6.52_2.2.0
+Outgoing License:           LA_OPT_Online Code Hosting NXP_Software_License - v1.2 October 2023
+License File:               nxp-demo-experience/LICENSE.txt
+Package Category:           Demo application
+Type of content:            Source code
+Description and comments:   GoPoint for i.MX Applications Processors launcher source code
+Release Location:           https://github.com/nxp-imx-support/nxp-demo-experience
+Origin:                     NXP (BSD-3-Clause)
+                            The Qt Company Ltd. (BSD-3-Clause)
+
+Package:                    nxp-demo-experience-demos-list
+Release branch:             lf-6.6.52_2.2.0
+Outgoing License:           LA_OPT_Online Code Hosting NXP_Software_License - v1.2 October 2023
+License File:               nxp-demo-experience-demos-list/LICENSE.txt
+Package Category:           Configuration
+Type of content:            Scripts, source code, graphics images and data files
+Description and comments:   GoPoint for i.MX Application Processors configuration and launchers
+Release Location:           https://github.com/nxp-imx-support/nxp-demo-experience-demos-list
+Origin:                     NXP (Proprietary, BSD-3-Clause, Apache-2.0, LGPL-2.1)
+                            Patrick Levin (MIT) https://github.com/patlevin/face-detection-tflite
+                            GStreamer (LGPL-2.1-or-later) - http://gstreamer.freedesktop.org/src/gstreamer/
+                            NNStreamer (LGPL-2.1) - https://github.com/nnstreamer/nnstreamer/
+
+Package:                    nxp-demo-experience-assets
+Release branch:             lf-6.6.52_2.2.0
+Outgoing License:           LA_OPT_Online Code Hosting NXP_Software_License - v1.2 October 2023
+License File:               nxp-demo-experience-assets/LICENSE.txt
+Package Category:           Demo application
+Type of content:            Machine learning models, videos, graphics, images, compiled executables
+Description and comments:   GoPoint for i.MX Applications Processors data, models and utility program
+Release Location:           https://github.com/nxp-imx-support/nxp-demo-experience-assets
+Origin:                     NXP (propietary)
+                            VIT_Model (BSD-3-Clause)
+                            The TensorFlow Authors (Apache-2.0)
+                            Google LLC (Apache-2.0)
+                            FaceRecognition with FaceNet Android Authors (Apache-2.0)
+                            MediaPipe (Apache-2.0) https://developers.google.com/mediapipe/solutions
+
+--------------------------------------------
+Kenrel RT Packages
+--------------------------------------------
+
+Package:					 patch-6.6.52-rt43.patch.xz
+Version:					 6.6.52
+Outgoing License:            GPL-2.0
+Package Category:            Kernel
+Type of Content:             source
+Description and comments:    RealTime Kernel Patch
+Release Location:            https://github.com/nxp/flexbuild
+Origin:                      https://cdn.kernel.org/pub/linux/kernel/projects/rt/6.6/older/patches-6.6.52-rt43.tar.xz

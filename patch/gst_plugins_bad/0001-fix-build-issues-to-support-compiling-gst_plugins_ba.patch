@@ -1,9 +1,8 @@
-From 1ad3d3b99c680483d1ee1eec2b01010492bee9bb Mon Sep 17 00:00:00 2001
-From: Shengzhou <shengzhou.liu@nxp.com>
-Date: Thu, 10 Oct 2024 10:19:58 +0200
+From 356c31dafab58066fcebb6dad1019484aaa96c79 Mon Sep 17 00:00:00 2001
+From: root <root@lsvm11u0000127.swis.ap-northeast-2.aws.nxp.com>
+Date: Fri, 31 Jan 2025 20:08:54 +0900
 Subject: [PATCH] fix build issues to support compiling gst_plugins_bad
 
-support compiling gst_plugins_bad 1.24.x with meson lower version 0.61.2 on Ubuntu 22.04 host rather than the required meson v1.1+
 ---
  ext/dtls/meson.build         | 29 -----------------
  ext/meson.build              |  3 --
@@ -211,12 +210,12 @@ index ebc5c337b..952503439 100644
    include_directories : [libsinc],
    sources: gstmse_headers_public + [gstmse_enums_h],
 diff --git a/meson.build b/meson.build
-index a0eb1dbc4..032799a9d 100644
+index 6707dcec5..29d534926 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -1,6 +1,6 @@
  project('gst-plugins-bad', 'c', 'cpp',
-   version : '1.24.0',
+   version : '1.24.7',
 -  meson_version : '>= 1.1',
 +  meson_version : '>= 0.61',
    default_options : [ 'warning_level=1',
@@ -232,10 +231,10 @@ index a0eb1dbc4..032799a9d 100644
      'pluginsdir=${libdir}/gstreamer-1.0',
      'datarootdir=${prefix}/share',
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index c21887d99..329df4dc7 100644
+index 40006d09b..85789a66c 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
-@@ -70,7 +70,6 @@ base_tests = [
+@@ -71,7 +71,6 @@ base_tests = [
    [['elements/rtpsink.c'], get_option('rtp').disabled()],
    [['elements/sdpdemux.c'], get_option('sdp').disabled(), [gstsdp_dep]],
    [['elements/srt.c'], not srt_dep.found(), [srt_dep]],
@@ -243,7 +242,7 @@ index c21887d99..329df4dc7 100644
    [['elements/switchbin.c'], get_option('switchbin').disabled()],
    [['elements/videoframe-audiolevel.c'], get_option('videoframe_audiolevel').disabled()],
    [['elements/viewfinderbin.c']],
-@@ -135,7 +134,6 @@ if host_machine.system() != 'windows'
+@@ -143,7 +142,6 @@ if host_machine.system() != 'windows'
      [['elements/curlftpsink.c'], not curl_dep.found(), [curl_dep]],
      [['elements/curlsmtpsink.c'], not curl_dep.found(), [curl_dep]],
      [['elements/dash_mpd.c'], not xml2_dep.found(), [xml2_dep]],

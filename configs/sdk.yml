@@ -1,12 +1,12 @@
 # NXP Debian Linux SDK Distribution configuration for iMX and Layerscape MPU platforms
 
 DISTRIB_NAME:    "NXP Debian Linux SDK"
-DISTRIB_VERSION: "lsdk2412"
+DISTRIB_VERSION: "lsdk2506"
 RELEASE_TYPE:    "external"
 
 
 # default repo tag which can be overrided by specified tag
-DEFAULT_REPO_TAG: "lf-6.6.36-2.1.0"
+DEFAULT_REPO_TAG: "lf-6.6.52-2.2.0"
 
 # default Debian version for target userland
 DEBIAN_CODENAME: "bookworm"
@@ -23,7 +23,6 @@ BUILD_BUILDROOT_RFS: n
 PKG_GROUPS_GRAPHICS: y
 PKG_GROUPS_MULTIMEDIA: y
 PKG_GROUPS_NETWORKING: y
-PKG_GROUPS_CONNECTIVITY: y
 PKG_GROUPS_UTILS: y
 PKG_GROUPS_SECURITY: y
 PKG_GROUPS_ML: y
@@ -59,7 +58,7 @@ DEFAULT_PKGDIR: $FBDIR/components_${DISTRIB_VERSION}
 # default kernel config list
 KERNEL_CONFIG:
   ARM64_LS:  "defconfig lsdk.config"
-  ARM64_IMX: "defconfig imx.config imx_v8_defconfig"
+  ARM64_IMX: "imx_v8_defconfig"
   ARM32_LS:  "multi_v7_defconfig multi_v7_lpae.config lsdk.config"
   ARM32_IMX: "imx_v7_defconfig"
 
@@ -83,8 +82,8 @@ repo:
     url:  https://github.com/nxp-qoriq/rcw.git
 
   mbedtls:
-    url:  https://github.com/ARMmbed/mbedtls.git
-    tag:  mbedtls-3.6.1
+    url:  https://github.com/Mbed-TLS/mbedtls.git
+    tag:  mbedtls-3.6.2
 
   mc_utils:
     url:  https://github.com/nxp-qoriq/mc-utils.git
@@ -122,12 +121,12 @@ repo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.17.0-83624b9.bin
 
   firmware_imx_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.25-27879f8.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.26-d4c33ab.bin
     # /lib/firmware for ddr,hdmi,dp,vpu,easrc,epdc,xcvr,xuvi
 
   imx_firmware:
     url:  https://github.com/NXP/imx-firmware.git
-    tag:  lf-6.12.3_1.0.0
+    tag:  lf-6.6.52-2.2.0
     # firmware for wifi/bt
 
   fw_ele_bin:
@@ -135,20 +134,22 @@ repo:
 
   fw_upower_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-upower-1.3.1.bin
+    # not found in release document
 
 
 # kernel and modules git repositories
   linux:
     url:  https://github.com/nxp-imx/linux-imx.git
-    tag:  lf-6.6.36-2.1.0
+    tag:  lf-6.6.52-2.2.0
 
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git
-    commit: bb8bc7cf60d
+    tag:  cryptodev-linux-1.14
+    #commit: bb8bc7cf60d
     
   lttng_modules:
-    url:  https://git.lttng.org/lttng-modules.git
-    tag:  v2.13.9
+    url:  https://github.com/lttng/lttng-modules.git
+    tag:  v2.13.11
      
   mdio_proxy_module:
     url:  https://github.com/nxp-qoriq/mdio-proxy-module.git
@@ -254,7 +255,7 @@ repo:
 
   openssl_provider_se05x:
     url:  https://github.com/NXPPlugNTrust/se05x-openssl-provider.git
-    tag:  v01.00.03
+    tag:  v01.00.02
 
 # graphics component repositories
   wayland:
@@ -271,7 +272,7 @@ repo:
     url:  https://github.com/nxp-imx/libdrm-imx.git
 
   gpu_viv_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/imx-gpu-viv-6.4.11.p2.8d-aarch64.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/imx-gpu-viv-6.4.11.p2.10-aarch64-6.6.52.bin
 
   gputop:
     url:  https://github.com/nxp-imx/imx-gputop.git
@@ -280,7 +281,7 @@ repo:
     url:  https://github.com/nxp-imx/apitrace-imx.git
 
   libgpuperfcnt_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/libgpuperfcnt-6.4.11.p2.8d-aarch64.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/libgpuperfcnt-6.4.11.p2-6.6.52.bin
 
   imx_gpu_g2d_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p2.8-aarch64-95408a4.bin
@@ -312,7 +313,7 @@ repo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.34.0-a0eda50.bin
 
   vpu_hantro_vc_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/imx-vpu-hantro-vc-1.10.0d.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/imx-vpu-hantro-vc-1.10.1-6.6.52.bin
 
   vpu_hantro_daemon_tar:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.3.0-33b724c.tar.gz
@@ -321,7 +322,7 @@ repo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/basler-camera-4.2.2.24.3-d1f506a.bin
 
   imx_isp_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/isp-imx-4.2.2.24.3d.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/isp-imx-4.2.2.24-6.6.52.bin
 
   gstreamer:
     url:  https://github.com/nxp-imx/gstreamer.git
@@ -337,7 +338,6 @@ repo:
 
   gst_plugins_ugly:
     url:  https://github.com/GStreamer/gst-plugins-ugly.git
-    #tag:  1.24.0
     commit: 499d3cd
 
   imx_gst_plugin:
@@ -345,6 +345,9 @@ repo:
 
   imx_alsa_plugin:
    url:   https://github.com/nxp-imx/imx-alsa-plugins.git
+
+  imx_lib:
+   url:  https://github.com/nxp-imx/imx-lib.git
 
   alsa_lib:
     url:  https://github.com/alsa-project/alsa-lib.git
@@ -382,7 +385,6 @@ repo:
 # connectivity component repositories
   nxp_wlan_bt:
     url:  https://github.com/nxp-imx/mwifiex.git
-    commit: 0396cfb38ad73a3
 
 
 # generic component repositories

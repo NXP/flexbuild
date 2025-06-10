@@ -1,0 +1,63 @@
+From 0d320871e01443e9e1f63aa1549a89ca125e842f Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Sun, 27 Apr 2025 10:47:16 +0800
+Subject: [PATCH 40/40] drm/panel: remove wavesahre node in simple-panel
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+---
+ drivers/gpu/drm/panel/panel-simple.c | 32 ----------------------------
+ 1 file changed, 32 deletions(-)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index b25860d839e8..b816ea06ff1b 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -4711,35 +4711,6 @@ static const struct panel_desc_dsi boe_tv080wum_nl0 = {
+ 	.lanes = 4,
+ };
+ 
+-static const struct drm_display_mode ws_panel_7_0_c_mode = {
+-	.clock = 50000,
+-	.hdisplay = 1024,
+-	.hsync_start = 1024 + 100,
+-	.hsync_end = 1024 + 100 + 100,
+-	.htotal = 1024 + 100 + 100 + 100,
+-	.vdisplay = 600,
+-	.vsync_start = 600 + 10,
+-	.vsync_end = 600 + 10 + 10,
+-	.vtotal = 600 + 10 + 10 + 10,
+-};
+-
+-static const struct panel_desc_dsi waveshare_7inch = {
+-	.desc = {
+-		.modes = &ws_panel_7_0_c_mode,
+-		.num_modes = 1,
+-		.bpc = 8,
+-		.size = {
+-			.width = 62,
+-			.height = 110,
+-		},
+-		.connector_type = DRM_MODE_CONNECTOR_DSI,
+-	},
+-	.flags = MIPI_DSI_MODE_VIDEO_HSE |
+-			MIPI_DSI_MODE_VIDEO | MIPI_DSI_CLOCK_NON_CONTINUOUS,
+-	.format = MIPI_DSI_FMT_RGB888,
+-	.lanes = 2,
+-};
+-
+ static const struct drm_display_mode lg_ld070wx3_sl01_mode = {
+ 	.clock = 71000,
+ 	.hdisplay = 800,
+@@ -4897,9 +4868,6 @@ static const struct of_device_id dsi_of_match[] = {
+ 	}, {
+ 		.compatible = "lg,lh500wx1-sd03",
+ 		.data = &lg_lh500wx1_sd03
+-	}, {
+-		.compatible = "waveshare,7inch",
+-		.data = &waveshare_7inch,
+ 	}, {
+ 		.compatible = "panasonic,vvx10f004b00",
+ 		.data = &panasonic_vvx10f004b00
+-- 
+2.34.1
+

@@ -10,15 +10,14 @@
 
 # gst version 1.24.0
 
-gst_plugins_base:
+gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocols
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"gst_plugins_base") && \
 	 $(call repo-mngr,fetch,gst_plugins_base,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
 	 if [ ! -f .patchdone ] && [ $${MACHINE:0:6} = imx8qm -o $${MACHINE:0:7} = imx8qxp ]; then \
-	     git am $(FBDIR)/patch/gst_plugins_base/*g2d-into-playsink.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/gst_plugins_base/*g2d-into-playsink.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
@@ -54,6 +53,7 @@ gst_plugins_base:
 	 if [ ! -f $(DESTDIR)/usr/share/pkgconfig/wayland-protocols.pc ]; then \
 	      bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"gst_plugins_base") && \
 	 sudo cp -rf $(DESTDIR)/usr/share/{pkgconfig,wayland-protocols} $(RFSDIR)/usr/share/ && \
 	 sudo cp -fPa $(DESTDIR)/usr/lib/{libGAL.so,libdrm.so*,libdrm_vivante.so*,libg2d*.so*} $(RFSDIR)/usr/lib && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0} && \
@@ -95,6 +95,6 @@ gst_plugins_base:
 		-Dvorbis=enabled \
 		-Dx11=enabled \
 		-Dxvideo=enabled \
-		-Dxshm=enabled && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install && \
+		-Dxshm=enabled $(LOG_MUTE) && \
+	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"gst_plugins_base")

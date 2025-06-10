@@ -1,13 +1,13 @@
 FROM debian:bookworm
 
 ARG http_proxy
-ENV http_proxy $http_proxy
+ENV http_proxy=$http_proxy
 ARG https_proxy
-ENV https_proxy $https_proxy
+ENV https_proxy=$https_proxy
 ARG no_proxy
-ENV no_proxy $no_proxy
-ENV DEBIAN_FRONTEND noninteractive
-ENV DEBCONF_NONINTERACTIVE_SEEN true
+ENV no_proxy=$no_proxy
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
 RUN echo "Acquire::http::proxy \"$http_proxy\";" | tee -a /etc/apt/apt.conf && \
     echo "Acquire::https::proxy \"$https_proxy\";" | tee -a /etc/apt/apt.conf && \
     echo 'PS1="[\u@\h \W]\$ "' | tee -a /root/.bashrc 1>/dev/null && \
@@ -15,7 +15,6 @@ RUN echo "Acquire::http::proxy \"$http_proxy\";" | tee -a /etc/apt/apt.conf && \
 RUN rm -rf /var/lib/apt/lists/* && apt autoclean
 RUN apt-get update --fix-missing && apt-get install -y locales && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 && export LANG=en_US.utf8
-
 RUN apt-get update && apt-get install -y \
         u-boot-tools device-tree-compiler autoconf automake dh-autoreconf libssl-dev zip \
         openssl curl flex bison bc git gcc vim ethtool wget ftp make makedev tclsh ccache \
@@ -30,3 +29,5 @@ RUN apt-get update && apt-get install -y \
 	parted rpm2cpio lsb-release xutils-dev libwayland-bin cmake locales texinfo gawk \
 	chrpath diffstat scons libgflags-dev libhdf5-serial-dev python3-numpy python3-wheel \
 	python3-h5py
+RUN git config --global user.email  "debian@nxp.com"
+RUN git config --global user.name "NXP debian"

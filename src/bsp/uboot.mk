@@ -11,10 +11,10 @@ include imx_mkimage.mk
 uboot u-boot:
 	@$(call repo-mngr,fetch,uboot,bsp) && \
 	 curbrch=`cd $(BSPDIR)/uboot && git branch | grep ^* | cut -d' ' -f2` && \
-	 $(call fbprint_n,"Building u-boot $$curbrch for $(MACHINE)") && \
+	 $(call fbprint_b,"u-boot $$curbrch for $(MACHINE)") && \
 	 cd $(BSPDIR)/uboot && \
 	 if [ -d $(FBDIR)/patch/uboot ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/uboot/*.patch && touch .patchdone; \
+	     git am $(FBDIR)/patch/uboot/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 if [ "$(BOOTTYPE)" = tfa -a "$(COT)" = arm-cot-with-verified-boot ]; then \
 	     uboot_cfg=$(MACHINE)_tfa_verified_boot_defconfig; \
@@ -42,8 +42,8 @@ define build-uboot-target
 	unset PKG_CONFIG_SYSROOT_DIR && \
 	\
 	$(call fbprint_n,"config = $1") && \
-	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 && \
-	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir && \
+	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $1 $(LOG_MUTE) && \
+	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $(LOG_MUTE) && \
 	\
 	if echo $1 | grep -iqE 'sdcard|nand'; then \
 	   [ -f $$opdir/u-boot-with-spl-pbl.bin ] && srcbin=u-boot-with-spl-pbl.bin || srcbin=u-boot-with-spl.bin; \

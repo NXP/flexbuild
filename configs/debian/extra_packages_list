@@ -1,4 +1,4 @@
-# Copyright 2017-2024 NXP
+# Copyright 2017-2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -25,7 +25,8 @@ host_dependent_packages=" \
     texlive-font-utils libglib2.0-dev autoconf-archive valac libcanberra-dev \
     zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
-    rename qt6-declarative-dev \
+    rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    libdbus-glib-1-dev qt6-tools-dev \
 "
 
 
@@ -36,115 +37,29 @@ host_dependent_packages=" \
 
 
 extra_server_devel_packages=" \
-    libxml2-dev \
-    libtinyxml2-9 \
-    libssl-dev \
-    libsbc-dev \
-    libsndfile1-dev \
-    libwebp-dev \
-    dh-autoreconf \
-    libnuma-dev \
-    libpcap-dev \
-    libtclap-dev \
-    libncurses5-dev \
-    libelf-dev \
-    libnl-genl-3-dev \
-    libreadline-dev \
-    libffi-dev \
-    libudev-dev \
-    libinput-dev \
-    libpixman-1-dev \
-    libxkbcommon-dev \
-    libpng-dev \
-    libcairo2-dev \
-    libpam0g-dev \
-    liblua5.3-dev \
-    libsystemd-dev \
-    libxcb-composite0-dev \
-    libxcursor-dev \
-    libxcb-cursor-dev \
-    libseat-dev \
-    seatd \
-    libtinfo-dev \
-    libusb-1.0-0-dev \
-    libexif-dev \
-    libxv-dev \
-    libtheora-dev \
-    libcjson-dev \
-    libmnl-dev \
-    uuid-dev \
-    libpython3.11-dev \
-    python3-pip \
-    python3-pybind11 \
-    python3-numpy \
-    python3-pillow \
-    python3-flatbuffers \
-    python3-decorator \
-    python3-numpy \
-    python3-attr \
-    python3-psutil \
-    python3-lxml \
-    libflatbuffers-dev \
-    libcpuinfo-dev \
-    libwaffle-dev \
-    libpciaccess-dev \
-    liborc-0.4-dev \
-    libbluetooth-dev \
-    libpangocairo-1.0-0 \
-    libcogl-pango-dev \
-    libvorbis-dev \
-    libjpeg62-turbo-dev \
-    libjsoncpp-dev \
+    libxml2-dev libtinyxml2-9 libssl-dev libsbc-dev libsndfile1-dev libwebp-dev \
+    dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses5-dev libelf-dev \
+    libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev libinput-dev libpixman-1-dev \
+    libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.3-dev libsystemd-dev \
+    libxcb-composite0-dev libxcursor-dev libxcb-cursor-dev libseat-dev seatd libtinfo-dev \
+    libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev \
+    uuid-dev libpython3.11-dev python3-pip python3-pybind11 python3-numpy python3-pillow \
+    python3-flatbuffers python3-decorator python3-numpy python3-attr python3-psutil \
+    python3-lxml libflatbuffers-dev libcpuinfo-dev libwaffle-dev libpciaccess-dev \
+    liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev \
+    libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd \
 "
 
 extra_desktop_devel_packages=" \
-    libcjson-dev \
-    libxshmfence-dev \
-    x11proto-dev \
-    libxfont-dev \
-    libxkbfile-dev \
-    libxv-dev \
-    libbsd-dev \
-    libxcb-dri3-dev \
-    libxcb-present-dev \
-    libepoxy-dev \
-    libdbus-1-dev \
-    libwayland-bin \
-    libasound2-dev \
-    gstreamer1.0-libav \
-    libgstrtspserver-1.0-0 \
-    libgudev-1.0-dev \
-    libclutter-1.0-dev \
-    libclutter-gst-3.0-dev \
-    libclutter-gtk-1.0-dev \
-    libgnome-desktop-3-dev \
-    libcanberra-dev \
-    libcanberra-gtk3-dev \
-    libv4l-dev \
-    libmpg123-dev \
-    libmpeg2-4-dev \
-    libx264-dev \
-    libflac-dev \
-    libsoup-3.0-dev \
-    libxcvt-dev \
-    libbz2-dev \
-    libmp3lame-dev \
-    libpulse-dev \
-    libspeex-dev x264 \
-    libtag1-dev \
-    libvulkan-dev \
-    libglm-dev \
-    libassimp-dev \
-    libxkbcommon-x11-dev \
-    libusb-1.0-0-dev \
-    librsvg2-dev \
-    libcurl4-openssl-dev \
-    libtheora-dev \
-    libxv-dev \
-    libx11-xcb-dev \
-    libjson-glib-dev \
-    python3-opencv \
-    libgtest-dev \
-    libboost-system1.74-dev \
-    libboost-thread1.74-dev \
+    libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev \
+    libbsd-dev libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev \
+    libwayland-bin libasound2-dev gstreamer1.0-libav libgstrtspserver-1.0-0 libgudev-1.0-dev \
+    libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev \
+    libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev \
+    libx264-dev libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev \
+    libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev libassimp-dev \
+    libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev libtheora-dev \
+    libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging \
+    python3-venv libgtest-dev libboost-system1.74-dev libboost-thread1.74-dev libdbus-glib-1-dev \
+    qt6-tools-dev libqt6svg6 libqt6svg6-dev libfmt-dev libdevil-dev nfs-common \
 "

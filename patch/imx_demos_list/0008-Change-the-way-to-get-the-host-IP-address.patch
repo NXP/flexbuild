@@ -1,0 +1,71 @@
+From 9545e350fd803e91f53fa6d9dae0c9ed6e6e55e3 Mon Sep 17 00:00:00 2001
+From: Andy Tang <andy.tang@nxp.com>
+Date: Fri, 13 Jun 2025 15:21:28 +0800
+Subject: [PATCH 8/8] Change the way to get the host IP address
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ .../machine_learning/ml_gateway/ml_gateway.py  | 18 ++++++++----------
+ .../gstreamer/two_way_video_streaming.py       | 17 ++++++++---------
+ 2 files changed, 16 insertions(+), 19 deletions(-)
+
+diff --git a/scripts/machine_learning/ml_gateway/ml_gateway.py b/scripts/machine_learning/ml_gateway/ml_gateway.py
+index b94cf1d..5db05d9 100644
+--- a/scripts/machine_learning/ml_gateway/ml_gateway.py
++++ b/scripts/machine_learning/ml_gateway/ml_gateway.py
+@@ -41,16 +41,14 @@ def threaded(fn):
+ 
+ def get_my_ip():
+     """Obtaining its own IP address"""
+-    socket_object = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+-    socket_object.connect(("8.8.8.8", 80))
+-    ip_address = socket_object.getsockname()[0]
+-    loopback = socket.gethostbyname(socket.gethostname())
+-    if ip_address == loopback:
+-        print("ERROR: Connected to loopback device, try again")
+-        sys.exit(1)
+-    else:
+-        return ip_address
+-
++    try:
++        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++        s.connect(("8.8.8.8", 80))
++        local_ip = s.getsockname()[0]
++        s.close()
++        return local_ip
++    except Exception as e:
++        return "127.0.0.1"
+ 
+ class ServerWindow:
+     """Server Window"""
+diff --git a/scripts/multimedia/gstreamer/two_way_video_streaming.py b/scripts/multimedia/gstreamer/two_way_video_streaming.py
+index 561a5aa..b4944c6 100644
+--- a/scripts/multimedia/gstreamer/two_way_video_streaming.py
++++ b/scripts/multimedia/gstreamer/two_way_video_streaming.py
+@@ -177,15 +177,14 @@ def get_my_ip():
+     """
+     Return its own IP address
+     """
+-    sock_obj = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+-    sock_obj.connect(("8.8.8.8", 80))
+-    self_ip = sock_obj.getsockname()[0]
+-    loopback = socket.gethostbyname(socket.gethostname())
+-    if self_ip == loopback:
+-        raise Exception("ERROR: Trying to figure out my IP address")
+-    # Shutting down socket, cleaning up resources
+-    sock_obj.close()
+-    return self_ip
++    try:
++        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++        s.connect(("8.8.8.8", 80))
++        local_ip = s.getsockname()[0]
++        s.close()
++        return local_ip
++    except Exception as e:
++        return "127.0.0.1"
+ 
+ 
+ MY_IP = get_my_ip()
+-- 
+2.43.0
+

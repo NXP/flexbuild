@@ -12,7 +12,7 @@ qbman_userspace:
 	 cd $(NETDIR)/qbman_userspace && \
 	 export PREFIX=/usr && \
 	 export ARCH=aarch64 && \
-	 $(MAKE) -j$(JOBS) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 cp -f lib_aarch64_static/libqbman.a $(DESTDIR)/usr/lib && \
 	 cp -f include/*.h $(DESTDIR)/usr/include && \
 	 $(call fbprint_d,"qbman_userspace")

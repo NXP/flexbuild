@@ -9,6 +9,6 @@ restool:
 	 $(call repo-mngr,fetch,restool,apps/networking) && \
 	 cd $(NETDIR)/restool && \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) -j$(JOBS) install && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"restool")

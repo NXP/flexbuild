@@ -9,13 +9,12 @@
 
 # disable the v4l_drm_test
 
-imx_isp:
+imx_isp: imx_gpu_g2d gpu_viv libdrm
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_isp") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/imx_isp ]; then \
-	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin && \
-	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept && \
+	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin $(LOG_MUTE) && \
+	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept $(LOG_MUTE) && \
 	     mv isp-imx-* imx_isp && rm -f imxisp.bin; \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so ]; then \
@@ -31,6 +30,7 @@ imx_isp:
              bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
          fi && \
 	 \
+	 $(call fbprint_b,"imx_isp") && \
 	 cd imx_isp/appshell && \
 	 sed -i '/v4l_drm_test/d' CMakeLists.txt && \
 	 sed -i 's/imx\///' display/DrmDisplay.cpp display/WlDisplay.cpp v4l_drm_test/video_test.cpp && \
@@ -60,8 +60,8 @@ imx_isp:
 		-DCMAKE_C_FLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/libdrm \
 			-I$(MMDIR)/imx_isp/utils3rd/3rd/jsoncpp/include -Wno-error=variadic-macros -Wno-error=pedantic" \
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/libdrm \
-			-I$(MMDIR)/imx_isp/utils3rd/3rd/jsoncpp/include -Wno-error=variadic-macros -Wno-error=pedantic" && \
-	 $(MAKE) -j$(JOBS) && \
+			-I$(MMDIR)/imx_isp/utils3rd/3rd/jsoncpp/include -Wno-error=variadic-macros -Wno-error=pedantic" $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/opt/imx8-isp/bin && \
 	 install -d $(DESTDIR)/usr/lib/systemd/system && \
 	 install -d $(DESTDIR)/etc/systemd/system/multi-user.target.wants && \
@@ -81,5 +81,4 @@ imx_isp:
 	     sed -i "5 a\After=gdm3.service" $(MMDIR)/imx_isp/imx/imx8-isp.service; \
 	 fi && \
 	 install -m 0644 $(MMDIR)/imx_isp/imx/imx8-isp.service $(DESTDIR)/usr/lib/systemd/system/ && \
-	 ln -sf /usr/lib/systemd/system/imx8-isp.service $(DESTDIR)/etc/systemd/system/multi-user.target.wants/imx8-isp.service && \
 	 $(call fbprint_d,"imx_isp")

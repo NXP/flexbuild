@@ -52,6 +52,7 @@ mmdebstrap:
     - util-linux
     - lshw
     - keyutils
+    - locales
     - wpasupplicant
   setup-hooks:
     # Setup NXP board-specific configurations for various platforms
@@ -64,7 +65,7 @@ mmdebstrap:
   customize-hooks:
     - 'chroot "$1" useradd -m -d /home/debian -s /bin/bash debian'
     - 'chroot "$1" gpasswd -a debian sudo'
-    - 'chroot "$1" usermod -aG sudo debian'
+    - 'chroot "$1" usermod -aG sudo,input,video debian'
     - 'chroot "$1" passwd --delete root'
     - 'chroot "$1" passwd --delete debian'
     - 'chroot "$1" apt-get update'
@@ -81,7 +82,6 @@ mmdebstrap:
     - 'cp src/system/platcfg.service $1/lib/systemd/system/'
     - 'cp src/system/blacklist.conf $1/etc/modprobe.d/'
     - 'cp src/system/ts.conf $1/etc/'
-    - 'chroot "$1" ln -s /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service'
     - 'chroot "$1" ln -s /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/boot.mount'
     - 'chroot "$1" ln -s /boot/tools/perf /usr/local/bin/perf'
     - 'chroot "$1" ln -s /sbin/init /init'
@@ -90,11 +90,17 @@ mmdebstrap:
     - 'chroot "$1" ln -s /boot/firmware /lib/firmware'
     - 'cp src/system/gpuconfig $1/etc/'
     - 'cp src/system/gpuconfig.service $1/lib/systemd/system/'
+    - 'cp src/system/board_id.sh $1/usr/bin/'
     - 'chroot "$1" ln -s /lib/systemd/system/gpuconfig.service /etc/systemd/system/graphical.target.wants/gpuconfig.service'
     - 'chroot "$1" ln -s /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target'
-    - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles" >> $1/etc/environment'
+    - 'chroot "$1" sed -i -e "s/.*zh_CN.UTF-8.*/zh_CN.UTF-8 UTF-8/" -e "s/.*en_US.UTF-8.*/en_US.UTF-8 UTF-8/"  /etc/locale.gen'
+    - 'chroot "$1" /usr/sbin/locale-gen'
+    - 'chroot "$1" /usr/sbin/update-locale LANG=en_US.UTF-8'
+    - 'printf "COGL_DRIVER=gles2\nCLUTTER_DRIVER=gles2\nQT_QPA_PLATFORM=wayland\nGDK_GL=gles\n" >> $1/etc/environment'
+    - 'printf "QT_QUICK_BACKEND=software\n" >> $1/etc/environment'
+    - 'printf "\nexport DISPLAY=:0\nexport WAYLAND_DISPLAY=wayland-1" >> $1/root/.bashrc'
     - 'printf "/usr/lib\n" >> $1/etc/ld.so.conf.d/01-sdk.conf'
     - 'printf " * Support:   https://www.nxp.com/support\n" >> $1/etc/update-motd.d/20-help-text'
     - 'printf " * Licensing: https://lsdk.github.io/eula\n" >> $1/etc/update-motd.d/20-help-text'
-    - 'printf "NXP Linux SDK 2412 Debian base\n" >> $1/etc/issue'
+    - 'printf "NXP Linux SDK 2506 Debian base\n" >> $1/etc/issue'
     - 'printf "Build: `date --rfc-3339 seconds`\n" >> $1/etc/buildinfo'

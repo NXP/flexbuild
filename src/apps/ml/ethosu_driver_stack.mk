@@ -21,15 +21,15 @@ ethosu_driver_stack:
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH)/dist && \
 	 cmake  -S $(MLDIR)/ethosu_driver_stack \
-		-B $(MLDIR)/ethosu_driver_stack/build_$(DISTROTYPE)_$(ARCH) && \
-	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr --strip && \
+		-B $(MLDIR)/ethosu_driver_stack/build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr --strip $(LOG_MUTE) && \
 	 NO_FETCH_BUILD=1 \
 	 STAGING_INCDIR=$(RFSDIR)/usr/include \
 	 STAGING_LIBDIR=$(RFSDIR)/usr/lib \
 	 python3 setup.py bdist_wheel --verbose --dist-dir build_$(DISTROTYPE)_$(ARCH)/dist build_ext \
-		 --library-dirs build_$(DISTROTYPE)_$(ARCH)/driver_library && \
+		 --library-dirs build_$(DISTROTYPE)_$(ARCH)/driver_library $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu && \
 	 cp build/lib.linux-*-cpython*/ethosu/interpreter.cpython-*-linux-gnu.so $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu && \
-	 rename "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so && \
+	 rename -f "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so && \
 	 $(call fbprint_d,"ethosu_driver_stack")

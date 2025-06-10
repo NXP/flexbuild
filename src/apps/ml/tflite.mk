@@ -19,7 +19,7 @@ tflite:
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 $(call repo-mngr,fetch,tflite,apps/ml) && \
 	 cd $(MLDIR)/tflite && \
-	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz && tar xf mobilenet.tgz || true && \
+	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
@@ -37,11 +37,11 @@ tflite:
 		-DTFLITE_ENABLE_RUY=on \
 		-DTFLITE_ENABLE_XNNPACK=on \
 		-DTFLITE_PYTHON_WRAPPER_BUILD_CMAKE2=on \
-		-DTFLITE_ENABLE_EXTERNAL_DELEGATE=on && \
-	 VERBOSE=0 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all -- benchmark_model label_image && \
+		-DTFLITE_ENABLE_EXTERNAL_DELEGATE=on $(LOG_MUTE) && \
+	 VERBOSE=0 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all -- benchmark_model label_image $(LOG_MUTE) && \
 	 cd build_$(DISTROTYPE)_$(ARCH) && \
 	 CI_BUILD_PYTHON=python3 BUILD_NUM_JOBS=$(JOBS) \
-	 $(MLDIR)/tflite/tensorflow/lite/tools/pip_package/build_pip_package_with_cmake2.sh aarch64 && \
+	 $(MLDIR)/tflite/tensorflow/lite/tools/pip_package/build_pip_package_with_cmake2.sh aarch64 $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip libtensorflow-lite.so* && \
 	 cp -Pf libtensorflow-lite.so* $(DESTDIR)/usr/lib && \
 	 install -d $(DESTDIR)/usr/include/tensorflow/lite && \
@@ -53,7 +53,7 @@ tflite:
 	 cd $(MLDIR)/tflite/tensorflow/lite && \
 	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite && \
 	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public && \
-	 rsync -avz $(MLDIR)/tflite/tensorflow/* $(DESTDIR)/usr/include/tensorflow/ && \
+	 rsync -avz $(MLDIR)/tflite/tensorflow/* $(DESTDIR)/usr/include/tensorflow/ $(LOG_MUTE) && \
 	 cp $(FBDIR)/src/system/pkgconfig/tensorflow2-lite.pc $(DESTDIR)/usr/lib/pkgconfig && \
 	 \
 	 $(call fbprint_n,"install examples") && \
@@ -74,6 +74,6 @@ tflite:
 	 cp $(MLDIR)/tflite/mobilenet_*.tflite $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.11/site-packages \
-		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl && \
+		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE) && \
 	 #rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
 	 $(call fbprint_d,"tflite")

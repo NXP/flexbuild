@@ -1,0 +1,489 @@
+From 0216fbdd9bb9feb122e48c6882f881b805a804f7 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Thu, 17 Apr 2025 14:38:35 +0800
+Subject: [PATCH 36/40] arm64: dts: imx8mp-frdm: add AP1302 support instead of
+ OV5640 in imx8mp-frdm.dts
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ .../dts/freescale/imx8mp-frdm-dual-ap1302.dts | 119 +--------------
+ .../freescale/imx8mp-frdm-dual-os08a20.dts    |  11 +-
+ .../dts/freescale/imx8mp-frdm-os08a20.dts     |  22 +--
+ arch/arm64/boot/dts/freescale/imx8mp-frdm.dts | 139 +++++++++++-------
+ 4 files changed, 100 insertions(+), 191 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-ap1302.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-ap1302.dts
+index eac70cb34381..e9d340cc3dbd 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-ap1302.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-ap1302.dts
+@@ -8,62 +8,6 @@
+ #include "imx8mp-frdm.dts"
+ 
+ / {
+-	reg_dvdd_sel: regulator-dvdd_sel {
+-		compatible = "regulator-fixed";
+-		regulator-name = "DVDD_SEL";
+-		gpio = <&adp5585gpio_isp 0 GPIO_ACTIVE_HIGH>;
+-		enable-active-high;
+-		startup-delay-us = <2000>;
+-	};
+-
+-	reg_dvdd_1v2: regulator-dvdd {
+-		compatible = "regulator-fixed";
+-		regulator-name = "DVDD_1V2";
+-		gpio = <&adp5585gpio_isp 6 GPIO_ACTIVE_HIGH>;
+-		regulator-min-microvolt = <1200000>;
+-		regulator-max-microvolt = <1200000>;
+-		enable-active-high;
+-		vin-supply = <&reg_dvdd_sel>;
+-	};
+-
+-	reg_vdd_3v3: regulator-vdd {
+-		compatible = "regulator-fixed";
+-		regulator-name = "VDD_3V3";
+-		gpio = <&adp5585gpio_isp 5 GPIO_ACTIVE_HIGH>;
+-		regulator-min-microvolt = <3300000>;
+-		regulator-max-microvolt = <3300000>;
+-		startup-delay-us = <4000>;
+-		enable-active-high;
+-	};
+-
+-	reg_vddio_1v8: regulator-vddo {
+-		compatible = "regulator-fixed";
+-		regulator-name = "VDDIO_1V8";
+-		gpio = <&adp5585gpio_isp 9 GPIO_ACTIVE_HIGH>;
+-		regulator-min-microvolt = <1800000>;
+-		regulator-max-microvolt = <1800000>;
+-		startup-delay-us = <4000>;
+-		enable-active-high;
+-		vin-supply = <&reg_vdd_3v3>;
+-	};
+-
+-	reg_vaa_sel: regulator-vaa_sel {
+-		compatible = "regulator-fixed";
+-		regulator-name = "VAA_SEL";
+-		gpio = <&adp5585gpio_isp 1 GPIO_ACTIVE_HIGH>;
+-		enable-active-high;
+-	};
+-
+-	reg_avdd_2v8: regulator-avdd {
+-		compatible = "regulator-fixed";
+-		regulator-name = "AVDD_2V8";
+-		gpio = <&adp5585gpio_isp 7 GPIO_ACTIVE_HIGH>;
+-		regulator-min-microvolt = <2800000>;
+-		regulator-max-microvolt = <2800000>;
+-		enable-active-high;
+-		vin-supply = <&reg_vaa_sel>;
+-	};
+-
+ 	reg_dvdd_sel_1: regulator-dvdd_sel_1 {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "DVDD_SEL";
+@@ -121,62 +65,19 @@ reg_avdd_2v8_1: regulator-avdd1 {
+ 	};
+ };
+ 
+-&i2c2 {
+-	/delete-node/ov5640_mipi@3c;
+-
+-	adp5585_isp: mfd-isp@34 {
+-		compatible = "adi,adp5585";
+-		reg = <0x34>;
+-		status = "okay";
+-
+-		adp5585gpio_isp: gpio-isp@34 {
+-			compatible = "adp5585-gpio";
+-			gpio-controller;
+-			#gpio-cells = <2>;
+-		};
+-
+-		adp5585pwm_isp: pwm-isp@34 {
+-			compatible = "adp5585-pwm";
+-			#pwm-cells = <3>;
+-		};
+-	};
+-
+-	ap1302: ap1302_mipi@3c {
+-		compatible = "onsemi,ap1302";
+-		reg = <0x3c>;
+-		csi_id = <0>;
+-		reset-gpios = <&pcal6416 0 GPIO_ACTIVE_LOW>;
+-		isp_en-gpios  = <&adp5585gpio_isp 2 GPIO_ACTIVE_HIGH>;
+-		DVDD-supply   = <&reg_dvdd_1v2>;
+-		VDDIO-supply  = <&reg_vddio_1v8>;
+-		AVDD-supply   = <&reg_avdd_2v8>;
+-		status = "okay";
+-
+-		port {
+-			ap1302_mipi_0_ep: endpoint {
+-				data-lanes = <1 2>;
+-				clock-lanes = <0>;
+-				remote-endpoint = <&mipi_csi0_ep>;
+-			};
+-		};
+-	};
+-};
+-
+ &i2c3 {
+-	/delete-node/ov5640_mipi@3c;
+-
+ 	adp5585_isp_1: mfd-isp@34 {
+ 		compatible = "adi,adp5585";
+ 		reg = <0x34>;
+ 		status = "okay";
+ 
+-		adp5585gpio_isp_1: gpio-isp@34 {
++		adp5585gpio_isp_1: gpio-isp {
+ 			compatible = "adp5585-gpio";
+ 			gpio-controller;
+ 			#gpio-cells = <2>;
+ 		};
+ 
+-		adp5585pwm_isp_1: pwm-isp@34 {
++		adp5585pwm_isp_1: pwm-isp {
+ 			compatible = "adp5585-pwm";
+ 			#pwm-cells = <3>;
+ 		};
+@@ -207,25 +108,11 @@ &isi_1 {
+ 	status = "okay";
+ };
+ 
+-&mipi_csi_0 {
+-	status = "okay";
+-
+-	/delete-node/port;
+-	port {
+-		mipi_csi0_ep: endpoint {
+-			remote-endpoint = <&ap1302_mipi_0_ep>;
+-			data-lanes = <2>;
+-			csis-hs-settle = <9>;
+-		};
+-	};
+-};
+-
+ &mipi_csi_1 {
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+ 	status = "okay";
+ 
+-	/delete-node/port;
+ 	port@1 {
+ 		reg = <1>;
+ 
+@@ -233,6 +120,8 @@ mipi_csi1_ep: endpoint {
+ 			remote-endpoint = <&ap1302_mipi_1_ep>;
+ 			data-lanes = <2>;
+ 			csis-hs-settle = <9>;
++			csis-clk-settle = <2>;
++			csis-wclk;
+ 		};
+ 	};
+ };
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-os08a20.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-os08a20.dts
+index df330dde0004..1d04b57f1ae8 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-os08a20.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm-dual-os08a20.dts
+@@ -16,7 +16,7 @@
+ #include "imx8mp-frdm.dts"
+ 
+ &i2c2 {
+-	/delete-node/ov5640_mipi@3c;
++	/delete-node/ap1302_mipi@3c;
+ 
+ 	os08a20_0: os08a20_mipi@36 {
+ 		compatible = "ovti,os08a20_mipi";
+@@ -48,8 +48,6 @@ &i2c3 {
+ 	pinctrl-0 = <&pinctrl_i2c3>;
+ 	status = "okay";
+ 
+-	/delete-node/ov5640_mipi@3c;
+-
+ 	os08a20_1: os08a20_mipi@36 {
+ 		compatible = "ovti,os08a20_mipi";
+ 		reg = <0x36>;
+@@ -103,11 +101,14 @@ &mipi_csi_0 {
+ 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>;
+ 	assigned-clock-rates = <266000000>;
+ 
++	/delete-node/port;
+ 	port {
+-		endpoint {
++		mipi_csi0_ep: endpoint {
+ 			remote-endpoint = <&os08a20_mipi_0_ep>;
+ 			data-lanes = <4>;
+ 			csis-hs-settle = <16>;
++			csis-clk-settle = <2>;
++			csis-wclk;
+ 		};
+ 	};
+ };
+@@ -121,6 +122,8 @@ mipi_csi1_ep: endpoint {
+ 			remote-endpoint = <&os08a20_mipi_1_ep>;
+ 			data-lanes = <4>;
+ 			csis-hs-settle = <16>;
++			csis-clk-settle = <2>;
++			csis-wclk;
+ 		};
+ 	};
+ };
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm-os08a20.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm-os08a20.dts
+index b652ffdc7e80..1ab97245709d 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm-os08a20.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm-os08a20.dts
+@@ -18,7 +18,7 @@
+ #include "imx8mp-frdm.dts"
+ 
+ &i2c2 {
+-	/delete-node/ov5640_mipi@3c;
++	/delete-node/ap1302_mipi@3c;
+ 
+ 	os08a20_0: os08a20_mipi@36 {
+ 		compatible = "ovti,os08a20_mipi";
+@@ -44,11 +44,6 @@ os08a20_mipi_0_ep: endpoint {
+ 	};
+ };
+ 
+-&i2c3 {
+-	/delete-node/ov5640_mipi@3c;
+-
+-};
+-
+ &cameradev {
+ 	status = "okay";
+ };
+@@ -59,10 +54,6 @@ cap_device {
+ 	};
+ };
+ 
+-&isi_1 {
+-	status = "disabled";
+-};
+-
+ &isp_0 {
+ 	status = "okay";
+ };
+@@ -74,17 +65,14 @@ &dewarp {
+ &mipi_csi_0 {
+ 	status = "okay";
+ 
++	/delete-node/port;
+ 	port {
+-		endpoint {
++		mipi_csi0_ep: endpoint {
+ 			remote-endpoint = <&os08a20_mipi_0_ep>;
+ 			data-lanes = <4>;
+ 			csis-hs-settle = <16>;
++			csis-clk-settle = <2>;
++			csis-wclk;
+ 		};
+ 	};
+ };
+-
+-&mipi_csi_1 {
+-	/delete-property/ #address-cells;
+-	/delete-property/ #size-cells;
+-	/delete-node/port@1;
+-};
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+index 509c991963d8..32b19f8d8bde 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+@@ -124,6 +124,62 @@ reg_audio_pwr: regulator-audio-pwr {
+ 		regulator-always-on;
+ 	};
+ 
++	reg_dvdd_sel: regulator-dvdd_sel {
++		compatible = "regulator-fixed";
++		regulator-name = "DVDD_SEL";
++		gpio = <&adp5585gpio_isp 0 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		startup-delay-us = <2000>;
++	};
++
++	reg_dvdd_1v2: regulator-dvdd {
++		compatible = "regulator-fixed";
++		regulator-name = "DVDD_1V2";
++		gpio = <&adp5585gpio_isp 6 GPIO_ACTIVE_HIGH>;
++		regulator-min-microvolt = <1200000>;
++		regulator-max-microvolt = <1200000>;
++		enable-active-high;
++		vin-supply = <&reg_dvdd_sel>;
++	};
++
++	reg_vdd_3v3: regulator-vdd {
++		compatible = "regulator-fixed";
++		regulator-name = "VDD_3V3";
++		gpio = <&adp5585gpio_isp 5 GPIO_ACTIVE_HIGH>;
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		startup-delay-us = <4000>;
++		enable-active-high;
++	};
++
++	reg_vddio_1v8: regulator-vddo {
++		compatible = "regulator-fixed";
++		regulator-name = "VDDIO_1V8";
++		gpio = <&adp5585gpio_isp 9 GPIO_ACTIVE_HIGH>;
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		startup-delay-us = <4000>;
++		enable-active-high;
++		vin-supply = <&reg_vdd_3v3>;
++	};
++
++	reg_vaa_sel: regulator-vaa_sel {
++		compatible = "regulator-fixed";
++		regulator-name = "VAA_SEL";
++		gpio = <&adp5585gpio_isp 1 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
++	reg_avdd_2v8: regulator-avdd {
++		compatible = "regulator-fixed";
++		regulator-name = "AVDD_2V8";
++		gpio = <&adp5585gpio_isp 7 GPIO_ACTIVE_HIGH>;
++		regulator-min-microvolt = <2800000>;
++		regulator-max-microvolt = <2800000>;
++		enable-active-high;
++		vin-supply = <&reg_vaa_sel>;
++	};
++
+ 	bt_sco_codec: bt_sco_codec {
+ 		#sound-dai-cells = <1>;
+ 		compatible = "linux,bt-sco";
+@@ -227,13 +283,6 @@ user: user {
+ 			gpios = <&gpio3 14 GPIO_ACTIVE_LOW>;
+ 		};
+ 	};
+-
+-	clk_dummy: clock-dummy {
+-		compatible = "fixed-clock";
+-		#clock-cells = <0>;
+-		clock-frequency = <27000000>;
+-		clock-output-names = "clk_dummy";
+-	};
+ };
+ 
+ &flexspi {
+@@ -656,22 +705,39 @@ pcf2131: rtc@53 {
+ 		status = "okay";
+ 	};
+ 
+-	ov5640_0: ov5640_mipi@3c {
+-		compatible = "ovti,ov5640";
++	adp5585_isp: mfd-isp@34 {
++		compatible = "adi,adp5585";
++		reg = <0x34>;
++		status = "okay";
++
++		adp5585gpio_isp: gpio-isp {
++			compatible = "adp5585-gpio";
++			gpio-controller;
++			#gpio-cells = <2>;
++		};
++
++		adp5585pwm_isp: pwm-isp {
++			compatible = "adp5585-pwm";
++			#pwm-cells = <3>;
++		};
++	};
++
++	ap1302: ap1302_mipi@3c {
++		compatible = "onsemi,ap1302";
+ 		reg = <0x3c>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_csi_pwdn>;
+-		clocks = <&clk_dummy>;
+-		clock-names = "xclk";
+-		powerdown-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
++		csi_id = <0>;
+ 		reset-gpios = <&pcal6416 0 GPIO_ACTIVE_LOW>;
++		isp_en-gpios  = <&adp5585gpio_isp 2 GPIO_ACTIVE_HIGH>;
++		DVDD-supply   = <&reg_dvdd_1v2>;
++		VDDIO-supply  = <&reg_vddio_1v8>;
++		AVDD-supply   = <&reg_avdd_2v8>;
+ 		status = "okay";
+ 
+ 		port {
+-			ov5640_mipi_0_ep: endpoint {
+-				remote-endpoint = <&mipi_csi0_ep>;
++			ap1302_mipi_0_ep: endpoint {
+ 				data-lanes = <1 2>;
+ 				clock-lanes = <0>;
++				remote-endpoint = <&mipi_csi0_ep>;
+ 			};
+ 		};
+ 	};
+@@ -704,26 +770,6 @@ wm8962: wm8962@1a {
+ 			0x0000 /* 5:Default */
+ 		>;
+ 	};
+-
+-	ov5640_1: ov5640_mipi@3c {
+-		compatible = "ovti,ov5640";
+-		reg = <0x3c>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_csi_pwdn>;
+-		clocks = <&clk_dummy>;
+-		clock-names = "xclk";
+-		powerdown-gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+-		reset-gpios = <&pcal6416 1 GPIO_ACTIVE_LOW>;
+-		status = "disabled";
+-
+-		port {
+-			ov5640_mipi_1_ep: endpoint {
+-				remote-endpoint = <&mipi_csi1_ep>;
+-				data-lanes = <1 2>;
+-				clock-lanes = <0>;
+-			};
+-		};
+-	};
+ };
+ 
+ &irqsteer_hdmi {
+@@ -1342,12 +1388,6 @@ MX8MP_IOMUXC_GPIO1_IO14__CCM_CLKO1	0x50
+ 		>;
+ 	};
+ 
+-	pinctrl_csi_pwdn: csi_pwdn{
+-		fsl,pins = <
+-			MX8MP_IOMUXC_GPIO1_IO14__GPIO1_IO14	0x146
+-		>;
+-	};
+-
+ 	pinctrl_key: key {
+ 		fsl,pins = <
+ 			MX8MP_IOMUXC_NAND_DQS__GPIO3_IO14	0x1c4
+@@ -1392,9 +1432,9 @@ &mipi_csi_0 {
+ 
+ 	port {
+ 		mipi_csi0_ep: endpoint {
+-			remote-endpoint = <&ov5640_mipi_0_ep>;
++			remote-endpoint = <&ap1302_mipi_0_ep>;
+ 			data-lanes = <2>;
+-			csis-hs-settle = <13>;
++			csis-hs-settle = <9>;
+ 			csis-clk-settle = <2>;
+ 			csis-wclk;
+ 		};
+@@ -1405,17 +1445,6 @@ &mipi_csi_1 {
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+ 	status = "disabled";
+-
+-	port@1 {
+-		reg = <1>;
+-		mipi_csi1_ep: endpoint {
+-			remote-endpoint = <&ov5640_mipi_1_ep>;
+-			data-lanes = <2>;
+-			csis-hs-settle = <13>;
+-			csis-clk-settle = <2>;
+-			csis-wclk;
+-		};
+-	};
+ };
+ 
+ &cameradev {
+-- 
+2.34.1
+

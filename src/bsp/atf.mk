@@ -6,6 +6,8 @@
 
 # build ATF image for Layerscape and i.MX platforms
 
+bldstr = "BUILD_STRING=$(DEFAULT_REPO_TAG)"
+
 atf:
 	@$(call repo-mngr,fetch,atf,bsp) && \
 	 $(call repo-mngr,fetch,uboot,bsp) && \
@@ -14,8 +16,8 @@ atf:
 	 if [ -z "$(BOOTTYPE)" ]; then $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; fi && \
 	 cd $(BSPDIR)/atf && \
 	 curbrch=`git branch | grep ^* | cut -d' ' -f2` && \
-	 $(call fbprint_n,"Building ATF $$curbrch" for $(MACHINE)) && \
-	 $(MAKE) realclean && mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
+	 $(call fbprint_b,"ATF $$curbrch for $(MACHINE)") && \
+	 $(MAKE) realclean $(LOG_MUTE) && mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
 	 platform=$(MACHINE); \
 	 [ $${platform:0:6} = ls1012 -o $${platform:0:5} = ls104 ] && chassistype=ls104x_1012 || chassistype=ls2088_1088; \
 	 if [ "$(SECURE)" = y -a "$(BL33TYPE)" = uboot ]; then \
@@ -75,7 +77,7 @@ atf:
 	 if [ -n "$(rcw_bin)" ]; then rcwbin=$(FBOUTDIR)/bsp/rcw/$(rcw_bin); fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 	    if [ ! -f $$rcwbin ] || `cd $(BSPDIR)/rcw && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null`; then \
-		echo building dependent rcw ...; \
+	 	$(call fbprint_b,"RCW  for $(MACHINE)");  \
 		bld rcw -m $(MACHINE); \
 		test -f $$rcwbin || { $(call fbprint_e,"$$rcwbin not exist"); exit;} \
 	    fi; \
@@ -97,7 +99,7 @@ atf:
 	 fi; \
 	 if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
 	    if [ ! -f $$bl33 ] || [[ `cd $(BSPDIR)/uboot && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null` ]]; then \
-		echo building dependent $$bl33 ...; \
+		echo building dependent $$bl33 ... $(LOG_MUTE); \
 		if [ ! -f $$ubootcfg ]; then \
 		    $(call fbprint_e,Not found the dependent $$ubootcfg) && exit; \
 		fi; \
@@ -109,12 +111,12 @@ atf:
 	 if [ $(BOOTTYPE) = xspi ]; then bootmode=flexspi_nor; else bootmode=$(BOOTTYPE); fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 	     echo $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode RCW=$$rcwbin \
-		  BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt && \
+		  BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt ${LOG_MUTE} && \
 	     $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode \
-		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt && \
+		     RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) $(LOG_MUTE) && \
 	     if [ $${MACHINE:0:5} = lx216 -a "$(SECURE)" = y ] && [ ! -f $$outputdir/ddr_fip_sec.bin ]; then \
-		 $(MAKE) -j$(JOBS) fip_ddr PLAT=$$platform BOOT_MODE=$$bootmode $$secureopt \
-		 $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a; \
+		 $(MAKE) -j$(JOBS) fip_ddr PLAT=$$platform BOOT_MODE=$$bootmode $$secureopt $(bldstr) \
+		 $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a $(LOG_MUTE) ; \
 		 [ "$(COT)" = arm-cot -o "$(COT)" = arm-cot-with-verified-boot ] && cp -f build/$$platform/release/*.pem $$outputdir/; \
 		 cp -f build/$$platform/release/ddr_fip_sec.bin $$outputdir/; \
 	     fi && \
@@ -133,9 +135,9 @@ atf:
 	 elif [ $(SOCFAMILY) = IMX ]; then \
 	    [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
 	    [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
-	    $(MAKE) -j$(JOBS) PLAT=$$plat bl31 && \
+	    $(MAKE) -j$(JOBS) PLAT=$$plat $(bldstr) bl31 $(LOG_MUTE) && \
 	    mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE) && \
 	    cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
 	 fi && \
-	 ls -l $(FBOUTDIR)/bsp/atf/$(MACHINE)/* && \
+	 ls -l $(FBOUTDIR)/bsp/atf/$(MACHINE)/* ${LOG_MUTE} && \
 	 $(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot")

@@ -1,0 +1,103 @@
+From a66849bd2c3d85965e2d92213482a1e4440751b3 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Tue, 15 Apr 2025 16:42:23 +0800
+Subject: [PATCH 33/40] arm64: dts: imx8mp-frdm: clean imx8mp-frdm.dts
+
+Clean some duplicated nodes in imx8mp-frdm.dts.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx8mp-frdm.dts | 42 +------------------
+ 1 file changed, 2 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+index eb1f6ab78b1f..509c991963d8 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+@@ -777,24 +777,6 @@ &pcie {
+ 	status = "okay";
+ };
+ 
+-&pwm1 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_pwm1>;
+-	status = "okay";
+-};
+-
+-&pwm2 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_pwm2>;
+-	status = "okay";
+-};
+-
+-&pwm4 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_pwm4>;
+-	status = "okay";
+-};
+-
+ &sai2 {
+ 	#sound-dai-cells = <0>;
+ 	pinctrl-names = "default";
+@@ -861,7 +843,6 @@ bluetooth {
+ 	};
+ };
+ 
+-
+ &uart2 {
+ 	/* console */
+ 	pinctrl-names = "default";
+@@ -1007,7 +988,7 @@ MX8MP_IOMUXC_GPIO1_IO01__PWM1_OUT	0x116
+ 
+ 	pinctrl_pwm2: pwm2grp {
+ 		fsl,pins = <
+-			MX8MP_IOMUXC_GPIO1_IO11__PWM2_OUT	0x116
++			MX8MP_IOMUXC_GPIO1_IO13__PWM2_OUT	0x116
+ 		>;
+ 	};
+ 
+@@ -1138,7 +1119,7 @@ MX8MP_IOMUXC_GPIO1_IO03__GPIO1_IO03	0x000001c0
+ 
+ 	pinctrl_pcal6416_int: pcal6416_int_grp {
+ 		fsl,pins = <
+-			MX8MP_IOMUXC_NAND_READY_B__GPIO3_IO16   0x146 /* Input pull-up. */
++			MX8MP_IOMUXC_NAND_READY_B__GPIO3_IO16	0x146 /* Input pull-up. */
+ 		>;
+ 	};
+ 
+@@ -1148,24 +1129,6 @@ MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11	0x146 /* Input pull-up. */
+ 		>;
+ 	};
+ 
+-	pinctrl_pwm1: pwm1grp {
+-		fsl,pins = <
+-			MX8MP_IOMUXC_GPIO1_IO01__PWM1_OUT	0x116
+-		>;
+-	};
+-
+-	pinctrl_pwm2: pwm2grp {
+-		fsl,pins = <
+-			MX8MP_IOMUXC_GPIO1_IO13__PWM2_OUT	0x116
+-		>;
+-	};
+-
+-	pinctrl_pwm4: pwm4grp {
+-		fsl,pins = <
+-			MX8MP_IOMUXC_SAI5_RXFS__PWM4_OUT	0x116
+-		>;
+-	};
+-
+ 	pinctrl_reg_usdhc2_vmmc: regusdhc2vmmcgrp {
+ 		fsl,pins = <
+ 			MX8MP_IOMUXC_SD2_RESET_B__GPIO2_IO19	0x40
+@@ -1198,7 +1161,6 @@ MX8MP_IOMUXC_SAI3_TXC__AUDIOMIX_SAI3_TX_BCLK	0xd6
+ 			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0xd6
+ 			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0xd6
+ 			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0xd6
+-			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29		0xd6
+ 		>;
+ 	};
+ 
+-- 
+2.34.1
+

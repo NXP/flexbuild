@@ -18,8 +18,8 @@ ecc_example:
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) $(DESTDIR)/usr/bin && \
 	 cmake  -S $(SECDIR)/ecc_example/ecc_example \
 		-B build_$(DISTROTYPE)_$(ARCH) \
-		-DCMAKE_BUILD_TYPE=release && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+		-DCMAKE_BUILD_TYPE=release $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 install -m 0755 build_$(DISTROTYPE)_$(ARCH)/ex_ecc $(DESTDIR)/usr/bin/ && \
 	 $(call fbprint_d,"ecc_example")

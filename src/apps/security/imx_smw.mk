@@ -9,11 +9,11 @@
 imx_smw:
 ifeq ($(CONFIG_SMW),y)
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_smw") && \
 	 $(call repo-mngr,fetch,imx_smw,apps/security) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libteec.so ]; then \
 	     CONFIG_OPTEE=y bld optee_client -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"imx_smw") && \
 	 cd $(SECDIR)/imx_smw && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
@@ -23,8 +23,8 @@ ifeq ($(CONFIG_SMW),y)
 		-DTA_DEV_KIT_ROOT=$(DESTDIR)/usr/include/optee/export-user_ta \
 		-DTEEC_ROOT=$(RFSDIR) \
 		-DJSONC_ROOT=$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-		-DTEE_TA_DESTDIR=/usr/lib && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
+		-DTEE_TA_DESTDIR=/usr/lib $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_smw")
 endif

@@ -14,6 +14,7 @@ spc:
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"SPC") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CFLAGS="-fpermissive -I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
@@ -22,9 +23,7 @@ spc:
 	 $(MAKE) -C $(NETDIR)/spc/source \
 		 LIBXML2_HEADER_PATH=$$xmlhdr \
 		 TCLAP_HEADER_PATH=$(RFSDIR)/usr/include \
-		 NET_USPACE_HEADER_PATH=$(NETDIR)/spc/source/include/net \
-		 CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" \
-		 CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
+		 NET_USPACE_HEADER_PATH=$(NETDIR)/spc/source/include/net $(LOG_MUTE) && \
 	 cp -rf $(NETDIR)/spc/source/spc $(DESTDIR)/usr/local/bin && \
 	 cp -rf $(NETDIR)/spc/etc $(DESTDIR) && \
 	 $(call fbprint_d,"SPC")

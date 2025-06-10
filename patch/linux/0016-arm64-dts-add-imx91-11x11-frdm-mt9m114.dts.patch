@@ -1,7 +1,7 @@
-From 9ffc27a1e759f2a35eae5687fdff2821de9298f7 Mon Sep 17 00:00:00 2001
+From 2b5ace51fdf06eebfab6e3a288fdd34f860675df Mon Sep 17 00:00:00 2001
 From: Lei Xu <lei.xu@nxp.com>
 Date: Mon, 12 Aug 2024 14:42:07 +0800
-Subject: [PATCH 16/19] arm64: dts: add imx91-11x11-frdm-mt9m114.dts
+Subject: [PATCH 16/30] arm64: dts: add imx91-11x11-frdm-mt9m114.dts
 
 Add parallel interface camera MT9M114 support for FRDM-iMX91.
 
@@ -13,10 +13,10 @@ Signed-off-by: Lei Xu <lei.xu@nxp.com>
  create mode 100644 arch/arm64/boot/dts/freescale/imx91-11x11-frdm-mt9m114.dts
 
 diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
-index 1b19dd57a10d..a78e1c7bdcf8 100644
+index 3022f21bb44d..421fe123d34f 100644
 --- a/arch/arm64/boot/dts/freescale/Makefile
 +++ b/arch/arm64/boot/dts/freescale/Makefile
-@@ -400,7 +400,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
+@@ -403,7 +403,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-evk.dtb \
  			  imx91-11x11-evk-i2c-spi-slave.dtb \
  			  imx91-11x11-evk-i3c.dtb \
  			  imx91-11x11-frdm.dtb imx91-11x11-frdm-ld.dtb \
@@ -236,5 +236,5 @@ index 000000000000..c2cfa757bd72
 +	status = "disabled";
 +};
 -- 
-2.25.1
+2.34.1
 

@@ -1,7 +1,7 @@
-From 19d631d26ac7e8b2e121b50186f41a194340b10b Mon Sep 17 00:00:00 2001
+From 1f5e9d56805fa31550db603c0e4cffe5e369fc1c Mon Sep 17 00:00:00 2001
 From: Joseph Guo <qijian.guo@nxp.com>
 Date: Wed, 19 Jun 2024 13:10:45 +0300
-Subject: [PATCH 05/19] Add CTP support for waveshare panel
+Subject: [PATCH 05/30] Add CTP support for waveshare panel
 
 Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
 ---
@@ -27,10 +27,10 @@ index 581bf8c02980..6ab11d8dc218 100644
 +	};
  };
 diff --git a/arch/arm64/configs/imx_v8_defconfig b/arch/arm64/configs/imx_v8_defconfig
-index 9c0ab8bf0848..bd1c81b9d8f4 100644
+index ada5041c1d89..07779ca2c486 100644
 --- a/arch/arm64/configs/imx_v8_defconfig
 +++ b/arch/arm64/configs/imx_v8_defconfig
-@@ -393,7 +393,7 @@ CONFIG_KEYBOARD_CROS_EC=y
+@@ -394,7 +394,7 @@ CONFIG_KEYBOARD_CROS_EC=y
  CONFIG_INPUT_TOUCHSCREEN=y
  CONFIG_TOUCHSCREEN_ATMEL_MXT=m
  CONFIG_TOUCHSCREEN_EXC3000=y
@@ -346,5 +346,5 @@ index 87797cc88b32..132e49d66324 100644
  
  int goodix_i2c_read(struct i2c_client *client, u16 reg, u8 *buf, int len);
 -- 
-2.25.1
+2.34.1
 

@@ -13,6 +13,6 @@ lttng_modules:
 	 fi && \
 	 cd $(PKGDIR)/linux/lttng_modules && \
 	 $(call fbprint_b,"LTTng modules") && \
-	 $(MAKE) KERNELDIR=$(KERNEL_PATH) O=$$opdir && \
-	 $(MAKE) KERNELDIR=$(KERNEL_PATH) O=$$opdir modules_install && \
+	 $(MAKE) KERNELDIR=$(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
+	 $(MAKE) KERNELDIR=$(KERNEL_PATH) O=$$opdir modules_install $(LOG_MUTE) && \
 	 $(call fbprint_d,"LTTng modules")

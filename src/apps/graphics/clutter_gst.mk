@@ -11,9 +11,8 @@
 # depends on clutter-1.0 which depends on cogl-1.0
 # depends on gstreamer1.0-plugins-base gstreamer1.0-plugins-bad clutter-1.0 libgudev
 
-clutter_gst:
+clutter_gst: gst_plugins_bad cogl libdrm
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"clutter_gst") && \
 	 $(call repo-mngr,fetch,clutter_gst,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
 	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
@@ -24,6 +23,7 @@ clutter_gst:
 	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
 	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"clutter_gst") && \
 	 sudo cp -Pf $(DESTDIR)/usr/lib/{libGLESv2.so*,libVSC.so,libEGL.so*,libGAL.so*,libgbm.so*,libcogl.so*,libdrm.so*,libgst*.so*} \
 	 $(RFSDIR)/usr/lib && \
 	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
@@ -32,21 +32,22 @@ clutter_gst:
 	 \
 	 cd $(GRAPHICSDIR)/clutter_gst && \
 	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/clutter_gst/*.patch && touch .patchdone; \
+	    git am $(FBDIR)/patch/clutter_gst/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -i 's/noinst_PROGRAMS/bin_PROGRAMS/' examples/Makefile.am && \
+	 sed -i 's/autoreconf -v --install/autoreconf --install/g' autogen.sh && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0 \
 			-I$(DESTDIR)/usr/include/clutter-1.0 -I$(RFSDIR)/usr/include" && \
 	 export GST_PLUGIN_SCANNER_1_0=$(GRAPHICSDIR)/clutter_gst/gst-plugin-scanner-dummy && \
 	 \
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu && \
+	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--enable-introspection=no \
 		--disable-gtk-doc \
 		--disable-static \
 		--enable-nls \
-		--prefix=/usr && \
-	 $(MAKE) -j$(JOBS) && \
-	 $(MAKE) install && \
+		--prefix=/usr $(LOG_MUTE) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"clutter_gst")

@@ -1,7 +1,10 @@
 [Unit]
 Description=Runtime Dynamic Configuration for various NXP i.MX/LS platforms
+Before=gdm.service gdm3.service
 
 [Service]
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Type=oneshot
 ExecStart=/usr/bin/distroplatcfg
 
 [Install]

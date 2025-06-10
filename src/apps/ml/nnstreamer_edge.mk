@@ -22,10 +22,11 @@ nnstreamer_edge:
 	 cmake  -S $(MLDIR)/nnstreamer_edge \
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_BUILD_TYPE=release \
-		-DENABLE_TEST=OFF && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr && \
-	 mv $(DESTDIR)/usr/local/include/nnstreamer-edge.h $(DESTDIR)/usr/include && \
+		-DENABLE_TEST=OFF $(LOG_MUTE) && \
+	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
+	 mkdir -p $(RFSDIR)/usr/local/include/nnstreamer && \
+	 mv $(DESTDIR)/usr/local/include/nnstreamer/nnstreamer-edge.h $(DESTDIR)/usr/include && \
 	 mv $(DESTDIR)/pkgconfig/nnstreamer-edge.pc $(DESTDIR)/usr/lib/pkgconfig/ && \
 	 rm -rf $(DESTDIR)/pkgconfig && \
 	 $(call fbprint_d,"nnstreamer_edge")

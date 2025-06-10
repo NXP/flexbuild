@@ -10,13 +10,13 @@
 # DEPEND: gpu_viv
 
 
-tim_vx:
+tim_vx: gpu_viv
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"tim_vx") && \
 	 $(call repo-mngr,fetch,tim_vx,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libOpenVX.so ]; then \
 	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
+	 $(call fbprint_b,"tim_vx") && \
 	 cd $(MLDIR)/tim_vx && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(DESTDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(DESTDIR)" && \
@@ -28,8 +28,8 @@ tim_vx:
 		-DCMAKE_C_FLAGS="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
 		-DCONFIG=YOCTO \
 		-DTIM_VX_ENABLE_TEST=off \
-		-DTIM_VX_USE_EXTERNAL_OVXLIB=off && \
-	 cmake --build $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all && \
+		-DTIM_VX_USE_EXTERNAL_OVXLIB=off $(LOG_MUTE) && \
+	 cmake --build $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
 	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so && \
 	 cp build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so $(DESTDIR)/usr/lib && \
 	 install -d $(DESTDIR)/usr/include/tim && \

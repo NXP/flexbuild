@@ -22,7 +22,7 @@ tsntool:
 	 mkdir -p include/linux && \
 	 cp -f $(KERNEL_PATH)/include/uapi/linux/tsn.h include/linux && \
 	 $(MAKE) clean && \
-	 $(MAKE) -j$(JOBS) && \
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/usr/local/bin && install -d $(DESTDIR)/usr/lib && \
 	 install -m 755 tsntool $(DESTDIR)/usr/local/bin/tsntool && \
 	 install -m 755 libtsn.so $(DESTDIR)/usr/lib/libtsn.so && \

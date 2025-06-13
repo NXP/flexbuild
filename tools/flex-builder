@@ -826,7 +826,6 @@ done
 [ -z "$CFGLISTYML" ] && CFGLISTYML=sdk.yml
 
 . $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
-. $FBDIR/tools/parse_yaml $FBDIR/configs/ml.yml >> $FBDIR/configs/.sdk.cfg
 chmod 666 $FBDIR/configs/.sdk.cfg
 CONFIGLIST=.sdk.cfg
 export CONFIGLIST CFGLISTYML
@@ -1026,6 +1025,8 @@ if [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && [ $DISTROTYPE != buildroot ]; t
 elif [ $HOSTARCH = aarch64 -a ! -f $FBDIR/logs/.deppkgdone ]; then
     check_host_dependent_pkg
 fi
+
+python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/sdk.yml $FBDIR/configs/.repo_pool
 
 tmppath=$(realpath $FBOUTDIR/linux/kernel)
 [ ${tmppath##*/} != $KERNEL_TREE ] && rm -f $FBOUTDIR/linux/kernel && ln -s $KERNEL_TREE $FBOUTDIR/linux/kernel

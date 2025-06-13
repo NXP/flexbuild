@@ -244,8 +244,9 @@ class DownloadGitHubTarball(object):
         self.submodules = args.submodules
         self.url = args.url
         self._init_owner_repo()
-        #self.xhash = args.hash
-        #self._init_hasher()
+        self.xhash = args.hash if ('hash' in args and args.hash) else None
+        if self.xhash:
+            self._init_hasher()
         self.commit_ts = None           # lazy load commit timestamp
         self.commit_ts_cache = GitHubCommitTsCache()
         self.name = 'github-tarball'
@@ -274,13 +275,12 @@ class DownloadGitHubTarball(object):
                     # repack
                     into=os.path.join(TMPDIR_DL, self.source)
                     Path.tar(dir_untar.path, self.subdir, into=into, ts=self.commit_ts)
-                    '''
-                    try:
-                        self._hash_check(into)
-                    except Exception:
-                        Path.rm_all(into)
-                        raise
-                    '''
+                    if self.xhash:
+                        try:
+                            self._hash_check(into)
+                        except Exception:
+                            Path.rm_all(into)
+                            raise
                     # move to target location
                     file1 = os.path.join(self.dl_dir, self.source)
                     if into != file1:
@@ -421,6 +421,7 @@ def main():
     parser.add_argument('--subdir', help='Source code subdir name')
     parser.add_argument('--version', help='Source code version')
     parser.add_argument('--source', help='Source tarball filename')
+    parser.add_argument('--hash', nargs='?', help='Optional: Source tarball hash (skip if empty)')
     parser.add_argument('--submodules', nargs='*', help='List of submodules, or "skip"')
     args = parser.parse_args()
     try:

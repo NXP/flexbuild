@@ -5,12 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-
 generate_bootpartition_tarball() {
     # check kernel image
     [ -f $KERNEL_PATH/Makefile ] || bld repo-fetch linux
-    curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
-    [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$curbrch/include/config/kernel.release ] && \
+    [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release ] && \
     echo Building the dependent $kernel_img ... && \
     bld linux -p $SOCFAMILY -a $DESTARCH
 
@@ -28,7 +26,7 @@ generate_bootpartition_tarball() {
     fbprint_n "Installing kernel and dtb ..."
     [ -f $tiny_itb ] && cp -f $tiny_itb $bootpartdir
     [ -f $base_itb ] && cp -f $base_itb $bootpartdir
-    kernelrelease=$(cat $KERNEL_OUTPUT_PATH/$curbrch/include/config/kernel.release)
+    kernelrelease=$(cat $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release)
     [ $DESTARCH = arm64 ] && kernelimg=Image* || kernelimg=zImage*
     cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/{*.dtb,$kernelimg,config-$kernelrelease} $bootpartdir
     if [ $DESTARCH = arm64 ]; then
@@ -39,8 +37,8 @@ generate_bootpartition_tarball() {
 
     # install kernel modules
     fbprint_n "Installing kernel modules ..."
-    cp -rf $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules $bootpartdir
-    modversion=$(ls $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules|xargs echo|cut -d' ' -f1)
+    cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules $bootpartdir
+    modversion=$(ls $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules|xargs echo|cut -d' ' -f1)
     rm -f $bootpartdir/modules/$modversion/{build,source}
 
     # install /lib/firmware

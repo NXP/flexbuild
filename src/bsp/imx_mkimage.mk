@@ -4,12 +4,8 @@
 
 
 define imx_mkimage_target
-    if [ ! -d $(BSPDIR)/imx_mkimage ]; then \
-        $(call repo-mngr,fetch,imx_mkimage,bsp); \
-    fi && \
-    if [ -d $(FBDIR)/patch/imx_mkimage ] && [ ! -f .patchdone ]; then \
-        git am $(FBDIR)/patch/imx_mkimage/*.patch $(LOG_MUTE) && touch .patchdone; \
-    fi && \
+	$(call download_repo,imx_mkimage,bsp) && \
+	$(call patch_apply,imx_mkimage,bsp) && \
     \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \
 	cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && chmod +x firmware_imx.bin && \

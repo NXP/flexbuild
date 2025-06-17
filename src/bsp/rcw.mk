@@ -8,7 +8,7 @@
 
 rcw:
 	@[ $(SOCFAMILY) != LS ] && exit || \
-	 $(call repo-mngr,fetch,rcw,bsp) && \
+	 $(call download_repo,rcw,bsp) && \
 	 cd $(BSPDIR) && mkdir -p $(FBOUTDIR)/bsp/rcw
 ifeq ($(MACHINE), all)
 	@cd $(BSPDIR) && \

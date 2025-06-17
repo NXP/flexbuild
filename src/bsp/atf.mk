@@ -9,13 +9,13 @@
 bldstr = "BUILD_STRING=$(DEFAULT_REPO_TAG)"
 
 atf:
-	@$(call repo-mngr,fetch,atf,bsp) && \
-	 $(call repo-mngr,fetch,uboot,bsp) && \
-	 $(call repo-mngr,fetch,mbedtls,bsp) && \
+	@$(call download_repo,atf,bsp) && \
+	 $(call download_repo,uboot,bsp) && \
+	 $(call download_repo,mbedtls,bsp,true) && \
 	 if [ "$(MACHINE)" = all ]; then $(call fbprint_w,"Please specify '-m <machine>'") && exit 0; fi && \
 	 if [ -z "$(BOOTTYPE)" ]; then $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; fi && \
 	 cd $(BSPDIR)/atf && \
-	 curbrch=`git branch | grep ^* | cut -d' ' -f2` && \
+	 curbrch=$(or $(repo_atf_ver),$(DEFAULT_REPO_TAG)) && \
 	 $(call fbprint_b,"ATF $$curbrch for $(MACHINE)") && \
 	 $(MAKE) realclean $(LOG_MUTE) && mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
 	 platform=$(MACHINE); \
@@ -76,7 +76,7 @@ atf:
 	 rcwbin=$(FBOUTDIR)/$$rcwbin && \
 	 if [ -n "$(rcw_bin)" ]; then rcwbin=$(FBOUTDIR)/bsp/rcw/$(rcw_bin); fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
-	    if [ ! -f $$rcwbin ] || `cd $(BSPDIR)/rcw && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null`; then \
+	    if [ ! -f $$rcwbin ]; then \
 	 	$(call fbprint_b,"RCW  for $(MACHINE)");  \
 		bld rcw -m $(MACHINE); \
 		test -f $$rcwbin || { $(call fbprint_e,"$$rcwbin not exist"); exit;} \
@@ -98,7 +98,7 @@ atf:
 	     fi; \
 	 fi; \
 	 if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
-	    if [ ! -f $$bl33 ] || [[ `cd $(BSPDIR)/uboot && git status -s|grep -qiE 'M|A|D' && cd - 1>/dev/null` ]]; then \
+	    if [ ! -f $$bl33 ]; then \
 		echo building dependent $$bl33 ... $(LOG_MUTE); \
 		if [ ! -f $$ubootcfg ]; then \
 		    $(call fbprint_e,Not found the dependent $$ubootcfg) && exit; \

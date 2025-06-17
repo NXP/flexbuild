@@ -9,13 +9,11 @@ include imx_mkimage.mk
 
 
 uboot u-boot:
-	@$(call repo-mngr,fetch,uboot,bsp) && \
-	 curbrch=`cd $(BSPDIR)/uboot && git branch | grep ^* | cut -d' ' -f2` && \
+	 $(call download_repo,uboot,bsp) && \
+	 curbrch=$(or $(repo_uboot_ver),$(DEFAULT_REPO_TAG)) && \
 	 $(call fbprint_b,"u-boot $$curbrch for $(MACHINE)") && \
 	 cd $(BSPDIR)/uboot && \
-	 if [ -d $(FBDIR)/patch/uboot ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/uboot/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
+	 $(call patch_apply,uboot,bsp) && \
 	 if [ "$(BOOTTYPE)" = tfa -a "$(COT)" = arm-cot-with-verified-boot ]; then \
 	     uboot_cfg=$(MACHINE)_tfa_verified_boot_defconfig; \
 	 elif [ -n "$(UBOOT_CONFIG)" ]; then \

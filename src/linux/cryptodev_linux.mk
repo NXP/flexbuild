@@ -5,10 +5,9 @@
 
 cryptodev_linux:
 	@[ "$(BUILDARG)" = custom ] && exit || \
-	 $(call repo-mngr,fetch,cryptodev_linux,linux) && \
-	 $(call repo-mngr,fetch,linux,linux) && \
-	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && \
+	 $(call download_repo,linux,linux) && \
+	 $(call download_repo,cryptodev_linux,linux) && \
+	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \
 	 if [ ! -f $$opdir/include/config/auto.conf ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
@@ -18,9 +17,7 @@ cryptodev_linux:
 	 \
 	 cd $(PKGDIR)/linux/cryptodev_linux && \
 	 $(call fbprint_b,"cryptodev_linux") && \
-	 if [ -d $(FBDIR)/patch/cryptodev_linux ] && [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/cryptodev_linux/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
+	 $(call patch_apply,cryptodev_linux,linux) && \
 	 export KERNEL_MAKE_OPTS="-lcrypto -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 $(MAKE) KERNEL_DIR=$(KERNEL_PATH) O=$$opdir -j$(JOBS) $(LOG_MUTE) && \
 	 $(MAKE) install KERNEL_DIR=$(KERNEL_PATH) O=$$opdir INSTALL_MOD_PATH=$$opdir/tmp -j$(JOBS) $(LOG_MUTE) && \

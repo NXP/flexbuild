@@ -447,7 +447,6 @@ host_push_image_to_target() {
         fbprint_w "$2 is not connected yet, please run 'bld connect $2'" && exit
     fi
     localmntdir=`cat /etc/mtab | grep $2 | cut -d' ' -f2 | head -1`
-    curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
     if [ $1 = kernel ]; then
         [ ! -f $kernel_img ] && fbprint_n "Generating kernel image ..." && \
         bld linux -a $DESTARCH -p $SOCFAMILY
@@ -456,7 +455,7 @@ host_push_image_to_target() {
         find $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY -maxdepth 1 -type f -exec cp -f {} $localmntdir/boot/ \;
 
         [ -d $localmntdir/boot/modules ] && fbprint_n "Pushing modules to target $2 ..." && \
-        cp -rf $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules/* $localmntdir/boot/modules/
+        cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules/* $localmntdir/boot/modules/
         fbprint_d "Push kernel and modules to target $2"
     elif [ $1 = apps -o $1 = ml ]; then
         [ $1 = ml ] && srcdir=${DESTDIR}_ml || srcdir=$DESTDIR
@@ -540,10 +539,6 @@ flex_auto_build() {
 
     echo "Time of build: `date`"
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
-
-    [ ! -d $KERNEL_PATH ] && bld repo-fetch linux
-    curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
-    [ "$KERNEL_BRANCH" != "$curbrch" ] && cd $KERNEL_PATH && git checkout $KERNEL_BRANCH -b $KERNEL_BRANCH && cd -
 
     bld linux -a $DESTARCH -p $SOCFAMILY
     bld linux-modules -a $DESTARCH -p $SOCFAMILY
@@ -825,8 +820,9 @@ done
 
 [ -z "$CFGLISTYML" ] && CFGLISTYML=sdk.yml
 
+python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/sdk.yml $FBDIR/configs/.repo_pool
 . $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
-chmod 666 $FBDIR/configs/.sdk.cfg
+chmod 666 $FBDIR/configs/.sdk.cfg $FBDIR/configs/.repo_pool
 CONFIGLIST=.sdk.cfg
 export CONFIGLIST CFGLISTYML
 
@@ -835,6 +831,7 @@ export CONFIGLIST CFGLISTYML
 . $FBDIR/tools/distro_poky
 . $FBDIR/tools/distro_buildroot
 . $FBDIR/configs/debian/extra_packages_list
+. $FBDIR/configs/.repo_pool
 
 [ -z "$MACHINE" ] && MACHINE=all
 [ "${MACHINE:0:7}" = "ls1021a" ] && DESTARCH=arm32
@@ -899,14 +896,8 @@ if [ $DESTARCH != arm64 -a $DESTARCH != arm32 ]; then
     fbprint_e "invalid $DESTARCH, valid arch: arm64, arm32" && exit 1
 fi
 
-if [ -n "`echo $1 | grep ^linux:`" -a -n "`echo $1 | cut -d: -f3`" ]; then
-    KERNEL_TREE=`echo $1|cut -d: -f2`
-    KERNEL_BRANCH=`echo $1|cut -d: -f3`
-else
-    KERNEL_TREE=linux
-    KERNEL_BRANCH=$repo_linux_tag
-fi
-
+KERNEL_TREE=linux
+KERNEL_BRANCH="${repo_linux_ver:-$DEFAULT_REPO_TAG}"
 KERNEL_PATH=$PKGDIR/linux/$KERNEL_TREE
 KERNEL_OUTPUT_PATH=$FBOUTDIR/linux/$KERNEL_TREE/$DESTARCH/$SOCFAMILY/output
 INSTALL_MOD_PATH=$FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY
@@ -1026,8 +1017,6 @@ elif [ $HOSTARCH = aarch64 -a ! -f $FBDIR/logs/.deppkgdone ]; then
     check_host_dependent_pkg
 fi
 
-python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/sdk.yml $FBDIR/configs/.repo_pool
-
 tmppath=$(realpath $FBOUTDIR/linux/kernel)
 [ ${tmppath##*/} != $KERNEL_TREE ] && rm -f $FBOUTDIR/linux/kernel && ln -s $KERNEL_TREE $FBOUTDIR/linux/kernel
 
@@ -1070,7 +1059,7 @@ export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE K
        CFGLISTYML BUILDARG DISTROTYPE DISTROVARIANT DISTROVARIANTOPT HOSTARCH SYSARCH SECURE \
        SOCFAMILY BL33TYPE DISTRIB_NAME SOCARCH COT DISTRIB_VERSION BOARD_VARIANTS \
        UBOOT_CONFIG CODENAME DISTRO_VERSION UBUNTU_VERSION FORCE LD_LIBRARY_PATH \
-       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH DEFAULT_REPO_TAG LOG_MUTE
+       PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH DEFAULT_REPO_TAG LOG_MUTE KERNEL_BRANCH
 
 case "$1" in
     repo-fetch)

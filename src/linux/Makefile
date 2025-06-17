@@ -9,7 +9,9 @@
 SHELL=/bin/bash
 include $(FBDIR)/configs/$(CONFIGLIST)
 include $(FBDIR)/include/repo.mk
-include $(FBDIR)/include/repo_update.inc
+include $(FBDIR)/include/download_repo.mk
+include $(FBDIR)/include/patch_apply.mk
+include $(FBDIR)/configs/.repo_pool
 
 include linux.mk
 include perf.mk

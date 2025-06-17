@@ -11,7 +11,7 @@ define dl_from_github
 	rm -f $(FBDIR)/dl/$(1)_$(3).tar.xz && \
 	mkdir -p $(FBDIR)/dl && \
 	md5=$(repo_$(1)_md5) && \
-	if [ -n $$md5 ]; then \
+	if [ -n "$${md5}" ]; then \
 		python3 $(FBDIR)/tools/dl_github_archive.py \
 			--dl-dir=$(FBDIR)/dl \
 			--url=$(2) \
@@ -19,7 +19,7 @@ define dl_from_github
 			--subdir=$(1) \
 			--source="$(1)_$(3).tar.xz" \
 			--hash=$$md5 \
-			|| ( echo Download failed; exit 1 ) \
+			|| { echo Download with md5 failed; exit 1; } \
 	else \
 		python3 $(FBDIR)/tools/dl_github_archive.py \
 			--dl-dir=$(FBDIR)/dl \
@@ -27,7 +27,7 @@ define dl_from_github
 			--version=$(3) \
 			--subdir=$(1) \
 			--source="$(1)_$(3).tar.xz" \
-			|| ( echo Download failed; exit 1 ) \
+			|| { echo Download without md5 failed; exit 1; } \
 	fi
 endef
 
@@ -57,13 +57,14 @@ endef
 # $1=package_name $2=dir $3=clone submodule or not
 #
 define download_repo
+	echo "Downloading the $(1) ..."; \
 	_URL=$(repo_$(1)_url); \
 	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)); \
 	\
-	[ -z "$${_URL}" ] && ( echo $${_URL} is not defined ; exit 1 ); \
-	[ -z "$${_VER}" ] && ( echo Repo version $${_VER}is not defined ; exit 1 ); \
+	[ -z "$${_URL}" ] && { echo $${_URL} is not defined ; exit 1; }; \
+	[ -z "$${_VER}" ] && { echo Repo version $${_VER}is not defined ; exit 1; }; \
 	\
-	_PKG_FILE=$(FBDIR)/dl/$(1)_$${_VER}.tar.xz; \
+	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.xz; \
 	_TARGET_DIR=$(PKGDIR)/$(2)/$(1); \
 	\
 	if [ -s "$${_PKG_FILE}" ]; then \
@@ -71,16 +72,16 @@ define download_repo
 	else \
 		echo "[INFO] Downloading: $(1) " $(LOG_MUTE); \
 		if [ "$(3)" = "true" ]; then \
-			$(call rawgit,$(1),$${_URL},$${_VER}) || ( echo Download failed; exit 1 ); \
+			$(call rawgit,$(1),$${_URL},$${_VER}) || { echo git clone failed; exit 1; }; \
 		else \
-			$(call dl_from_github,$(1),$${_URL},$${_VER}) || ( echo Download failed; exit 1 ); \
+			$(call dl_from_github,$(1),$${_URL},$${_VER}) || { echo Download failed; exit 1; }; \
 		fi; \
-	fi; \
+	fi && \
 	\
-	echo "[INFO] Extracting: $(1) " $(LOG_MUTE);  \
+	echo "[INFO] Extracting: $(1) " $(LOG_MUTE); \
 	if [ -d "$${_TARGET_DIR}" ]; then \
 		echo "[INFO] Target already exists" $(LOG_MUTE); \
 	else \
-		tar -xf "$${_PKG_FILE}" -C "$(PKGDIR)/$(2)"; \
+		tar -xf "$${_PKG_FILE}" -C "$(PKGDIR)/$(2)" || { echo "Extraction failed"; exit 1; }; \
 	fi
 endef

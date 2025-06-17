@@ -28,6 +28,6 @@ RUN apt-get update && apt-get install -y \
 	cpp-arm-linux-gnueabihf dosfstools ruby iputils-ping cpio rsync libtclap-dev     \
 	parted rpm2cpio lsb-release xutils-dev libwayland-bin cmake locales texinfo gawk \
 	chrpath diffstat scons libgflags-dev libhdf5-serial-dev python3-numpy python3-wheel \
-	python3-h5py
+	python3-h5py python3-yaml
 RUN git config --global user.email  "debian@nxp.com"
 RUN git config --global user.name "NXP debian"

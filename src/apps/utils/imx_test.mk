@@ -9,7 +9,8 @@ PLATFORM = IMX8
 
 imx_test: libdrm alsa_lib
 	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_test,apps/utils) && \
+	 $(call download_repo,imx_test,apps/utils) && \
+	 $(call patch_apply,imx_test,apps/utils) && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/mxc_asrc.h ]; then \
 	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

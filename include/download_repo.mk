@@ -7,7 +7,7 @@
 # $1=pkg_name $2=url $3=branch/tag/commit
 #
 define dl_from_github
-    echo "[INFO] Downloading $(1)_$(3).tar.xz..." $(LOG_MUTE); \
+    echo "[INFO] Downloading $(1)_$(3).tar.xz..."; \
 	rm -f $(FBDIR)/dl/$(1)_$(3).tar.xz && \
 	mkdir -p $(FBDIR)/dl && \
 	md5=$(repo_$(1)_md5) && \
@@ -35,7 +35,7 @@ endef
 # $1=pkg_name $2=url $3=branch/tag/commit
 #
 define rawgit
-	echo "[INFO] Cloning $(1) (with submodules) ... " $(LOG_MUTE); \
+	echo "[INFO] Cloning $(1) (with submodules) ... "; \
 	rm -rf $(FBDIR)/tmp/$(1) && \
 	_TMP_DIR=$(FBDIR)/tmp/$(1) && \
 	mkdir -p $${_TMP_DIR} && \
@@ -57,7 +57,6 @@ endef
 # $1=package_name $2=dir $3=clone submodule or not
 #
 define download_repo
-	echo "[INFO] Downloading the $(1) ..."; \
 	_URL=$(repo_$(1)_url); \
 	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)); \
 	\
@@ -70,7 +69,6 @@ define download_repo
 	if [ -s "$${_PKG_FILE}" ]; then \
 		echo "[INFO] Package exists: $(1)_$${_VER} " $(LOG_MUTE); \
 	else \
-		echo "[INFO] Downloading: $(1) " $(LOG_MUTE); \
 		if [ "$(3)" = "true" ]; then \
 			$(call rawgit,$(1),$${_URL},$${_VER}) || { echo git clone failed; exit 1; }; \
 		else \
@@ -78,10 +76,10 @@ define download_repo
 		fi; \
 	fi && \
 	\
-	echo "[INFO] Extracting: $(1) " $(LOG_MUTE); \
 	if [ -d "$${_TARGET_DIR}" ]; then \
 		echo "[INFO] Target already exists" $(LOG_MUTE); \
 	else \
+		echo "[INFO] Extracting: $(1) "; \
 		tar -xf "$${_PKG_FILE}" -C "$(PKGDIR)/$(2)" || { echo "Extraction failed"; exit 1; }; \
 	fi
 endef
@@ -90,7 +88,6 @@ endef
 # $1=package_name $2=dir
 #
 define download_git
-	echo "[INFO] Git clone package $(1) ..."; \
 	_URL=$(repo_$(1)_url) && \
 	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)) && \
 	\
@@ -98,11 +95,12 @@ define download_git
 	[ -z "$${_VER}" ] && { echo Repo version $${_VER}is not defined ; exit 1; }; \
 	\
 	if [ ! -d $(PKGDIR)/$(2)/$(1) ]; then \
+		echo "[INFO] Git clone package $(1) ..." && \
 		mkdir -p $(PKGDIR)/$(2) && \
 		cd $(PKGDIR)/$(2) && \
 		git clone $${_URL} $(PKGDIR)/$(2)/$(1) $(LOG_MUTE) && \
 		cd $(1) && git checkout $${_VER} $(LOG_MUTE) &&  \
 		git submodule update --init --recursive $(LOG_MUTE); \
-	fi && \
-	echo "{INFO} Git clone DONE."
+		echo "{INFO} Git clone DONE."; \
+	fi
 endef

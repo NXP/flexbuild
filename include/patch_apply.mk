@@ -7,7 +7,6 @@
 # $(1)=pkg_name, $(2)=app_dir $(3)=patchpattern
 #
 define patch_apply
-	echo "[INFO] Applying patches ..." $(LOG_MUTE); \
 	targetdir=$(PKGDIR)/$(2)/$(1) && \
 	patchdir=$(FBDIR)/patch/$(1) && \
 	patchpattern=$(or $(3),*.patch) && \
@@ -18,6 +17,7 @@ define patch_apply
 			exit 1; \
 		fi && \
 		\
+		echo "[INFO] Applying patches ..."; \
 		for i in $$(ls "$$patchdir"/$$patchpattern 2>/dev/null); do \
 			[ -d "$$i" ] && echo "Ignoring subdirectory '$$i' " $(LOG_MUTE) && continue; \
 			echo '' $(LOG_MUTE); \

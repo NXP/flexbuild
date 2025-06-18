@@ -6,7 +6,7 @@
 
 imx_firmware:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,imx_firmware,bsp) && \
+	 $(call download_git,imx_firmware,bsp) && \
 	 cd $(BSPDIR)/imx_firmware && \
 	 if [ -d $(FBDIR)/patch/imx_firmware ] && [ ! -f .patchdone ]; then \
 	     git am $(FBDIR)/patch/imx_firmware/*.patch $(LOG_MUTE) && touch .patchdone; \

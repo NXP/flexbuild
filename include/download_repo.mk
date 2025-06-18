@@ -57,7 +57,7 @@ endef
 # $1=package_name $2=dir $3=clone submodule or not
 #
 define download_repo
-	echo "Downloading the $(1) ..."; \
+	echo "[INFO] Downloading the $(1) ..."; \
 	_URL=$(repo_$(1)_url); \
 	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)); \
 	\
@@ -84,4 +84,25 @@ define download_repo
 	else \
 		tar -xf "$${_PKG_FILE}" -C "$(PKGDIR)/$(2)" || { echo "Extraction failed"; exit 1; }; \
 	fi
+endef
+
+#
+# $1=package_name $2=dir
+#
+define download_git
+	echo "[INFO] Git clone package $(1) ..."; \
+	_URL=$(repo_$(1)_url) && \
+	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)) && \
+	\
+	[ -z "$${_URL}" ] && { echo $${_URL} is not defined ; exit 1; }; \
+	[ -z "$${_VER}" ] && { echo Repo version $${_VER}is not defined ; exit 1; }; \
+	\
+	if [ ! -d $(PKGDIR)/$(2)/$(1) ]; then \
+		mkdir -p $(PKGDIR)/$(2) && \
+		cd $(PKGDIR)/$(2) && \
+		git clone $${_URL} $(PKGDIR)/$(2)/$(1) $(LOG_MUTE) && \
+		cd $(1) && git checkout $${_VER} $(LOG_MUTE) &&  \
+		git submodule update --init --recursive $(LOG_MUTE); \
+	fi && \
+	echo "{INFO} Git clone DONE."
 endef

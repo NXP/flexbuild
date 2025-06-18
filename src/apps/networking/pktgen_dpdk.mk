@@ -6,7 +6,8 @@
 
 pktgen_dpdk: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,pktgen_dpdk,apps/networking) && \
+	 $(call download_repo,pktgen_dpdk,apps/networking) && \
+	 $(call patch_apply,pktgen_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

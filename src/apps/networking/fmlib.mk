@@ -7,7 +7,8 @@
 
 fmlib:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,fmlib,apps/networking) && \
+	 $(call download_repo,fmlib,apps/networking) && \
+	 $(call patch_apply,fmlib,apps/networking) && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \

@@ -6,11 +6,12 @@
 
 aiopsl:
 	@[ $${MACHINE:0:5} != lx216 -a $${MACHINE:0:6} != ls1088 -a $${MACHINE:0:6} != ls2088 ] && exit || \
-	 $(call fbprint_b,"AIOPSL") && \
-	 $(call repo-mngr,fetch,aiopsl,apps/networking) && \
+	 $(call download_repo,aiopsl,apps/networking) && \
+	 $(call patch_apply,aiopsl,apps/networking) && \
+	 $(call fbprint_b,"aiopsl") && \
 	 cd $(NETDIR)/aiopsl && \
 	 mkdir -p $(DESTDIR)/usr/local/aiop/bin && \
 	 cp -rf misc/setup/scripts $(DESTDIR)/usr/local/aiop  && \
 	 cp -rf misc/setup/traffic_files $(DESTDIR)/usr/local/aiop && \
 	 cp -rf demos/images/* $(DESTDIR)/usr/local/aiop/bin && \
-	 $(call fbprint_d,"AIOPSL")
+	 $(call fbprint_d,"aiopsl")

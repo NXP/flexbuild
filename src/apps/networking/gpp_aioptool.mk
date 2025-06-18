@@ -6,8 +6,9 @@
 
 gpp_aioptool:
 	@[ $${MACHINE:0:3} != lx2 -a $${MACHINE:0:6} != ls2088 ] && exit || \
+	 $(call download_repo,gpp_aioptool,apps/networking) && \
+	 $(call patch_apply,gpp_aioptool,apps/networking) && \
 	 $(call fbprint_b,"gpp_aioptool") && \
-	 $(call repo-mngr,fetch,gpp_aioptool,apps/networking) && \
 	 cd $(NETDIR)/gpp_aioptool && \
 	 sed -i '/libio.h/d' flib/mc/fsl_mc_sys.h && \
 	 sed -i 's/= -Wall/= -fcommon -Wall/' Makefile && \

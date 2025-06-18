@@ -5,7 +5,8 @@
 
 ovs_dpdk: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,ovs_dpdk,apps/networking) && \
+	 $(call download_repo,ovs_dpdk,apps/networking) && \
+	 $(call patch_apply,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \

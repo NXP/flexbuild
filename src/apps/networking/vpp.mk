@@ -10,7 +10,7 @@
 
 vpp: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,vpp,apps/networking) && \
+	 $(call download_repo,vpp,apps/networking,true) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
@@ -32,7 +32,7 @@ vpp: dpdk
 	 /usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py || true && \
 	 \
 	 cd $(NETDIR)/vpp && \
-	 if [ ! -f .patchdone ]; then \
+	 if [ -d $(FBDIR)/patch/vpp ] && [ ! -f .patchdone ]; then \
 	      git am $(FBDIR)/patch/vpp/*.patch $(LOG_MUTE) && touch .patchdone; \
 	 fi && \
 	 sed -i -e 's/22.04)/12)/g' -e 's/clang-format-11/clang-format/g' \

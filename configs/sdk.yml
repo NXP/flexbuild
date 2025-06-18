@@ -157,6 +157,9 @@ repo:
   isp_vvcam_module:
     url:  https://github.com/nxp-imx/isp-vvcam.git
 
+  nxp_wlan_bt:
+    url:  https://github.com/nxp-imx/mwifiex.git
+
 
 # networking component repositories
   restool:
@@ -381,11 +384,6 @@ repo:
   cheese:
     url:  https://gitlab.gnome.org/GNOME/cheese.git
     tag:  43.0
-
-
-# connectivity component repositories
-  nxp_wlan_bt:
-    url:  https://github.com/nxp-imx/mwifiex.git
 
 
 # generic component repositories

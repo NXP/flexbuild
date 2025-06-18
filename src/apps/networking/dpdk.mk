@@ -16,13 +16,14 @@ DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool"
 
 dpdk:
 	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,dpdk,apps/networking) && \
-	 $(call repo-mngr,fetch,linux,linux) && \
+	 $(call download_repo,dpdk,apps/networking) && \
+	 $(call patch_apply,dpdk,apps/networking) && \
+	 $(call download_repo,linux,linux) && \
+	 $(call patch_apply,linux,linux) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
-	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	 if [ ! -f $(KERNEL_OUTPUT_PATH)/$$curbrch/.config ]; then \
+	 if [ ! -f $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)/.config ]; then \
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 \
@@ -33,7 +34,7 @@ dpdk:
 	 	--prefix=/usr --buildtype=release \
 		--strip \
 		-Denable_kmods=false \
-		-Dkernel_dir=$(KERNEL_OUTPUT_PATH)/$$curbrch \
+		-Dkernel_dir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) \
 		-Dexamples=$(DPDK_EXAMPLES) \
 		-Dc_args="-Ofast -fPIC -ftls-model=local-dynamic -Wno-error=implicit-function-declaration -I$(DESTDIR)/usr/include" \
 		-Doptimization=3 \

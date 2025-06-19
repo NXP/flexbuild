@@ -69,7 +69,7 @@ define fbprint_n
 	echo -e "$(green)$1 $(NC)"
 endef
 define fbprint_d
-	echo -e "$(GREEN)$1  [Done] $(NC)"
+	echo -e "$(GREEN)$1  [Done] \n $(NC)"
 endef
 define fbprint_w
         echo -e "$(YELLOW)$1 $(NC)"

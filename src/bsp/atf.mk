@@ -11,7 +11,7 @@ bldstr = "BUILD_STRING=$(DEFAULT_REPO_TAG)"
 atf:
 	@$(call download_repo,atf,bsp) && \
 	 $(call download_repo,uboot,bsp) && \
-	 $(call download_repo,mbedtls,bsp,true) && \
+	 $(call download_repo,mbedtls,bsp,submod) && \
 	 if [ "$(MACHINE)" = all ]; then $(call fbprint_w,"Please specify '-m <machine>'") && exit 0; fi && \
 	 if [ -z "$(BOOTTYPE)" ]; then $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; fi && \
 	 cd $(BSPDIR)/atf && \

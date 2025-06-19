@@ -32,7 +32,7 @@ define dl_from_github
 endef
 
 #
-# $1=pkg_name $2=url $3=branch/tag/commit
+# $1=pkg_name $2=url $3=branch/tag/commit $4={git: keep git info}
 #
 define rawgit
 	echo "[INFO] Cloning $(1) (with submodules) ... "; \
@@ -44,6 +44,9 @@ define rawgit
 	cd $${_TMP_DIR} && \
 	git checkout $(3) $(LOG_MUTE) && \
 	git submodule update --init --recursive $(LOG_MUTE) && \
+	if [  $(4) = "submod" ]; then \
+		rm -rf .git .gitmodules .github; \
+	fi && \
 	cd .. && \
 	echo "[INFO] Creating package $(1)_$(3).tar.xz" $(LOG_MUTE) && \
 	mkdir -p $(FBDIR)/dl && \
@@ -54,7 +57,7 @@ define rawgit
 endef
 
 #
-# $1=package_name $2=dir $3=clone submodule or not
+# $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.xz only}
 #
 define download_repo
 	_URL=$(repo_$(1)_url); \
@@ -69,11 +72,12 @@ define download_repo
 	if [ -s "$${_PKG_FILE}" ]; then \
 		echo "[INFO] Package exists: $(1)_$${_VER} " $(LOG_MUTE); \
 	else \
-		if [ "$(3)" = "true" ]; then \
-			$(call rawgit,$(1),$${_URL},$${_VER}) || { echo git clone failed; exit 1; }; \
-		else \
-			$(call dl_from_github,$(1),$${_URL},$${_VER}) || { echo Download failed; exit 1; }; \
-		fi; \
+		case "$(3)" in \
+			submod|git) \
+				$(call rawgit,$(1),$${_URL},$${_VER},$(3)) || { echo git clone failed; exit 1; } ;; \
+			*) \
+				$(call dl_from_github,$(1),$${_URL},$${_VER}) || { echo Download failed; exit 1; } ;; \
+		esac; \
 	fi && \
 	\
 	if [ -d "$${_TARGET_DIR}" ]; then \

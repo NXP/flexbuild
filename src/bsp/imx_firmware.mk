@@ -6,10 +6,10 @@
 
 imx_firmware:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call download_repo,imx_firmware,bsp,true) && \
+	 $(call download_repo,imx_firmware,bsp,git) && \
 	 cd $(BSPDIR)/imx_firmware && \
 	 if [ -d $(FBDIR)/patch/imx_firmware ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_firmware/*.patch $(LOG_MUTE) && touch .patchdone; \
+	     git am $(FBDIR)/patch/imx_firmware/*.patch $(LOG_MUTE) && touch .patchdone || exit 1; \
 	 fi && \
 	 mkdir -p $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/{nxp,imx,brcm} $(LOG_MUTE) && \
 	 echo Installing NXP WIFI/BT firmware && \

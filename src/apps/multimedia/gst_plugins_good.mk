@@ -8,11 +8,9 @@
 gst_plugins_good: gst_plugins_base libdrm
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,gst_plugins_good,apps/multimedia) && \
+	 $(call download_repo,gst_plugins_good,apps/multimedia) && \
+	 $(call patch_apply,gst_plugins_good,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_good && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/gst_plugins_good/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 sed -i 's/1\.1/0.61/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

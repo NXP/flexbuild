@@ -12,11 +12,9 @@
 gst_plugins_bad: gst_plugins_base
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,gst_plugins_bad,apps/multimedia) && \
+	 $(call download_repo,gst_plugins_bad,apps/multimedia) && \
+	 $(call patch_apply,gst_plugins_bad,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_bad && \
-         if [ ! -f .patchdone ]; then \
-             git am $(FBDIR)/patch/gst_plugins_bad/*.patch $(LOG_MUTE) && touch .patchdone; \
-         fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
 	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \

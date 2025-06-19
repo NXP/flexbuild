@@ -10,7 +10,8 @@ gst_plugins_ugly: gst_plugins_base
 ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,gst_plugins_ugly,apps/multimedia) && \
+	 $(call download_repo,gst_plugins_ugly,apps/multimedia) && \
+	 $(call patch_apply,gst_plugins_ugly,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_ugly && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \

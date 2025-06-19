@@ -9,11 +9,9 @@
 
 imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_gst_plugin,apps/multimedia) && \
+	 $(call download_repo,imx_gst_plugin,apps/multimedia) && \
+	 $(call patch_apply,imx_gst_plugin,apps/multimedia) && \
 	 cd $(MMDIR)/imx_gst_plugin && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_gst_plugin/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 export PKG_CONFIG_SYSROOT_DIR="" && \

@@ -13,11 +13,9 @@
 
 cheese: clutter_gst gst_plugins_bad
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,cheese,apps/multimedia) && \
+	 $(call download_repo,cheese,apps/multimedia,submod) && \
+	 $(call patch_apply,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \
-	 if [ ! -f .patchdone ]; then \
-	      git am $(FBDIR)/patch/cheese/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \

@@ -7,7 +7,8 @@
 optee_client:
 ifeq ($(CONFIG_OPTEE),y)
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,optee_client,apps/security) && \
+	 $(call download_repo,optee_client,apps/security) && \
+	 $(call patch_apply,optee_client,apps/security) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

@@ -40,7 +40,7 @@ define rawgit
 	_TMP_DIR=$(FBDIR)/tmp/$(1) && \
 	mkdir -p $${_TMP_DIR} && \
 	\
-	git clone --recursive $(2) $${_TMP_DIR} $(LOG_MUTE) && \
+	git clone $(2) $${_TMP_DIR} $(LOG_MUTE) && \
 	cd $${_TMP_DIR} && \
 	git checkout $(3) $(LOG_MUTE) && \
 	git submodule update --init --recursive $(LOG_MUTE) && \

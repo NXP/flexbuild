@@ -7,12 +7,10 @@
 optee_os:
 ifeq ($(CONFIG_OPTEE),y)
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 $(call download_repo,optee_os,apps/security) && \
+	 $(call patch_apply,optee_os,apps/security) && \
 	 $(call fbprint_b,"optee_os") && \
-	 $(call repo-mngr,fetch,optee_os,apps/security) && \
 	 cd $(SECDIR)/optee_os && \
-	 if [ -d $(FBDIR)/patch/optee_os ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/optee_os/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 if [ $(SOCFAMILY) = LS ]; then \
 		 if [ $(MACHINE) = lx2162aqds ]; then \
 		     brd=lx2160aqds; \
@@ -42,7 +40,7 @@ ifeq ($(CONFIG_OPTEE),y)
 		     brd=$${MACHINE:1}; \
 		 fi && \
 		 $(MAKE) PLATFORM=imx PLATFORM_FLAVOR=$$brd ARCH=arm CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=0 $(LOG_MUTE) && \
-		 $(CROSS_COMPILE)objcopy -v -O binary out/arm-plat-imx/core/tee.elf out/arm-plat-imx/core/tee_$(MACHINE).bin && \
+		 $(CROSS_COMPILE)objcopy -v -O binary out/arm-plat-imx/core/tee.elf out/arm-plat-imx/core/tee_$(MACHINE).bin $(LOG_MUTE) && \
 		 mkdir -p $(DESTDIR)/usr/lib/optee_armtz && \
 		 cp -f out/arm-plat-imx/export-ta_arm64/ta/*.ta $(DESTDIR)/usr/lib/optee_armtz/; \
 	fi && \

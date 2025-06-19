@@ -6,8 +6,9 @@
 
 cst:
 	@[ $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base -o $(SOCFAMILY) != LS ] && exit || \
+	 $(call download_repo,cst,apps/security) && \
+	 $(call patch_apply,cst,apps/security) && \
 	 $(call fbprint_b,"CST") && \
-	 $(call repo-mngr,fetch,cst,apps/security) && \
 	 cd $(SECDIR)/cst && \
 	 sed -i 's/^struct input_field/extern struct input_field/g' tools/*/*.c && \
 	 sed -i 's/-g -Wall/-g -Wno-deprecated-declarations -Wall/' Makefile && \

@@ -8,7 +8,7 @@
 
 dce:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call download_repo,dce,apps/networking,true) && \
+	 $(call download_repo,dce,apps/networking,submod) && \
 	 $(call patch_apply,dce,apps/networking) && \
 	 $(call fbprint_b,"dce") && \
 	 cd $(NETDIR)/dce && \

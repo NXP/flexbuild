@@ -6,13 +6,11 @@
 # NXP i.MX Security Middleware Library
 
 
-imx_smw:
+imx_smw: optee_client
 ifeq ($(CONFIG_SMW),y)
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,imx_smw,apps/security) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libteec.so ]; then \
-	     CONFIG_OPTEE=y bld optee_client -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+	 $(call download_repo,imx_smw,apps/security) && \
+	 $(call patch_apply,imx_smw,apps/security) && \
 	 $(call fbprint_b,"imx_smw") && \
 	 cd $(SECDIR)/imx_smw && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

@@ -8,7 +8,8 @@
 
 imx_pxp_g2d:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,imx_pxp_g2d,apps/graphics) && \
+	 $(call download_repo,imx_pxp_g2d,apps/graphics) && \
+	 $(call patch_apply,imx_pxp_g2d,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/pxp_device.h ]; then \
 	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

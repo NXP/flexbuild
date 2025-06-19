@@ -19,7 +19,7 @@ define dl_from_github
 			--subdir=$(1) \
 			--source="$(1)_$(3).tar.xz" \
 			--hash=$$md5 \
-			|| { echo Download with md5 failed; exit 1; } \
+			|| { echo Downloading with md5 failed; exit 1; } \
 	else \
 		python3 $(FBDIR)/tools/dl_github_archive.py \
 			--dl-dir=$(FBDIR)/dl \
@@ -27,7 +27,7 @@ define dl_from_github
 			--version=$(3) \
 			--subdir=$(1) \
 			--source="$(1)_$(3).tar.xz" \
-			|| { echo Download without md5 failed; exit 1; } \
+			|| { echo Downloading without md5 failed; exit 1; } \
 	fi
 endef
 

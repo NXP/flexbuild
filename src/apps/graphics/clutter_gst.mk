@@ -13,7 +13,8 @@
 
 clutter_gst: gst_plugins_bad cogl libdrm
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,clutter_gst,apps/graphics) && \
+	 $(call download_repo,clutter_gst,apps/graphics,submod) && \
+	 $(call patch_apply,clutter_gst,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
 	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
@@ -31,9 +32,6 @@ clutter_gst: gst_plugins_bad cogl libdrm
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgbm.so,libcogl.so,libgstallocators-1.0.so*,libclutter-gst-3.0.so.0} && \
 	 \
 	 cd $(GRAPHICSDIR)/clutter_gst && \
-	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/clutter_gst/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 sed -i 's/noinst_PROGRAMS/bin_PROGRAMS/' examples/Makefile.am && \
 	 sed -i 's/autoreconf -v --install/autoreconf --install/g' autogen.sh && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0 \

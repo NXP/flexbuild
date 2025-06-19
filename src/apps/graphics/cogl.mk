@@ -10,15 +10,13 @@
 
 cogl: gpu_viv
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,cogl,apps/graphics) && \
+	 $(call download_repo,cogl,apps/graphics,submod) && \
+	 $(call patch_apply,cogl,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/cogl && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libGLESv2.so ]; then \
 	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 $(call fbprint_b,"cogl") && \
-	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/cogl/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)  \
 		 -march=armv8-a+crc+crypto -mbranch-protection=standard -O2 \

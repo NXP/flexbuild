@@ -306,9 +306,13 @@ repo:
     url:  https://gitlab.gnome.org/GNOME/clutter-gst.git
     tag:  3.0.27
 
-  mesa:
-    url:  https://gitlab.freedesktop.org/mesa/mesa.git
-    tag:  mesa-23.0.3
+  vulkan_headers:
+    url: https://github.com/KhronosGroup/Vulkan-Headers.git
+    commit: 2bb0a23104ceffd9a2
+
+  vkmark:
+    url: https://github.com/vkmark/vkmark.git
+    commit: ab6e6f3407
 
 
 # multimedia component repositories

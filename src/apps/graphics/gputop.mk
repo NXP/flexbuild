@@ -8,7 +8,8 @@
 
 gputop: libgpuperfcnt
 	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,gputop,apps/graphics) && \
+	 $(call download_repo,gputop,apps/graphics) && \
+	 $(call patch_apply,gputop,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/gpuperfcnt/gpuperfcnt.h ]; then \
 	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

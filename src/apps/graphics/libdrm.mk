@@ -5,8 +5,9 @@
 libdrm:
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	 $(call download_repo,libdrm,apps/graphics) && \
+	 $(call patch_apply,libdrm,apps/graphics) && \
 	 $(call fbprint_b,"libdrm") && \
-	 $(call repo-mngr,fetch,libdrm,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/libdrm && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

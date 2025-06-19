@@ -6,19 +6,15 @@
 
 # DEPENDS: libvulkan1 libassimp-dev libglm-dev
 
-repo_vkmark_url=https://github.com/vkmark/vkmark.git
-repo_vkmark_commit=ab6e6f3407
 
 vkmark:
 ifeq ($(CONFIG_VKMARK),y)
 	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,vkmark,apps/graphics) && \
+	 $(call download_repo,vkmark,apps/graphics) && \
+	 $(call patch_apply,vkmark,apps/graphics) && \
 	 bld vulkan_headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 $(call fbprint_b,"vkmark") && \
 	 cd $(GRAPHICSDIR)/vkmark && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/vkmark/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 [ `hostname` = fbdebian ] && export PKG_CONFIG_SYSROOT_DIR="" || true && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

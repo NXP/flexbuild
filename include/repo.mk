@@ -63,7 +63,7 @@ YELLOW=\e[1;33m
 NC=\e[0m
 
 define fbprint_b
-        echo -e "$(green)\nBuilding $1 ... $(NC)"
+        echo -e "$(green)Building $1 ... $(NC)"
 endef
 define fbprint_n
 	echo -e "$(green)$1 $(NC)"

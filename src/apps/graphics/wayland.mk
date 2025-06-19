@@ -7,8 +7,9 @@ wayland:
 ifeq ($(CONFIG_WAYLAND),y)
 	@[ $(SOCFAMILY) = LS -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	 $(call download_repo,wayland,apps/graphics) && \
+	 $(call patch_apply,wayland,apps/graphics) && \
 	 $(call fbprint_b,"wayland") && \
-	 $(call repo-mngr,fetch,wayland,apps/graphics) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \
 	 export PKG_CONFIG_LIBDIR=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \

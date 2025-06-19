@@ -7,8 +7,9 @@
 wayland_protocols:
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	 $(call download_repo,wayland_protocols,apps/graphics) && \
+	 $(call patch_apply,wayland_protocols,apps/graphics) && \
 	 $(call fbprint_b,"wayland_protocols") && \
-	 $(call repo-mngr,fetch,wayland_protocols,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/wayland_protocols && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

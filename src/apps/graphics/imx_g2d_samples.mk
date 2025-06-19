@@ -24,7 +24,8 @@ endif
 
 imx_g2d_samples: imx_gpu_g2d
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,imx_g2d_samples,apps/graphics) && \
+	 $(call download_repo,imx_g2d_samples,apps/graphics) && \
+	 $(call patch_apply,imx_g2d_samples,apps/graphics) && \
 	 \
 	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so.2 ]; then \
 	     bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \

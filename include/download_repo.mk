@@ -66,6 +66,7 @@ define download_repo
 	[ -z "$${_URL}" ] && { echo $${_URL} is not defined ; exit 1; }; \
 	[ -z "$${_VER}" ] && { echo Repo version $${_VER}is not defined ; exit 1; }; \
 	\
+	mkdir -p $(PKGDIR)/$(2); \
 	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.xz; \
 	_TARGET_DIR=$(PKGDIR)/$(2)/$(1); \
 	\

@@ -7,7 +7,8 @@ EBIKE_DIR = ${GPNT_APPS_FOLDER}/scripts/multimedia/ebike-vit
 
 imx_ebike_vit:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_ebike_vit,apps/gopoint) && \
+	 $(call download_repo,imx_ebike_vit,apps/gopoint,git) && \
+	 $(call patch_apply,imx_ebike_vit,apps/gopoint) && \
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 #	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
 #	 fi && \

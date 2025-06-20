@@ -8,7 +8,8 @@ SMART_KITCHEN_DIR = ${GPNT_APPS_FOLDER}/scripts/multimedia/smart-kitchen
 
 imx_smart_kitchen:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_smart_kitchen,apps/gopoint) && \
+	 $(call download_repo,imx_smart_kitchen,apps/gopoint,git) && \
+	 $(call patch_apply,imx_smart_kitchen,apps/gopoint) && \
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 #	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
 #	 fi && \
@@ -25,9 +26,6 @@ imx_smart_kitchen:
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 $(call fbprint_b,"imx_smart_kitchen") && \
 	 cd $(GPDIR)/imx_smart_kitchen && \
-	 if [ -d $(FBDIR)/patch/imx_smart_kitchen ] && [ ! -f .patchdone ]; then \
-		 git am $(FBDIR)/patch/imx_smart_kitchen/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 sed -i 's|/home/root/.nxp-demo-experience|/opt/gopoint-apps|g' \
 	     main.cpp main.cpp misc/scripts/vit-notify/WWCommandNotify && \
 	 if [ ! -f lvgl/.patchdone ]; then \

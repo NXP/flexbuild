@@ -10,9 +10,10 @@ GPNT_GPU_SOURDIR = $(GPDIR)/gtec_demo_framework/build/Yocto/Ninja/release/DemoAp
 
 gtec_demo_framework:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"gtec_demo_framework") && \
-	 $(call repo-mngr,fetch,gtec_demo_framework,apps/gopoint) && \
+	 $(call download_repo,gtec_demo_framework,apps/gopoint) && \
+	 $(call patch_apply,gtec_demo_framework,apps/gopoint) && \
 	 \
+	 $(call fbprint_b,"gtec_demo_framework") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export EXTENSIONS="OpenGLES:GL_VIV_direct_texture,OpenGLES3:GL_EXT_color_buffer_float" && \
@@ -20,9 +21,6 @@ gtec_demo_framework:
 	 \
 	 ln -sf $(RFSDIR)/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	 cd $(GPDIR)/gtec_demo_framework && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/gtec_demo_framework/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 source ./prepare.sh && export DESTDIR='' && \
 	 # *DESTDIR* is for compiling, it is not the *DESTDIR* of flexbuild && \
 	 # FslBuild.py -vvvvv -c install --BuildThreads $(JOBS) --CMakeInstallPrefix . && \

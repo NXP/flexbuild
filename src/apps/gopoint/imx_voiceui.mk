@@ -14,7 +14,8 @@ IMX_VOICE_PLAYER_DIR = $(GPNT_APPS_FOLDER)/scripts/multimedia/imx-voiceplayer
 imx_voiceui:
 ifeq ($(CONFIG_IMX_VOICEUI),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,imx_voiceui,apps/gopoint) && \
+	 $(call download_repo,imx_voiceui,apps/gopoint) && \
+	 $(call patch_apply,imx_voiceui,apps/gopoint) && \
 	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \

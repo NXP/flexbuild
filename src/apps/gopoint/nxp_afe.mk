@@ -8,7 +8,8 @@
 nxp_afe:
 ifeq ($(CONFIG_NXP_AFE),y)
 	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,nxp_afe,apps/multimedia) && \
+	 $(call download_repo,nxp_afe,apps/multimedia) && \
+	 $(call patch_apply,nxp_afe,apps/multimedia) && \
 	 if  [ ! -f $(DESTDIR)/usr/lib/pkgconfig/alsa.pc ]; then \
 	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \

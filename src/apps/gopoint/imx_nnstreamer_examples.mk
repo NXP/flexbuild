@@ -16,12 +16,10 @@ IMX_NNSTREANER_DIR = $(GPNT_APPS_FOLDER)/scripts/machine_learning/nnstreamer
 imx_nnstreamer_examples:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base \
 	   -o $(DISTROVARIANT) = server ] && exit || \
+	 $(call download_repo,imx_nnstreamer_examples,apps/gopoint) && \
+	 $(call patch_apply,imx_nnstreamer_examples,apps/gopoint) && \
 	 $(call fbprint_b,"imx_nnstreamer_examples") && \
-	 $(call repo-mngr,fetch,imx_nnstreamer_examples,apps/gopoint) && \
 	 cd $(GPDIR)/imx_nnstreamer_examples && \
-	 if [ -d $(FBDIR)/patch/imx_nnstreamer_examples ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/imx_nnstreamer_examples/*.patch && touch .patchdone; \
-	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CXXFLAGS="-I$(DESTDIR)/usr/include/ -L$(DESTDIR)/usr/lib -lgstreamer-1.0" && \

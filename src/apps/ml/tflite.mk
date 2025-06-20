@@ -16,8 +16,9 @@ TFLITE_VERSION = tensorflow-lite-2.16.2
 
 tflite:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 $(call download_repo,tflite,apps/ml) && \
+	 $(call patch_apply,tflite,apps/ml) && \
 	 $(call fbprint_b,"tensorflow-lite") && \
-	 $(call repo-mngr,fetch,tflite,apps/ml) && \
 	 cd $(MLDIR)/tflite && \
 	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

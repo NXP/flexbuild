@@ -12,7 +12,8 @@
 
 tim_vx: gpu_viv
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,tim_vx,apps/ml) && \
+	 $(call download_repo,tim_vx,apps/ml) && \
+	 $(call patch_apply,tim_vx,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libOpenVX.so ]; then \
 	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

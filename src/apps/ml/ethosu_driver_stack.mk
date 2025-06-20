@@ -14,8 +14,9 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
 
 ethosu_driver_stack:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 $(call download_repo,ethosu_driver_stack,apps/ml) && \
+	 $(call patch_apply,ethosu_driver_stack,apps/ml) && \
 	 $(call fbprint_b,"ethosu_driver_stack") && \
-	 $(call repo-mngr,fetch,ethosu_driver_stack,apps/ml) && \
 	 cd $(MLDIR)/ethosu_driver_stack && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

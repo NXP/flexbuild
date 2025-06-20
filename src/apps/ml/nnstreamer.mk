@@ -8,7 +8,8 @@
 
 nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
+	 $(call download_repo,nnstreamer,apps/ml) && \
+	 $(call patch_apply,nnstreamer,apps/ml) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
@@ -26,9 +27,6 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 	 fi && \
 	 cd $(MLDIR)/nnstreamer && \
 	 rm -rf build_debian_arm64 && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/nnstreamer/*.patch $(LOG_MUTE) && touch .patchdone; \
-     fi && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
 	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \

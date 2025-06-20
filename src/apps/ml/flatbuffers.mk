@@ -10,8 +10,9 @@
 
 flatbuffers:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 $(call download_repo,flatbuffers,apps/ml) && \
+	 $(call patch_apply,flatbuffers,apps/ml) && \
 	 $(call fbprint_b,"flatbuffers") && \
-	 $(call repo-mngr,fetch,flatbuffers,apps/ml) && \
 	 cd $(MLDIR)/flatbuffers && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

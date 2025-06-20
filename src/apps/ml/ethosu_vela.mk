@@ -13,8 +13,9 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
 
 ethosu_vela:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 $(call download_repo,ethosu_vela,apps/ml) && \
+	 $(call patch_apply,ethosu_vela,apps/ml) && \
 	 $(call fbprint_b,"ethosu_vela") && \
-	 $(call repo-mngr,fetch,ethosu_vela,apps/ml) && \
 	 cd $(MLDIR)/ethosu_vela && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -I$(RFSDIR)/usr/include/python3.11" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \

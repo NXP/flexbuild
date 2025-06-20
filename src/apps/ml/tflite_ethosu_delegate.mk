@@ -9,7 +9,8 @@
 
 tflite_ethosu_delegate: tflite ethosu_driver_stack
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,tflite_ethosu_delegate,apps/ml) && \
+	 $(call download_repo,tflite_ethosu_delegate,apps/ml) && \
+	 $(call patch_apply,tflite_ethosu_delegate,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
 	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

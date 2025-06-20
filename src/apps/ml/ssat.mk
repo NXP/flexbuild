@@ -6,8 +6,9 @@
 
 ssat:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 $(call download_repo,ssat,apps/ml) && \
+	 $(call patch_apply,ssat,apps/ml) && \
 	 $(call fbprint_b,"ssat") && \
-	 $(call repo-mngr,fetch,ssat,apps/ml) && \
 	 cd $(MLDIR)/ssat && \
 	 install -p -m 0755 ssat.sh $(DESTDIR)/usr/bin/ && \
 	 install -p -m 0644 ssat-api.sh $(DESTDIR)/usr/bin/ && \

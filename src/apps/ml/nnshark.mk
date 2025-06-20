@@ -8,7 +8,8 @@
 
 nnshark: gst_plugins_bad libgpuperfcnt
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,nnshark,apps/ml) && \
+	 $(call download_repo,nnshark,apps/ml,submod) && \
+	 $(call patch_apply,nnshark,apps/ml) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
 	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

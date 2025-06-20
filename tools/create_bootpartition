@@ -7,7 +7,6 @@
 
 generate_bootpartition_tarball() {
     # check kernel image
-    [ -f $KERNEL_PATH/Makefile ] || bld repo-fetch linux
     [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release ] && \
     echo Building the dependent $kernel_img ... && \
     bld linux -p $SOCFAMILY -a $DESTARCH

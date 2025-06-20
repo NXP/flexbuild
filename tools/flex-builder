@@ -524,19 +524,6 @@ flex_auto_build() {
     echo "Time of fetching repo: `date`"
     [ -d $FBDIR/.git ] && echo Flexbuild HEAD commit: `git log -1 --oneline`
 
-    if [ ! -f $FBDIR/logs/.repodone ]; then
-        # bld repo-fetch
-        if [ "$UPDATE_REPO_PER_TAG" = y ]; then
-            bld repo-tag
-        elif [ "$UPDATE_REPO_PER_COMMIT" = y ]; then
-            bld repo-commit
-        else
-            # update all repos to latest HEAD commit by default
-            echo bld repo-update
-        fi
-        touch $FBDIR/logs/.repodone
-    fi
-
     echo "Time of build: `date`"
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
 

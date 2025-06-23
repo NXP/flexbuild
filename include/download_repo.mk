@@ -7,26 +7,24 @@
 # $1=pkg_name $2=url $3=branch/tag/commit
 #
 define dl_from_github
-    echo "[INFO] Downloading $(1)_$(3).tar.xz..."; \
-	rm -f $(FBDIR)/dl/$(1)_$(3).tar.xz && \
+    echo "[INFO] Downloading $(1)_$(3).tar.gz..."; \
+	rm -f $(FBDIR)/dl/$(1)_$(3).tar.gz && \
 	mkdir -p $(FBDIR)/dl && \
 	md5=$(repo_$(1)_md5) && \
 	if [ -n "$${md5}" ]; then \
-		python3 $(FBDIR)/tools/dl_github_archive.py \
+		python3 $(FBDIR)/tools/dl_github.py \
 			--dl-dir=$(FBDIR)/dl \
 			--url=$(2) \
 			--version=$(3) \
 			--subdir=$(1) \
-			--source="$(1)_$(3).tar.xz" \
 			--hash=$$md5 \
 			|| { echo Downloading with md5 failed; exit 1; } \
 	else \
-		python3 $(FBDIR)/tools/dl_github_archive.py \
+		python3 $(FBDIR)/tools/dl_github.py \
 			--dl-dir=$(FBDIR)/dl \
 			--url=$(2) \
 			--version=$(3) \
 			--subdir=$(1) \
-			--source="$(1)_$(3).tar.xz" \
 			|| { echo Downloading without md5 failed; exit 1; } \
 	fi
 endef
@@ -36,8 +34,8 @@ endef
 #
 define rawgit
 	echo "[INFO] Cloning $(1) (with submodules) ... "; \
-	rm -rf $(FBDIR)/tmp/$(1) && \
-	_TMP_DIR=$(FBDIR)/tmp/$(1) && \
+	rm -rf /tmp/$(1) && \
+	_TMP_DIR=/tmp/$(1) && \
 	mkdir -p $${_TMP_DIR} && \
 	\
 	git clone $(2) $${_TMP_DIR} $(LOG_MUTE) && \
@@ -48,16 +46,16 @@ define rawgit
 		rm -rf .git .gitmodules .github; \
 	fi && \
 	cd .. && \
-	echo "[INFO] Creating package $(1)_$(3).tar.xz" $(LOG_MUTE) && \
+	echo "[INFO] Creating package $(1)_$(3).tar.gz" $(LOG_MUTE) && \
 	mkdir -p $(FBDIR)/dl && \
-	tar -cJf $(1)_$(3).tar.xz $(1)/ && \
-	mv $(1)_$(3).tar.xz $(FBDIR)/dl && \
-	rm -rf $(FBDIR)/tmp/$(1); \
-	echo "[INFO] Package created: $(1)_$(3).tar.xz" $(LOG_MUTE)
+	tar -czf $(1)_$(3).tar.gz $(1)/ && \
+	mv $(1)_$(3).tar.gz $(FBDIR)/dl && \
+	rm -rf /tmp/$(1); \
+	echo "[INFO] Package created: $(1)_$(3).tar.gz" $(LOG_MUTE)
 endef
 
 #
-# $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.xz only}
+# $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.gz only}
 #
 define download_repo
 	_URL=$(repo_$(1)_url); \
@@ -67,7 +65,7 @@ define download_repo
 	[ -z "$${_VER}" ] && { echo Repo version $${_VER}is not defined ; exit 1; }; \
 	\
 	mkdir -p $(PKGDIR)/$(2); \
-	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.xz; \
+	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.gz; \
 	_TARGET_DIR=$(PKGDIR)/$(2)/$(1); \
 	\
 	if [ -s "$${_PKG_FILE}" ]; then \

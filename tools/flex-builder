@@ -805,6 +805,7 @@ shift
 done
 
 
+[ -z "${MACHINE}" ] && { echo "Please specify the board" ; exit 1; }
 [ -z "$CFGLISTYML" ] && CFGLISTYML=sdk.yml
 
 python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/sdk.yml $FBDIR/configs/.repo_pool
@@ -820,7 +821,6 @@ export CONFIGLIST CFGLISTYML
 . $FBDIR/configs/debian/extra_packages_list
 . $FBDIR/configs/.repo_pool
 
-[ -z "$MACHINE" ] && MACHINE=all
 [ "${MACHINE:0:7}" = "ls1021a" ] && DESTARCH=arm32
 
 if echo $MACHINE | grep -Eq 'imx6|imx7'; then
@@ -873,6 +873,14 @@ fi
 . $FBDIR/tools/create_bootpartition
 . $FBDIR/tools/create_composite_firmware
 . $FBDIR/tools/clean_components
+
+if ! echo "$LS_MACHINE_LIST" | grep -qw "$MACHINE" && ! echo "$IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
+	echo "Error: Invalid MACHINE '$MACHINE'."
+	echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
+	echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
+	exit 1
+fi
+
 
 [ $SOCFAMILY = IMX -a -z "$BOOT_TYPE" ] && BOOT_TYPE=sd
 [ $DESTARCH = arm64 ] && kernelname=Image && SOCARCH=aarch64 && SYSARCH=arm64

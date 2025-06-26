@@ -65,7 +65,7 @@ def create_output_filename(subdir: str, version: str) -> str:
     safe_version = re.sub(r'[^a-zA-Z0-9._-]', '_', version)
     return f"{subdir}_{safe_version}.tar.gz"
 
-def openwrt_repack(source_dir: str, output_path: str, subdir_name: str) -> None:
+def repack(source_dir: str, output_path: str, subdir_name: str) -> None:
     """
     OpenWrt standardized repacking method
     Key parameters:
@@ -92,6 +92,69 @@ def openwrt_repack(source_dir: str, output_path: str, subdir_name: str) -> None:
         ], check=True)
     finally:
         shutil.rmtree(temp_dir)
+
+def find_extracted_source_dir(extracted_dir: str, repo: str, version: str) -> str:
+    """Robust implementation for locating source directory from GitHub archive extraction
+
+    Args:
+        extracted_dir: Path where the archive was extracted
+        repo: Repository name (e.g., 'alsa-lib')
+        version: Version/ref (e.g., 'v1.2.11')
+
+    Returns:
+        Path to the identified source directory
+
+    Raises:
+        DownloadError: When no valid source directory can be determined
+    """
+    # 1. Normalize input parameters
+    repo = repo.lower().replace('.git', '')
+    version_clean = version.lstrip('vV').replace('/', '-')
+
+    # 2. Generate all possible naming patterns
+    separators = ['-', '_', '.', '']
+    version_prefixes = ['', 'v', 'V']
+    patterns = {
+        f"{repo}{sep}{vpre}{version_clean}"
+        for sep in separators
+        for vpre in version_prefixes
+    }
+
+    # 3. Try exact case-insensitive match first
+    for entry in os.listdir(extracted_dir):
+        if entry.lower() in patterns:
+            return os.path.join(extracted_dir, entry)
+
+    # 4. Fallback to partial matching (repo name + version fragment)
+    for entry in os.listdir(extracted_dir):
+        entry_lower = entry.lower()
+        if (repo in entry_lower) and (version_clean[:5] in entry_lower):
+            return os.path.join(extracted_dir, entry)
+
+    # 5. Smart fallback: Detect build system files
+    candidates = []
+    for entry in os.listdir(extracted_dir):
+        dir_path = os.path.join(extracted_dir, entry)
+        if os.path.isdir(dir_path):
+            # Check for common build system indicators
+            if any(os.path.exists(os.path.join(dir_path, marker))
+                  for marker in ['CMakeLists.txt', 'Makefile', 'configure.ac']):
+                candidates.append(dir_path)
+
+    # 6. Return if only one candidate exists
+    if len(candidates) == 1:
+        return candidates[0]
+
+    # 7. Final fallback: Select most recently modified directory
+    if candidates:
+        return max(candidates, key=lambda x: os.path.getmtime(x))
+
+    # 8. Exhausted all strategies
+    raise DownloadError(
+        "Failed to automatically determine source directory.\n"
+        f"Extracted contents: {os.listdir(extracted_dir)}\n"
+        f"Search parameters: repo={repo}, version={version}"
+    )
 
 def download_and_process(
     repo_url: str,
@@ -131,8 +194,8 @@ def download_and_process(
         check_gitmodules(extracted_dir)
 
         # 4. Standardized repacking
-        source_dir = os.path.join(extracted_dir, f"{repo}-{version}")
-        openwrt_repack(source_dir, output_file, subdir_name)
+        source_dir = find_extracted_source_dir(extracted_dir, repo, version)
+        repack(source_dir, output_file, subdir_name)
 
         # 5. Final hash verification
         if file_hash:

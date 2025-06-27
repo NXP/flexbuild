@@ -26,7 +26,8 @@ define dl_from_github
 			--version=$(3) \
 			--subdir=$(1) \
 			|| { echo Downloading without md5 failed; exit 1; } \
-	fi
+	fi; \
+	echo "[INFO] Downloading Done"
 endef
 
 #
@@ -87,3 +88,18 @@ define download_repo
 	fi
 endef
 
+
+#
+# $1=package_name $2=dir
+#
+define clone_repo
+	if [ -d $(PKGDIR)/$(2)/$(1) ]; then \
+		echo "[INFO] Target already exists" $(LOG_MUTE); \
+	else \
+		echo "[INFO] Clone $(1) ..."; \
+		cd $(PKGDIR)/$(2); \
+		git clone $(repo_$(1)_url) $(1) $(LOG_MUTE) && \
+		cd $(1) && git submodule update --init --recursive $(LOG_MUTE); \
+		echo "[INFO] Clone DONE."; \
+	fi
+endef

@@ -35,8 +35,16 @@ host_dependent_packages=" \
 # packages/components from source code against Debian rootfs libraries/headers
 # during build-time for NXP iMX & Layerscape MPU platforms.
 
+base_pkgs=" \
+	wpasupplicant ntpdate bridge-utils tcpdump mtd-utils pciutils \
+	hdparm psmisc libssl-dev usbutils sysstat lsb-release kexec-tools \
+	iptables libhugetlbfs0 strongswan libcharon-extra-plugins dmidecode \
+	flex rdate initramfs-tools fbset mmc-utils usbutils i2c-tools \
+	lm-sensors rt-tests linuxptp mosquitto xterm bluez pipewire pipewire-audio \
+	pipewire-pulse wireplumber locales libspa-0.2-bluetooth \
+"
 
-extra_server_devel_packages=" \
+ls_pkgs=" \
     libxml2-dev libtinyxml2-9 libssl-dev libsbc-dev libsndfile1-dev libwebp-dev \
     dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses5-dev libelf-dev \
     libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev libinput-dev libpixman-1-dev \
@@ -50,11 +58,16 @@ extra_server_devel_packages=" \
     libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd \
 "
 
-extra_desktop_devel_packages=" \
+imx9_pkgs=" \
+	libinput-tools libqt6core6 qt6-base-dev qt6-wayland qt6-declarative-dev \
+	qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window \
+	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript \
+	qml6-module-qt5compat-graphicaleffects glmark2-es2-wayland wayland-utils \
+	libgles2-mesa clinfo v4l-utils mesa-utils alsa-utils \
+	\
     libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev \
     libbsd-dev libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev \
     libwayland-bin libasound2-dev gstreamer1.0-libav libgstrtspserver-1.0-0 libgudev-1.0-dev \
-    libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev \
     libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev \
     libx264-dev libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev \
     libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev libassimp-dev \
@@ -62,4 +75,8 @@ extra_desktop_devel_packages=" \
     libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging \
     python3-venv libgtest-dev libboost-system1.74-dev libboost-thread1.74-dev libdbus-glib-1-dev \
     qt6-tools-dev libqt6svg6 libqt6svg6-dev libfmt-dev libdevil-dev nfs-common \
+"
+imx8_pkgs=" \
+	gnome chromium dmz-cursor-theme \
+    libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev \
 "

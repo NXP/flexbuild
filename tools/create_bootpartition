@@ -41,6 +41,7 @@ generate_bootpartition_tarball() {
     rm -f $bootpartdir/modules/$modversion/{build,source}
 
     # install /lib/firmware
+    fbprint_n "Installing firmware ..."
     mkdir -p $bootpartdir/firmware
     if [ $SOCFAMILY = IMX ]; then
 	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld sof_zephyr -a $DESTARCH -p $SOCFAMILY
@@ -65,7 +66,11 @@ generate_bootpartition_tarball() {
 	socseries=imx*; scrmask='imx6|imx7'
     fi
 
-    bld distroscr -a $DESTARCH -p $SOCFAMILY
+	if [ "$MACHINE" = all ]; then
+		bld distroscrall -a $DESTARCH -p $SOCFAMILY
+	else
+		bld distroscr -a $DESTARCH -p $SOCFAMILY -m $MACHINE
+	fi
 
     ls $FBOUTDIR/bsp/u-boot/$socseries*/*boot.scr | grep -E $scrmask | xargs -I {} cp {} $bootpartdir
 

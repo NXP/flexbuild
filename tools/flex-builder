@@ -7,7 +7,7 @@
 # Author: Shengzhou Liu <shengzhou.liu@nxp.com>
 #
 
-set -e
+[ -n "$FBDEBUG" ] && set -xe || set -e
 
 FB_VERSION=2.28.2506
 
@@ -218,7 +218,7 @@ generate_distro_bootscr() {
         [ "$IMA_EVM" = "y" ] && echo $distroboot_ima >> $FBOUTDIR/${distro_bootscript}.tmp || echo $distroboot >> $FBOUTDIR/${distro_bootscript}.tmp
         log_mute mkimage -A arm64 -O linux -T script -C none -a 0 -e 0  -n "boot.scr" -d $FBOUTDIR/${distro_bootscript}.tmp $FBOUTDIR/$distro_bootscript
         rm -f $FBOUTDIR/${distro_bootscript}.tmp
-        fbprint_d $distro_bootscript
+        fbprint_d $FBOUTDIR/$distro_bootscript
     fi
 }
 
@@ -319,6 +319,7 @@ pack_distro_rfs() {
             [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
             sudo umount $RFSDIR/sys
         fi
+		debian_rfs_post_config
     fi
 
     [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && \
@@ -335,12 +336,15 @@ pack_distro_rfs() {
 
 
 pack_app_components() {
-    local appsname=${DESTDIR##*/}
-    local appstarball=nxp_${appsname}_`date +%Y%m%d%H%M`.tar.zst
-    echo packing ${appstarball} ...
-    cd $FBOUTDIR/apps/$appsname && sudo tar --zstd -cf $FBOUTDIR/images/${appstarball} *
-    cd $FBOUTDIR/images && ln -sf $appstarball $FBOUTDIR/images/nxp_${appsname}.tar.zst
-    cd $FBDIR && fbprint_d $FBOUTDIR/images/${appstarball}
+	local appdeb_sym=nxp_apps_debian_${DISTRIB_VERSION}_${MACHINE}_`date +%Y%m%d%H%M`.deb
+	local appdeb=nxp_apps_debian_${DISTRIB_VERSION}_${MACHINE}.deb
+	local ver="${DISTRIB_VERSION:4}"
+	echo packing $appdeb
+	cd $FBOUTDIR/images
+	sudo fpm -s dir -t deb -n $appdeb -v $ver -a arm64 --deb-no-default-config-files --package $appdeb_sym \
+		"${FBOUTDIR}"/apps/apps_${DESTARCH}_${DISTROTYPE}_${MACHINE}/=/ 2>/dev/null
+	ln -sf $appdeb_sym $FBOUTDIR/images/$appdeb
+	fbprint_d $FBOUTDIR/images/${appdeb_sym}
 }
 
 
@@ -381,6 +385,18 @@ check_component_valid() {
     fi
 }
 
+check_board_valid() {
+	if [ -z "${MACHINE}" ] || [ "$MACHINE" = "all" ]; then
+		echo -e "Error: Please specify the board, for example: bld -m imx8mpevk \n"
+		exit 1
+	fi
+	if ! echo "$LS_MACHINE_LIST" | grep -qw "$MACHINE" && ! echo "$IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
+		echo "Error: Invalid board: '$MACHINE'."
+		echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
+		echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
+		exit 1
+	fi
+}
 
 check_binfmt_qemu() {
     if grep -q Ubuntu /etc/issue; then
@@ -486,14 +502,7 @@ build_rfs_and_apps() {
         bld packrfs -r debian:base -a $DESTARCH -p $SOCFAMILY
     fi
 
-    if [[ -z "$DISTROVARIANT" ]]; then
-        if [[ "${MACHINE}" == imx8* || "${MACHINE}" == imx9* || "${MACHINE}" == ls1028a* || "$MACHINE" == all ]]; then 
-            DISTROVARIANT=desktop
-        else
-            DISTROVARIANT=server
-        fi
-    fi
-
+    DISTROVARIANT=server
     bld rfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
     bld linux-headers -r debian:"$DISTROVARIANT" -a $DESTARCH
     bld apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
@@ -527,13 +536,21 @@ flex_auto_build() {
     echo "Time of build: `date`"
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
 
+    DISTROVARIANT=server
     bld linux -a $DESTARCH -p $SOCFAMILY
+    bld linux-headers -r debian:"$DISTROVARIANT" -a $DESTARCH
+    bld rfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
     bld linux-modules -a $DESTARCH -p $SOCFAMILY
+    bld apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
     bld distroscr -a $DESTARCH -p $SOCFAMILY
-    bld bspall -a $DESTARCH -p $SOCFAMILY
+    bld bsp -a $DESTARCH -p $SOCFAMILY
     bld boot -a $DESTARCH -p $SOCFAMILY
-    build_rfs_and_apps
+	#build_rfs_and_apps
+
+    bld merge-apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
+    bld packrfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
+
     cp -f $FBDIR/tools/flex-installer $FBOUTDIR/images
 	log_mute ls -goh $FBOUTDIR/images
 
@@ -586,10 +603,10 @@ check_debian_version() {
 }
 
 check_host_dependent_pkg() {
-	fbprint_n "Prepare the build environment on host ..."
+	fbprint_n "Prepare the build environment on host ... "
 
-    log_mute sudo apt-get autoclean && log_mute sudo apt-get update -y
-    log_mute sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $host_dependent_packages
+    show_one_line sudo apt-get autoclean && log_mute sudo apt-get update -y
+    show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $host_dependent_packages
 
     if [ ! -f ~/.gitconfig ] || [[ ! `grep 'name =' ~/.gitconfig` ]]; then
         echo [user] > ~/.gitconfig
@@ -605,6 +622,7 @@ check_host_dependent_pkg() {
     [ `hostname` = fbdebian ] && git config --global --add safe.directory $FBDIR
     [ `hostname` = fbdebian ] && nflag=.deppkgdonefbdeb || nflag=.deppkgdone
     check_toolchain && touch $FBDIR/logs/$nflag
+	log_mute gem install fpm
 }
 
 check_linux_config() {
@@ -700,6 +718,13 @@ set_loglevel() {
         exit 1
         ;;
 	esac
+}
+
+show_one_line() {
+	echo
+    "$@" 2>&1 | while IFS= read -r line; do
+		printf "\033[1A\033[2K\r%s\n" "$line"
+    done
 }
 
 fbprint_e() {
@@ -805,11 +830,11 @@ shift
 done
 
 
-[ -z "${MACHINE}" ] && { echo "Please specify the board" ; exit 1; }
 [ -z "$CFGLISTYML" ] && CFGLISTYML=sdk.yml
 
-python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/sdk.yml $FBDIR/configs/.repo_pool
-. $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
+python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/repo.yml $FBDIR/configs/.repo_pool
+python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/$CFGLISTYML $FBDIR/configs/.sdk.cfg
+#. $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
 chmod 666 $FBDIR/configs/.sdk.cfg $FBDIR/configs/.repo_pool
 CONFIGLIST=.sdk.cfg
 export CONFIGLIST CFGLISTYML
@@ -819,8 +844,8 @@ export CONFIGLIST CFGLISTYML
 . $FBDIR/tools/distro_poky
 . $FBDIR/tools/distro_buildroot
 . $FBDIR/configs/debian/extra_packages_list
-. $FBDIR/configs/.repo_pool
 
+[ -z "$MACHINE" ] && MACHINE=all
 [ "${MACHINE:0:7}" = "ls1021a" ] && DESTARCH=arm32
 
 if echo $MACHINE | grep -Eq 'imx6|imx7'; then
@@ -841,17 +866,11 @@ fi
 
 [ "$1" = mkitb -a -z "$DISTROTYPE" ] && DISTROTYPE=poky && DISTROVARIANT=tiny
 [ -z "$DISTROTYPE" ] && DISTROTYPE=debian
-if [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $SOCFAMILY = IMX -a $DESTARCH = arm64 ]; then
-    DISTROVARIANT=desktop
-elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $SOCFAMILY = LS -a "${MACHINE:0:7}" = ls1028a  ]; then
-    DISTROVARIANT=desktop
-elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ]; then
+if [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ]; then
     DISTROVARIANT=server
 elif [ -z "$DISTROVARIANT" ] && [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ]; then
     DISTROVARIANT=tiny
 fi
-
-[ "${MACHINE:0:7}" = ls1028a -a -z "$DISTROVARIANT" ] && DISTROVARIANT=desktop
 
 [ -z "$FBOUTDIR" ] && FBOUTDIR=$DEFAULT_OUT_PATH
 [ -z "$PKGDIR" ] && PKGDIR=$DEFAULT_PKGDIR
@@ -873,13 +892,6 @@ fi
 . $FBDIR/tools/create_bootpartition
 . $FBDIR/tools/create_composite_firmware
 . $FBDIR/tools/clean_components
-
-if ! echo "$LS_MACHINE_LIST" | grep -qw "$MACHINE" && ! echo "$IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
-	echo "Error: Invalid MACHINE '$MACHINE'."
-	echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
-	echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
-	exit 1
-fi
 
 
 [ $SOCFAMILY = IMX -a -z "$BOOT_TYPE" ] && BOOT_TYPE=sd
@@ -904,7 +916,11 @@ elif [ -z "$CODENAME" -a $DISTROTYPE = debian ]; then
 fi
 
 if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
-    RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}
+	if [ $DISTROVARIANT = base ]; then
+		RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}
+	else
+		RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${MACHINE}_${DESTARCH}
+	fi
 elif [ $DISTROTYPE = buildroot ]; then
     RFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_buildroot_${DISTROVARIANT}_${DESTARCH}/target
 elif [ $DISTROTYPE = poky ]; then
@@ -920,7 +936,7 @@ fi
 if [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ]; then
     DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}
 else
-    DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}_${DISTROVARIANT}
+    DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}_${MACHINE}
 fi
 
 [ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && log_mute echo $DISTROTYPE desktop supports only arm64 && exit
@@ -932,7 +948,7 @@ initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIA
 
 [ $DISTROVARIANT != base ] && mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
-mkdir -p $PKGDIR/linux $FBDIR/logs $RFSDIR
+mkdir -p $PKGDIR/linux $FBDIR/logs
 mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}
 mkdir -p $KERNEL_OUTPUT_PATH
 
@@ -1015,13 +1031,12 @@ fi
 tmppath=$(realpath $FBOUTDIR/linux/kernel)
 [ ${tmppath##*/} != $KERNEL_TREE ] && rm -f $FBOUTDIR/linux/kernel && ln -s $KERNEL_TREE $FBOUTDIR/linux/kernel
 
-[ -z "$MACHINE" ] && MACHINE=all
 if [ $MACHINE = all -a $SOCFAMILY = LS -a $DESTARCH = arm64 ]; then
-    machinelist=$(echo $LS_MACHINE_LIST | sed -e 's/ls1021atwr//' -e 's/ls1021aqds//')
+    machinelist=$LS_MACHINE_LIST
 elif [ $MACHINE = all -a $SOCFAMILY = LS -a $DESTARCH = arm32 ]; then
-    machinelist=ls1021atwr
+    machinelist="ls1021atwr ls1021aqds"
 elif [ $MACHINE = all -a $SOCFAMILY = IMX -a $DESTARCH = arm64 ]; then
-    machinelist=$(echo $IMX_MACHINE_LIST | sed 's/imx6qsabresd imx6qpsabresd imx6sllevk imx7ulpevk//')
+    machinelist=$IMX_MACHINE_LIST
 elif [ $MACHINE = all -a $SOCFAMILY = IMX -a $DESTARCH = arm32 ]; then
     machinelist="imx6qsabresd imx6qpsabresd imx6sllevk imx7ulpevk"
 else
@@ -1100,6 +1115,11 @@ case "$1" in
         fbprint_d "Build all composite firmware"; exit
         ;;
     distroscr)
+		check_board_valid
+        generate_distro_bootscr $MACHINE
+        exit
+        ;;
+    distroscrall)
         for brd in $machinelist; do
             generate_distro_bootscr $brd
         done
@@ -1113,7 +1133,7 @@ case "$1" in
         [ $MACHINE = all ] && brdlist=$machinelist || brdlist=$MACHINE
         for brd in $brdlist; do
             for boottype in $boottypelist; do
-            secure_sign_image $brd $boottype
+                secure_sign_image $brd $boottype
             done
         done
         exit
@@ -1128,6 +1148,7 @@ case "$1" in
         convert_rfs_raw_to_ext4; exit
         ;;
     packrfs)
+		check_board_valid
         pack_distro_rfs; exit
         ;;
     packapp|packapps)
@@ -1185,6 +1206,7 @@ case $1 in
         ;;
 
     app|apps)
+		check_board_valid
         if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY} ]; then
             $MAKE -C $FBDIR/src $1
             #touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
@@ -1195,6 +1217,7 @@ case $1 in
 
     *)
         check_component_valid $1
+		check_board_valid
         $MAKE -C $FBDIR/src $1
         ;;
 esac

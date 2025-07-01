@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:trixie
 
 ARG http_proxy
 ENV http_proxy=$http_proxy

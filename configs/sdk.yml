@@ -1,21 +1,21 @@
 # NXP Debian Linux SDK Distribution configuration for iMX and Layerscape MPU platforms
 
 DISTRIB_NAME:    "NXP Debian Linux SDK"
-DISTRIB_VERSION: "lsdk2506"
+DISTRIB_VERSION: "lsdk2512"
 RELEASE_TYPE:    "external"
 
 
 # default repo tag which can be overrided by specified tag
-DEFAULT_REPO_TAG: "lf-6.6.52-2.2.0"
+DEFAULT_REPO_TAG: "lf-6.12.20-2.0.0"
 
 # default Debian version for target userland
-DEBIAN_CODENAME: "bookworm"
-DEBIAN_VERSION:  "12"
+DEBIAN_CODENAME: "trixie"
+DEBIAN_VERSION:  "13"
 
 # default build options for CI auto build
 BUILD_DEBIAN_BASE: n
 BUILD_DEBIAN_SERVER: y
-BUILD_DEBIAN_DESKTOP: y
+BUILD_DEBIAN_DESKTOP: n
 BUILD_YOCTO_RFS: n
 BUILD_BUILDROOT_RFS: n
 

@@ -55,7 +55,7 @@ EOF
 
 
 check_toolchain() {
-    tc_version='11.x or 12.x or 13.x'
+    tc_version='12.x or 13.x or 14.x'
     if [ $DESTARCH = arm32 ] && [ $HOSTARCH = x86_64 -o $HOSTARCH = aarch64 -o $HOSTARCH = i686 ]; then
         [ -f /usr/bin/arm-linux-gnueabihf-gcc ] && gccversion=$(arm-linux-gnueabihf-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
         if [ $gccversion = 0 ]; then
@@ -584,9 +584,9 @@ check_proxy() {
 }
 
 check_debian_version() {
-    if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/issue | grep -iE '^Debian GNU/Linux 12'` ]]; then
+    if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/issue | grep -iE '^Debian GNU/Linux trixie'` ]]; then
         if [ "$FORCE_BUILD_IN_DOCKER" = y -a "$FORCE" != y ]; then
-            fbprint_w "The host is not Debian 12 system, please install docker (refer to docs/FAQ-docker-setup.md) and run 'bld docker' to build in docker" && exit
+            fbprint_w "The host is not Debian 13 system, please install docker (refer to docs/FAQ-docker-setup.md) and run 'bld docker' to build in docker" && exit
         fi
     else
         [ -f /usr/bin/lsb_release ] || log_mute sudo apt-get install -y lsb-release

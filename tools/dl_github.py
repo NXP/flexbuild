@@ -185,10 +185,11 @@ def download_and_process(
         download_file(archive_url, temp_file)
 
         # 2. Extract original archive
+        sys.stdout.write(f"Checking and repacking ... \n")
         extracted_dir = os.path.join(temp_dir, "extracted")
         os.makedirs(extracted_dir)
         with tarfile.open(temp_file, "r:gz") as tar:
-            tar.extractall(extracted_dir)
+            tar.extractall(extracted_dir, filter='data')
         
         # 3. Check for submodules
         check_gitmodules(extracted_dir)

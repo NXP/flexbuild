@@ -337,7 +337,7 @@ pack_distro_rfs() {
 
 pack_app_components() {
 	local appdeb_sym=nxp_apps_debian_${DISTRIB_VERSION}_${MACHINE}_`date +%Y%m%d%H%M`.deb
-	local appdeb=nxp_apps_debian_${DISTRIB_VERSION}_${MACHINE}.deb
+	local appdeb=nxp_apps_arm64_debian_${DISTRIB_VERSION}_${MACHINE}.deb
 	local ver="${DISTRIB_VERSION:4}"
 	echo packing $appdeb
 	cd $FBOUTDIR/images
@@ -584,7 +584,7 @@ check_proxy() {
 }
 
 check_debian_version() {
-    if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/issue | grep -iE '^Debian GNU/Linux trixie'` ]]; then
+    if [[ ! -f /etc/os-release ]] || [[ ! `cat /etc/issue | grep -iE '^Debian GNU/Linux 13'` ]]; then
         if [ "$FORCE_BUILD_IN_DOCKER" = y -a "$FORCE" != y ]; then
             fbprint_w "The host is not Debian 13 system, please install docker (refer to docs/FAQ-docker-setup.md) and run 'bld docker' to build in docker" && exit
         fi
@@ -622,7 +622,7 @@ check_host_dependent_pkg() {
     [ `hostname` = fbdebian ] && git config --global --add safe.directory $FBDIR
     [ `hostname` = fbdebian ] && nflag=.deppkgdonefbdeb || nflag=.deppkgdone
     check_toolchain && touch $FBDIR/logs/$nflag
-	log_mute gem install fpm
+    log_mute gem install fpm
 }
 
 check_linux_config() {
@@ -721,10 +721,24 @@ set_loglevel() {
 }
 
 show_one_line() {
-	echo
-    "$@" 2>&1 | while IFS= read -r line; do
-		printf "\033[1A\033[2K\r%s\n" "$line"
-    done
+  case "${LOG_LEVEL:-2}" in
+    0)
+      "$@"
+      ;;
+    1)
+      "$@" >/dev/null
+      ;;
+    2)
+		echo
+		"$@" 2>&1 | while IFS= read -r line; do
+			printf "\033[1A\033[2K\r%s\n" "$line"
+		done
+      ;;
+	*)
+		echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
+		exit 1
+		;;
+  esac
 }
 
 fbprint_e() {

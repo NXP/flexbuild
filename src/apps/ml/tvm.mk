@@ -14,7 +14,7 @@
 
 # COMPATIBLE_MACHINE: imx8mp
 
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
 
 tvm: tim_vx
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \

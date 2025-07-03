@@ -27,9 +27,9 @@ vpp: dpdk
 	 export EXTRA_LIBS=$(RFSDIR)/lib/aarch64-linux-gnu && \
 	 export DPDK_PATH=$(DESTDIR)/usr && \
 	 export LD_LIBRARY_PATH=$(DESTDIR)/usr/local/lib:$(RFSDIR)/lib/aarch64-linux-gnu:$(RFSDIR)/lib && \
-	 [ ! -f /usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py ] && \
-	 sudo ln -s $(RFSDIR)/usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py \
-	 /usr/lib/python3.11/_sysconfigdata__aarch64-linux-gnu.py || true && \
+	 [ ! -f /usr/lib/python3.13/_sysconfigdata__aarch64-linux-gnu.py ] && \
+	 sudo ln -s $(RFSDIR)/usr/lib/python3.13/_sysconfigdata__aarch64-linux-gnu.py \
+	 /usr/lib/python3.13/_sysconfigdata__aarch64-linux-gnu.py || true && \
 	 \
 	 cd $(NETDIR)/vpp && \
 	 if [ -d $(FBDIR)/patch/vpp ] && [ ! -f .patchdone ]; then \

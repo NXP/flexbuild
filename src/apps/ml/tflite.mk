@@ -6,7 +6,7 @@
 # Version: 2.16.2
 
 # DEPEND: protobuf-compiler + libprotobuf-dev + libprotoc-dev for protoc on host
-# libpython3.11-dev python3-pybind11 on target
+# libpython3.13-dev python3-pybind11 on target
 
 # run ./benchmark_model --external_delegate_path=<patch_to_libvx_delegate.so> --graph=<tflite_model.tflite>
 
@@ -50,7 +50,7 @@ tflite:
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/public && \
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/platform && \
 	 install -d $(DESTDIR)/usr/include/tsl/platform && \
-	 install -d $(DESTDIR)/usr/lib/python3.11/site-packages && \
+	 install -d $(DESTDIR)/usr/lib/python3.13/dist-packages && \
 	 cd $(MLDIR)/tflite/tensorflow/lite && \
 	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite && \
 	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public && \
@@ -74,7 +74,7 @@ tflite:
 	 $(call fbprint_n,"install mobilenet tflite file python example and pip package") && \
 	 cp $(MLDIR)/tflite/mobilenet_*.tflite $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
-	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.11/site-packages \
+	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.13/dist-packages \
 		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE) && \
 	 #rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
 	 $(call fbprint_d,"tflite")

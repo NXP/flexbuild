@@ -8,7 +8,7 @@
 
 PV = "2.0.0"
 PYV = "cp311"
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
 
 
 pytorch:

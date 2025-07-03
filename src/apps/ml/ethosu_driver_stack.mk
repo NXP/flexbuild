@@ -9,7 +9,7 @@
 
 # COMPATIBLE_MACHINE: imx93
 
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
 
 
 ethosu_driver_stack:

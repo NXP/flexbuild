@@ -8,58 +8,46 @@
 #
 # Install NXP-specific packages and extra deb packages for Debian on i.MX and Layerscape platforms.
 
+LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1012aqds ls1028ardb ls1028aqds ls1043ardb ls1043aqds ls1046ardb ls1046aqds ls1046afrwy ls1088ardb ls1088aqds ls2088ardb ls2088aqds lx2160ardb lx2160aqds lx2162aqds"
+IMX_MACHINE_LIST="imx8mmevk imx8mpevk imx8mpfrdm imx8mnevk imx8
+show_one_line() {
+	echo
+	"$@" 2>&1 | while IFS= read -r line; do
+		printf "\033[1A\033[2K\r%s\n" "$line"
+	done
+}
+
+
+check_board_valid() {
+	if [ -z "${MACHINE}" ] || [ "$MACHINE" = "all" ]; then
+		echo -e "Error: Please specify the board, for example: bld -m imx8mpevk \n"
+		exit 1
+	fi
+	if ! echo "$LS_MACHINE_LIST" | grep -qw "$MACHINE" && ! echo "$IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
+		echo "Error: Invalid board: '$MACHINE'."
+		echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
+		echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
+		exit 1
+	fi
+}
+
 set -e
 
-DEFAULT_DL_URL=http://www.nxp.com/lgfiles/sdk/lsdk2506
+DEFAULT_DL_URL=https://www.nxp.com/lgfiles/sdk/lsdk2512
 
-NXPAPPSPKG=nxp_apps_arm64_debian_$1.tar.zst
 
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 
-if [ "$1" != server -a "$1" != desktop ]; then
-cat <<EOF
-  run 'debian-post-install-pkg server' to install extra packages for Debian server (without GUI desktop)
-  run 'debian-post-install-pkg desktop' to install extra packages for Debian desktop
-EOF
+NXPAPPSPKG=nxp_apps_arm64_debian_lsdk2512_${board_id}.deb
+
+if [[ -n "$1" && ! "$1" =~ ^http ]]; then
+  echo run 'debian-post-install-pkg url' to install packages from specified url address.
+  echo Or run 'debian-post-install-pkg' to install packages from default url
   exit
 fi
 
-
-pkglist_server="base-files dnsutils ntpdate bridge-utils tcpdump mtd-utils pciutils hdparm psmisc libssl-dev usbutils
-	sysstat lsb-release kexec-tools iptables libhugetlbfs0 strongswan libcharon-extra-plugins
-	dmidecode flex rdate initramfs-tools fbset mmc-utils usbutils i2c-tools lm-sensors rt-tests
-	linuxptp mosquitto xterm bluez pipewire pipewire-audio pipewire-pulse wireplumber libspa-0.2-bluetooth"
-
-
-pkglist_desktop="gnome chromium libinput-tools libqt6core6 qt6-base-dev qt6-wayland
-	qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window
-	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript
-	qml6-module-qt5compat-graphicaleffects glmark2-es2-wayland wayland-utils libgles2-mesa clinfo
-	v4l-utils mesa-utils alsa-utils dmz-cursor-theme"
-
-
-pkglist_server_dev="libxml2-dev libtinyxml2-9 libjsoncpp-dev libssl-dev libsbc-dev libsndfile1-dev libwebp-dev
-	libnuma-dev libpcap-dev libtclap-dev libncurses5-dev libelf-dev libnl-genl-3-dev libreadline-dev libffi-dev
-	libudev-dev libinput-dev libpixman-1-dev libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.3-dev
-	libsystemd-dev libxcb-composite0-dev libxcursor-dev libxcb-cursor-dev libseat-dev seatd libtinfo-dev
-	libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev uuid-dev libpython3.11-dev
-	python3-pip python3-pybind11 python3-numpy python3-pillow python3-flatbuffers python3-decorator python3-numpy
-	python3-attr python3-psutil python3-lxml libflatbuffers-dev libcpuinfo-dev libwaffle-dev libpciaccess-dev
-    liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev libjpeg62-turbo-dev
-    dh-autoreconf rsync dbus-user-session hostapd "
-
-
-pkglist_desktop_dev="libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev libbsd-dev
-	libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev libwayland-bin libasound2-dev gstreamer1.0-libav
-	libgstrtspserver-1.0-0 libgudev-1.0-dev libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
-	libgnome-desktop-3-dev libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev libx264-dev
-	libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev libpulse-dev libspeex-dev x264 libtag1-dev
-	libvulkan-dev libglm-dev libassimp-dev libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev
-    libtheora-dev libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging python3-venv
-    libgtest-dev libboost-system1.74-dev libboost-thread1.74-dev libdbus-glib-1-dev qt6-tools-dev libqt6svg6
-    libqt6svg6-dev libfmt-dev libdevil-dev nfs-common "
-
+source /etc/extra_packages_list
 
 if ! `ping deb.debian.org -c 2 1>/dev/null 2>&1`; then
   echo ERROR: unable to access deb.debian.org !
@@ -77,42 +65,36 @@ fi
 [ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
 
 echo -e "\e[0;32mPreparing to install packages ...\e[0m"
-sudo apt-get update -y 1>/dev/null
+show_one_line sudo apt-get update -y 
 
-[ "$1" = server ] && pkglist_desktop="" && pkglist_desktop_dev=""
+case "$board_id" in
+	   imx8*|ls1028*)   PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs" ;;
+	   imx9*)   PKGS="$ls_pkgs $imx9_pkgs" ;;
+	   ls*|lx*) PKGS="$ls_pkgs" ;;
+	   *)       echo "machine is not supported"; exit 1;  ;;
+esac
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q apt-utils $pkglist_server $pkglist_server_dev $pkglist_desktop $pkglist_desktop_dev
-
-if [[ "$board_id" == imx93* && "$1" == "desktop" ]]; then
-    sudo rm -f /usr/lib/aarch64-linux-gnu/{libGLESv2.so,libEGL.so,libgbm.so,libcogl.so,libgstallocators-1.0.so,libvulkan.so}
-fi
+show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y apt-utils $base_pkgs $PKGS
 
 echo -e "\e[0;32mInstalling Debian packages successfully.\e[0m"
 
-[ -n "$2" ] && pkglink=$2 || pkglink=$DEFAULT_DL_URL
+[ -n "$1" ] && pkglink=$1 || pkglink=$DEFAULT_DL_URL
 
 echo -e "\e[0;32mDownloading and installing NXP-specific packages ...\e[0m"
-rm -rf /tmp/dl
-mkdir -p /tmp/dl
-rm -rf ${NXPAPPSPKG}*
+rm -rf ${NXPAPPSPKG}
 wget $pkglink/$NXPAPPSPKG -q --show-progress || { echo "Downloading ${NXPAPPSPKG} failed "; exit 1; }
-sudo tar -I zstd -xf $NXPAPPSPKG -C /tmp/dl
-rsync -a --exclude='/lib/' /tmp/dl/ /
-[ -d /tmp/dl/lib/ ] && rsync -a /tmp/dl/lib/ /usr/lib/
-rm -rf ${NXPAPPSPKG}*
+show_one_line dpkg -i --force-overwrite ${NXPAPPSPKG}
+rm -rf ${NXPAPPSPKG}
 
-echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
+echo -e "\e[0;32mInstalling NXP-specific packages successfully.\e[0m"
 
-if [[ "$1" == "desktop" ]]; then
-	sudo DEBIAN_FRONTEND=noninteractive apt-get reinstall -y $pkglist_desktop 1>/dev/null
-fi
+#show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get reinstall -y $reinst_pkgs
 
 sudo apt-get clean
 sudo apt-get autoclean
 sudo apt-get autoremove -y
 
 [ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
-sed -i "s/Debian base/Debian $1/" /etc/issue
 
 echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
 

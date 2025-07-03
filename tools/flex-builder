@@ -313,13 +313,15 @@ convert_rfs_raw_to_ext4() {
 pack_distro_rfs() {
     [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit; }
     if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
+		debian_rfs_post_config
         test -c $RFSDIR/dev/pts/0 && sudo umount $RFSDIR/dev/pts
         test -f $RFSDIR/proc/uptime && sudo umount $RFSDIR/proc
         if [ -d $RFSDIR/sys/devices ]; then
             [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
             sudo umount $RFSDIR/sys
         fi
-		debian_rfs_post_config
+		sudo umount $RFSDIR/sys >/dev/null 2>&1 || true
+		sudo umount $RFSDIR/dev >/dev/null 2>&1 || true
     fi
 
     [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && \
@@ -644,6 +646,7 @@ do_clean() {
 }
 
 do_clean_rfs() {
+	set -x
     if [ $DISTROTYPE = poky ]; then
         echo cleaning $pokytmpdir ... && sudo rm -rf $pokytmpdir
         sudo rm -rf $FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}
@@ -652,15 +655,19 @@ do_clean_rfs() {
         rm -rf ${RFSDIR%/*}
         fbprint_d "clean ${RFSDIR%/*}"
     else
-        [ -c $RFSDIR/dev/pts/ptmx ] && sudo umount $RFSDIR/dev/pts || true
+		sudo umount $RFSDIR/sys >/dev/null 2>&1 || true
+		sudo umount $RFSDIR/dev >/dev/null 2>&1 || true
+        sudo umount $RFSDIR/dev/pts >/dev/null 2>&1 || true
         [ -f $RFSDIR/proc/uptime ] && sudo umount $RFSDIR/proc || true
         if [ -d $RFSDIR/sys/devices ]; then
             [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
-                sudo umount $RFSDIR/sys
+                sudo umount $RFSDIR/sys || true
         fi
+
         sudo rm -rf $RFSDIR && rm -rf $FBOUTDIR/images/${RFSDIR##*/}*
         fbprint_d "clean distro $RFSDIR"
     fi
+	set -e
 }
 
 show_lists() {
@@ -1162,7 +1169,7 @@ case "$1" in
         convert_rfs_raw_to_ext4; exit
         ;;
     packrfs)
-		check_board_valid
+	check_board_valid
         pack_distro_rfs; exit
         ;;
     packapp|packapps)

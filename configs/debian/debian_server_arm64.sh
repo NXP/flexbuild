@@ -5,7 +5,7 @@ SUITE=trixie
 ARCH=arm64
 TARGET_DIR=${1:-/tmp/rootfs}
 KEYRING="/usr/share/keyrings/debian-archive-keyring.gpg"
-MIRRORS=(http://ftp.cn.debian.org/debian http://ftp.de.debian.org/debian )
+MIRRORS=(http://deb.debian.org/debian http://ftp.cn.debian.org/debian http://ftp.de.debian.org/debian )
 
 PACKAGES=(
   init udev sudo vim apt file zstd parted fdisk dosfstools iputils-ping isc-dhcp-client

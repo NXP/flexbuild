@@ -309,19 +309,27 @@ convert_rfs_raw_to_ext4() {
     fbprint_d $rfsname.gz
 }
 
+rfs_umount() {
+	for mnt in dev/pts dev sys/kernel/security sys  proc; do
+		 if mountpoint -q "$RFSDIR/$mnt"; then
+			 if ! sudo umount "$RFSDIR/$mnt"; then
+				 sleep 2
+				 sudo umount -f "$RFSDIR/$mnt" || true
+				 log_mute echo umount $RFSDIR/$mnt failed
+			 else
+				 log_mute echo umont $mnt successfully
+			 fi
+		 else
+			 log_mute echo $mnt is not mounted.
+		 fi
+	done
+}
 
 pack_distro_rfs() {
     [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit; }
     if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
 		debian_rfs_post_config
-        test -c $RFSDIR/dev/pts/0 && sudo umount $RFSDIR/dev/pts
-        test -f $RFSDIR/proc/uptime && sudo umount $RFSDIR/proc
-        if [ -d $RFSDIR/sys/devices ]; then
-            [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
-            sudo umount $RFSDIR/sys
-        fi
-		sudo umount $RFSDIR/sys >/dev/null 2>&1 || true
-		sudo umount $RFSDIR/dev >/dev/null 2>&1 || true
+		rfs_umount
     fi
 
     [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && \
@@ -330,7 +338,7 @@ pack_distro_rfs() {
 
     tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
     fbprint_n "Generating $tarname ..."
-    cd $RFSDIR && sudo tar --zstd -cf $FBOUTDIR/images/$tarname *
+    cd $RFSDIR && sudo tar --exclude=proc --exclude=sys --exclude=dev --exclude=run --zstd -cf $FBOUTDIR/images/$tarname *
     cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
     log_mute ls -lh $FBOUTDIR/images/${rname}*
     fbprint_d $FBOUTDIR/images/$tarname
@@ -655,15 +663,7 @@ do_clean_rfs() {
         rm -rf ${RFSDIR%/*}
         fbprint_d "clean ${RFSDIR%/*}"
     else
-		sudo umount $RFSDIR/sys >/dev/null 2>&1 || true
-		sudo umount $RFSDIR/dev >/dev/null 2>&1 || true
-        sudo umount $RFSDIR/dev/pts >/dev/null 2>&1 || true
-        [ -f $RFSDIR/proc/uptime ] && sudo umount $RFSDIR/proc || true
-        if [ -d $RFSDIR/sys/devices ]; then
-            [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
-                sudo umount $RFSDIR/sys || true
-        fi
-
+		rfs_umount
         sudo rm -rf $RFSDIR && rm -rf $FBOUTDIR/images/${RFSDIR##*/}*
         fbprint_d "clean distro $RFSDIR"
     fi

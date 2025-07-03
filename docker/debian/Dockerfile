@@ -17,17 +17,18 @@ RUN apt-get update --fix-missing && apt-get install -y locales && \
     localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 && export LANG=en_US.utf8
 RUN apt-get update && apt-get install -y \
         u-boot-tools device-tree-compiler autoconf automake dh-autoreconf libssl-dev zip \
-        openssl curl flex bison bc git gcc vim ethtool wget ftp make makedev tclsh ccache \
-        binfmt-support qemu-system-common qemu-user-static debootstrap sudo ncurses-dev  \
-        gcc-arm-linux-gnueabihf crossbuild-essential-arm64 gcc-aarch64-linux-gnu file    \
+        openssl curl flex bison bc git gcc vim ethtool wget ftp make udev tcl ccache \
+        binfmt-support qemu-system-common qemu-user-static debootstrap sudo coreutils \
+        gcc-arm-linux-gnueabihf crossbuild-essential-arm64 gcc-aarch64-linux-gnu file \
         build-essential gdb u-boot-tools device-tree-compiler python3 python3-dev python3-pip \
-        libxml2-dev libsensors4-dev libssl-dev libedit-dev liblzma-dev tree binutils-dev \
-        libnuma-dev libpcap-dev libtool mtd-utils libncurses5-dev libelf-dev net-tools   \
+        libxml2-dev libsensors-dev libssl-dev libedit-dev liblzma-dev tree binutils-dev \
+        libnuma-dev libpcap-dev libtool mtd-utils libncurses-dev libelf-dev iproute2 \
         libcunit1-dev pkg-config autotools-dev crossbuild-essential-armhf openssh-server \
-        openssh-client crossbuild-essential-armhf qemu-utils kmod g++-aarch64-linux-gnu  \
-	cpp-arm-linux-gnueabihf dosfstools ruby iputils-ping cpio rsync libtclap-dev     \
-	parted rpm2cpio lsb-release xutils-dev libwayland-bin cmake locales texinfo gawk \
-	chrpath diffstat scons libgflags-dev libhdf5-serial-dev python3-numpy python3-wheel \
-	python3-h5py python3-yaml
+        openssh-client crossbuild-essential-armhf qemu-utils kmod g++-aarch64-linux-gnu \
+        cpp-arm-linux-gnueabihf dosfstools ruby iputils-ping cpio rsync libtclap-dev \
+        parted rpm2cpio lsb-release xutils-dev libwayland-bin cmake locales texinfo gawk \
+        chrpath diffstat scons libgflags-dev libhdf5-dev python3-numpy python3-wheel \
+        python3-h5py python3-yaml
+
 RUN git config --global user.email  "debian@nxp.com"
 RUN git config --global user.name "NXP debian"

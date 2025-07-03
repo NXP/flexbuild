@@ -57,7 +57,6 @@ repo:
 
   imx_firmware:
     url:  https://github.com/NXP/imx-firmware.git
-    tag:  lf-6.6.52-2.2.0
     # firmware for wifi/bt
 
   fw_ele_bin:
@@ -71,7 +70,6 @@ repo:
 # kernel and modules git repositories
   linux:
     url:  https://github.com/nxp-imx/linux-imx.git
-    tag:  lf-6.6.52-2.2.0
 
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git

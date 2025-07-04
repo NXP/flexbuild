@@ -14,7 +14,7 @@ repo:
 
   mbedtls:
     url:  https://github.com/Mbed-TLS/mbedtls.git
-    tag:  mbedtls-3.6.2
+    tag:  v2.28.10
 
   mc_utils:
     url:  https://github.com/nxp-qoriq/mc-utils.git
@@ -77,11 +77,10 @@ repo:
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git
     tag:  cryptodev-linux-1.14
-    #commit: bb8bc7cf60d
     
   lttng_modules:
     url:  https://github.com/lttng/lttng-modules.git
-    tag:  v2.13.11
+    tag:  v2.13.17
      
   mdio_proxy_module:
     url:  https://github.com/nxp-qoriq/mdio-proxy-module.git
@@ -156,8 +155,8 @@ repo:
 
   openssl:
     url:  https://github.com/openssl/openssl.git
-    tag:  openssl-3.0.0
-    # must use this version to match debian 12
+    tag:  openssl-3.4.1
+    # must use this version to match debian 12.... 
 
   libpkcs11:
     url:  https://github.com/nxp-qoriq/libpkcs11.git
@@ -186,7 +185,7 @@ repo:
 
   ecc_example:
     url:  https://github.com/nxp/plug-and-trust.git
-    commit: 1e17cde135868
+    tag:  v04.07.00
 
   openssl_provider_se05x:
     url:  https://github.com/NXPPlugNTrust/se05x-openssl-provider.git
@@ -234,10 +233,12 @@ repo:
   imx_g2d_samples:
     url:  https://github.com/nxp-imx/g2d-samples.git
 
+# ...............
   cogl:
     url:  https://gitlab.gnome.org/GNOME/cogl.git
     tag:  1.22.8
 
+# ...............
   clutter_gst:
     url:  https://gitlab.gnome.org/GNOME/clutter-gst.git
     tag:  3.0.27
@@ -302,7 +303,7 @@ repo:
 
   alsa_lib:
     url:  https://github.com/alsa-project/alsa-lib.git
-    tag:  v1.2.11
+    tag:  v1.2.13
 
 #  SOF firmware architecture is based on Zephyr RTOS
   sof_zephyr_tar:
@@ -335,6 +336,7 @@ repo:
   imx_vpuwrap:
     url:  https://github.com/nxp/imx-vpuwrap.git
 
+# .........
   cheese:
     url:  https://gitlab.gnome.org/GNOME/cheese.git
     tag:  43.0
@@ -346,19 +348,19 @@ repo:
 
   firmwared:
     url:  https://github.com/teg/firmwared.git
-    commit: 2e6b5db43d
+    commit: 2e6b5db
 
-  buildroot:
-    url:  https://github.com/buildroot/buildroot.git
-    tag:  2024.02.2
+#  buildroot:
+#    url:  https://github.com/buildroot/buildroot.git
+#    tag:  2024.02.2
 
-  yocto_poky:
-    url:  https://git.yoctoproject.org/poky.git
-    tag:  scarthgap-5.0.2
+#  yocto_poky:
+#    url:  https://git.yoctoproject.org/poky.git
+#    tag:  scarthgap-5.0.2
 
-  yocto_oe:
-    url:  https://github.com/openembedded/meta-openembedded.git
-    branch: scarthgap
+#  yocto_oe:
+#    url:  https://github.com/openembedded/meta-openembedded.git
+#    branch: scarthgap
 
 
 # eIQ AI/ML components
@@ -388,29 +390,29 @@ repo:
 
   nnstreamer:
     url:    https://github.com/nnstreamer/nnstreamer.git
-    commit: 807060954acfdb6cec1
+    commit: 8070609
 
   nnstreamer_edge:
     url:    https://github.com/nnstreamer/nnstreamer-edge.git
-    commit: 2bf50d57f0f8d856ae38
+    commit: 2bf50d5
+
 
   nnshark:
     url:    https://github.com/nxp-imx/nnshark.git
 
   ssat:
     url:    https://github.com/myungjoo/ssat.git
-    commit: 1635168973
+    tag:    v1.2.0
 
   eiq_examples:
     url:    https://github.com/nxp-imx/eiq-example.git
 
   pytorch:
     url:    https://github.com/nxp-imx/pytorch-release.git
-    commit: 6948822f1d3
 
   flatbuffers:
     url:    https://github.com/google/flatbuffers.git
-    commit: 7d6d99c6befa63
+    commit: e646392
 
 
 # NXP GoPoint Demo Experience components
@@ -419,18 +421,18 @@ repo:
 
   imx_nnstreamer_examples:
     url:    https://github.com/nxp-imx/nxp-nnstreamer-examples.git
-    commit: 5d9a7a674e52697
+    commit: b8dafc1
 
   imx_demos_list:
     url:    https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git
 
   imx_smart_kitchen:
     url:    https://github.com/nxp-imx-support/smart-kitchen.git
-    commit: 1f42aceae2e79f
+    commit: 1f42ace
 
   imx_smart_fitness:
     url:    https://github.com/nxp-imx-support/imx-smart-fitness.git
-    commit: 5ac9a93c6c651e
+    commit: 5ac9a93
 
   nxp_afe:
     url:  https://github.com/nxp-imx/nxp-afe.git
@@ -443,16 +445,17 @@ repo:
 
   imx_video_to_texture:
     url: https://github.com/nxp-imx-support/imx-video-to-texture.git
-    commit: 5d55728b5c562f1
+    commit: ee77a45
 
   imx_voiceplayer:
     url: https://github.com/nxp-imx-support/imx-voiceplayer.git
-    commit: a70dba74eeff1b
+    commit: ab1304a
 
   imx_ebike_vit:
-    url: https://github.com/nxp-imx-support/imx-ebike-vit
+    url: https://github.com/nxp-imx-support/imx-ebike-vit.git
     commit: 7216521
 
+# ......
   gtec_demo_framework:
     url: https://github.com/nxp-imx/gtec-demo-framework.git
-    tag: 6.4.2
+    tag: 6.6.0

@@ -14,7 +14,7 @@ PACKAGES=(
   tcpdump mtd-utils pciutils hdparm libssl-dev usbutils sysstat lsb-release kexec-tools iptables
   libhugetlbfs0 strongswan-charon dmidecode flex systemd-timesyncd initramfs-tools fbset
   mmc-utils i2c-tools lm-sensors rt-tests linuxptp mosquitto xterm bluez pipewire pipewire-audio
-  pipewire-pulse wireplumber locales libspa-0.2-bluetooth
+  pipewire-pulse wireplumber locales libspa-0.2-bluetooth net-tools
 )
 
 echo "Running mmdebstrap with mirrors: ${MIRRORS[@]}"

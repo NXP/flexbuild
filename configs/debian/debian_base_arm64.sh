@@ -9,7 +9,7 @@ MIRRORS=(http://ftp.cn.debian.org/debian http://ftp.de.debian.org/debian http://
 PACKAGES=(
   init udev sudo vim apt file zstd parted fdisk dosfstools iputils-ping isc-dhcp-client
   wget curl ca-certificates systemd systemd-sysv psmisc ethtool iproute2 openssh-server
-  openssh-client patchelf htop util-linux lshw keyutils locales wpasupplicant
+  openssh-client patchelf htop util-linux lshw keyutils locales wpasupplicant net-tools
 )
 
 echo "Running mmdebstrap with mirrors: ${MIRRORS[@]}"

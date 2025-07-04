@@ -44,7 +44,7 @@ base_pkgs=" \
 "
 
 ls_pkgs=" \
-    libxml2-dev libtinyxml2-dev libssl-dev libsbc-dev libsndfile1-dev libwebp-dev \
+    efitools libxml2-dev libtinyxml2-dev libssl-dev libsbc-dev libsndfile1-dev libwebp-dev \
     dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses-dev libelf-dev \
     libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev libinput-dev libpixman-1-dev \
     libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.4-dev libsystemd-dev \

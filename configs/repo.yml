@@ -45,26 +45,29 @@ repo:
   imx_mkimage:
     url:  https://github.com/nxp-imx/imx-mkimage.git
 
+# i.MX SECO firmware for i.MX 8QuadMax, 8QuadXPlus, and 8DXL reference boards
   seco_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-seco-5.9.4.1-0333596.bin
 
+# i.MX System Controller Firmware for i.MX 8QuadMax, 8QuadXPlus, and 8DXL reference boards
   scfw_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.17.0-83624b9.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.18.0-654907b.bin
 
   firmware_imx_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.26-d4c33ab.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.28-994fa14.bin
     # /lib/firmware for ddr,hdmi,dp,vpu,easrc,epdc,xcvr,xuvi
 
   imx_firmware:
     url:  https://github.com/NXP/imx-firmware.git
     # firmware for wifi/bt
 
+#  i.MX 91, i.MX 93, i.MX 95, and i.MX 8ULP ELE Firmware
   fw_ele_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-ele-imx-1.3.0-17945fc.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-ele-imx-2.0.2-89161a8.bin
 
+# i.MX 8ULP uPower firmware
   fw_upower_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-upower-1.3.1.bin
-    # not found in release document
 
 
 # kernel and modules git repositories
@@ -216,12 +219,14 @@ repo:
   libgpuperfcnt_bin:
     url:  http://sun.ap.freescale.net/dash/tmp/libgpuperfcnt-6.4.11.p2-6.6.52.bin
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/libgpuperfcnt-6.4.11.p2.8d-aarch64.bin
-
+#
+#  i.MX Graphics G2D libraries for i.MX 8
   imx_gpu_g2d_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p2.8-aarch64-95408a4.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p3.2-aarch64-3c5e429.bin
 
+# i.MX G2D library for i.MX 9 SoC with DPU blitter engine
   imx_dpu_g2d_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v1-2.2.0-7943590.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v2-2.4.0.0-9e8bbf1.bin
 
   imx_pxp_g2d:
     url:  https://github.com/nxp-imx/imx-g2d-pxp.git
@@ -247,19 +252,24 @@ repo:
 
 
 # multimedia component repositories
+# i.MX VPU Hantro libraries for i.MX 8M Quad, 8M Mini, and 8M Plus
   vpu_hantro_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.34.0-a0eda50.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.37.0-deec65e.bin
 
+# i.MX VPU Hantro VC8000E Encoder libraries for i.MX 8M plus
   vpu_hantro_vc_bin:
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/imx-vpu-hantro-vc-1.10.0d.bin
     url:  http://sun.ap.freescale.net/dash/tmp/imx-vpu-hantro-vc-1.10.1-6.6.52.bin
 
+# i.MX VPU Hantro deamon binary for i.MX 8M Quad, 8M Mini, and 8M Plus
   vpu_hantro_daemon_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.3.0-33b724c.tar.gz
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.6.0-cc9a838.tar.gz
 
-  basler_camera_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/basler-camera-4.2.2.24.3-d1f506a.bin
+#
+#  basler_camera_bin:
+#    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/basler-camera-4.2.2.25.2-dd86758.bin
 
+# i.MX 8M Plus ISP SDK
   imx_isp_bin:
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/isp-imx-4.2.2.24.3d.bin
     url: http://sun.ap.freescale.net/dash/tmp/isp-imx-4.2.2.24-6.6.52.bin
@@ -294,24 +304,31 @@ repo:
     url:  https://github.com/alsa-project/alsa-lib.git
     tag:  v1.2.11
 
+#  SOF firmware architecture is based on Zephyr RTOS
   sof_zephyr_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-zephyr-2.10.0.tar.gz
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-zephyr-2.13.0-3d67d3f.tar.gz
 
+# i.MX optimized Audio and Video core codec libraries
   imx_codec_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-codec-4.9.0.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-codec-4.10.0-464e9d8.bin
 
+# DSP firmware
   imx_dsp_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.8.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.10-ea4fe3f.bin
 
+# DSP AACPlus decoder
   imx_dsp_codec_ext_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-codec-ext-2.1.8.bin
 
+# NXP Asynchronous Sample Rate Converter
   imx_dspc_asrc_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dspc-asrc-1.0.1.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dspc-asrc-1.0.2-ce4ae5a.bin
 
+# i.MX optimized core parser
   imx_parser_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.9.1-5d91190.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.10.0-e8a7ec7.bin
 
+# NXP PDM to PCM Software Decimation SIMD Library
   imx_sw_pdm_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sw-pdm-1.0.3.bin
 

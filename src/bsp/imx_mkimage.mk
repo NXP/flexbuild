@@ -78,7 +78,7 @@ define imx_mkimage_target
     cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
 	$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
-	$$opdir/arch/arm/dts/*$${plat}*.dtb \
+	$$opdir/dts/upstream/src/arm64/freescale/*$${plat}*.dtb \
 	$$opdir/u-boot-nodtb.bin && \
 	if [ $${MACHINE} = imx8mpfrdm ]; then \
         cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \

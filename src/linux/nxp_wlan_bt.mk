@@ -23,5 +23,5 @@ nxp_wlan_bt:
 	 mkdir -p $(DESTDIR)/usr/share/nxp_wireless && \
 	 install -d $$kerneloutdir/tmp/lib/modules/$$kernelrelease/kernel/drivers/net/wireless/nxp && \
 	 cp -f mlan.ko moal.ko $$kerneloutdir/tmp/lib/modules/$$kernelrelease/updates/ && \
-	 cp -f bin_wlan/{load,unload,README} $(DESTDIR)/usr/share/nxp_wireless/ && \
+	 cp -f README $(DESTDIR)/usr/share/nxp_wireless/ && \
 	 $(call fbprint_d,"nxp_wlan_bt")

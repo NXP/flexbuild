@@ -9,7 +9,7 @@
 
 [ -n "$FBDEBUG" ] && set -xe || set -e
 
-FB_VERSION=2.28.2506
+FB_VERSION=2512
 
 usage () {
 cat <<EOF
@@ -338,7 +338,7 @@ pack_distro_rfs() {
 
     tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
     fbprint_n "Generating $tarname ..."
-    cd $RFSDIR && sudo tar --exclude=proc --exclude=sys --exclude=dev --exclude=run --zstd -cf $FBOUTDIR/images/$tarname *
+    cd $RFSDIR && sudo tar --exclude=proc --exclude=sys --exclude=dev --exclude=run --zstd -C "$RFSDIR" -cf $FBOUTDIR/images/$tarname *
     cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
     log_mute ls -lh $FBOUTDIR/images/${rname}*
     fbprint_d $FBOUTDIR/images/$tarname
@@ -654,7 +654,6 @@ do_clean() {
 }
 
 do_clean_rfs() {
-	set -x
     if [ $DISTROTYPE = poky ]; then
         echo cleaning $pokytmpdir ... && sudo rm -rf $pokytmpdir
         sudo rm -rf $FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}
@@ -667,7 +666,6 @@ do_clean_rfs() {
         sudo rm -rf $RFSDIR && rm -rf $FBOUTDIR/images/${RFSDIR##*/}*
         fbprint_d "clean distro $RFSDIR"
     fi
-	set -e
 }
 
 show_lists() {

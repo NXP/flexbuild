@@ -54,10 +54,15 @@ def verify_hash(file_path: str, expected_hash: str) -> None:
     if hash_algo.hexdigest() != expected_hash:
         raise DownloadError(f"Hash mismatch!\nExpected: {expected_hash}\nActual:   {hash_algo.hexdigest()}")
 
-def check_gitmodules(extracted_dir: str) -> None:
+def check_gitmodules_subdir(extracted_dir: str) -> None:
     """Check for .gitmodules file existence"""
     for root, _, files in os.walk(extracted_dir):
         if '.gitmodules' in files:
+            raise DownloadError("Repository contains submodules (not supported)")
+def check_gitmodules(extracted_dir: str) -> None:
+    """Check for .gitmodules file existence"""
+    for root, _, files in os.walk(extracted_dir):
+        if '.gitmodules' in os.listdir(extracted_dir):
             raise DownloadError("Repository contains submodules (not supported)")
 
 def create_output_filename(subdir: str, version: str) -> str:

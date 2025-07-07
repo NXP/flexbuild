@@ -245,11 +245,11 @@ repo:
 
   vulkan_headers:
     url: https://github.com/KhronosGroup/Vulkan-Headers.git
-    commit: 2bb0a23104ceffd9a2
+    ver: 2bb0a23104ceffd9a2
 
   vkmark:
     url: https://github.com/vkmark/vkmark.git
-    commit: ab6e6f3407
+    ver: ab6e6f3407
 
 
 # multimedia component repositories
@@ -289,7 +289,7 @@ repo:
 
   gst_plugins_ugly:
     url:  https://github.com/GStreamer/gst-plugins-ugly.git
-    commit: 499d3cd
+    ver: 499d3cd
 
   imx_gst_plugin:
     url:  https://github.com/nxp-imx/imx-gst1.0-plugin.git
@@ -319,36 +319,36 @@ repo:
 
 # DSP AACPlus decoder
   imx_dsp_codec_ext_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-codec-ext-2.1.8.bin
+    url: https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-codec-ext-2.1.8.bin
 
 # NXP Asynchronous Sample Rate Converter
   imx_dspc_asrc_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dspc-asrc-1.0.2-ce4ae5a.bin
+    url: https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dspc-asrc-1.0.2-ce4ae5a.bin
 
 # i.MX optimized core parser
   imx_parser_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.10.0-e8a7ec7.bin
+    url: https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.10.0-e8a7ec7.bin
 
 # NXP PDM to PCM Software Decimation SIMD Library
   imx_sw_pdm_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sw-pdm-1.0.3.bin
+    url: https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sw-pdm-1.0.3.bin
 
   imx_vpuwrap:
-    url:  https://github.com/nxp/imx-vpuwrap.git
+    url: https://github.com/nxp/imx-vpuwrap.git
 
 # .........
   cheese:
-    url:  https://gitlab.gnome.org/GNOME/cheese.git
-    tag:  43.0
+    url: https://gitlab.gnome.org/GNOME/cheese.git
+    tag: 43.0
 
 
 # generic component repositories
   imx_test:
-    url:  https://github.com/nxp-imx/imx-test.git
+    url: https://github.com/nxp-imx/imx-test.git
 
   firmwared:
-    url:  https://github.com/teg/firmwared.git
-    commit: 2e6b5db
+    url: https://github.com/teg/firmwared.git
+    ver: 2e6b5db
 
 #  buildroot:
 #    url:  https://github.com/buildroot/buildroot.git
@@ -365,97 +365,97 @@ repo:
 
 # eIQ AI/ML components
   tim_vx:
-    url:    https://github.com/nxp-imx/tim-vx-imx.git
+    url: https://github.com/nxp-imx/tim-vx-imx.git
 
   tvm:
-    url:    https://github.com/nxp-imx/eiq-tvm-imx.git
+    url: https://github.com/nxp-imx/eiq-tvm-imx.git
 
   tflite:
-    url:    https://github.com/nxp-imx/tensorflow-imx.git
+    url: https://github.com/nxp-imx/tensorflow-imx.git
 
   tflite_vx_delegate:
-    url:    https://github.com/nxp-imx/tflite-vx-delegate-imx.git
+    url: https://github.com/nxp-imx/tflite-vx-delegate-imx.git
 
   tflite_ethosu_delegate:
-    url:    https://github.com/nxp-imx/tflite-ethosu-delegate-imx.git
+    url: https://github.com/nxp-imx/tflite-ethosu-delegate-imx.git
 
   ethosu_driver_stack:
-    url:    https://github.com/nxp-imx/ethos-u-driver-stack-imx.git
+    url: https://github.com/nxp-imx/ethos-u-driver-stack-imx.git
 
   ethosu_firmware:
-    url:    https://github.com/nxp-imx/ethos-u-firmware.git
+    url: https://github.com/nxp-imx/ethos-u-firmware.git
 
   ethosu_vela:
-    url:    https://github.com/nxp-imx/ethos-u-vela.git
+    url: https://github.com/nxp-imx/ethos-u-vela.git
 
   nnstreamer:
-    url:    https://github.com/nnstreamer/nnstreamer.git
-    commit: 8070609
+    url: https://github.com/nnstreamer/nnstreamer.git
+    ver: 8070609
 
   nnstreamer_edge:
-    url:    https://github.com/nnstreamer/nnstreamer-edge.git
-    commit: 2bf50d5
+    url: https://github.com/nnstreamer/nnstreamer-edge.git
+    ver: 2bf50d5
 
 
   nnshark:
-    url:    https://github.com/nxp-imx/nnshark.git
+    url: https://github.com/nxp-imx/nnshark.git
 
   ssat:
-    url:    https://github.com/myungjoo/ssat.git
-    tag:    v1.2.0
+    url: https://github.com/myungjoo/ssat.git
+    ver: v1.2.0
 
   eiq_examples:
-    url:    https://github.com/nxp-imx/eiq-example.git
+    url: https://github.com/nxp-imx/eiq-example.git
 
   pytorch:
-    url:    https://github.com/nxp-imx/pytorch-release.git
+    url: https://github.com/nxp-imx/pytorch-release.git
 
   flatbuffers:
-    url:    https://github.com/google/flatbuffers.git
-    commit: e646392
+    url: https://github.com/google/flatbuffers.git
+    ver: e646392
 
 
 # NXP GoPoint Demo Experience components
   imx_demo_experience:
-    url:    https://github.com/nxp-imx-support/nxp-demo-experience.git
+    url: https://github.com/nxp-imx-support/nxp-demo-experience.git
 
   imx_nnstreamer_examples:
-    url:    https://github.com/nxp-imx/nxp-nnstreamer-examples.git
-    commit: b8dafc1
+    url: https://github.com/nxp-imx/nxp-nnstreamer-examples.git
+    ver: b8dafc1
 
   imx_demos_list:
-    url:    https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git
+    url: https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git
 
   imx_smart_kitchen:
-    url:    https://github.com/nxp-imx-support/smart-kitchen.git
-    commit: 1f42ace
+    url: https://github.com/nxp-imx-support/smart-kitchen.git
+    ver: 1f42ace
 
   imx_smart_fitness:
-    url:    https://github.com/nxp-imx-support/imx-smart-fitness.git
-    commit: 5ac9a93
+    url: https://github.com/nxp-imx-support/imx-smart-fitness.git
+    ver: 5ac9a93
 
   nxp_afe:
-    url:  https://github.com/nxp-imx/nxp-afe.git
+    url: https://github.com/nxp-imx/nxp-afe.git
 
   imx_voiceui:
-    url:    https://github.com/nxp-imx/imx-voiceui.git
+    url: https://github.com/nxp-imx/imx-voiceui.git
 
   nxp_demo_experience_assets:
     url: https://github.com/nxp-imx-support/nxp-demo-experience-assets.git
 
   imx_video_to_texture:
     url: https://github.com/nxp-imx-support/imx-video-to-texture.git
-    commit: ee77a45
+    ver: ee77a45
 
   imx_voiceplayer:
     url: https://github.com/nxp-imx-support/imx-voiceplayer.git
-    commit: ab1304a
+    ver: ab1304a
 
   imx_ebike_vit:
     url: https://github.com/nxp-imx-support/imx-ebike-vit.git
-    commit: 7216521
+    ver: 7216521
 
 # ......
   gtec_demo_framework:
     url: https://github.com/nxp-imx/gtec-demo-framework.git
-    tag: 6.6.0
+    tag: 6.5.0

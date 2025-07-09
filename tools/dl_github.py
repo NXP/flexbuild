@@ -35,7 +35,7 @@ def download_file(url: str, output_path: str) -> None:
             sys.stdout.write(f"\rDownloading... {count * block_size:,} bytes")
             sys.stdout.flush()
 
-    # print(f"\nFetching: {url}")
+    #print(f"\nFetching: {url}")
     try:
         urllib.request.urlretrieve(url, output_path, reporthook=progress)
     except urllib.error.HTTPError as e:
@@ -79,24 +79,26 @@ def repack(source_dir: str, output_path: str, subdir_name: str) -> None:
     --owner=0 --group=0  Fixed ownership
     -czf             Use gzip compression
     """
-    # Create temporary directory structure
-    temp_dir = tempfile.mkdtemp()
-    try:
-        temp_pack_dir = os.path.join(temp_dir, subdir_name)
-        shutil.copytree(source_dir, temp_pack_dir)
 
-        # re-packing command
-        subprocess.run([
-            'tar',
-            '--sort=name',
-            '--mtime=@0',
-            '--owner=0',
-            '--group=0',
-            '-czf', output_path,
-            '-C', temp_dir, subdir_name
-        ], check=True)
-    finally:
-        shutil.rmtree(temp_dir)
+    original_dir = os.path.dirname(source_dir)
+    temp_pack_dir = os.path.join(original_dir, subdir_name)
+
+    if os.path.exists(temp_pack_dir):
+        shutil.rmtree(temp_pack_dir)
+
+    shutil.move(source_dir, temp_pack_dir)
+
+    # re-packing command
+    subprocess.run([
+        'tar',
+        '--sort=name',
+        '--mtime=@0',
+        '--owner=0',
+        '--group=0',
+        '-czf', output_path,
+        '-C', original_dir, subdir_name
+    ], check=True)
+
 
 def find_extracted_source_dir(extracted_dir: str, repo: str, version: str) -> str:
     """Robust implementation for locating source directory from GitHub archive extraction
@@ -193,9 +195,25 @@ def download_and_process(
         sys.stdout.write(f"Checking and repacking ... \n")
         extracted_dir = os.path.join(temp_dir, "extracted")
         os.makedirs(extracted_dir)
-        with tarfile.open(temp_file, "r:gz") as tar:
-            tar.extractall(extracted_dir, filter='data')
-        
+        try:
+            with tarfile.open(temp_file, "r:gz") as tar:
+                tar.extractall(extracted_dir, filter='data')
+        except tarfile.AbsoluteLinkError:
+            try:
+                subprocess.run(
+                    ['tar', 'xzf', temp_file, '--no-same-owner', '-C', extracted_dir],
+                    check=True,
+                    stderr=subprocess.PIPE
+                )
+            except subprocess.CalledProcessError as e:
+                raise DownloadError(
+                        f"Failed to extract archive (even with fallback): {e.stderr.decode().strip()}\n"
+                        f"URL: {archive_url}"
+                )
+
+        #with tarfile.open(temp_file, "r:gz") as tar:
+            #tar.extractall(extracted_dir, filter='data')
+
         # 3. Check for submodules
         check_gitmodules(extracted_dir)
 

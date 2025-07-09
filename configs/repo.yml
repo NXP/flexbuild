@@ -245,11 +245,11 @@ repo:
 
   vulkan_headers:
     url: https://github.com/KhronosGroup/Vulkan-Headers.git
-    ver: 2bb0a23104ceffd9a2
+    ver: vulkan-sdk-1.3.275.0
 
   vkmark:
     url: https://github.com/vkmark/vkmark.git
-    ver: ab6e6f3407
+    ver: ab6e6f3
 
 
 # multimedia component repositories

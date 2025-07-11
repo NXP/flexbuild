@@ -5,9 +5,8 @@
 
 wayland:
 ifeq ($(CONFIG_WAYLAND),y)
-	@[ $(SOCFAMILY) = LS -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call download_repo,wayland,apps/graphics) && \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a ] && exit || \
+	 $(call download_repo,wayland,apps/graphics,git) && \
 	 $(call patch_apply,wayland,apps/graphics) && \
 	 $(call fbprint_b,"wayland") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

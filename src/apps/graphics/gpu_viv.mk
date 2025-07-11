@@ -7,7 +7,7 @@
 
 gpu_viv:
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	 $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"gpu_viv ") && \
 	 if [ ! -d $(GRAPHICSDIR)/gpu_viv ]; then \
 	     mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR) && \
@@ -23,4 +23,8 @@ gpu_viv:
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libGLESv2.so,libGLESv2.so.2,libgbm.so.1,libvulkan.so,libvulkan.so.1,libEGL.so,libEGL.so.1} && \
 	 if [ -d gpu-tools ]; then cp -rfa gpu-tools/gmem-info/usr $(DESTDIR); fi && \
 	 if [ -d gpu-demos ]; then cp -rf gpu-demos/opt $(DESTDIR); fi && \
+	 cp -af $(DESTDIR)/usr/lib/libVSC.so $(RFSDIR)/usr/lib/ && \
+	 cp -af $(DESTDIR)/usr/lib/libGLESv2.so* $(RFSDIR)/usr/lib/ && \
+	 cp -af $(DESTDIR)/usr/lib/libOpenCL.so* $(RFSDIR)/usr/lib/ && \
+	 cp -af $(DESTDIR)/usr/lib/libSPIRV_viv.so $(RFSDIR)/usr/lib/ && \
 	 $(call fbprint_d,"gpu_viv")

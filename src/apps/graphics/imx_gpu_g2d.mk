@@ -18,7 +18,5 @@ imx_gpu_g2d:
 	     mv imx-gpu-g2d-* imx_gpu_g2d && rm -f imx_gpu_g2d.bin; \
 	 fi && \
 	 cd imx_gpu_g2d && \
-	 cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/ && \
-	 cp -Pf g2d/usr/lib/libg2d* $(DESTDIR)/usr/lib/ && \
-	 cp g2d/usr/lib/mx8mm/libg2d-viv.so.2.2.0 $(DESTDIR)/usr/lib/libg2d-viv-mx8mm.so.2.2.0 && \
+	 cp -af g2d/usr "$(DESTDIR)/" && \
 	 $(call fbprint_d,"imx_gpu_g2d")

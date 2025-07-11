@@ -8,7 +8,7 @@
 
 
 libgpuperfcnt:
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"libgpuperfcnt") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d libgpuperfcnt ]; then \

@@ -7,7 +7,7 @@
 
 
 imx_pxp_g2d:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@#[ $${MACHINE:0:5} != imx93 -o $${MACHINE:0:5} != imx91 ] && exit || \
 	 $(call download_repo,imx_pxp_g2d,apps/graphics) && \
 	 $(call patch_apply,imx_pxp_g2d,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/pxp_device.h ]; then \

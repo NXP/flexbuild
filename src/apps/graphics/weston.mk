@@ -11,38 +11,23 @@
 # version：12.0.3
 
 weston: libdrm wayland wayland_protocols gpu_viv
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a ] && exit || \
 	 $(call download_repo,weston,apps/graphics) && \
 	 $(call patch_apply,weston,apps/graphics) && \
-	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/wayland-client.h ]; then \
-	     bld wayland -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/share/wayland-protocols ]; then \
-	     bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/include/EGL ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
+	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/share/pkgconfig && \
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \
-	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
+	 export PKG_CONFIG_PATH="" && \
 	 export LD_LIBRARY_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib && \
 	 $(call fbprint_b,"weston") && \
 	 cd $(GRAPHICSDIR)/weston && \
-	 sed -i 's/0.63/0.61/' meson.build && \
-	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 ln -sf $(RFSDIR)/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
-	 PYTHONNOUSERSITE=y PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) \
 	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 cp -rf $(DESTDIR)/usr/include/drm/drm_fourcc.h $(RFSDIR)/usr/include/libdrm/ && \
-	 meson setup build_$(DISTROTYPE)_$(ARCH) \
+	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
+	 PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBDIR)" \
+	 PKG_CONFIG_SYSROOT_DIR="$(PKG_CONFIG_SYSROOT_DIR)" \
+	 PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
+	 PYTHONNOUSERSITE=y meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file=meson.cross \
 		--prefix=/usr --libdir=lib \
 		--default-library=shared \
@@ -51,14 +36,11 @@ weston: libdrm wayland wayland_protocols gpu_viv
 		-Dpipewire=false \
 		-Dsimple-clients=all \
 		-Ddemo-clients=true \
-		-Ddeprecated-color-management-colord=false \
 		-Drenderer-gl=true \
 		-Dbackend-headless=false \
 		-Dimage-jpeg=true \
 		-Drenderer-g2d=true \
 		-Dbackend-drm=true \
-		-Dlauncher-libseat=true \
-		-Ddeprecated-launcher-logind=false \
 		-Dcolor-management-lcms=false \
 		-Dbackend-pipewire=false \
 		-Dbackend-rdp=false \
@@ -89,5 +71,4 @@ weston: libdrm wayland wayland_protocols gpu_viv
 	 ln -sf /lib/systemd/system/weston.socket $(DESTDIR)/etc/systemd/system/sockets.target.wants/weston.socket && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston.png $(DESTDIR)/usr/share/icons/hicolor/48x48/apps/weston.png && \
 	 install -m 644 $(FBDIR)/src/system/weston/weston.desktop $(DESTDIR)/usr/share/applications/weston.desktop && \
-	 rm -rf /lib/ld-linux-aarch64.so.1 && \
 	 $(call fbprint_d,"weston")

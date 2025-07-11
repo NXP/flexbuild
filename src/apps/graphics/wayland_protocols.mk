@@ -11,6 +11,7 @@ wayland_protocols:
 	 $(call patch_apply,wayland_protocols,apps/graphics) && \
 	 $(call fbprint_b,"wayland_protocols") && \
 	 cd $(GRAPHICSDIR)/wayland_protocols && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
@@ -21,4 +22,6 @@ wayland_protocols:
 		--cross-file meson.cross $(LOG_MUTE) && \
 	 DESTDIR=$(RFSDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
+	 cp -af $(DESTDIR)/usr/share/pkgconfig/wayland-protocols.pc $(RFSDIR)/usr/share/pkgconfig/ && \
+	 cp -af $(DESTDIR)/usr/share/wayland-protocols $(RFSDIR)/usr/share/ && \
 	 $(call fbprint_d,"wayland_protocols")

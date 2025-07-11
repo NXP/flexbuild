@@ -9,12 +9,13 @@
 
 vkmark:
 ifeq ($(CONFIG_VKMARK),y)
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,vkmark,apps/graphics) && \
 	 $(call patch_apply,vkmark,apps/graphics) && \
 	 bld vulkan_headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 $(call fbprint_b,"vkmark") && \
 	 cd $(GRAPHICSDIR)/vkmark && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 [ `hostname` = fbdebian ] && export PKG_CONFIG_SYSROOT_DIR="" || true && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

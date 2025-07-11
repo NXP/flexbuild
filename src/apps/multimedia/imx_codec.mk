@@ -9,7 +9,7 @@
 
 
 imx_codec:
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"imx_codec") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_codec ]; then \

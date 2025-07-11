@@ -7,7 +7,7 @@
 
 
 imx_sw_pdm:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 ] && exit || \
 	 $(call fbprint_b,"imx_sw_pdm") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_sw_pdm ]; then \

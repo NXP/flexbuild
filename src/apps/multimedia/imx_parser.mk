@@ -7,7 +7,7 @@
 
 
 imx_parser:
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"imx_parser") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_parser ]; then \

@@ -10,7 +10,7 @@
 # disable the v4l_drm_test
 
 imx_isp: imx_gpu_g2d gpu_viv libdrm
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/imx_isp ]; then \
 	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin $(LOG_MUTE) && \

@@ -8,50 +8,23 @@
 
 # need to set gl_winsys with x11 to include libX11-xcb.so libX11.so for libgstgl-1.0.so
 
-# gst version 1.24.0
+# depends on: linux-headers
 
+#gst_plugins_base:
 gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocols
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call download_repo,gst_plugins_base,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
-	 if [ ! -f .patchdone ] && [ $${MACHINE:0:6} = imx8qm -o $${MACHINE:0:7} = imx8qxp ]; then \
-		$(call patch_apply,gst_plugins_base,apps/multimedia); \
-	 fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
-	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \
-	     sed -i 's/1\.1/0.61/' meson.build; \
+	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build; \
 	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgbm_viv.so ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/include/gstreamer-1.0 ]; then \
-	     bld gstreamer -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so ]; then \
-	      bld imx_gpu_g2d -m imx8mmevk -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if  [ ! -f $(DESTDIR)/usr/include/alsa/asoundlib.h ]; then \
-	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
 	 if [ ! -f $(RFSDIR)/usr/include/gstreamer-1.0/gst/gstbytearrayinterface.h ]; then \
 	     sudo cp -Prf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include; \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/share/pkgconfig/wayland-protocols.pc ]; then \
-	      bld wayland_protocols -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \
 	 $(call fbprint_b,"gst_plugins_base") && \
 	 sudo cp -rf $(DESTDIR)/usr/share/{pkgconfig,wayland-protocols} $(RFSDIR)/usr/share/ && \
@@ -62,6 +35,7 @@ gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocol
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export GI_SCANNER_DISABLE_CACHE=1 && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file meson.cross \
 		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0" \
@@ -97,4 +71,7 @@ gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocol
 		-Dxvideo=enabled \
 		-Dxshm=enabled $(LOG_MUTE) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
+	 cp -af $(DESTDIR)/usr/lib/libgstvideo-1.0.so* $(RFSDIR)/usr/lib/ && \
+	 cp -af $(DESTDIR)/usr/lib/libgstpbutils-1.0.so* $(RFSDIR)/usr/lib/ && \
+	 cp -af $(DESTDIR)/usr/lib/libgstaudio-1.0.so* $(RFSDIR)/usr/lib/ && \
 	 $(call fbprint_d,"gst_plugins_base")

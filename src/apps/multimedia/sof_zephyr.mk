@@ -8,7 +8,7 @@
 # LICENSE: Apache-2.0 & BSD-3-Clause
 
 sof_zephyr:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 if [ ! -d $(MMDIR)/sof_zephyr/sof-xcc ]; then \
 	     mkdir -p $(MMDIR)/sof_zephyr && cd $(MMDIR)/sof_zephyr && \
 	     wget -q $(repo_sof_zephyr_tar_url) -O sof_zephyr.tar.gz $(LOG_MUTE) && \

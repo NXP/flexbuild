@@ -5,7 +5,7 @@
 # Gstreamer iMX lib 
 
 imx_lib:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 ] && exit || \
 	 $(call download_repo,imx_lib,apps/multimedia) && \
 	 $(call patch_apply,imx_lib,apps/multimedia) && \
 	 $(call fbprint_b,"imx_lib") && \

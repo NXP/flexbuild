@@ -5,7 +5,7 @@
 # depends on libasound2 and libasound2-dev
 
 imx_alsa_plugin: alsa_lib imx_sw_pdm
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 ] && exit || \
 	 $(call download_repo,imx_alsa_plugin,apps/multimedia) && \
 	 $(call patch_apply,imx_alsa_plugin,apps/multimedia) && \
 	 if  [ ! -f $(DESTDIR)/usr/lib/pkgconfig/alsa.pc ]; then \

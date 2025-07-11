@@ -7,7 +7,7 @@
 
 
 imx_vpu_hantro_vc:
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"imx_vpu_hantro_vc") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_vpu_hantro_vc ]; then \

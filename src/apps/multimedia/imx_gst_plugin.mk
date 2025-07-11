@@ -8,7 +8,7 @@
 # depends on imx-codec imx-parser libdrm gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
 
 imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(DESTARCH) != arm64 ] && exit || \
 	 $(call download_repo,imx_gst_plugin,apps/multimedia) && \
 	 $(call patch_apply,imx_gst_plugin,apps/multimedia) && \
 	 cd $(MMDIR)/imx_gst_plugin && \
@@ -18,24 +18,6 @@ imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap 
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 sed -i "s/libfslaudiocodec', required: false/libfslaudiocodec', required: true/"  plugins/meson.build && \
-	 if [ ! -d $(DESTDIR)/usr/include/libdrm ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/pkgconfig/imx-parser.pc ]; then \
-	     bld imx_parser -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
-	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/hevcencapi.h ]; then \
-	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libfslvpuwrap.so ]; then \
-	     bld imx_vpuwrap -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/pkgconfig/libfslaudiocodec.pc ]; then \
-	     bld imx_codec -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 if [ ! -f $(RFSDIR)/usr/include/imx-mm/audio-codec/fsl_unia.h ]; then \
 	     sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include; \
 	 fi && \

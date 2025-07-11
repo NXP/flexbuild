@@ -206,7 +206,7 @@ repo:
     url:  https://github.com/nxp-imx/libdrm-imx.git
 
   gpu_viv_bin:
-    url:  http://sun.ap.freescale.net/dash/tmp/imx-gpu-viv-6.4.11.p2.10-aarch64-6.6.52.bin
+    url:  http://sun.ap.freescale.net/dash/debian/lsdk2512/imx-gpu-viv-6.4.11.p3.2-aarch64-6.12.20.bin
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/imx-gpu-viv-6.4.11.p2.8d-aarch64.bin
 
   gputop:
@@ -216,7 +216,7 @@ repo:
     url:  https://github.com/nxp-imx/apitrace-imx.git
 
   libgpuperfcnt_bin:
-    url:  http://sun.ap.freescale.net/dash/tmp/libgpuperfcnt-6.4.11.p2-6.6.52.bin
+    url:  http://sun.ap.freescale.net/dash/debian/lsdk2512/libgpuperfcnt-6.4.11.p3.2-aarch64-6.12.20.bin
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/libgpuperfcnt-6.4.11.p2.8d-aarch64.bin
 #
 #  i.MX Graphics G2D libraries for i.MX 8
@@ -260,7 +260,7 @@ repo:
 # i.MX VPU Hantro VC8000E Encoder libraries for i.MX 8M plus
   vpu_hantro_vc_bin:
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/imx-vpu-hantro-vc-1.10.0d.bin
-    url:  http://sun.ap.freescale.net/dash/tmp/imx-vpu-hantro-vc-1.10.1-6.6.52.bin
+    url:  http://sun.ap.freescale.net/dash/debian/lsdk2512/imx-vpu-hantro-vc-1.10.2-aarch64-6.12.20.bin
 
 # i.MX VPU Hantro deamon binary for i.MX 8M Quad, 8M Mini, and 8M Plus
   vpu_hantro_daemon_tar:
@@ -273,7 +273,7 @@ repo:
 # i.MX 8M Plus ISP SDK
   imx_isp_bin:
     #url:  https://www.nxp.com/lgfiles/sdk/lsdk2412/isp-imx-4.2.2.24.3d.bin
-    url: http://sun.ap.freescale.net/dash/tmp/isp-imx-4.2.2.24-6.6.52.bin
+    url: http://sun.ap.freescale.net/dash/debian/lsdk2512/isp-imx-4.2.2.25.2-aarch64-6.12.20.bin
 
   gstreamer:
     url:  https://github.com/nxp-imx/gstreamer.git

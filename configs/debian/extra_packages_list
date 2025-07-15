@@ -52,7 +52,7 @@ ls_pkgs=" \
     libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev \
     uuid-dev libpython3.13-dev python3-pip python3-pybind11 python3-pil \
     python3-flatbuffers python3-decorator python3-numpy python3-attr python3-psutil \
-    python3-lxml libflatbuffers-dev libwaffle-dev libpciaccess-dev \
+    python3-lxml libwaffle-dev libpciaccess-dev \
     liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev \
     libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd \
 "
@@ -72,7 +72,7 @@ imx9_pkgs=" \
     libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev libassimp-dev \
     libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev libtheora-dev \
     libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging \
-    python3-venv libgtest-dev libdbus-glib-1-dev \
+    python3-venv libgtest-dev libdbus-glib-1-dev libprotobuf-dev \
     qt6-tools-dev libqt6svg6 qt6-svg-dev libfmt-dev libdevil-dev nfs-common \
 "
 imx8_pkgs=" \

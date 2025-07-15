@@ -412,7 +412,7 @@ repo:
 
   flatbuffers:
     url: https://github.com/google/flatbuffers.git
-    ver: e646392
+    ver: v24.3.25
 
 
 # NXP GoPoint Demo Experience components

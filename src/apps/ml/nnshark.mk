@@ -7,15 +7,10 @@
 # Depend: gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad libgpuperfcnt perf
 
 nnshark: gst_plugins_bad libgpuperfcnt
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
+#nnshark: gst_plugins_bad libgpuperfcnt
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,nnshark,apps/ml,submod) && \
 	 $(call patch_apply,nnshark,apps/ml) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
-	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgpuperfcnt.so ]; then \
-	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 $(call fbprint_b,"nnshark") && \
 	 sudo cp -rf $(DESTDIR)/usr/lib/libgpuperfcnt.so* $(RFSDIR)/usr/lib/ && \
 	 sudo cp -rf $(DESTDIR)/usr/include/gpuperfcnt $(RFSDIR)/usr/include/ && \

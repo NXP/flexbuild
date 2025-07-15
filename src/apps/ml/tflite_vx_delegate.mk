@@ -11,15 +11,10 @@
 
 
 tflite_vx_delegate: tflite tim_vx
+#tflite_vx_delegate: tflite tim_vx
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,tflite_vx_delegate,apps/ml) && \
 	 $(call patch_apply,tflite_vx_delegate,apps/ml) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
-	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libtim-vx.so ]; then \
-	     bld tim_vx -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 $(call fbprint_b,"tflite_vx_delegate") && \
 	 cd $(MLDIR)/tflite_vx_delegate && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

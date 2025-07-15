@@ -8,7 +8,7 @@
 
 # RDEPEND: python3-flatbuffers python3-numpy python3-lxml
 
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
 
 ethosu_vela:

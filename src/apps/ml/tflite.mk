@@ -12,7 +12,7 @@
 
 model-mobv1 = https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_08_02/mobilenet_v1_1.0_224_quant.tgz
 
-TFLITE_VERSION = tensorflow-lite-2.16.2
+TFLITE_VERSION = tensorflow-lite-2.18.0
 
 tflite:
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
@@ -20,15 +20,32 @@ tflite:
 	 $(call patch_apply,tflite,apps/ml) && \
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 cd $(MLDIR)/tflite && \
+	    if ! flatc --version 2>/dev/null | grep -qE '^flatc version 24\.'; then \
+        echo "flatc is not available, instlling flatbuffers 24.3.25..." $(LOG_MUTE) && \
+        wget https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz && \
+        tar -xf v24.3.25.tar.gz && \
+        cd flatbuffers-24.3.25 && \
+        cmake -DCMAKE_BUILD_TYPE=Release . && \
+        make -j$(nproc) && \
+        sudo make install && \
+        cd ..; \
+     else \
+        echo "flatc is OK" $(LOG_MUTE); \
+     fi && \
 	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	 export CMAKE_TLS_VERIFY=0 && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cmake  -S tensorflow/lite \
 		-B build_$(DISTROTYPE)_$(ARCH) \
+		-DCMAKE_POLICY_DEFAULT_CMP0169=OLD \
+		-DCMAKE_POLICY_DEFAULT_CMP0177=OLD \
 		-DCMAKE_BUILD_TYPE=release \
 		-DCMAKE_SYSTEM_NAME=Linux \
 		-DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+		-DTFLITE_ENABLE_FLATBUFFERS=ON \
 		-DTFLITE_HOST_TOOLS_DIR=/usr/bin \
 		-DFETCHCONTENT_FULLY_DISCONNECTED=OFF \
 		-DTFLITE_EVAL_TOOLS=on \
@@ -50,7 +67,7 @@ tflite:
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/public && \
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/platform && \
 	 install -d $(DESTDIR)/usr/include/tsl/platform && \
-	 install -d $(DESTDIR)/usr/lib/python3.13/dist-packages && \
+	 install -d $(DESTDIR)/usr/lib/python3/dist-packages && \
 	 cd $(MLDIR)/tflite/tensorflow/lite && \
 	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite && \
 	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public && \
@@ -74,7 +91,7 @@ tflite:
 	 $(call fbprint_n,"install mobilenet tflite file python example and pip package") && \
 	 cp $(MLDIR)/tflite/mobilenet_*.tflite $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
-	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.13/dist-packages \
-		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE) && \
+	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3/dist-packages \
+		--no-cache-dir --upgrade --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE) && \
 	 #rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
 	 $(call fbprint_d,"tflite")

@@ -12,9 +12,6 @@ secure_obj: optee_os optee_client
 	 if [ "$(CONFIG_OPTEE)" != "y" ]; then \
 	     $(call fbprint_d,"secure_obj"); exit ; \
 	 fi && \
-	 if [ ! -d $(SECDIR)/optee_os/out/arm-plat-ls ]; then \
-		CONFIG_OPTEE=y bld optee_os -m ls1028ardb -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
 	 kerneloutdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \
 	 mkdir -p $(DESTDIR)/usr/lib && \
 	 kernelrelease=`cat $$kerneloutdir/include/config/kernel.release` && \

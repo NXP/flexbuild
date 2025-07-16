@@ -161,9 +161,11 @@ repo:
 
   libpkcs11:
     url:  https://github.com/nxp-qoriq/libpkcs11.git
+    ver:  lf-6.6.52-2.2.0
 
   secure_obj:
     url:  https://github.com/nxp-qoriq/secure_obj.git
+    ver:  lf-6.6.52-2.2.0
 
   optee_os:
     url:  https://github.com/nxp-qoriq/optee_os.git

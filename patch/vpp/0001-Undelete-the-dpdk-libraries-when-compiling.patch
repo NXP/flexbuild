@@ -1,0 +1,67 @@
+From 5be9a69909cda7c799a305807d979b052f72f20c Mon Sep 17 00:00:00 2001
+From: nxa22691 <andy.tang@nxp.com>
+Date: Mon, 9 Jun 2025 10:36:59 +0900
+Subject: [PATCH] Undelete the dpdk libraries when compiling
+
+Also update the debian package to new version
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ Makefile                        | 6 +++---
+ build-data/packages/dpaa.mk     | 3 +--
+ build/external/packages/dpdk.mk | 1 -
+ 3 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 3514e7d93..8d890f18c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -104,8 +104,8 @@ else ifeq ($(OS_ID)-$(OS_VERSION_ID),debian-11)
+ 	DEB_DEPENDS += clang clang-format-11
+ 	LIBFFI=libffi7
+ else
+-	DEB_DEPENDS += clang-11 clang-format-11
+-	LIBFFI=libffi7
++	DEB_DEPENDS += clang clang-format
++	LIBFFI=libffi-dev
+ 	DEB_DEPENDS += enchant-2  # for docs
+ endif
+ 
+@@ -310,7 +310,7 @@ bootstrap:
+ install-dep:
+ ifeq ($(filter ubuntu debian,$(OS_ID)),$(OS_ID))
+ 	@sudo -E apt-get update
+-	@sudo -E apt-get $(APT_ARGS) $(CONFIRM) $(FORCE) install $(DEB_DEPENDS)
++	@sudo -E apt-get -y $(APT_ARGS) $(CONFIRM) $(FORCE) install $(DEB_DEPENDS)
+ else ifneq ("$(wildcard /etc/redhat-release)","")
+ ifeq ($(OS_ID),rhel)
+ 	@sudo -E yum-config-manager --enable rhel-server-rhscl-7-rpms
+diff --git a/build-data/packages/dpaa.mk b/build-data/packages/dpaa.mk
+index 9a42453e9..d7526627e 100644
+--- a/build-data/packages/dpaa.mk
++++ b/build-data/packages/dpaa.mk
+@@ -15,8 +15,7 @@ prep-dpdk-lib:
+ ifneq ($(DPDK_PATH),)
+ 	@echo "@@@@ Creating libdpdk.a in $(DPDK_PATH)/lib"
+ 	@cd $(DPDK_PATH)/lib && \
+-	 echo "GROUP ( $$(ls librte*.a) )" > libdpdk.a && \
+-	 rm -rf librte*.so librte*.so.* dpdk/*/librte*.so dpdk/*/librte*.so.*
++	 echo "GROUP ( $$(ls librte*.a) )" > libdpdk.a
+ else
+ 	@echo "DPDK Install Path not defined"
+ endif
+diff --git a/build/external/packages/dpdk.mk b/build/external/packages/dpdk.mk
+index 9519b2845..86427ff2e 100644
+--- a/build/external/packages/dpdk.mk
++++ b/build/external/packages/dpdk.mk
+@@ -210,7 +210,6 @@ define dpdk_install_cmds
+ 	meson install && \
+ 	cd $(dpdk_install_dir)/lib && \
+ 	echo "GROUP ( $$(ls librte*.a ) )" > libdpdk.a && \
+-	rm -rf librte*.so librte*.so.* dpdk/*/librte*.so dpdk/*/librte*.so.* && \
+ 	deactivate
+ endef
+ 
+-- 
+2.34.1
+

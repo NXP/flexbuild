@@ -7,15 +7,15 @@
 # https://wiki.fd.io/view/VPP
 
 # depends on libmnl-dev for libmnl/libmnl.h
+# Need git information to compile, so must use git clone
 
+#vpp:
 vpp: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call download_repo,vpp,apps/networking,git) && \
+	 $(call patch_apply,vpp,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
-	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
 	 $(call fbprint_b,"vpp") && \
 	 export CROSS_PREFIX=aarch64-linux-gnu && \
@@ -26,19 +26,9 @@ vpp: dpdk
 	 	-I$(NETDIR)/dpdk/lib/cryptodev -I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
 	 export EXTRA_LIBS=$(RFSDIR)/lib/aarch64-linux-gnu && \
 	 export DPDK_PATH=$(DESTDIR)/usr && \
+	 export PYTHONPATH=$(RFSDIR)/usr/lib/python3.13:$(PYTHONPATH) && \
 	 export LD_LIBRARY_PATH=$(DESTDIR)/usr/local/lib:$(RFSDIR)/lib/aarch64-linux-gnu:$(RFSDIR)/lib && \
-	 [ ! -f /usr/lib/python3.13/_sysconfigdata__aarch64-linux-gnu.py ] && \
-	 sudo ln -s $(RFSDIR)/usr/lib/python3.13/_sysconfigdata__aarch64-linux-gnu.py \
-	 /usr/lib/python3.13/_sysconfigdata__aarch64-linux-gnu.py || true && \
-	 \
 	 cd $(NETDIR)/vpp && \
-	 if [ -d $(FBDIR)/patch/vpp ] && [ ! -f .patchdone ]; then \
-	      git am $(FBDIR)/patch/vpp/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
-	 sed -i -e 's/22.04)/12)/g' -e 's/clang-format-11/clang-format/g' \
-		-e 's/libffi7/libffi8/g' -e 's/E apt-get/E apt-get -y/g' Makefile && \
-	 sed -i -e "s/-Werror -Wall//g" -e "/^#check_c_compiler_flag/s/#//g" \
-	        -e "/^#		      compiler_flag_no_address/s/#//g" src/CMakeLists.txt && \
 	 $(MAKE) -j$(JOBS) install-dep $(LOG_MUTE) && \
 	 cd build-root && \
 	 $(MAKE) -j$(JOBS) distclean $(LOG_MUTE) && \

@@ -1,11 +1,12 @@
 # Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# only used on: lx216, ls1088 and ls2088
 
 
 
 aiopsl:
-	@[ $${MACHINE:0:5} != lx216 -a $${MACHINE:0:6} != ls1088 -a $${MACHINE:0:6} != ls2088 ] && exit || \
+	@[ $(SOCFAMILY) != LS ] && exit || \
 	 $(call download_repo,aiopsl,apps/networking) && \
 	 $(call patch_apply,aiopsl,apps/networking) && \
 	 $(call fbprint_b,"aiopsl") && \

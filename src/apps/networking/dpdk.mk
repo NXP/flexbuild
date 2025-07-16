@@ -18,8 +18,6 @@ dpdk:
 	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call download_repo,dpdk,apps/networking) && \
 	 $(call patch_apply,dpdk,apps/networking) && \
-	 $(call download_repo,linux,linux) && \
-	 $(call patch_apply,linux,linux) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 fi && \

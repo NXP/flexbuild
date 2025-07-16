@@ -10,13 +10,10 @@ ovs_dpdk: dpdk
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
 	 fi && \
-	 if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
-	     bld dpdk -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
+	 if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then \
+		sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/ && \
+		sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/; \
 	 fi && \
-         if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then \
-	     sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/ && \
-             sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/; \
-         fi && \
 	 \
 	 $(call fbprint_b,"ovs_dpdk") && \
 	 cd $(NETDIR)/ovs_dpdk && \

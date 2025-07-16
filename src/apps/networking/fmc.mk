@@ -21,9 +21,6 @@ fmc: fmlib
 	 elif [ $(DISTROTYPE) = buildroot ]; then \
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
-	 if [ ! -d $(NETDIR)/fmlib/include/fmd/Peripherals -o ! -f $(DESTDIR)/usr/lib/libfm-arm.a ]; then \
-	     bld fmlib -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
-	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
 	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
 	 fi && \

@@ -104,6 +104,7 @@ repo:
 
   tsntool:
     url:  https://github.com/nxp-qoriq/tsntool.git
+    ver:  Real-Time-Edge-v3.2-202507
 
   dpdk:
     url:  https://github.com/nxp-qoriq/dpdk.git

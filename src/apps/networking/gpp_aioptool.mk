@@ -1,11 +1,12 @@
 # Copyright 2017-2023 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# only used on: lx2 and ls2088a
 
 
 
 gpp_aioptool:
-	@[ $${MACHINE:0:3} != lx2 -a $${MACHINE:0:6} != ls2088 ] && exit || \
+	@[ $(SOCFAMILY) != LS ] && exit || \
 	 $(call download_repo,gpp_aioptool,apps/networking) && \
 	 $(call patch_apply,gpp_aioptool,apps/networking) && \
 	 $(call fbprint_b,"gpp_aioptool") && \

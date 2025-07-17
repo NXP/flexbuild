@@ -647,6 +647,7 @@ check_linux_config() {
 
 do_clean() {
     rm -rf $FBOUTDIR/images/*
+	rm $FBDIR/logs/.*
     clean_bsp_components
     clean_linux_components
     clean_apps_components

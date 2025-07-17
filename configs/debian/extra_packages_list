@@ -25,7 +25,7 @@ host_dependent_packages=" \
     zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
     rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-    libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata \
+    libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser \
 "
 
 
@@ -90,3 +90,74 @@ reinst_pkgs=" \
 	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript \
 	qml6-module-qt5compat-graphicaleffects \
 "
+
+#
+# config RFS for each board
+#
+debian_rfs_post_config() {
+
+	echo "Setup ${MACHINE} ..."
+	[ -f $FBDIR/logs/.postcfgdone ] && exit
+	case "${MACHINE}" in
+		imx8mm*)
+			sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
+			sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
+			sed -i '$a\[Install]\nWantedBy=graphical.target\n' $RFSDIR/lib/systemd/system/gdm.service
+			#rm -rf $RFSDIR/etc/systemd/system/display-manager.service
+			ln -sf /lib/systemd/system/gdm.service $RFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
+			ln -sf vsidaemon-IMX8MM $RFSDIR/usr/bin/vsidaemon
+			/usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' $RFSDIR/etc/xdg/weston/weston.ini
+			/usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' $RFSDIR/etc/xdg/weston/weston.ini
+			#sudo chroot $RFSDIR patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-*.so.0.0.0
+
+			;;
+
+		imx8mp*)
+			sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
+			sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
+			sed -i '$a\[Install]\nWantedBy=graphical.target\n' $RFSDIR/lib/systemd/system/gdm.service
+			#rm -rf $RFSDIR/etc/systemd/system/display-manager.service
+			ln -sf /lib/systemd/system/gdm.service $RFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
+			ln -sf /lib/systemd/system/imx8-isp.service $RFSDIR/etc/systemd/system/multi-user.target.wants/imx8-isp.service
+			ln -sf vsidaemon-IMX8MP $RFSDIR/usr/bin/vsidaemon
+
+			#sudo chroot $RFSDIR patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-*.so.0.0.0
+			;;
+
+		imx91*)
+			sed -i '/^use-g2d=true/s/^/# /' $RFSDIR/etc/xdg/weston/weston.ini
+			sed -i '/^gbm-format=argb8888/s/^/# /' $RFSDIR/etc/xdg/weston/weston.ini
+			sed -i '/gopoint/d' $RFSDIR/etc/xdg/weston/weston.ini
+			ln -sf /lib/systemd/system/weston.service $RFSDIR/etc/systemd/system/graphical.target.wants/weston.service
+			;;
+
+		imx93*)
+			ln -sf libg2d-pxp.so.2.2.0 $RFSDIR/usr/lib/libg2d.so.2
+			sed -i '/^xwayland=true$/a modules=screen-share.so' $RFSDIR/etc/xdg/weston/weston.ini
+			ln -sf /lib/systemd/system/weston.service $RFSDIR/etc/systemd/system/graphical.target.wants/weston.service
+			;;
+
+		ls1028a*)
+			sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
+			sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i $RFSDIR/etc/gdm3/daemon.conf
+			sed -i '$a\[Install]\nWantedBy=graphical.target\n' $RFSDIR/lib/systemd/system/gdm.service
+			#rm -rf $RFSDIR/etc/systemd/system/display-manager.service
+			ln -sf /lib/systemd/system/gdm.service $RFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
+			;;
+
+		ls1043*|ls1046*)
+			ln -sf /lib/systemd/system/fmc.service $RFSDIR/etc/systemd/system/multi-user.target.wants/fmc.service
+			;;
+		*)
+			echo " Error: ${MACHINE} is not supported "
+			exit 1
+			;;
+	esac
+
+	sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' $RFSDIR/usr/lib/udev/rules.d/50-firmware.rules
+	echo "${MACHINE}" > $RFSDIR/etc/hostname
+	#/usr/bin/hostnamectl set-hostname "${MACHINE}"
+	#/usr/sbin/depmod -a
+	#/usr/sbin/update-initramfs -u
+	touch $FBDIR/logs/.postcfgdone 1>/dev/null 2>&1
+}

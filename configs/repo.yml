@@ -458,7 +458,6 @@ repo:
     url: https://github.com/nxp-imx-support/imx-ebike-vit.git
     ver: 7216521
 
-# ......
   gtec_demo_framework:
     url: https://github.com/nxp-imx/gtec-demo-framework.git
-    tag: 6.5.0
+    tag: 6.6.0

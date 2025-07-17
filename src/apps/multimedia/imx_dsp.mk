@@ -18,7 +18,7 @@ endif
 
 
 imx_dsp:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"imx_dsp") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp ]; then \

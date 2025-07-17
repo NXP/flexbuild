@@ -9,7 +9,7 @@ GPNT_GPU_DESTDIR = /opt/imx-gpu-sdk/GLES2/
 GPNT_GPU_SOURDIR = $(GPDIR)/gtec_demo_framework/build/Yocto/Ninja/release/DemoApps/GLES2
 
 gtec_demo_framework:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,gtec_demo_framework,apps/gopoint) && \
 	 $(call patch_apply,gtec_demo_framework,apps/gopoint) && \
 	 \
@@ -18,8 +18,9 @@ gtec_demo_framework:
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export EXTENSIONS="OpenGLES:GL_VIV_direct_texture,OpenGLES3:GL_EXT_color_buffer_float" && \
 	 export FEATURES="ConsoleHost,EarlyAccess,EGL,GoogleUnitTest,Lib_NlohmannJson,Lib_pugixml,Test_RequireUserInputToExit,WindowHost,G2D,OpenGLES2,OpenCV4,Vulkan1.2,OpenGLES3.2,OpenCL1.2,OpenVX1.2" && \
+	 mv $(RFSDIR)/usr/bin/wayland-scanner $(RFSDIR)/usr/bin/wayland-scanner.bak && \
+	 ln -sf /usr/bin/wayland-scanner $(RFSDIR)/usr/bin/wayland-scanner && \
 	 \
-	 ln -sf $(RFSDIR)/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	 cd $(GPDIR)/gtec_demo_framework && \
 	 source ./prepare.sh && export DESTDIR='' && \
 	 # *DESTDIR* is for compiling, it is not the *DESTDIR* of flexbuild && \
@@ -35,5 +36,5 @@ gtec_demo_framework:
 		cp -arf $(GPNT_GPU_SOURDIR)/$${demoapp}___Wayland/GLES2.$${demoapp}___Wayland $(DESTDIR)/$(GPNT_GPU_DESTDIR)/$${demoapp}___Wayland/; \
 	 done && \
 	 \
-	 rm -rf /lib/ld-linux-aarch64.so.1 && \
+	 mv $(RFSDIR)/usr/bin/wayland-scanner.bak $(RFSDIR)/usr/bin/wayland-scanner && \
 	 $(call fbprint_d,"gtec_demo_framework")

@@ -12,7 +12,7 @@ uefi_bin_url = https://github.com/nxp-qoriq/qoriq-uefi-binary.git
 
 
 layerscape_fw: rcw mc_bin mc_utils fm_ucode qe_ucode dp_fw_cadence phy_cortina phy_inphi pfe_bin ddr_phy_bin
-	@touch $(FBOUTDIR)/bsp/.lsfwdone
+	@touch $(FBDIR)/logs/.lsfwdone
 
 
 

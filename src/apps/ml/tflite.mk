@@ -20,14 +20,14 @@ tflite:
 	 $(call patch_apply,tflite,apps/ml) && \
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 cd $(MLDIR)/tflite && \
-	    if ! flatc --version 2>/dev/null | grep -qE '^flatc version 24\.'; then \
-        echo "flatc is not available, instlling flatbuffers 24.3.25..." $(LOG_MUTE) && \
-        wget https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz && \
+	 if ! flatc --version 2>/dev/null | grep -qE '^flatc version 24\.'; then \
+        echo "flatc is not available, instlling flatbuffers 24.3.25..." && \
+        wget https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz $(LOG_MUTE) && \
         tar -xf v24.3.25.tar.gz && \
         cd flatbuffers-24.3.25 && \
-        cmake -DCMAKE_BUILD_TYPE=Release . && \
-        make -j$(nproc) && \
-        sudo make install && \
+        cmake -DCMAKE_BUILD_TYPE=Release . $(LOG_MUTE) && \
+        make -j$(nproc) $(LOG_MUTE) && \
+        sudo make install $(LOG_MUTE) && \
         cd ..; \
      else \
         echo "flatc is OK" $(LOG_MUTE); \

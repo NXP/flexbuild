@@ -129,7 +129,7 @@ generate_composite_firmware() {
         done
     done
 
-    [ $SOCFAMILY = LS -a ! -f $FBOUTDIR/bsp/.lsfwdone ] && bld layerscape_fw
+    [ $SOCFAMILY = LS -a ! -f $FBDIR/logs/.lsfwdone ] && bld layerscape_fw
 
     [ ! -f $FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb ] && \
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
@@ -966,7 +966,7 @@ tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.
 base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
 initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.cpio.gz
 
-[ $DISTROVARIANT != base ] && mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
+[ $DISTROVARIANT != base -a "$MACHINE" != all ] && sudo mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
 mkdir -p $PKGDIR/linux $FBDIR/logs
 mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}

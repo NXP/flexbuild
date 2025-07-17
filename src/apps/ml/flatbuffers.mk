@@ -24,4 +24,5 @@ flatbuffers:
 		-DFLATBUFFERS_BUILD_SHAREDLIB=ON $(LOG_MUTE) && \
 	 cmake --build $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
+	 cp -rf $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH)/libflatbuffers* $(RFSDIR)/usr/lib && \
 	 $(call fbprint_d,"flatbuffers")

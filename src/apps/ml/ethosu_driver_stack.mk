@@ -12,7 +12,7 @@
 PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
 
-ethosu_driver_stack:
+ethosu_driver_stack: flatbuffers
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,ethosu_driver_stack,apps/ml) && \
 	 $(call patch_apply,ethosu_driver_stack,apps/ml) && \

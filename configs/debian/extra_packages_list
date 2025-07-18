@@ -26,6 +26,7 @@ host_dependent_packages=" \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
     rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser \
+    efitools \
 "
 
 
@@ -97,7 +98,7 @@ reinst_pkgs=" \
 debian_rfs_post_config() {
 
 	echo "Setup ${MACHINE} ..."
-	[ -f $FBDIR/logs/.postcfgdone ] && exit
+	[ -f $FBDIR/tmp/.postcfgdone ] && exit
 	case "${MACHINE}" in
 		imx8mm*)
 			sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
@@ -159,5 +160,5 @@ debian_rfs_post_config() {
 	#/usr/bin/hostnamectl set-hostname "${MACHINE}"
 	#/usr/sbin/depmod -a
 	#/usr/sbin/update-initramfs -u
-	touch $FBDIR/logs/.postcfgdone 1>/dev/null 2>&1
+	touch $FBDIR/tmp/.postcfgdone 1>/dev/null 2>&1
 }

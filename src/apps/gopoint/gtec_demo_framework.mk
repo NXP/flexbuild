@@ -8,7 +8,7 @@
 GPNT_GPU_DESTDIR = /opt/imx-gpu-sdk/GLES2/
 GPNT_GPU_SOURDIR = $(GPDIR)/gtec_demo_framework/build/Yocto/Ninja/release/DemoApps/GLES2
 
-gtec_demo_framework:
+gtec_demo_framework: gpu_viv
 	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,gtec_demo_framework,apps/gopoint) && \
 	 $(call patch_apply,gtec_demo_framework,apps/gopoint) && \

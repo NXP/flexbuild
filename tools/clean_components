@@ -9,6 +9,7 @@ clean_bsp_components() {
 	echo "[INFO] Clean the BSP ..."
     rm -rf $FBOUTDIR/bsp
     rm -rf $PKGDIR/bsp/*
+	rm -f $FBDIR/logs/.lsfwdone
 	echo "[INFO] Done."
 }
 

@@ -325,6 +325,22 @@ rfs_umount() {
 	done
 }
 
+rfs_mount() {
+	if ! mountpoint -q "$RFSDIR/proc"; then
+		mount -t proc /proc "$RFSDIR/proc"
+	fi
+	if ! mountpoint -q "$RFSDIR/sys"; then
+		mount -t sysfs /sys "$RFSDIR/sys"
+	fi
+	if ! mountpoint -q "$RFSDIR/dev"; then
+		mount --bind /dev "$RFSDIR/dev"
+	fi
+	if ! mountpoint -q "$RFSDIR/dev/pts"; then
+		mount --bind /dev/pts "$RFSDIR/dev/pts"
+	fi
+}
+
+
 pack_distro_rfs() {
     [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit; }
     if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then

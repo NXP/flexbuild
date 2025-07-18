@@ -36,10 +36,11 @@ build_distro_rfs_debian() {
     [ -f $RFSDIR/etc/buildinfo ] || $sudopt rsync -aHAX $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH/* $RFSDIR
 
     if [ $DISTROVARIANT = server -o $DISTROVARIANT = desktop ]; then
-		mount -t proc /proc "$RFSDIR/proc"
-		mount -t sysfs /sys "$RFSDIR/sys"
-		mount --bind /dev "$RFSDIR/dev"
-		mount --bind /dev/pts "$RFSDIR/dev/pts"
+		if grep -q "Bootloader" $RFSDIR/etc/buildinfo; then
+			log_mute echo "Rootfs already exists, exit..." && exit 0
+		fi
+
+		rfs_mount
 
 		show_one_line $sudopt chroot $RFSDIR apt-get update
 		case "$MACHINE" in

@@ -10,7 +10,7 @@
 
 # version：12.0.3
 
-weston: libdrm wayland wayland_protocols gpu_viv
+weston: libdrm wayland wayland_protocols
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a ] && exit || \
 	 $(call download_repo,weston,apps/graphics) && \
 	 $(call patch_apply,weston,apps/graphics) && \

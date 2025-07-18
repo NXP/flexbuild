@@ -7,7 +7,7 @@
 
 
 gputop: libgpuperfcnt
-	@[ $(DESTARCH) != arm64 ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,gputop,apps/graphics) && \
 	 $(call patch_apply,gputop,apps/graphics) && \
 	 $(call fbprint_b,"gputop") && \

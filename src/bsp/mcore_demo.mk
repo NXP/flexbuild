@@ -4,24 +4,31 @@
 
 # i.MX M4/M7/M33 core Demo images
 
-IMX_MCORE_VERSION ?= 2.16.000
-
-MCORE_LIST ?= imx8mm-m4 imx8mq-m4 imx8mn-m7 imx8mp-m7 imx8ulp-m33 imx93-m33 imx95-m7
-
-FW_DOWNLOAD_URL ?= https://www.nxp.com/lgfiles/NMG/MAD/YOCTO
 
 
 mcore_demo:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 if [ ! -d $(BSPDIR)/imx_mcore_demos ]; then \
-	     mkdir -p $(BSPDIR)/imx_mcore_demos && \
-	     cd $(BSPDIR)/imx_mcore_demos && \
-	     for soc in $(MCORE_LIST); do \
-		wget -q $(FW_DOWNLOAD_URL)/$${soc}-demo-$(IMX_MCORE_VERSION).bin -O $${soc}.bin $(LOG_MUTE) && \
-		chmod +x $${soc}.bin && ./$${soc}.bin --auto-accept $(LOG_MUTE) && \
-		mv $${soc}-demo-$(IMX_MCORE_VERSION) $${soc}-demo && \
-		rm -f $${soc}.bin; \
-	     done; \
-	 fi && \
+	 [ -d $(BSPDIR)/imx_mcore_demos ] && exit || \
+	 mkdir -p $(BSPDIR)/imx_mcore_demos && \
+	 cd $(BSPDIR)/imx_mcore_demos && \
+	 \
+	 for soc in imx8mm imx8mp imx93 imx95; do \
+		case $$soc in \
+			imx8mm) url="$(repo_imx8mm_mdemo_url)" ;; \
+			imx8mp) url="$(repo_imx8mp_mdemo_url)" ;; \
+			imx93) url="$(repo_imx93_mdemo_url)" ;; \
+			imx95) url="$(repo_imx95_mdemo_url)" ;; \
+			*) echo "Unknown soc: $$soc"; exit 1 ;; \
+		esac; \
+		\
+		_FNAME="$$(basename "$${url}")" && \
+		wget -q $${url} -O $${_FNAME} $(LOG_MUTE) && \
+		chmod +x $${_FNAME} && ./$${_FNAME} --auto-accept $(LOG_MUTE) && \
+		_BNAME="$$(basename "$${_FNAME}" .bin)" && \
+		_DNAME="$$(echo "$${_BNAME}" | cut -d'-' -f1-3)" && \
+		mv $${_BNAME} $${_DNAME} && \
+		rm -f $${_FNAME} ; \
+	 \
+	 done && \
 	 [ ! -L $(FBOUTDIR)/bsp/imx_mcore_demos ] && ln -sf $(BSPDIR)/imx_mcore_demos $(FBOUTDIR)/bsp/imx_mcore_demos || true && \
 	 $(call fbprint_d,"imx_mcore_demo")

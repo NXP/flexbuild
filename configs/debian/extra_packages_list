@@ -97,7 +97,7 @@ reinst_pkgs=" \
 debian_rfs_post_config() {
 
 	echo "Setup ${MACHINE} ..."
-	[ -f $FBDIR/tmp/.postcfgdone ] && exit
+	[ -f $FBDIR/tmp/.postcfgdone ] && exit 0
 	case "${MACHINE}" in
 		imx8mm*)
 			sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password
@@ -147,6 +147,8 @@ debian_rfs_post_config() {
 
 		ls1043*|ls1046*)
 			ln -sf /lib/systemd/system/fmc.service $RFSDIR/etc/systemd/system/multi-user.target.wants/fmc.service
+			;;
+		ls*|lx*)
 			;;
 		*)
 			echo " Error: ${MACHINE} is not supported "

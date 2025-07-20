@@ -574,8 +574,8 @@ flex_auto_build() {
     bld boot -a $DESTARCH -p $SOCFAMILY
 	#build_rfs_and_apps
 
-    bld merge-apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
-    bld packrfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
+    bld merge-apps -m $MACHINE
+    bld packrfs -m $MACHINE
 
     cp -f $FBDIR/tools/flex-installer $FBOUTDIR/images
 	log_mute ls -goh $FBOUTDIR/images

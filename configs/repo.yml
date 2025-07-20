@@ -168,8 +168,7 @@ repo:
 
   openssl:
     url:  https://github.com/openssl/openssl.git
-    tag:  openssl-3.4.1
-    # must use this version to match debian 12.... 
+    tag:  openssl-3.5.0
 
   libpkcs11:
     url:  https://github.com/nxp-qoriq/libpkcs11.git

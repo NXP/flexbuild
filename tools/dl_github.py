@@ -192,7 +192,7 @@ def download_and_process(
         download_file(archive_url, temp_file)
 
         # 2. Extract original archive
-        sys.stdout.write(f"Checking and repacking ... \n")
+        # sys.stdout.write(f"Checking and repacking ... \n")
         extracted_dir = os.path.join(temp_dir, "extracted")
         os.makedirs(extracted_dir)
         try:

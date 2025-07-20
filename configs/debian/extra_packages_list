@@ -97,7 +97,7 @@ reinst_pkgs=" \
 debian_rfs_post_config() {
 
 	echo "Setup ${MACHINE} ..."
-	[ -f $FBDIR/tmp/.postcfgdone ] && exit 0
+	[ -f $FBDIR/tmp/.postcfgdone ] && return 0
 	case "${MACHINE}" in
 		imx8mm*)
 			sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" $RFSDIR/etc/pam.d/gdm-password

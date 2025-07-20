@@ -27,7 +27,7 @@ define dl_from_github
 			--subdir=$(1) \
 			|| { echo Downloading without md5 failed; exit 1; } \
 	fi; \
-	echo "[INFO] Downloading Done"
+	echo "[INFO] Downloading Done" $(LOG_MUTE)
 endef
 
 #

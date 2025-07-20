@@ -20,6 +20,7 @@ ovs_dpdk: dpdk
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu" && \
 	 export LIBS="$(shell PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig $(CROSS)pkg-config --libs libdpdk)" && \
+	 export ovs_cv_groff=no && \
 	 ./boot.sh $(LOG_MUTE) && \
 	 ./configure --prefix=/usr \
 	   --host=aarch64-linux-gnu \

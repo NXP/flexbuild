@@ -344,7 +344,7 @@ rfs_mount() {
 pack_distro_rfs() {
     [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit; }
     if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
-		debian_rfs_post_config
+		[ ! -f $FBDIR/logs/.rfsconfig${MACHINE} ] && { debian_rfs_post_config; touch $FBDIR/logs/.rfsconfig${MACHINE}; }
 		rfs_umount
     fi
 

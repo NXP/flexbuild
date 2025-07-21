@@ -19,7 +19,6 @@ imx_nnstreamer_examples: gstreamer
 	 $(call patch_apply,imx_nnstreamer_examples,apps/gopoint) && \
 	 $(call fbprint_b,"imx_nnstreamer_examples") && \
 	 cd $(GPDIR)/imx_nnstreamer_examples && \
-	 set -x && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CXXFLAGS="-I$(DESTDIR)/usr/include/ -I$(DESTDIR)/usr/include/gstreamer-1.0 \

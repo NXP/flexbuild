@@ -49,7 +49,7 @@ build_distro_rfs_debian() {
 			   ls*|lx*) PKGS="$ls_pkgs" ; log_mute echo ls  package ... ;;
 			   *)       echo "machine is not supported"; exit 1;  ;;
 		esac
-		mkdir -p $RFSDIR/run/dbus/ && touch $RFSDIR/run/dbus/system_bus_socket
+		export DEBIAN_FRONTEND=noninteractive &&
         show_one_line $sudopt chroot $RFSDIR apt-get install --no-install-recommends -y $PKGS
 
 		# set U-Boot version info in userland to be readable in linux runtime

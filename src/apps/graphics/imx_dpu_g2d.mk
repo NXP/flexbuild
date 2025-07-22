@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-# G2D library using i.MX DPU on imx8dx, imx8qxp, imx8qm
+# G2D library using i.MX DPU on imx8dx, imx8qxp, imx8qm imx95
 #
 # DEPENDS: libgal-imx libdrm
 

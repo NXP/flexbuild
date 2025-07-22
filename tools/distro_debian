@@ -37,6 +37,7 @@ build_distro_rfs_debian() {
 
     if [ $DISTROVARIANT = server -o $DISTROVARIANT = desktop ]; then
 		if grep -q "Bootloader" $RFSDIR/etc/buildinfo; then
+			rfs_mount
 			log_mute echo "Rootfs already exists, exit..." && exit 0
 		fi
 

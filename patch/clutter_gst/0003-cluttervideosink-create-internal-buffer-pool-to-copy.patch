@@ -1,0 +1,192 @@
+From d8cff661623403e4710adf11872dd68b5d4de359 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Wed, 14 Apr 2021 22:57:12 +0800
+Subject: [PATCH] cluttervideosink: create internal buffer pool to copy sw
+ buffer
+
+Signed-off-by: Haihua Hu <jared.hu@nxp.com>
+---
+ clutter-gst/clutter-gst-video-sink.c | 107 ++++++++++++++++++++++++++-
+ 1 file changed, 106 insertions(+), 1 deletion(-)
+
+diff --git a/clutter-gst/clutter-gst-video-sink.c b/clutter-gst/clutter-gst-video-sink.c
+index d6c08bf..e8ad874 100644
+--- a/clutter-gst/clutter-gst-video-sink.c
++++ b/clutter-gst/clutter-gst-video-sink.c
+@@ -82,6 +82,7 @@
+ #include <gst/video/navigation.h>
+ #include <gst/video/video.h>
+ #include <gst/allocators/gstdmabuf.h>
++#include <gst/allocators/gstdmabufheaps.h>
+ #include <gst/riff/riff-ids.h>
+ #include <string.h>
+ #include <math.h>
+@@ -254,6 +255,7 @@ struct _ClutterGstVideoSinkPrivate
+   int video_start;
+   gboolean default_sample;
+   GstVideoInfo info;
++  GstBufferPool *pool;
+ 
+   gdouble brightness;
+   gdouble contrast;
+@@ -2234,6 +2236,44 @@ clutter_gst_video_sink_parse_caps (GstCaps *caps,
+   }
+ }
+ 
++static GstBufferPool *
++clutter_gst_video_sink_create_pool (ClutterGstVideoSink *sink, GstCaps * caps)
++{
++  GstBufferPool *pool = NULL;
++  GstStructure *structure;
++  GstVideoInfo info;
++  GstAllocator *alloc = NULL;
++
++  gst_video_info_from_caps (&info, caps);
++  GstVideoFormat format = GST_VIDEO_INFO_FORMAT (&info);
++  /* currently only support NV12 and YUY2 */
++  if (format != GST_VIDEO_FORMAT_NV12 && format != GST_VIDEO_FORMAT_YUY2)
++    return NULL;
++
++  alloc = gst_dmabufheaps_allocator_obtain ();
++  if (!alloc)
++    return NULL;
++
++  GST_INFO_OBJECT (sink, "create internal buffer allocator %"GST_PTR_FORMAT, alloc);
++
++  pool = gst_video_buffer_pool_new ();
++
++  structure = gst_buffer_pool_get_config (pool);
++  gst_buffer_pool_config_set_params (structure, caps, info.size, 2, 0);
++  gst_buffer_pool_config_set_allocator (structure, alloc, NULL);
++  if (!gst_buffer_pool_set_config (pool, structure)) {
++    g_object_unref (pool);
++    pool = NULL;
++  }
++  g_object_unref (alloc);
++
++  sink->priv->info = info;
++
++  GST_INFO_OBJECT (sink, "create internal buffer pool %"GST_PTR_FORMAT, pool);
++
++  return pool;
++}
++
+ static gboolean
+ clutter_gst_video_sink_set_caps (GstBaseSink *bsink,
+                                  GstCaps *caps)
+@@ -2249,6 +2289,10 @@ clutter_gst_video_sink_set_caps (GstBaseSink *bsink,
+   if (!clutter_gst_video_sink_parse_caps (caps, sink, FALSE))
+     return FALSE;
+ 
++  if (priv->pool)
++    gst_object_unref (priv->pool);
++  priv->pool = clutter_gst_video_sink_create_pool (sink, caps);
++
+   g_mutex_lock (&priv->source->buffer_lock);
+   priv->source->has_new_caps = TRUE;
+   g_mutex_unlock (&priv->source->buffer_lock);
+@@ -2410,6 +2454,8 @@ clutter_gst_video_sink_init (ClutterGstVideoSink *sink)
+   priv->tablev = g_new0 (guint8, 256 * 256);
+ 
+   priv->overlays = clutter_gst_overlays_new ();
++
++  priv->pool = NULL;
+ }
+ 
+ static GstFlowReturn
+@@ -2419,6 +2465,41 @@ _clutter_gst_video_sink_render (GstBaseSink *bsink,
+   ClutterGstVideoSink *sink = CLUTTER_GST_VIDEO_SINK (bsink);
+   ClutterGstVideoSinkPrivate *priv = sink->priv;
+   ClutterGstSource *gst_source = priv->source;
++  GstBuffer *to_render = NULL;
++  GstFlowReturn ret = GST_FLOW_OK;
++ 
++  if (!gst_is_dmabuf_memory (gst_buffer_peek_memory (buffer, 0)) && priv->pool) {
++    GstVideoFrame src, dst;
++    GstBuffer *tmp_buffer = NULL;
++
++    if (!gst_buffer_pool_is_active (priv->pool)) {
++      if (!gst_buffer_pool_set_active (priv->pool, TRUE))
++        goto activate_failed;
++    }
++
++    ret = gst_buffer_pool_acquire_buffer (priv->pool, &tmp_buffer, NULL);
++    if (ret != GST_FLOW_OK)
++      return ret;
++
++    if (!gst_video_frame_map (&dst, &priv->info, tmp_buffer,
++                      GST_MAP_WRITE))
++      goto dst_map_fail;
++
++
++    if (!gst_video_frame_map (&src, &priv->info, buffer,
++                      GST_MAP_READ)) {
++      gst_video_frame_unmap (&dst);
++      goto src_map_fail;
++    }
++
++    gst_video_frame_copy (&dst, &src);
++
++    gst_video_frame_unmap (&src);
++    gst_video_frame_unmap (&dst);
++
++    to_render = tmp_buffer;
++  } else 
++    to_render = buffer;
+ 
+   g_mutex_lock (&gst_source->buffer_lock);
+ 
+@@ -2428,11 +2509,14 @@ _clutter_gst_video_sink_render (GstBaseSink *bsink,
+   if (gst_source->buffer)
+     gst_buffer_unref (gst_source->buffer);
+ 
+-  gst_source->buffer = gst_buffer_ref (buffer);
++  gst_source->buffer = gst_buffer_ref (to_render);
+   g_mutex_unlock (&gst_source->buffer_lock);
+ 
+   g_main_context_wakeup (NULL);
+ 
++  if (buffer != to_render)
++    gst_buffer_unref (to_render);
++
+   return GST_FLOW_OK;
+ 
+  dispatch_flow_ret:
+@@ -2440,6 +2524,21 @@ _clutter_gst_video_sink_render (GstBaseSink *bsink,
+     g_mutex_unlock (&gst_source->buffer_lock);
+     return priv->flow_return;
+   }
++  src_map_fail:
++  {
++    GST_ERROR ("map src error");
++    return GST_FLOW_ERROR;
++  }
++  dst_map_fail:
++  {
++    GST_ERROR ("map dst error");
++    return GST_FLOW_ERROR;
++  }
++  activate_failed:
++  {
++    GST_ERROR ("activate_failed");
++    return GST_FLOW_ERROR;
++  }
+ }
+ 
+ static GstFlowReturn
+@@ -2493,6 +2592,12 @@ clutter_gst_video_sink_dispose (GObject *object)
+       g_boxed_free (CLUTTER_GST_TYPE_OVERLAYS, priv->overlays);
+       priv->overlays = NULL;
+     }
++  
++  if (priv->pool)
++    {
++      gst_object_unref (priv->pool);
++      priv->pool = NULL;
++    }
+ 
+   G_OBJECT_CLASS (clutter_gst_video_sink_parent_class)->dispose (object);
+ }
+-- 
+2.17.1
+

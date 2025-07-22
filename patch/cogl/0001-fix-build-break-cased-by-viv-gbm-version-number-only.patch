@@ -1,0 +1,31 @@
+From c84bf361e09feff55bff8ed7486b94d992295dd5 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Fri, 5 Feb 2021 17:39:21 +0800
+Subject: [PATCH] fix build break cased by viv gbm version number only has two
+ number
+
+in cogl-winsys-egl-kms.c it has below compare, the COGL_GBM_MICRO is none
+when queryed from viv gbm.pc
+     COGL_VERSION_ENCODE (8, 1, 0))
+---
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index b7ba95d2..e6c4b5d8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1107,6 +1107,10 @@ AS_IF([test "x$enable_kms_egl_platform" = "xyes"],
+         GBM_MAJOR=`echo $GBM_VERSION | cut -d'.' -f1`
+         GBM_MINOR=`echo $GBM_VERSION | cut -d'.' -f2`
+         GBM_MICRO=`echo $GBM_VERSION | cut -d'.' -f3 | sed 's/-.*//'`
++        [test "x$GBM_MICRO" = "x"],
++        [
++          GBM_MICRO=0
++        ]
+ 
+         AC_DEFINE_UNQUOTED([COGL_GBM_MAJOR], [$GBM_MAJOR], [The major version for libgbm])
+         AC_DEFINE_UNQUOTED([COGL_GBM_MINOR], [$GBM_MINOR], [The minor version for libgbm])
+-- 
+2.17.1
+

@@ -1,0 +1,119 @@
+From 6c34d0070c6b51e154601b4fb682368bdc75754a Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Tue, 9 Feb 2021 13:49:37 +0800
+Subject: [PATCH] cluttervideosink: add YUY2 format support
+
+---
+ clutter-gst/clutter-gst-video-sink.c | 40 ++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 8 deletions(-)
+
+diff --git a/clutter-gst/clutter-gst-video-sink.c b/clutter-gst/clutter-gst-video-sink.c
+index 084821c..d6c08bf 100644
+--- a/clutter-gst/clutter-gst-video-sink.c
++++ b/clutter-gst/clutter-gst-video-sink.c
+@@ -105,7 +105,8 @@ GST_DEBUG_CATEGORY_STATIC (clutter_gst_video_sink_debug);
+   "BGRx,"                                       \
+   "RGB,"                                        \
+   "BGR,"                                        \
+-  "NV12 }"
++  "NV12,"                                       \
++  "YUY2 }"
+ 
+ 
+ #define MAKE_CAPS(feature, caps) \
+@@ -171,7 +172,8 @@ typedef enum
+   CLUTTER_GST_YV12,
+   CLUTTER_GST_SURFACE,
+   CLUTTER_GST_I420,
+-  CLUTTER_GST_NV12
++  CLUTTER_GST_NV12,
++  CLUTTER_GST_YUY2
+ } ClutterGstVideoFormat;
+ 
+ typedef enum
+@@ -1949,7 +1951,7 @@ clutter_gst_dmabuf_upload (ClutterGstVideoSink *sink,
+   }
+ }
+ 
+-static ClutterGstRenderer dmabuf_renderer =
++static ClutterGstRenderer dmabuf_NV12_renderer =
+   {
+     "dmabuf",
+     CLUTTER_GST_NV12,
+@@ -1963,6 +1965,20 @@ static ClutterGstRenderer dmabuf_renderer =
+     clutter_gst_dummy_shutdown,
+   };
+ 
++static ClutterGstRenderer dmabuf_YUY2_renderer =
++  {
++    "dmabuf",
++    CLUTTER_GST_YUY2,
++    CLUTTER_GST_RENDERER_NEEDS_GLSL | CLUTTER_GST_RENDERER_NEEDS_TEXTURE_RG,
++    GST_STATIC_CAPS (MAKE_CAPS(GST_CAPS_FEATURE_MEMORY_SYSTEM_MEMORY,
++                               "YUY2")),
++    1, /* n_layers */
++    clutter_gst_dmabuf_setup_pipeline,
++    clutter_gst_dmabuf_upload,
++    clutter_gst_dummy_upload_gl,
++    clutter_gst_dummy_shutdown,
++  };
++
+ static GSList*
+ clutter_gst_build_renderers_list (CoglContext *ctx)
+ {
+@@ -1982,7 +1998,8 @@ clutter_gst_build_renderers_list (CoglContext *ctx)
+       &i420_glsl_renderer,
+       &rgb24_glsl_renderer,
+       &rgb32_glsl_renderer,
+-      &dmabuf_renderer,
++      &dmabuf_NV12_renderer,
++      &dmabuf_YUY2_renderer,
+       NULL
+     };
+ 
+@@ -2061,7 +2078,8 @@ clutter_gst_find_renderer_by_format (ClutterGstVideoSink *sink,
+ }
+ 
+ static ClutterGstRenderer *
+-clutter_gst_get_dmabuf_renderer (ClutterGstVideoSink *sink)
++clutter_gst_get_dmabuf_renderer (ClutterGstVideoSink *sink,
++                                 ClutterGstVideoFormat format)
+ {
+   ClutterGstVideoSinkPrivate *priv = sink->priv;
+   ClutterGstRenderer *renderer = NULL;
+@@ -2077,8 +2095,11 @@ clutter_gst_get_dmabuf_renderer (ClutterGstVideoSink *sink)
+       ClutterGstRenderer *candidate = (ClutterGstRenderer *) element->data;
+       if (strcmp(candidate->name, "dmabuf") == 0)
+         {
+-          renderer = candidate;
+-          break;
++          if (candidate->format == format)
++            {
++              renderer = candidate;
++              break;
++            }
+         }
+     }
+ 
+@@ -2157,6 +2178,9 @@ clutter_gst_video_sink_parse_caps (GstCaps *caps,
+       format = CLUTTER_GST_RGB32;
+       bgr = TRUE;
+       break;
++    case GST_VIDEO_FORMAT_YUY2:
++      format = CLUTTER_GST_YUY2;
++      break;
+     default:
+       goto unhandled_format;
+     }
+@@ -2278,7 +2302,7 @@ clutter_gst_source_dispatch (GSource *source,
+     {
+       if (gst_is_dmabuf_memory (gst_buffer_peek_memory (buffer, 0))) {
+         priv->is_dmabuf = TRUE;
+-        priv->renderer = clutter_gst_get_dmabuf_renderer (gst_source->sink);
++        priv->renderer = clutter_gst_get_dmabuf_renderer (gst_source->sink, priv->format);
+       }
+ 
+       if (gst_buffer_get_video_gl_texture_upload_meta (buffer) != NULL) {
+-- 
+2.17.1
+

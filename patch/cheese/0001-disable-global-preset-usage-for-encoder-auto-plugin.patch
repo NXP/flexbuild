@@ -1,0 +1,41 @@
+From 83d229aa6e2f4b9bafbaca46ca862641cb551d44 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Thu, 23 Sep 2021 22:16:30 +0800
+Subject: [PATCH] disable global preset usage for encoder auto plugin
+
+---
+ libcheese/cheese-camera.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/libcheese/cheese-camera.c b/libcheese/cheese-camera.c
+index e41d42f1..f62afc4d 100644
+--- a/libcheese/cheese-camera.c
++++ b/libcheese/cheese-camera.c
+@@ -441,6 +441,7 @@ cheese_camera_set_video_recording (CheeseCamera *camera, GError **error)
+   const gchar *video_preset;
+   gboolean res;
+ 
++#if 0
+   /* Check if we can use global preset for vp8enc. */
+   video_enc = gst_element_factory_make ("vpuenc_h264", "vpuenc_h264");
+   video_preset = (gchar *) &CHEESE_VIDEO_ENC_PRESET;
+@@ -468,6 +469,7 @@ cheese_camera_set_video_recording (CheeseCamera *camera, GError **error)
+     }
+   }
+   gst_object_unref(video_enc);
++#endif
+ 
+   /* create profile for webm encoding */
+   caps = gst_caps_new_simple ("video/quicktime", "variant", G_TYPE_STRING, 
+@@ -478,7 +480,7 @@ cheese_camera_set_video_recording (CheeseCamera *camera, GError **error)
+   caps = gst_caps_from_string("video/x-h264");
+   v_prof = gst_encoding_video_profile_new (caps, NULL, NULL, 1);
+   gst_encoding_video_profile_set_variableframerate(v_prof, TRUE);
+-  gst_encoding_profile_set_preset((GstEncodingProfile*) v_prof, video_preset);
++//  gst_encoding_profile_set_preset((GstEncodingProfile*) v_prof, video_preset);
+   gst_encoding_container_profile_add_profile(prof, (GstEncodingProfile*) v_prof);
+   gst_caps_unref (caps);
+ 
+-- 
+2.17.1
+

@@ -8,8 +8,9 @@
 
 # clutter-1.0 depends on cogl-1.0
 
+#cogl:
 cogl: gpu_viv
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,cogl,apps/graphics,submod) && \
 	 $(call patch_apply,cogl,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/cogl && \

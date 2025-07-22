@@ -11,8 +11,9 @@
 # depends on clutter-1.0 which depends on cogl-1.0
 # depends on gstreamer1.0-plugins-base gstreamer1.0-plugins-bad clutter-1.0 libgudev
 
+#clutter_gst:
 clutter_gst: gst_plugins_bad cogl libdrm
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,clutter_gst,apps/graphics,submod) && \
 	 $(call patch_apply,clutter_gst,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \

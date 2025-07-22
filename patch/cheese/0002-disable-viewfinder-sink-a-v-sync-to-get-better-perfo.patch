@@ -1,0 +1,28 @@
+From 5aae79851b03cd945051943623f73bb01f153916 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Wed, 7 Jul 2021 14:17:15 +0800
+Subject: [PATCH 2/2] disable viewfinder-sink a/v sync to get better
+ performance
+
+Signed-off-by: Haihua Hu <jared.hu@nxp.com>
+---
+ libcheese/cheese-camera.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/libcheese/cheese-camera.c b/libcheese/cheese-camera.c
+index 91392892..e41d42f1 100644
+--- a/libcheese/cheese-camera.c
++++ b/libcheese/cheese-camera.c
+@@ -1591,6 +1591,9 @@ cheese_camera_setup (CheeseCamera *camera, CheeseCameraDevice *device, GError **
+                     "size-change", G_CALLBACK(cheese_camera_size_change_cb), camera);
+ 
+   g_object_set (G_OBJECT (priv->camerabin), "viewfinder-sink", video_sink, NULL);
++  /* disable viewfinder-sink a/v sync to get better performance */
++  if (video_sink)
++    g_object_set (video_sink, "sync", FALSE, NULL);
+ 
+   /* Set flags to enable conversions*/
+ 
+-- 
+2.17.1
+

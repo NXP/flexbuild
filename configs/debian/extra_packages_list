@@ -26,7 +26,7 @@ host_dependent_packages=" \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
     rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser \
-    efitools \
+    efitools itstool \
 "
 
 
@@ -77,7 +77,8 @@ imx9_pkgs=" \
     qt6-tools-dev libqt6svg6 qt6-svg-dev libfmt-dev libdevil-dev nfs-common \
 "
 imx8_pkgs=" \
-	gnome-core chromium dmz-cursor-theme \
+	libgnome-desktop-3-dev chromium dmz-cursor-theme \
+	libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev \
 "
 
 bak="

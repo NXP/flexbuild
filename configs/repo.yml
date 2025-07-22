@@ -247,12 +247,10 @@ repo:
   imx_g2d_samples:
     url:  https://github.com/nxp-imx/g2d-samples.git
 
-# ...............
   cogl:
     url:  https://gitlab.gnome.org/GNOME/cogl.git
     tag:  1.22.8
 
-# ...............
   clutter_gst:
     url:  https://gitlab.gnome.org/GNOME/clutter-gst.git
     tag:  3.0.27
@@ -350,7 +348,6 @@ repo:
   imx_vpuwrap:
     url: https://github.com/nxp/imx-vpuwrap.git
 
-# .........
   cheese:
     url: https://gitlab.gnome.org/GNOME/cheese.git
     tag: 43.0

@@ -662,6 +662,26 @@ check_linux_config() {
 }
 
 do_clean() {
+	local has_valid=0
+	for arg in "${@:2}"; do
+		has_valid=1
+		if ! echo $APPS_REPO_LIST utils security networking graphics multimedia ml gopoint robotics | grep -q $arg; then
+			echo "Invalid component: $arg"; echo;  continue;
+		fi
+
+		for valid_arg in $APPS_REPO_LIST; do
+			if [ "$arg" = "$valid_arg" ]; then
+				rm -rf $PKGDIR/apps/*/$arg 2>/dev/null
+				echo "Clean components: $arg"; echo
+			fi
+		done
+		if [ -d $PKGDIR/apps/$arg ]; then
+			rm -rf $PKGDIR/apps/$arg
+			echo "Clean components: $arg"; echo
+		fi
+	done
+	[ $has_valid = 1 ] && return 0
+
     rm -rf $FBOUTDIR/images/*
     clean_bsp_components
     clean_linux_components
@@ -1127,7 +1147,7 @@ case "$1" in
         git_repo_update branch $2; exit
         ;;
     clean)
-        do_clean; exit
+        do_clean $@; exit
         ;;
     clean-rfs)
         do_clean_rfs; exit

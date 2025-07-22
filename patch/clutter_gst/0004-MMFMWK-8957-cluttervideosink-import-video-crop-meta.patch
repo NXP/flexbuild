@@ -1,0 +1,50 @@
+From 6aaadef340b8c01a66ff510c77fff391b7aff071 Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Tue, 1 Jun 2021 17:09:35 +0800
+Subject: [PATCH] MMFMWK-8957 cluttervideosink: import video crop meta
+
+Signed-off-by: Haihua Hu <jared.hu@nxp.com>
+---
+ clutter-gst/clutter-gst-video-sink.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/clutter-gst/clutter-gst-video-sink.c b/clutter-gst/clutter-gst-video-sink.c
+index e8ad874..a590a4b 100644
+--- a/clutter-gst/clutter-gst-video-sink.c
++++ b/clutter-gst/clutter-gst-video-sink.c
+@@ -1850,7 +1850,7 @@ clutter_gst_dmabuf_upload (ClutterGstVideoSink *sink,
+                          GstBuffer *buffer)
+ {
+   ClutterGstVideoSinkPrivate *priv = sink->priv;
+-  GstMemory *mem;
++  GstVideoCropMeta *crop;
+   guint i, width, height;
+   guint nplanes;
+   int fourcc;
+@@ -1861,9 +1861,6 @@ clutter_gst_dmabuf_upload (ClutterGstVideoSink *sink,
+   CoglColorRange range;
+   CoglError *internal_error = NULL;
+ 
+-  mem = gst_buffer_peek_memory (buffer, 0);
+-
+-
+   width = GST_VIDEO_INFO_WIDTH (&priv->info);
+   height = GST_VIDEO_INFO_HEIGHT (&priv->info);
+   nplanes = GST_VIDEO_INFO_N_PLANES (&priv->info);
+@@ -1871,6 +1868,13 @@ clutter_gst_dmabuf_upload (ClutterGstVideoSink *sink,
+ 
+   if (fourcc < 0)
+     goto bail;
++  
++  crop = gst_buffer_get_video_crop_meta (buffer);
++  if (crop) {
++    width = MIN (crop->width, width);
++    height = MIN (crop->height, height);
++    GST_DEBUG ("video crop size  %dx%d", width, height);
++  }
+ 
+   for (i = 0; i < nplanes; i++) {
+     guint offset, stride, mem_idx, length;
+-- 
+2.17.1
+

@@ -1,0 +1,43 @@
+From ea424153dda698146cdbaaac2af016e5aaefbcfb Mon Sep 17 00:00:00 2001
+From: Haihua Hu <jared.hu@nxp.com>
+Date: Fri, 22 Oct 2021 17:50:09 +0800
+Subject: [PATCH] cogl-winsys-egl: add glFinish after swapbuffer
+
+add glFinish after swapbuffer to sync gl status
+
+Signed-off-by: Haihua Hu <jared.hu@nxp.com>
+---
+ cogl/Makefile.am              | 3 ++-
+ cogl/winsys/cogl-winsys-egl.c | 2 ++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/cogl/Makefile.am b/cogl/Makefile.am
+index 7de750c1..0568d8b0 100644
+--- a/cogl/Makefile.am
++++ b/cogl/Makefile.am
+@@ -552,7 +552,8 @@ libcogl_la_LDFLAGS = \
+ 	-no-undefined \
+ 	-version-info @COGL_LT_CURRENT@:@COGL_LT_REVISION@:@COGL_LT_AGE@ \
+ 	-export-dynamic \
+-	-export-symbols-regex "^(cogl|_cogl_debug_flags|_cogl_atlas_new|_cogl_atlas_add_reorganize_callback|_cogl_atlas_reserve_space|_cogl_callback|_cogl_util_get_eye_planes_for_screen_poly|_cogl_atlas_texture_remove_reorganize_callback|_cogl_atlas_texture_add_reorganize_callback|_cogl_texture_get_format|_cogl_texture_foreach_sub_texture_in_region|_cogl_profile_trace_message|_cogl_context_get_default|_cogl_framebuffer_get_stencil_bits|_cogl_clip_stack_push_rectangle|_cogl_framebuffer_get_modelview_stack|_cogl_object_default_unref|_cogl_pipeline_foreach_layer_internal|_cogl_clip_stack_push_primitive|_cogl_buffer_unmap_for_fill_or_fallback|_cogl_framebuffer_draw_primitive|_cogl_debug_instances|_cogl_framebuffer_get_projection_stack|_cogl_pipeline_layer_get_texture|_cogl_buffer_map_for_fill_or_fallback|_cogl_texture_can_hardware_repeat|_cogl_pipeline_prune_to_n_layers|_cogl_primitive_draw|test_|unit_test_).*"
++	-export-symbols-regex "^(cogl|_cogl_debug_flags|_cogl_atlas_new|_cogl_atlas_add_reorganize_callback|_cogl_atlas_reserve_space|_cogl_callback|_cogl_util_get_eye_planes_for_screen_poly|_cogl_atlas_texture_remove_reorganize_callback|_cogl_atlas_texture_add_reorganize_callback|_cogl_texture_get_format|_cogl_texture_foreach_sub_texture_in_region|_cogl_profile_trace_message|_cogl_context_get_default|_cogl_framebuffer_get_stencil_bits|_cogl_clip_stack_push_rectangle|_cogl_framebuffer_get_modelview_stack|_cogl_object_default_unref|_cogl_pipeline_foreach_layer_internal|_cogl_clip_stack_push_primitive|_cogl_buffer_unmap_for_fill_or_fallback|_cogl_framebuffer_draw_primitive|_cogl_debug_instances|_cogl_framebuffer_get_projection_stack|_cogl_pipeline_layer_get_texture|_cogl_buffer_map_for_fill_or_fallback|_cogl_texture_can_hardware_repeat|_cogl_pipeline_prune_to_n_layers|_cogl_primitive_draw|test_|unit_test_).*" \
++	-lGLESv2
+ 
+ libcogl_la_SOURCES = $(cogl_sources_c)
+ nodist_libcogl_la_SOURCES = $(BUILT_SOURCES)
+diff --git a/cogl/winsys/cogl-winsys-egl.c b/cogl/winsys/cogl-winsys-egl.c
+index de775543..fc02e465 100644
+--- a/cogl/winsys/cogl-winsys-egl.c
++++ b/cogl/winsys/cogl-winsys-egl.c
+@@ -846,6 +846,8 @@ _cogl_winsys_onscreen_swap_buffers_with_damage (CoglOnscreen *onscreen,
+     }
+   else
+     eglSwapBuffers (egl_renderer->edpy, egl_onscreen->egl_surface);
++  
++  glFinish();
+ }
+ 
+ static void
+-- 
+2.17.1
+

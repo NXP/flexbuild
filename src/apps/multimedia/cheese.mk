@@ -11,8 +11,9 @@
 #	  libclutter-gtk-1.0-dev vala-native gnome-desktop libxml2-native gdk-pixbuf-native itstool-native
 
 
+#cheese:
 cheese: clutter_gst gst_plugins_bad
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,cheese,apps/multimedia,submod) && \
 	 $(call patch_apply,cheese,apps/multimedia) && \
 	 cd $(MMDIR)/cheese && \
@@ -40,7 +41,7 @@ cheese: clutter_gst gst_plugins_bad
 		-Dintrospection=false \
 		-Dgtk_doc=false \
 		-Dman=false $(LOG_MUTE) && \
-	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
+	 ninja -v -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/org.gnome.Cheese.svg && \
 	 rm -f $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/org.gnome.Cheese-symbolic.svg && \
 	 $(call fbprint_d,"cheese")

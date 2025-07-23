@@ -5,7 +5,9 @@ ar = '@TARGET_CROSS@ar'
 strip = '@TARGET_CROSS@strip'
 ld = ['@TARGET_CROSS@ld', '--sysroot=@STAGING_DIR@']
 pkg-config = '/usr/bin/pkg-config'
-
+glib-compile-schemas = '/usr/bin/glib-compile-schemas'
+glib-compile-resources = '/usr/bin/glib-compile-resources'
+#g-ir-scanner = '/usr/bin/g-ir-scanner'
 
 # g-ir-scanner = '/usr/bin/g-ir-scanner'
 # g-ir-compiler = '/usr/bin/g-ir-compiler'

@@ -346,6 +346,7 @@ pack_distro_rfs() {
     if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
 		[ ! -f $FBDIR/logs/.rfsconfig${MACHINE} ] && { debian_rfs_post_config; touch $FBDIR/logs/.rfsconfig${MACHINE}; }
 		rfs_umount
+        sudo chroot $RFSDIR ldconfig
     fi
 
     [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && \
@@ -700,6 +701,7 @@ do_clean_rfs() {
     else
 		rfs_umount
         sudo rm -rf $RFSDIR && rm -rf $FBOUTDIR/images/${RFSDIR##*/}*
+        rm -rf $FBDIR/logs/.rfsconfig${MACHINE}
         fbprint_d "clean distro $RFSDIR"
     fi
 }

@@ -54,6 +54,7 @@ mmdebstrap \
     cp src/system/blacklist.conf "$1"/etc/modprobe.d/
     cp src/system/ts.conf "$1"/etc/ts.conf.bak
     cp src/system/board_id.sh "$1"/usr/bin/
+    cp src/system/80-wired.network "$1"/usr/lib/systemd/network/
     chroot "$1" ln -s /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service
     chroot "$1" ln -s /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/boot.mount
     chroot "$1" ln -s /boot/tools/perf /usr/local/bin/perf

@@ -65,6 +65,8 @@ build_distro_rfs_debian() {
 		log_mute $sudopt chroot $RFSDIR apt clean
 		log_mute $sudopt chroot $RFSDIR apt autoclean
 		log_mute $sudopt chroot $RFSDIR apt autoremove -y
+
+        rfs_umount
     fi
 
     # fix absolute path for libz.so symlink when cross compiling apitrace

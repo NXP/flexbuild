@@ -6,7 +6,12 @@
 
 
 build_distro_rfs_debian() {
-    [ $DISTROTYPE = debian -a -f $RFSDIR/etc/buildinfo ] && log_mute echo $RFSDIR already exists! && exit 0
+    [ $DISTROTYPE = debian ] && \
+		[ -f $RFSDIR/etc/buildinfo ] && \
+		grep -q "Bootloader" "$RFSDIR/etc/buildinfo" && \
+		log_mute echo "$RFSDIR already exists!" && exit 0
+	rfs_umount
+
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
 	mkdir -p $RFSDIR
@@ -50,7 +55,6 @@ build_distro_rfs_debian() {
 			   ls*|lx*) PKGS="$ls_pkgs" ; log_mute echo ls  package ... ;;
 			   *)       echo "machine is not supported"; exit 1;  ;;
 		esac
-		export DEBIAN_FRONTEND=noninteractive &&
         show_one_line $sudopt chroot $RFSDIR apt-get install --no-install-recommends -y $PKGS
 
 		# set U-Boot version info in userland to be readable in linux runtime

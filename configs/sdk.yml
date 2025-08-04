@@ -66,6 +66,3 @@ KERNEL_CONFIG:
 
 # DPAA2 MC firmware version
 MC_FW_VERSION:  "10.39.0"
-
-IMX_MCORE_VERSION: "2.16.000"
-

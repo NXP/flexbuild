@@ -15,4 +15,12 @@ board_id=$(get_board_id)
 
 : ${board_id:?}
 
+/usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+/usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-*.so.0.0.0
+
+/usr/sbin/ldconfig
+
+/usr/sbin/depmod -a
+
 systemctl disable platcfg.service

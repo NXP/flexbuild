@@ -15,19 +15,91 @@ board_id=$(get_board_id)
 
 : ${board_id:?}
 
-case "$board_id" in
+case "${board_id}" in
+    imx8mm*)
+        sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
+        #rm -rf /etc/systemd/system/display-manager.service
+        ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+        ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
+        /usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
+        /usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
+        /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+
+        ;;
+
     imx8mp*)
-    ;;
-    imx9*)
-    ;;
-    *)
-    ;;
+        sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
+        #rm -rf /etc/systemd/system/display-manager.service
+        ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+        ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
+        ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
+        /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        ;;
+
+    imx91*)
+        sed -i '/^use-g2d=true/s/^/# /' /etc/xdg/weston/weston.ini
+        sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
+        sed -i '/gopoint/d' /etc/xdg/weston/weston.ini
+        ln -sf /lib/systemd/system/weston.service /etc/systemd/system/graphical.target.wants/weston.service
+        ;;
+
+    imx93*)
+        ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
+        [ -f /usr/lib/libg2d-viv.so.2.4.0 ] && rm -f /usr/lib/libg2d-viv.so.2.4.0
+        sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
+        ln -sf /lib/systemd/system/weston.service /etc/systemd/system/graphical.target.wants/weston.service
+        rm -rf /etc/systemd/system/display-manager.service
+        rm -rf /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
+        rm -rf /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
+        rm -rf /usr/lib/libclutter-gst-3.0.so*
+
+        ;;
+
+    ls1028a*)
+        sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
+        #rm -rf /etc/systemd/system/display-manager.service
+        ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+        ;;
+
+    ls1043*|ls1046*)
+        ln -sf /lib/systemd/system/fmc.service /etc/systemd/system/multi-user.target.wants/fmc.service
+        ;;
 esac
+
+sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
+
+/usr/bin/hostnamectl set-hostname "${board_id}"
+
+### network config
+# disable rename network interface
+ln -s /dev/null /etc/udev/rules.d/80-net-setup-link.rules
+
+# disable legacy networking service
+systemctl disable networking
+
+# use systemd-networkd
+systemctl enable systemd-networkd
+
+# disable systemd-networkd-wait-online to speed up the boot
+systemctl disable systemd-networkd-wait-online
+
+# for timesync
+sed -i '/^\[Time\]/a NTP=time1.google.com time2.google.com time3.google.com\nFallbackNTP=ntp.aliyun.com cn.ntp.org.cn' /etc/systemd/timesyncd.conf
+
+# continue to config the board at runtime
+ln -sf /usr/lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service
 
 /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
 
 /usr/sbin/ldconfig
 
 /usr/sbin/depmod -a
+/usr/sbin/update-initramfs -u
 
 systemctl disable platcfg.service >/dev/null 2>&1

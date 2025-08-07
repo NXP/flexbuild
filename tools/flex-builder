@@ -343,11 +343,7 @@ rfs_mount() {
 
 pack_distro_rfs() {
     [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit; }
-    if [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ]; then
-		[ ! -f $FBDIR/logs/.rfsconfig${MACHINE} ] && { debian_rfs_post_config $MACHINE $RFSDIR; touch $FBDIR/logs/.rfsconfig${MACHINE}; }
-		rfs_umount
-        sudo chroot $RFSDIR ldconfig
-    fi
+    [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ] && rfs_umount
 
     [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ] && \
     rname=rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH} || \
@@ -387,7 +383,7 @@ merge_apps() {
             ls -d $DESTDIR/* | grep -v -E "lib|bin|sbin" | xargs -I {} sudo cp -Prf --preserve=mode,timestamps {} $RFSDIR/
         fi
         [ $DESTARCH = arm64 ] && tgtarch=aarch64 || tgtarch=arm
-        if update-binfmts --display qemu-$tgtarch | grep -q disabled; then
+        if update-binfmts --display qemu-$tgtarch 2>/dev/null | grep -q disabled; then
             log_mute sudo update-binfmts --enable qemu-$tgtarch
         fi
         sudo chroot $RFSDIR ldconfig

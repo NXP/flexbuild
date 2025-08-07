@@ -27,7 +27,6 @@ ethosu_vela:
 	 pip3 install --ignore-installed --disable-pip-version-check -t $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) \
 	      --no-cache-dir --no-deps build/dist/ethos_u_vela*.whl $(LOG_MUTE) && \
 	 cp -rfa build/lib.linux-*cpython*/ethosu $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) && \
-	 cp -f build/temp.linux-*cpython*/*.so $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/ && \
 	 rename -f "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so && \
 	 rm -rf $(DESTDIR)/data && \
 	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela ]; then \

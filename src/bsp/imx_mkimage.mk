@@ -76,10 +76,14 @@ define imx_mkimage_target
     [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
     [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
     cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
-	$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
-	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
-	$$opdir/dts/upstream/src/arm64/freescale/*$${plat}*.dtb \
-	$$opdir/u-boot-nodtb.bin && \
+		$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+		$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+		$$opdir/u-boot-nodtb.bin && \
+	if ls $$opdir/arch/arm/dts/*$${plat}*.dtb 1>/dev/null 2>&1; then \
+		cp -f $$opdir/arch/arm/dts/*$${plat}*.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+	else \
+		cp -f $$opdir/dts/upstream/src/arm64/freescale/*$${plat}*.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+	fi && \
 	if [ $${MACHINE} = imx8mpfrdm ]; then \
         cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
 	fi && \

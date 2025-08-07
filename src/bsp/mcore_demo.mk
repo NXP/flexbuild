@@ -12,10 +12,13 @@ mcore_demo:
 	 mkdir -p $(BSPDIR)/imx_mcore_demos && \
 	 cd $(BSPDIR)/imx_mcore_demos && \
 	 \
-	 for soc in imx8mm imx8mp imx93 imx95; do \
+	 for soc in imx8mm imx8mp imx93 imx95 imx8mq imx8mn imx8ulp; do \
 		case $$soc in \
 			imx8mm) url="$(repo_imx8mm_mdemo_url)" ;; \
 			imx8mp) url="$(repo_imx8mp_mdemo_url)" ;; \
+			imx8mq) url="$(repo_imx8mq_mdemo_url)" ;; \
+			imx8mn) url="$(repo_imx8mn_mdemo_url)" ;; \
+			imx8ulp) url="$(repo_imx8ulp_mdemo_url)" ;; \
 			imx93) url="$(repo_imx93_mdemo_url)" ;; \
 			imx95) url="$(repo_imx95_mdemo_url)" ;; \
 			*) echo "Unknown soc: $$soc"; exit 1 ;; \

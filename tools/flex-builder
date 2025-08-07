@@ -364,12 +364,12 @@ pack_distro_rfs() {
 
 pack_app_components() {
 	local appdeb_sym=nxp_apps_debian_${DISTRIB_VERSION}_${MACHINE}_`date +%Y%m%d%H%M`.deb
-	local appdeb=nxp_apps_arm64_debian_${DISTRIB_VERSION}_${MACHINE}.deb
+	local appdeb=nxp_apps_debian_${DISTRIB_VERSION}_${MACHINE}.deb
 	local ver="${DISTRIB_VERSION:4}"
 	echo packing $appdeb
 	cd $FBOUTDIR/images
 	sudo fpm -s dir -t deb -n $appdeb -v $ver -a arm64 --deb-no-default-config-files --package $appdeb_sym \
-		"${FBOUTDIR}"/apps/apps_${DESTARCH}_${DISTROTYPE}_${MACHINE}/=/ 2>/dev/null
+		"${FBOUTDIR}"/apps/apps_${DISTROTYPE}_${MACHINE}/=/ 2>/dev/null
 	ln -sf $appdeb_sym $FBOUTDIR/images/$appdeb
 	fbprint_d $FBOUTDIR/images/${appdeb_sym}
 }
@@ -991,9 +991,9 @@ elif [ $DISTROTYPE = poky ]; then
 fi
 
 if [ $DISTROTYPE = poky -o $DISTROTYPE = buildroot ]; then
-    DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}
+    DESTDIR=$FBOUTDIR/apps/apps_${DISTROTYPE}
 else
-    DESTDIR=$FBOUTDIR/apps/apps_${DESTARCH}_${DISTROTYPE}_${MACHINE}
+    DESTDIR=$FBOUTDIR/apps/apps_${DISTROTYPE}_${MACHINE}
 fi
 
 [ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && log_mute echo $DISTROTYPE desktop supports only arm64 && exit

@@ -9,7 +9,7 @@
 # Install NXP-specific packages and extra deb packages for Debian on i.MX and Layerscape platforms.
 
 LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1012aqds ls1028ardb ls1028aqds ls1043ardb ls1043aqds ls1046ardb ls1046aqds ls1046afrwy ls1088ardb ls1088aqds ls2088ardb ls2088aqds lx2160ardb lx2160aqds lx2162aqds"
-IMX_MACHINE_LIST="imx8mmevk imx8mpevk imx8mpfrdm imx8mnevk imx8
+IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95evk imx95frdm"
 show_one_line() {
 	echo
 	"$@" 2>&1 | while IFS= read -r line; do
@@ -39,7 +39,7 @@ DEFAULT_DL_URL=https://www.nxp.com/lgfiles/sdk/lsdk2512
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 
-NXPAPPSPKG=nxp_apps_arm64_debian_lsdk2512_${board_id}.deb
+NXPAPPSPKG=nxp_apps_debian_lsdk2512_${board_id}.deb
 
 if [[ -n "$1" && ! "$1" =~ ^http ]]; then
   echo run 'debian-post-install-pkg url' to install packages from specified url address.

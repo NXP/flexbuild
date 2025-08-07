@@ -76,6 +76,15 @@ repo:
   imx8mp_mdemo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mp-m7-demo-25.03.00.bin
 
+  imx8mq_mdemo:
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mq-m4-demo-25.03.00.bin
+
+  imx8mn_mdemo:
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mn-m7-demo-25.03.00.bin
+
+  imx8ulp_mdemo:
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8ulp-m33-demo-25.03.00.bin
+
   imx93_mdemo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx93-m33-demo-25.06.00.bin
 

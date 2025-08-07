@@ -56,7 +56,6 @@ mmdebstrap:
     - lshw
     - keyutils
     - wpasupplicant
-    - ntpdate
     - bridge-utils
     - tcpdump
     - mtd-utils

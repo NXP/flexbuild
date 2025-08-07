@@ -26,7 +26,7 @@ host_dependent_packages=" \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
     rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser \
-    efitools itstool \
+    efitools itstool patchelf \
 "
 
 
@@ -36,7 +36,7 @@ host_dependent_packages=" \
 # during build-time for NXP iMX & Layerscape MPU platforms.
 
 base_pkgs=" \
-	wpasupplicant ntpdate bridge-utils tcpdump mtd-utils pciutils \
+	wpasupplicant bridge-utils tcpdump mtd-utils pciutils \
 	hdparm psmisc libssl-dev usbutils sysstat lsb-release kexec-tools \
 	iptables libhugetlbfs0 strongswan libcharon-extra-plugins dmidecode \
 	flex rdate initramfs-tools fbset mmc-utils usbutils i2c-tools \
@@ -110,7 +110,7 @@ debian_rfs_post_config() {
 			ln -sf vsidaemon-IMX8MM $2/usr/bin/vsidaemon
 			/usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' $2/etc/xdg/weston/weston.ini
 			/usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' $2/etc/xdg/weston/weston.ini
-			#sudo chroot $2 patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-*.so.0.0.0
+            /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 $2/lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
 
 			;;
 
@@ -122,8 +122,7 @@ debian_rfs_post_config() {
 			ln -sf /lib/systemd/system/gdm.service $2/etc/systemd/system/graphical.target.wants/gdm.service
 			ln -sf /lib/systemd/system/imx8-isp.service $2/etc/systemd/system/multi-user.target.wants/imx8-isp.service
 			ln -sf vsidaemon-IMX8MP $2/usr/bin/vsidaemon
-
-			#sudo chroot $2 patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-*.so.0.0.0
+            /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 $2/lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
 			;;
 
 		imx91*)
@@ -176,7 +175,7 @@ debian_rfs_post_config() {
     rm -f $2/etc/systemd/system/network-online.target.wants/networking.service
     rm -f $2/etc/systemd/system/multi-user.target.wants/networking.service
 
-    # use systemdj-networkd
+    # use systemd-networkd
     ln -sf /usr/lib/systemd/system/systemd-networkd.service $2/etc/systemd/system/dbus-org.freedesktop.network1.service
     ln -sf /usr/lib/systemd/system/systemd-networkd.service $2/etc/systemd/system/multi-user.target.wants/systemd-networkd.service
     ln -sf /usr/lib/systemd/system/systemd-networkd.socket $2/etc/systemd/system/sockets.target.wants/systemd-networkd.socket
@@ -185,7 +184,7 @@ debian_rfs_post_config() {
 
     # for timesync
     sed -i '/^\[Time\]/a NTP=time1.google.com time2.google.com time3.google.com\nFallbackNTP=ntp.aliyun.com cn.ntp.org.cn' $2/etc/systemd/timesyncd.conf
-	#/usr/bin/hostnamectl set-hostname "$1"
-	#/usr/sbin/depmod -a
-	#/usr/sbin/update-initramfs -u
+
+    # continue to config the board at runtime
+    ln -sf /usr/lib/systemd/system/platcfg.service $2/etc/systemd/system/multi-user.target.wants/platcfg.service
 }

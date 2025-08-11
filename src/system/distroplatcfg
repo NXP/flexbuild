@@ -92,9 +92,6 @@ systemctl disable systemd-networkd-wait-online
 # for timesync
 sed -i '/^\[Time\]/a NTP=time1.google.com time2.google.com time3.google.com\nFallbackNTP=ntp.aliyun.com cn.ntp.org.cn' /etc/systemd/timesyncd.conf
 
-# continue to config the board at runtime
-ln -sf /usr/lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service
-
 /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
 
 /usr/sbin/ldconfig

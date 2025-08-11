@@ -16,8 +16,9 @@
 
 PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
-#tvm:
-tvm: tim_vx
+tvm:
+#tvm: tim_vx
+ifeq ($(CONFIG_TVM),y)
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,tvm,apps/ml,submod) && \
 	 $(call patch_apply,tvm,apps/ml) && \
@@ -50,3 +51,4 @@ tvm: tim_vx
 	 cp ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples && \
 	 cp ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/ && \
 	 $(call fbprint_d,"tvm")
+endif

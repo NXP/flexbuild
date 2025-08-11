@@ -28,22 +28,23 @@ def download_file(url: str, output_path: str) -> None:
     def progress(count, block_size, total_size):
         if total_size > 0:
             percent = min(100, int(count * block_size * 100 / total_size))
-            sys.stdout.write(f"\rDownloading... {percent}%")
+            #sys.stdout.write(f"\rDownloading... {percent}%")
             sys.stdout.flush()
         else:
             # Handle cases where total size is unknown
-            sys.stdout.write(f"\rDownloading... {count * block_size:,} bytes")
+            #sys.stdout.write(f"\rDownloading... {count * block_size:,} bytes")
             sys.stdout.flush()
 
     #print(f"\nFetching: {url}")
     try:
-        urllib.request.urlretrieve(url, output_path, reporthook=progress)
+        urllib.request.urlretrieve(url, output_path)
+        #urllib.request.urlretrieve(url, output_path, reporthook=progress)
     except urllib.error.HTTPError as e:
         raise DownloadError(f"HTTP Error {e.code}: {e.reason}")
     except urllib.error.URLError as e:
         raise DownloadError(f"URL Error: {e.reason}")
 
-    sys.stdout.write("\n")
+    #sys.stdout.write("\n")
 
 def verify_hash(file_path: str, expected_hash: str) -> None:
     """Verify file hash (supports SHA256/MD5)"""

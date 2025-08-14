@@ -39,8 +39,6 @@ DEFAULT_DL_URL=https://www.nxp.com/lgfiles/sdk/lsdk2512
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 
-NXPAPPSPKG=nxp_apps_debian_lsdk2512_${board_id}.deb
-
 if [[ -n "$1" && ! "$1" =~ ^http ]]; then
   echo run 'debian-post-install-pkg url' to install packages from specified url address.
   echo Or run 'debian-post-install-pkg' to install packages from default url
@@ -64,29 +62,45 @@ fi
 
 [ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
 
-echo -e "\e[0;32mPreparing to install packages ...\e[0m"
+echo -e "Preparing to install packages ..."
 show_one_line sudo apt-get update -y 
 
-case "$board_id" in
-	   imx8*|ls1028*)   PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs" ;;
-	   imx9*)   PKGS="$ls_pkgs $imx9_pkgs" ;;
-	   ls*|lx*) PKGS="$ls_pkgs" ;;
-	   *)       echo "machine is not supported"; exit 1;  ;;
+case "${board_id}" in
+    imx8*)
+        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb
+        PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"
+        ;;
+    imx9*)
+        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb
+        PKGS="$ls_pkgs $imx9_pkgs"
+        ;;
+    ls1028a*)
+        NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb
+        PKGS="$ls_pkgs $imx9_pkgs"
+        ;;
+    ls*|lx*)
+        NXPAPPSPKG=nxp_apps_debian_lsdk2512_lx2160ardb.deb
+        PKGS="$ls_pkgs"
+        ;;
+    *)
+        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb
+        PKGS="$ls_pkgs $imx9_pkgs"
+        ;;
 esac
 
 show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y apt-utils $base_pkgs $PKGS
 
-echo -e "\e[0;32mInstalling Debian packages successfully.\e[0m"
+echo -e "Installing Debian packages successfully."
 
 [ -n "$1" ] && pkglink=$1 || pkglink=$DEFAULT_DL_URL
 
-echo -e "\e[0;32mDownloading and installing NXP-specific packages ...\e[0m"
+echo -e "Downloading and installing NXP-specific packages ..."
 rm -rf ${NXPAPPSPKG}
 wget $pkglink/$NXPAPPSPKG -q --show-progress || { echo "Downloading ${NXPAPPSPKG} failed "; exit 1; }
 show_one_line dpkg -i --force-overwrite ${NXPAPPSPKG}
 rm -rf ${NXPAPPSPKG}
 
-echo -e "\e[0;32mInstalling NXP-specific packages successfully.\e[0m"
+echo -e "Installing NXP-specific packages successfully."
 
 #show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get reinstall -y $reinst_pkgs
 
@@ -96,9 +110,9 @@ sudo apt-get autoremove -y
 
 [ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
 
-echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
+echo -e "Installing NXP-specific packages for Debian $1 successfully."
 
-echo -e "\e[0;32m\nStart to configure the system ...\e[0m"
+echo -e "\nStart to configure the system ..."
 /usr/bin/distroplatcfg
 
 echo -e "\nSystem is ready, please reboot the system now."

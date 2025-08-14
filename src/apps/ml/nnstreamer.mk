@@ -7,7 +7,7 @@
 # NNStreamer is a GStreamer plugin allowing to construct neural network applications with stream pipeline paradigm.
 
 #nnstreamer:
-nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
+nnstreamer: gst_plugins_base tflite nnstreamer_edge
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,nnstreamer,apps/ml) && \
 	 $(call patch_apply,nnstreamer,apps/ml) && \
@@ -42,7 +42,6 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 		-Dprotobuf-support=enabled \
 		-Dpython3-support=enabled \
 		-Dnnstreamer-edge-support=enabled \
-		-Dtflite2-support=enabled \
-		-Dtvm-support=enabled $(LOG_MUTE) && \
+		-Dtflite2-support=enabled $(LOG_MUTE) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"nnstreamer")

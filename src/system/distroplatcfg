@@ -90,16 +90,13 @@ sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
 ln -s /dev/null /etc/udev/rules.d/80-net-setup-link.rules
 
 # disable legacy networking service
-systemctl disable networking
+systemctl disable networking 2>/dev/null || true
 
 # use systemd-networkd
-systemctl enable systemd-networkd
+systemctl enable systemd-networkd 2>/dev/null || true
 
 # disable systemd-networkd-wait-online to speed up the boot
-systemctl disable systemd-networkd-wait-online
-
-# for timesync
-sed -i '/^\[Time\]/a NTP=time1.google.com time2.google.com time3.google.com\nFallbackNTP=ntp.aliyun.com cn.ntp.org.cn' /etc/systemd/timesyncd.conf
+systemctl disable systemd-networkd-wait-online 2>/dev/null || true
 
 /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
 
@@ -108,7 +105,9 @@ sed -i '/^\[Time\]/a NTP=time1.google.com time2.google.com time3.google.com\nFal
 /usr/sbin/depmod -a
 /usr/sbin/update-initramfs -u
 
-systemctl disable platcfg.service
+systemctl disable platcfg.service 2>/dev/null || true
 
 systemctl daemon-reload
-[ /etc/systemd/system/graphical.target.wants/weston.service ] && systemctl start weston
+if [[ $PPID -eq 1 ]] && [[ -f /etc/systemd/system/graphical.target.wants/weston.service ]];
+    systemctl start weston
+fi

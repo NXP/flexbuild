@@ -42,6 +42,7 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge
 		-Dprotobuf-support=enabled \
 		-Dpython3-support=enabled \
 		-Dnnstreamer-edge-support=enabled \
-		-Dtflite2-support=enabled $(LOG_MUTE) && \
+		-Dtflite2-support=enabled \
+		-Dtvm-support=disabled $(LOG_MUTE) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"nnstreamer")

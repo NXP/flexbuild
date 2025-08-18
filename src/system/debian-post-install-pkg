@@ -88,7 +88,24 @@ case "${board_id}" in
         ;;
 esac
 
-show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y apt-utils $base_pkgs $PKGS
+install_success=false
+MAX_RETRIES=3
+for ((attempt=1; attempt<=$MAX_RETRIES; attempt++)); do
+    echo "Try to generate rootfs for the $attempt time..."
+    if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y apt-utils $base_pkgs $PKGS; then
+        install_success=true
+        break
+    else
+        if [ $attempt -lt $MAX_RETRIES ]; then
+            sleep 5
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt update --fix-missing > /dev/null 2>&1
+        fi
+    fi
+done
+if ! $install_success; then
+    echo "Generating rootfs failed, please try again."
+    exit 1
+fi
 
 echo -e "Installing Debian packages successfully."
 

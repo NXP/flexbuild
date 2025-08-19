@@ -46,7 +46,7 @@ case "${board_id}" in
         sed -i '/gopoint/d' /etc/xdg/weston/weston.ini
         #ln -sf /lib/systemd/system/weston.service /etc/systemd/system/graphical.target.wants/weston.service
         rm -rf /etc/systemd/system/display-manager.service
-        systemctl enable weston
+        systemctl enable weston || true
         ;;
 
     imx93*)
@@ -58,7 +58,7 @@ case "${board_id}" in
         rm -rf /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
         rm -rf /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
         rm -rf /usr/lib/libclutter-gst-3.0.so*
-        systemctl enable weston
+        systemctl enable weston || true
 
         ;;
 
@@ -73,7 +73,7 @@ case "${board_id}" in
             -e '0,/^icon=\/opt\/gopoint-apps\/icon\/icon_demo_launcher\.png$/{s/^icon=\/opt\/gopoint-apps\/icon\/icon_demo_launcher\.png$/#&/}' \
             -e '0,/^path=\/usr\/bin\/gopoint$/{s/^path=\/usr\/bin\/gopoint$/#&/}' \
             /etc/xdg/weston/weston.ini
-        systemctl enable weston
+        systemctl enable weston || true
         ;;
 
     ls1043*|ls1046*)
@@ -84,6 +84,8 @@ esac
 sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
 
 /usr/bin/hostnamectl set-hostname "${board_id}"
+
+systemctl disable strongswan.service || true
 
 ### network config
 # disable rename network interface

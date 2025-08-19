@@ -24,6 +24,10 @@ ifeq ($(CONFIG_OPTEE),y)
 		     mv out/arm-plat-ls/core/tee-raw.bin out/arm-plat-ls/core/tee_$${MACHINE:0:10}.bin; \
 		 fi; \
 	elif [ $(SOCFAMILY) = IMX ]; then \
+		 if [[ "$(MACHINE)" == *"frdm"* ]]; then \
+			 echo "optee was not supported on $(MACHINE), skip..."; \
+			 exit 0; \
+		 fi; \
 		 brd=$${MACHINE:1}; \
 		 $(MAKE) PLATFORM=imx PLATFORM_FLAVOR=$$brd ARCH=arm CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=0 $(LOG_MUTE) && \
 		 $(CROSS_COMPILE)objcopy -v -O binary out/arm-plat-imx/core/tee.elf out/arm-plat-imx/core/tee_$(MACHINE).bin $(LOG_MUTE) && \

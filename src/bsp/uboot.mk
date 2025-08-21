@@ -70,6 +70,10 @@ define build-uboot-target
 	    bld rcw -m $(MACHINE); \
 	fi && \
 	if echo $1 | grep -qE '^imx8|^imx9'; then \
+		if [[ "$(MACHINE)" == *"imx95"* ]]; then \
+			bld imx_sm -m $(MACHINE); \
+			bld imx_oei -m $(MACHINE); \
+		fi; \
 	    bld atf -m $(MACHINE) -b sd && \
 	    $(call imx_mkimage_target, $1) \
 	elif echo $1 | grep -qiE "mx6|mx7"; then \

@@ -645,7 +645,18 @@ check_host_dependent_pkg() {
     [ `hostname` = fbdebian ] && git config --global --add safe.directory $FBDIR
     [ `hostname` = fbdebian ] && nflag=.deppkgdonefbdeb || nflag=.deppkgdone
     check_toolchain && touch $FBDIR/logs/$nflag
+
+    # for creating .deb package
     log_mute gem install fpm
+
+    # for imx95 m core toolchain
+    if [ ! -d /usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin ]; then
+        wget --no-check-certificate \
+            https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi.tar.xz \
+            -O /tmp/arm-toolchain.tar.xz
+        sudo tar -xf /tmp/arm-toolchain.tar.xz -C /usr
+        rm -f /tmp/arm-toolchain.tar.xz
+    fi
 }
 
 check_linux_config() {

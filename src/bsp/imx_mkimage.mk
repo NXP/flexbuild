@@ -244,6 +244,25 @@ define imx_mkimage_target
 			fi;  \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
             ;; \
+        imx95evk) \
+			SOC_FAMILY=iMX95; \
+			cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
+			cp $(BSPDIR)/imx_mcore_demos/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
+				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \
+			cp -f $(BSPDIR)/atf/build/imx95/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_sm/build/mx95evk/m33_image.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
+				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			fi;  \
+			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
+            ;; \
     esac && \
     cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin;
 endef

@@ -45,6 +45,12 @@ repo:
   imx_mkimage:
     url:  https://github.com/nxp-imx/imx-mkimage.git
 
+  imx_sm:
+    url:  https://github.com/nxp-imx/imx-sm.git
+
+  imx_oei:
+    url:  https://github.com/nxp-imx/imx-oei.git
+
 # i.MX SECO firmware for i.MX 8QuadMax, 8QuadXPlus, and 8DXL reference boards
   seco_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-seco-5.9.4.1-0333596.bin
@@ -246,9 +252,17 @@ repo:
   imx_gpu_g2d_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p3.2-aarch64-3c5e429.bin
 
+# i.MX G2D library for i.MX 8 Auto SoC with DPU blitter engine
+  imx_dpu_g2d_bin_imx8:
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v1-2.4.0.0-9e8bbf1.bin
+
 # i.MX G2D library for i.MX 9 SoC with DPU blitter engine
   imx_dpu_g2d_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v2-2.4.0.0-9e8bbf1.bin
+
+  mali_imx_bin:
+    url:  http://sun.ap.freescale.net/dash/debian/lsdk2512/mali-imx-r54.0-aarch64-6.12.20.bin
+    #url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/mali-imx-r54.0-aarch64-6.12.20.bin
 
   imx_pxp_g2d:
     url:  https://github.com/nxp-imx/imx-g2d-pxp.git

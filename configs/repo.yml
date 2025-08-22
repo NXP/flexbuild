@@ -3,6 +3,7 @@
 repo:
 
 # BSP component repositories
+# --------------------------------------------------------------------------------------
   atf:
     url:  https://github.com/nxp-imx/imx-atf.git
 
@@ -97,7 +98,10 @@ repo:
   imx95_mdemo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx95-m7-demo-25.06.00.bin
 
+
+
 # kernel and modules git repositories
+# --------------------------------------------------------------------------------------
   linux:
     url:  https://github.com/nxp-imx/linux-imx.git
 
@@ -119,7 +123,9 @@ repo:
     url:  https://github.com/nxp-imx/mwifiex.git
 
 
+
 # networking component repositories
+# --------------------------------------------------------------------------------------
   restool:
     url:  https://github.com/nxp-qoriq/restool.git
 
@@ -178,6 +184,7 @@ repo:
 
 
 # security component repositories
+# --------------------------------------------------------------------------------------
   cst:
     url:  https://github.com/nxp-qoriq/cst.git
 
@@ -220,7 +227,10 @@ repo:
     url:  https://github.com/NXPPlugNTrust/se05x-openssl-provider.git
     tag:  v01.00.02
 
+
+
 # graphics component repositories
+# --------------------------------------------------------------------------------------
   wayland:
     url:  https://gitlab.freedesktop.org/wayland/wayland.git
     tag:  1.22.0
@@ -287,7 +297,9 @@ repo:
     ver: ab6e6f3
 
 
+
 # multimedia component repositories
+# --------------------------------------------------------------------------------------
 # i.MX VPU Hantro libraries for i.MX 8M Quad, 8M Mini, and 8M Plus
   vpu_hantro_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.37.0-deec65e.bin
@@ -375,8 +387,12 @@ repo:
     url: https://gitlab.gnome.org/GNOME/cheese.git
     tag: 43.0
 
+  libcamera:
+    url: https://github.com/nxp-imx/libcamera.git
+
 
 # generic component repositories
+# --------------------------------------------------------------------------------------
   imx_test:
     url: https://github.com/nxp-imx/imx-test.git
 
@@ -398,6 +414,7 @@ repo:
 
 
 # eIQ AI/ML components
+# --------------------------------------------------------------------------------------
   tim_vx:
     url: https://github.com/nxp-imx/tim-vx-imx.git
 
@@ -450,6 +467,7 @@ repo:
 
 
 # NXP GoPoint Demo Experience components
+# --------------------------------------------------------------------------------------
   imx_demo_experience:
     url: https://github.com/nxp-imx-support/nxp-demo-experience.git
 
@@ -491,4 +509,4 @@ repo:
 
   gtec_demo_framework:
     url: https://github.com/nxp-imx/gtec-demo-framework.git
-    tag: 6.6.0
+    tag: 6.5.0

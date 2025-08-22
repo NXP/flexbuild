@@ -6,7 +6,7 @@
 
 
 gpu_viv:
-	@[  $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:7} != ls1028a -o \
 	 $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"gpu_viv ") && \
 	 if [ ! -d $(GRAPHICSDIR)/gpu_viv ]; then \

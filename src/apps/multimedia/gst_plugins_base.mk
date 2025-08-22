@@ -10,8 +10,17 @@
 
 # depends on: linux-headers
 
+
+ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
+  DEP_GSTBASE = mali_imx
+else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
+  DEP_GSTBASE = gpu_viv
+else
+  DEP_GSTBASE =
+endif
+
 #gst_plugins_base:
-gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocols
+gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocols
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
 	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call download_repo,gst_plugins_base,apps/multimedia) && \
@@ -31,7 +40,6 @@ gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocol
 	 fi && \
 	 $(call fbprint_b,"gst_plugins_base") && \
 	 sudo cp -rf $(DESTDIR)/usr/share/{pkgconfig,wayland-protocols} $(RFSDIR)/usr/share/ && \
-	 sudo cp -fPa $(DESTDIR)/usr/lib/{libGAL.so,libdrm.so*,libdrm_vivante.so*,libg2d*.so*} $(RFSDIR)/usr/lib && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0} && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstallocators-1.0.so.0,libgstreamer-1.0.so.0,libdrm.so.2} && \
 	 \
@@ -43,10 +51,10 @@ gst_plugins_base: gpu_viv libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocol
 		--cross-file meson.cross \
 		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 \
-			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -lgbm -lEGL \
-			       -lgbm_viv -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
+			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
+			       -lEGL -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
 		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-			       -lgbm -lEGL -lgbm_viv -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
+			       -lEGL -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
 		--prefix=/usr --buildtype=release \
 		--strip \
 		-Dintrospection=disabled \

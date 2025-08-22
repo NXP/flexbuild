@@ -50,7 +50,7 @@ build_distro_rfs_debian() {
 
 		show_one_line $sudopt chroot $RFSDIR apt-get update
 		case "$MACHINE" in
-			   imx8*)   	    PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"; log_mute echo imx8 package...  ;;
+			   imx8*|imx95*)    PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"; log_mute echo imx8 package...  ;;
 			   imx9*|ls1028*)   PKGS="$ls_pkgs $imx9_pkgs" ; log_mute echo imx9 package... ;;
 			   ls*|lx*)  	    PKGS="$ls_pkgs" ; log_mute echo ls  package... ;;
 			   *)               PKGS="$ls_pkgs $imx9_pkgs" ; log_mute echo imx9 package... ;;

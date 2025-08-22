@@ -12,7 +12,7 @@
 
 #tim_vx:
 tim_vx: gpu_viv
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,tim_vx,apps/ml) && \
 	 $(call patch_apply,tim_vx,apps/ml) && \
 	 $(call fbprint_b,"tim_vx") && \

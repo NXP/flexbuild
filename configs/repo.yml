@@ -447,7 +447,6 @@ repo:
     url: https://github.com/nnstreamer/nnstreamer-edge.git
     ver: 2bf50d5
 
-
   nnshark:
     url: https://github.com/nxp-imx/nnshark.git
 
@@ -464,6 +463,12 @@ repo:
   flatbuffers:
     url: https://github.com/google/flatbuffers.git
     ver: v24.3.25
+
+  neutron:
+    url:  https://github.com/nxp-imx/neutron.git
+
+  tflite_neutron_delegate:
+    url:  https://github.com/nxp-imx/tflite-neutron-delegate.git
 
 
 # NXP GoPoint Demo Experience components

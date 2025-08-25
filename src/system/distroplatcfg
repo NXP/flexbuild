@@ -85,21 +85,21 @@ sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
 
 /usr/bin/hostnamectl set-hostname "${board_id}"
 
-systemctl disable strongswan.service || true
+systemctl disable strongswan.service --now || true
 
 ### network config
 # disable rename network interface
 ln -sf /dev/null /etc/udev/rules.d/80-net-setup-link.rules
 
 # disable legacy networking service
-systemctl disable networking 2>/dev/null || true
+systemctl disable networking --now 2>/dev/null || true
 
 # use systemd-networkd
-systemctl enable systemd-networkd 2>/dev/null || true
+systemctl enable systemd-networkd --now 2>/dev/null || true
 
 # disable systemd-networkd-wait-online to speed up the boot
-systemctl disable systemd-networkd-wait-online 2>/dev/null || true
-systemctl disable NetworkManager-wait-online 2>/dev/null || true
+systemctl disable systemd-networkd-wait-online --now 2>/dev/null || true
+systemctl disable NetworkManager-wait-online --now 2>/dev/null || true
 
 /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
 

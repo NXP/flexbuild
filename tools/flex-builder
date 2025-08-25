@@ -708,7 +708,6 @@ do_clean_rfs() {
     else
 		rfs_umount
         sudo rm -rf $RFSDIR && rm -rf $FBOUTDIR/images/${RFSDIR##*/}*
-        rm -rf $FBDIR/logs/.rfsconfig${MACHINE}
         fbprint_d "clean distro $RFSDIR"
     fi
 }

@@ -11,8 +11,7 @@
 
 #gst_plugins_bad:
 gst_plugins_bad: gst_plugins_base
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	 $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call download_repo,gst_plugins_bad,apps/multimedia) && \
 	 $(call patch_apply,gst_plugins_bad,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_bad && \
@@ -29,14 +28,12 @@ gst_plugins_bad: gst_plugins_base
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} && \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}; \
 	 fi && \
+	 \
 	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib && \
 	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/ && \
 	 sudo cp -rf $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include && \
-	 sudo cp -rf $(DESTDIR)/usr/share/{wayland-protocols,pkgconfig} $(RFSDIR)/usr/share && \
-	 sudo cp -f $(DESTDIR)/usr/lib/{libgsttag-1.0.so*,libgstallocators-1.0.so,libEGL*,libgbm*} $(RFSDIR)/usr/lib && \
 	 sudo cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/ && \
 	 sudo cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/ && \
-	 \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
 			  -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/lib/gstreamer-1.0/include \
@@ -46,7 +43,7 @@ gst_plugins_bad: gst_plugins_base
 				-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
 			    -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0" \
 		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-				 -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0" \
+				 -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0 -Wl,-rpath-link=$(DESTDIR)/usr/lib" \
 		--prefix=/usr --buildtype=release \
 		--cross-file meson.cross \
 		--strip \

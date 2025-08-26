@@ -14,8 +14,7 @@
 
 
 gstreamer:
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call download_repo,gstreamer,apps/multimedia) && \
 	 $(call patch_apply,gstreamer,apps/multimedia) && \
 	 cd $(MMDIR)/gstreamer && \

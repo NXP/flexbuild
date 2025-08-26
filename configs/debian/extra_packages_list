@@ -53,7 +53,7 @@ ls_pkgs=" \
     libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev \
     uuid-dev libpython3.13-dev python3-pip python3-pybind11 python3-pil \
     python3-flatbuffers python3-decorator python3-numpy python3-attr python3-psutil \
-    python3-lxml libwaffle-dev libpciaccess-dev \
+    python3-lxml libwaffle-dev libpciaccess-dev clinfo \
     liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev \
     libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd \
 "
@@ -63,7 +63,7 @@ imx9_pkgs=" \
 	qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window \
 	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript \
 	qml6-module-qt5compat-graphicaleffects glmark2-es2-wayland wayland-utils \
-	clinfo v4l-utils mesa-utils alsa-utils qt6-svg-plugins network-manager \
+	v4l-utils mesa-utils alsa-utils qt6-svg-plugins network-manager \
 	\
     libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev \
     libbsd-dev libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev \

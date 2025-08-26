@@ -5,8 +5,8 @@
 # section: iMX multimedia
 # description: NXP Audio Front End (AFE) for incorporating Voice Assistants
 
-nxp_afe:
-#nxp_afe: alsa_lib
+#nxp_afe:
+nxp_afe: alsa_lib
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,nxp_afe,apps/multimedia) && \
 	 $(call patch_apply,nxp_afe,apps/multimedia) && \

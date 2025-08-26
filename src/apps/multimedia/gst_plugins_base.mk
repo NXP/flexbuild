@@ -12,17 +12,16 @@
 
 
 ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
-  DEP_GSTBASE = mali_imx
+  DEP_GSTBASE = mali_imx imx_dpu_g2d
 else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
-  DEP_GSTBASE = gpu_viv
+  DEP_GSTBASE = gpu_viv imx_gpu_g2d
 else
   DEP_GSTBASE =
 endif
 
 #gst_plugins_base:
-gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer imx_gpu_g2d alsa_lib wayland_protocols
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer alsa_lib wayland_protocols
+	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call download_repo,gst_plugins_base,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
@@ -51,10 +50,10 @@ gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer imx_gpu_g2d alsa_lib wayland_p
 		--cross-file meson.cross \
 		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 \
-			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
+			       -L$(RFSDIR)/usr/lib/aarch64-linux-gnu -Wl,-rpath-link=$(DESTDIR)/usr/lib \
 			       -lEGL -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
 		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(DESTDIR)/usr/lib/gstreamer-1.0 -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-			       -lEGL -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl" \
+			       -lEGL -lgstbase-1.0 -lgstreamer-1.0 -lpthread -ldl -Wl,-rpath-link=$(DESTDIR)/usr/lib" \
 		--prefix=/usr --buildtype=release \
 		--strip \
 		-Dintrospection=disabled \

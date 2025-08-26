@@ -390,6 +390,9 @@ repo:
   libcamera:
     url: https://github.com/nxp-imx/libcamera.git
 
+  neo_ipa_uguzzi:
+    url:  https://github.com/nxp-imx/neo-ipa-uguzzi.git
+
 
 # generic component repositories
 # --------------------------------------------------------------------------------------

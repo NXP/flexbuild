@@ -26,7 +26,7 @@ host_dependent_packages=" \
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
     rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser \
-    efitools itstool \
+    efitools itstool python3-jinja2 \
 "
 
 
@@ -73,7 +73,7 @@ imx9_pkgs=" \
     libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev libassimp-dev \
     libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev libtheora-dev \
     libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging \
-    python3-venv libgtest-dev libdbus-glib-1-dev libprotobuf-dev \
+    python3-venv libgtest-dev libdbus-glib-1-dev libprotobuf-dev libevent-dev \
     qt6-tools-dev libqt6svg6 qt6-svg-dev libfmt-dev libdevil-dev nfs-common \
     python3-gi python3-gi-cairo gir1.2-gtk-3.0 python3-gst-1.0 gir1.2-gstreamer-1.0 \
 "

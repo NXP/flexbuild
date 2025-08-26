@@ -44,15 +44,22 @@ generate_bootpartition_tarball() {
     fbprint_n "Installing firmware ..."
     mkdir -p $bootpartdir/firmware
     if [ $SOCFAMILY = IMX ]; then
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld sof_zephyr -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY
+        [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld sof_zephyr -a $DESTARCH -p $SOCFAMILY
+        [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY
+        [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY
+        [ ! -d $FBOUTDIR/bsp/imx_mcore_demos ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY
+        [ ! -f $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY
+        [ ! -f $DESTDIR/usr/lib/firmware/mali_csffw.bin ] && bld mali_imx -m imx95evk
 
-	cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware
-	cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo/imx93-*m33*.elf $DESTDIR/usr/lib/ethosu_firmware $bootpartdir/firmware
-     fi
+        cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware
+        cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo/imx93* $bootpartdir/firmware
+        cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx8mp-m7-demo/imx8mp* $bootpartdir/firmware
+        cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx8mm-m4-demo/imx8mm* $bootpartdir/firmware
+        cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx95-m7-demo/imx95* $bootpartdir/firmware
+        cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/vpu/* $bootpartdir/firmware
+        cp -Prf $DESTDIR/usr/lib/ethosu_firmware $bootpartdir/firmware
+        cp -Prf $DESTDIR/usr/lib/firmware/mali_csffw.bin $bootpartdir/firmware
+    fi
 
     # install distro boot script
     fbprint_n "Installing distro boot script ..."

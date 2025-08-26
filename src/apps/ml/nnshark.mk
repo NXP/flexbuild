@@ -6,14 +6,14 @@
 
 # Depend: gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad libgpuperfcnt perf
 
+#nnshark:
 nnshark: gst_plugins_bad libgpuperfcnt
-#nnshark: gst_plugins_bad libgpuperfcnt
-	@[ $(SOCFAMILY) != IMX ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call download_repo,nnshark,apps/ml,submod) && \
 	 $(call patch_apply,nnshark,apps/ml) && \
 	 $(call fbprint_b,"nnshark") && \
-	 sudo cp -rf $(DESTDIR)/usr/lib/libgpuperfcnt.so* $(RFSDIR)/usr/lib/ && \
-	 sudo cp -rf $(DESTDIR)/usr/include/gpuperfcnt $(RFSDIR)/usr/include/ && \
+	 export CPPFLAGS="-I$(DESTDIR)/usr/include" && \
+	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-rpath-link,$(DESTDIR)/usr/lib" && \
 	 cd $(MLDIR)/nnshark && \
 	 sed -i 's/--exclude=gtkdocize//' autogen.sh && \
 	 ./autogen.sh --noconfigure --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \

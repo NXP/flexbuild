@@ -9,7 +9,7 @@
 
 
 imx_dpu_g2d:
-	@[ $(SOCFAMILY) != IMX ] && exit || \
+	@[ $${MACHINE:0:5} != imx95 ] && exit || \
 	 $(call fbprint_b,"imx_dpu_g2d") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/imx_dpu_g2d ]; then \

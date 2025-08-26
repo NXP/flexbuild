@@ -8,7 +8,7 @@
 
 
 libgpuperfcnt:
-	@[  $(SOCFAMILY) != IMX ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
 	 $(call fbprint_b,"libgpuperfcnt") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d libgpuperfcnt ]; then \

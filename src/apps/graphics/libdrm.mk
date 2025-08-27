@@ -11,6 +11,7 @@ libdrm:
 	 cd $(GRAPHICSDIR)/libdrm && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 PYTHONNOUSERSITE=y PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file=meson.cross \

@@ -15,7 +15,7 @@ ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
 else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
   DEP_WESTON = gpu_viv imx_gpu_g2d
 else ifeq ($(filter l%,$(MACHINE)),$(MACHINE))
-  DEP_WESTON = gpu_viv
+  DEP_WESTON = gpu_viv imx_gpu_g2d
 else ifeq ($(filter imx9%,$(MACHINE)),$(MACHINE))
   DEP_WESTON = imx_pxp_g2d
 else

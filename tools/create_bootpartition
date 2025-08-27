@@ -58,7 +58,7 @@ generate_bootpartition_tarball() {
         cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx95-m7-demo/imx95* $bootpartdir/firmware
         cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/vpu/* $bootpartdir/firmware
         cp -Prf $DESTDIR/usr/lib/ethosu_firmware $bootpartdir/firmware
-        cp -Prf $DESTDIR/usr/lib/firmware/mali_csffw.bin $bootpartdir/firmware
+        cp -Prf $PKGDIR/apps/graphics/mali_imx/usr/lib/firmware/mali_csffw.bin $bootpartdir/firmware
     fi
 
     # install distro boot script

@@ -8,7 +8,7 @@
 # COMPATIBLE_MACHINE: imx8mm
 
 imx_gpu_g2d:
-	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:6} != ls1028 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"imx_gpu_g2d") && \
 	 cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/imx_gpu_g2d ]; then \

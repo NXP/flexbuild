@@ -63,11 +63,13 @@ qe_ucode:
 
 
 dp_fw_cadence:
-	@if [ ! -d $(BSPDIR)/firmware-imx/firmware/hdmi/cadence ]; then \
-             cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && \
-             chmod +x firmware_imx.bin && \
-             ./firmware_imx.bin --auto-accept $(LOG_MUTE) && \
-	     mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
+	@if [ ! -d $(BSPDIR)/firmware-imx ]; then \
+			cd $(BSPDIR) && rm -f firmware_imx*; \
+			$(WGET) $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE); \
+			[ $$? -ne 0 ] && { echo "Downloading $(repo_firmware_imx_bin_url) failed."; exit 1; } || \
+			chmod +x firmware_imx.bin; \
+			./firmware_imx.bin --auto-accept --force $(LOG_MUTE); \
+			mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
 	 fi && \
 	 if [ ! -L $(FBOUTDIR)/bsp/dp_fw_cadence ]; then \
 	     ln -sf $(BSPDIR)/firmware-imx/firmware/hdmi/cadence $(FBOUTDIR)/bsp/dp_fw_cadence; \

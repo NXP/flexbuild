@@ -8,24 +8,26 @@ define imx_mkimage_target
 	$(call patch_apply,imx_mkimage,bsp) && \
     \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \
-		cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && chmod +x firmware_imx.bin && \
-		./firmware_imx.bin --auto-accept $(LOG_MUTE) && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
+		cd $(BSPDIR) && rm -f firmware_imx.bin && $(WGET) $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && \
+		chmod +x firmware_imx.bin && ./firmware_imx.bin --auto-accept --force $(LOG_MUTE) && \
+		mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
-		cd $(BSPDIR) && wget -q $(repo_seco_bin_url) -O imx-seco.bin $(LOG_MUTE) && chmod +x imx-seco.bin && \
-		./imx-seco.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
+		cd $(BSPDIR) && rm -f imx-seco.bin && $(WGET) $(repo_seco_bin_url) -O imx-seco.bin $(LOG_MUTE) && chmod +x imx-seco.bin && \
+		./imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/fw_ele ]; then \
-		cd $(BSPDIR) && wget -q $(repo_fw_ele_bin_url) -O fw_ele.bin $(LOG_MUTE) && chmod +x fw_ele.bin && \
-		./fw_ele.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele && rm -f fw_ele.bin; \
+		cd $(BSPDIR) && rm -f fw_ele.bin && $(WGET) $(repo_fw_ele_bin_url) -O fw_ele.bin $(LOG_MUTE) && chmod +x fw_ele.bin && \
+		./fw_ele.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele && rm -f fw_ele.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/fw_upower ]; then \
-		cd $(BSPDIR) && wget -q $(repo_fw_upower_bin_url) -O fw_upower.bin $(LOG_MUTE) && chmod +x fw_upower.bin && \
-		./fw_upower.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower && rm -f fw_upower.bin; \
+		cd $(BSPDIR) && rm -f fw_upower.bin && $(WGET) $(repo_fw_upower_bin_url) -O fw_upower.bin $(LOG_MUTE) && chmod +x fw_upower.bin && \
+		./fw_upower.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower && rm -f fw_upower.bin; \
     fi && \
-    if [ ! -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin ]; then \
-		wget -q $(repo_scfw_bin_url) -O imx-scfw.bin $(LOG_MUTE) && chmod +x imx-scfw.bin && \
-		./imx-scfw.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
+    if [ ! -d $(BSPDIR)/imx-scfw ]; then \
+		cd $(BSPDIR) && rm -f imx-scfw.bin && \
+		$(WGET) $(repo_scfw_bin_url) -O imx-scfw.bin $(LOG_MUTE) && chmod +x imx-scfw.bin && \
+		./imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
     fi && \
     if [ ! -d $(BSPDIR)/imx_mcore_demos ]; then \
 		bld mcore_demo; \
@@ -248,6 +250,25 @@ define imx_mkimage_target
 			SOC_FAMILY=iMX95; \
 			cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
+			cp $(BSPDIR)/imx_mcore_demos/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
+				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \
+			cp -f $(BSPDIR)/atf/build/imx95/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_sm/build/mx95evk/m33_image.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
+				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			fi;  \
+			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
+            ;; \
+        imx95frdm) \
+			SOC_FAMILY=iMX95; \
+			cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx95-15x15-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
 			cp $(BSPDIR)/imx_mcore_demos/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
 				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \

@@ -24,9 +24,10 @@ mcore_demo:
 			*) echo "Unknown soc: $$soc"; exit 1 ;; \
 		esac; \
 		\
-		_FNAME="$$(basename "$${url}")" && \
-		wget -q $${url} -O $${_FNAME} $(LOG_MUTE) && \
-		chmod +x $${_FNAME} && ./$${_FNAME} --auto-accept $(LOG_MUTE) && \
+		_FNAME="$$(basename $${url})" && \
+		$(WGET) $${url} -O $${_FNAME} $(LOG_MUTE) && \
+		[ $$? -ne 0 ] && { echo "Downloading $${url} failed."; exit 1; } || \
+		chmod +x $${_FNAME} && ./$${_FNAME} --auto-accept --force $(LOG_MUTE) && \
 		_BNAME="$$(basename "$${_FNAME}" .bin)" && \
 		_DNAME="$$(echo "$${_BNAME}" | cut -d'-' -f1-3)" && \
 		mv $${_BNAME} $${_DNAME} && \

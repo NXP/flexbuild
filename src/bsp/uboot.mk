@@ -71,6 +71,9 @@ define build-uboot-target
 	fi && \
 	if echo $1 | grep -qE '^imx8|^imx9'; then \
 		if [[ "$(MACHINE)" == *"imx95"* ]]; then \
+			if [ ! -d /usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin ]; then \
+				bld host-dep -m $(MACHINE); \
+			fi; \
 			bld imx_sm -m $(MACHINE); \
 			bld imx_oei -m $(MACHINE); \
 		fi; \

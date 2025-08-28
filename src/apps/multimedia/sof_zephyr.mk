@@ -10,8 +10,10 @@
 sof_zephyr:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 if [ ! -d $(MMDIR)/sof_zephyr/sof-xcc ]; then \
-	     mkdir -p $(MMDIR)/sof_zephyr && cd $(MMDIR)/sof_zephyr && \
-	     wget -q $(repo_sof_zephyr_tar_url) -O sof_zephyr.tar.gz $(LOG_MUTE) && \
+		 rm -rf sof_zephyr*; \
+	     mkdir -p $(MMDIR)/sof_zephyr && cd $(MMDIR)/sof_zephyr; \
+	     $(WGET) $(repo_sof_zephyr_tar_url) -O sof_zephyr.tar.gz $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_sof_zephyr_tar_url) failed."; exit 1; } || \
 	     tar xf sof_zephyr.tar.gz --strip-components 1; \
 	 fi && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \

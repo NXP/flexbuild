@@ -11,9 +11,11 @@ imx_vpu_hantro_vc:
 	 $(call fbprint_b,"imx_vpu_hantro_vc") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_vpu_hantro_vc ]; then \
-	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_vc_bin_url) -O vpu_hantro_vc.bin $(LOG_MUTE) && \
-	     chmod +x vpu_hantro_vc.bin && \
-	     ./vpu_hantro_vc.bin --auto-accept $(LOG_MUTE) && \
+		 rm -rf imx_vpu_hantro_vc*; \
+	     $(WGET) $(repo_vpu_hantro_vc_bin_url) -O vpu_hantro_vc.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_vpu_hantro_vc_bin_url) failed."; exit 1; } || \
+	     chmod +x vpu_hantro_vc.bin; \
+	     ./vpu_hantro_vc.bin --auto-accept --force $(LOG_MUTE) && \
 	     mv imx-vpu-hantro-vc-* imx_vpu_hantro_vc && rm -f vpu_hantro_vc.bin; \
 	 fi && \
 	 cp -Prf $(MMDIR)/imx_vpu_hantro_vc/usr $(DESTDIR)/ && \

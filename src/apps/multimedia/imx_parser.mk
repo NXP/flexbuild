@@ -11,9 +11,11 @@ imx_parser:
 	 $(call fbprint_b,"imx_parser") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_parser ]; then \
-	     wget -q $(repo_imx_parser_bin_url) -O imx_parser.bin $(LOG_MUTE) && \
-	     chmod +x imx_parser.bin && ./imx_parser.bin --auto-accept $(LOG_MUTE) && \
-	     mv imx-parser* imx_parser && rm -f imx_parser.bin; \
+		 rm -rf imx_parser*; \
+	     $(WGET) $(repo_imx_parser_bin_url) -O imx_parser.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_imx_parser_bin_url) failed."; exit 1; } || \
+	     chmod +x imx_parser.bin && ./imx_parser.bin --auto-accept --force $(LOG_MUTE); \
+	     mv imx-parser-* imx_parser && rm -f imx_parser.bin; \
 	 fi && \
 	 cd imx_parser && \
 	 ./configure CC=aarch64-linux-gnu-gcc \

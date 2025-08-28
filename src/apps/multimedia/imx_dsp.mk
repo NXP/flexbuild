@@ -22,8 +22,10 @@ imx_dsp:
 	 $(call fbprint_b,"imx_dsp") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp ]; then \
-	     wget -q $(repo_imx_dsp_bin_url) -O imx_dsp.bin $(LOG_MUTE) && \
-	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept $(LOG_MUTE) && \
+		 rm -rf imx_dsp*; \
+	     $(WGET) $(repo_imx_dsp_bin_url) -O imx_dsp.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_imx_dsp_bin_url) failed."; exit 1; } || \
+	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept --force $(LOG_MUTE); \
 	     mv imx-dsp* imx_dsp && rm -f imx_dsp.bin; \
 	 fi && \
 	 cd imx_dsp && \

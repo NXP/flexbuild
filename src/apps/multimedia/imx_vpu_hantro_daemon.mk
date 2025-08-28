@@ -14,9 +14,12 @@ SOCLIST = IMX8MM IMX8MQ IMX8MP
 
 imx_vpu_hantro_daemon: imx_vpu_hantro imx_vpu_hantro_vc
 	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 cd $(MMDIR) && \
 	 if [ ! -d $(MMDIR)/imx_vpu_hantro_daemon ]; then \
-	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_daemon_tar_url) -O imx_vpu_hantro_daemon.tar.gz $(LOG_MUTE) && \
-	     tar xf imx_vpu_hantro_daemon.tar.gz && rm -rf imx_vpu_hantro_daemon.tar.gz && \
+		 rm -rf imx_vpu_hantro_daemon*; \
+	     $(WGET) $(repo_vpu_hantro_daemon_tar_url) -O imx_vpu_hantro_daemon.tar.gz $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_vpu_hantro_daemon_tar_url) failed."; exit 1; } || \
+	     tar xf imx_vpu_hantro_daemon.tar.gz && rm -rf imx_vpu_hantro_daemon.tar.gz; \
 	     mv imx-vpu-hantro-daemon-* imx_vpu_hantro_daemon; \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/lib/libhantro.so ]; then \

@@ -22,12 +22,14 @@ endif
 
 
 imx_dsp_codec_ext:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"imx_dsp_codec_ext") && \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_dsp_codec_ext ]; then \
-	     wget -q $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin $(LOG_MUTE) && \
-	     chmod +x imx_dsp_codec_ext.bin && ./imx_dsp_codec_ext.bin --auto-accept $(LOG_MUTE) && \
+		 rm -rf imx_dsp_codec_ext*; \
+	     $(WGET) $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_imx_dsp_codec_ext_bin_url) failed."; exit 1; } || \
+	     chmod +x imx_dsp_codec_ext.bin && ./imx_dsp_codec_ext.bin --auto-accept --force $(LOG_MUTE) && \
 	     mv imx-dsp-codec-ext* imx_dsp_codec_ext && rm -f imx_dsp_codec_ext.bin; \
 	 fi && \
 	 cd imx_dsp_codec_ext && \

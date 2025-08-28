@@ -12,8 +12,10 @@ imx_vpu_hantro:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 cd $(MMDIR) && \
 	 if [ ! -d imx_vpu_hantro ]; then \
-	     wget -q $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin $(LOG_MUTE) && chmod +x vpu_hantro.bin && \
-	     ./vpu_hantro.bin --auto-accept $(LOG_MUTE) && \
+		 rm -rf imx_vpu_hantro*; \
+	     $(WGET) $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_vpu_hantro_bin_url) failed."; exit 1; } || \
+		 chmod +x vpu_hantro.bin && ./vpu_hantro.bin --auto-accept --force $(LOG_MUTE); \
 	     mv imx-vpu-hantro-* imx_vpu_hantro && rm -f vpu_hantro.bin; \
 	 fi && \
 	 \

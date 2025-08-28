@@ -103,3 +103,9 @@ define clone_repo
 		echo "[INFO] Clone DONE."; \
 	fi
 endef
+
+#
+# define the default wget command
+#
+
+WGET := wget --tries=2 --timeout=100 --continue --progress=bar --verbose

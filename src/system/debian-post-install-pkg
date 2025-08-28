@@ -66,20 +66,20 @@ echo -e "Preparing to install packages ..."
 show_one_line sudo apt-get update -y 
 
 case "${board_id}" in
+    imx95*)
+        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx95evk.deb
+        PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"
+        ;;
     imx8*)
         NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb
         PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"
         ;;
-    imx9*)
+    imx91*|imx93*)
         NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb
         PKGS="$ls_pkgs $imx9_pkgs"
         ;;
-    ls1028a*)
+    l*)
         NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb
-        PKGS="$ls_pkgs $imx9_pkgs"
-        ;;
-    ls*|lx*)
-        NXPAPPSPKG=nxp_apps_debian_lsdk2512_lx2160ardb.deb
         PKGS="$ls_pkgs"
         ;;
     *)
@@ -113,7 +113,7 @@ echo -e "Installing Debian packages successfully."
 
 echo -e "Downloading and installing NXP-specific packages ..."
 rm -rf ${NXPAPPSPKG}
-wget $pkglink/$NXPAPPSPKG -q --show-progress || { echo "Downloading ${NXPAPPSPKG} failed "; exit 1; }
+wget --tries=2 --timeout=100 --continue --progress=bar --verbose $pkglink/$NXPAPPSPKG || { echo "Downloading ${NXPAPPSPKG} failed, please try again. "; exit 1; }
 show_one_line dpkg -i --force-overwrite ${NXPAPPSPKG}
 rm -rf ${NXPAPPSPKG}
 

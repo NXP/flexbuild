@@ -59,7 +59,6 @@ case "${board_id}" in
         rm -rf /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
         rm -rf /usr/lib/libclutter-gst-3.0.so*
         systemctl enable weston || true
-
         ;;
 
     ls1028a*)

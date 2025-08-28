@@ -11,23 +11,16 @@ mali_imx:
 	 mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/mali_imx ]; then \
 	     echo Downloading $(repo_mali_imx_bin_url) $(LOG_MUTE) && \
-		 rm -f mali_imx.bin && \
-		 retry=0; success=0; \
-		 while [ $${retry} -lt 3 ]; do \
-			wget -q $(repo_mali_imx_bin_url) -O mali_imx.bin $(LOG_MUTE) && success=1 && break; \
-			retry=$$((retry+1)); \
-			echo "Download failed, retry $$retry/3 ..." $(LOG_MUTE); \
-		 done; \
-		 if [ $$success -ne 1 ]; then \
-			echo "Download failed after 3 attempts, exiting."; \
-			exit 1; \
-		 fi && \
-		 chmod a+x mali_imx.bin && \
-	     ./mali_imx.bin --auto-accept $(LOG_MUTE) && mv mali-imx-* mali_imx && rm -f mali_imx.bin; \
+		 rm -rf mali_imx*; \
+	     $(WGET) $(repo_mali_imx_bin_url) -O mali_imx.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_mali_imx_bin_url) failed."; exit 1; } || \
+		 chmod a+x mali_imx.bin; \
+	     ./mali_imx.bin --auto-accept --force $(LOG_MUTE) && mv mali-imx-* mali_imx && rm -f mali_imx.bin; \
 	 fi && \
 	 cd $(GRAPHICSDIR)/mali_imx && \
 	 mkdir -p $(DESTDIR)/etc && mkdir -p $(DESTDIR)/usr && \
 	 cp -af ./etc/* $(DESTDIR)/etc/ && \
 	 cp -af ./usr/* $(DESTDIR)/usr/ && \
+	 rm -rf $(DESTDIR)/usr/lib/firmware && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libGLESv2.so,libGLESv2.so.2,libgbm.so.1,libvulkan.so,libvulkan.so.1,libEGL.so,libEGL.so.1} && \
 	 $(call fbprint_d,"mali_imx")

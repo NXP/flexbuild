@@ -22,7 +22,8 @@ tflite:
 	 cd $(MLDIR)/tflite && \
 	 if ! flatc --version 2>/dev/null | grep -qE '^flatc version 24\.'; then \
         echo "flatc is not available, instlling flatbuffers 24.3.25..." && \
-        wget https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz $(LOG_MUTE) && \
+		rm -f v24.3.25.tar.gz && \
+		$(WGET) https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz $(LOG_MUTE) && \
         tar -xf v24.3.25.tar.gz && \
         cd flatbuffers-24.3.25 && \
         cmake -DCMAKE_BUILD_TYPE=Release . $(LOG_MUTE) && \
@@ -32,7 +33,7 @@ tflite:
      else \
         echo "flatc is OK" $(LOG_MUTE); \
      fi && \
-	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
+	 [ ! -f mobilenet.tgz ] && $(WGET) $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CMAKE_TLS_VERIFY=0 && \

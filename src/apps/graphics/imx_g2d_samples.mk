@@ -12,6 +12,9 @@
 ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
 	DEP_G2D = imx_dpu_g2d
 	BUILD_IMPLEMENTATION = dpu95
+else ifeq ($(filter imx91%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_pxp_g2d
+	BUILD_IMPLEMENTATION = pxp
 else ifeq ($(filter imx93%,$(MACHINE)),$(MACHINE))
 	DEP_G2D = imx_pxp_g2d
 	BUILD_IMPLEMENTATION = pxp

@@ -9,11 +9,14 @@ gpu_viv:
 	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:7} != ls1028a -o \
 	 $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	 $(call fbprint_b,"gpu_viv ") && \
+	 mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR) && \
 	 if [ ! -d $(GRAPHICSDIR)/gpu_viv ]; then \
-	     mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR) && \
-	     echo Downloading $(repo_gpu_viv_bin_url) $(LOG_MUTE) && \
-	     wget -q $(repo_gpu_viv_bin_url) -O gpu_viv.bin $(LOG_MUTE) && chmod +x gpu_viv.bin && \
-	     ./gpu_viv.bin --auto-accept $(LOG_MUTE) && mv imx-gpu-* gpu_viv && rm -f gpu_viv.bin; \
+		 rm -rf gpu_viv*; \
+	     echo Downloading $(repo_gpu_viv_bin_url) $(LOG_MUTE); \
+	     $(WGET) $(repo_gpu_viv_bin_url) -O gpu_viv.bin $(LOG_MUTE); \
+		 [ $$? -ne 0 ] && { echo "Downloading $(repo_gpu_viv_bin_url) failed."; exit 1; } || \
+		 chmod +x gpu_viv.bin; \
+	     ./gpu_viv.bin --auto-accept --force $(LOG_MUTE) && mv imx-gpu-* gpu_viv && rm -f gpu_viv.bin; \
 	 fi && \
 	 cd $(GRAPHICSDIR)/gpu_viv && \
 	 cp -rfa gpu-core/* $(DESTDIR) && \

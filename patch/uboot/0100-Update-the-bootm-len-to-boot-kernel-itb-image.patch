@@ -1,4 +1,4 @@
-From 2228d6f3348af49fcfe4f5236c14635513c92d50 Mon Sep 17 00:00:00 2001
+From d617a63ffaedf598a04aa6cbd02fb2a39f2db3e3 Mon Sep 17 00:00:00 2001
 From: Yuantian Tang <andy.tang@nxp.com>
 Date: Mon, 4 Aug 2025 20:12:26 -0700
 Subject: [PATCH] Update the bootm len to boot kernel itb image
@@ -13,9 +13,9 @@ Signed-off-by: Andy Tang <andy.tang@nxp.com>
  configs/imx91_11x11_frdm_imx91s_defconfig | 2 ++
  configs/imx93_11x11_evk_defconfig         | 2 ++
  configs/imx93_11x11_frdm_defconfig        | 2 ++
- configs/imx95_15x15_evk_defconfig         | 1 +
- configs/imx95_15x15_frdm_defconfig        | 1 +
- 10 files changed, 15 insertions(+), 2 deletions(-)
+ configs/imx95_15x15_evk_defconfig         | 3 ++-
+ configs/imx95_15x15_frdm_defconfig        | 3 ++-
+ 10 files changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/configs/imx8mm_evk_defconfig b/configs/imx8mm_evk_defconfig
 index 067880fafeb..3b6173928ea 100644
@@ -121,7 +121,7 @@ index 623ed1eb650..a5eeef29afb 100644
  CONFIG_BOOTCOMMAND="run sr_ir_v2_cmd;bootflow scan -lb; run bsp_bootcmd"
  CONFIG_DEFAULT_FDT_FILE="imx93-11x11-frdm.dtb"
 diff --git a/configs/imx95_15x15_evk_defconfig b/configs/imx95_15x15_evk_defconfig
-index ef7e2f05fb7..9dd99a2ab08 100644
+index ef7e2f05fb7..e5246253263 100644
 --- a/configs/imx95_15x15_evk_defconfig
 +++ b/configs/imx95_15x15_evk_defconfig
 @@ -3,6 +3,7 @@ CONFIG_ARCH_IMX9=y
@@ -132,8 +132,17 @@ index ef7e2f05fb7..9dd99a2ab08 100644
  CONFIG_SPL_GPIO=y
  CONFIG_SPL_LIBCOMMON_SUPPORT=y
  CONFIG_SPL_LIBGENERIC_SUPPORT=y
+@@ -37,7 +38,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_OF_SYSTEM_SETUP=y
+-CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx95-15x15-evk-adv7535-ap1302.dtb"
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
 diff --git a/configs/imx95_15x15_frdm_defconfig b/configs/imx95_15x15_frdm_defconfig
-index ce8cbde68e8..9f03fb286e8 100644
+index ce8cbde68e8..88b56d1adce 100644
 --- a/configs/imx95_15x15_frdm_defconfig
 +++ b/configs/imx95_15x15_frdm_defconfig
 @@ -3,6 +3,7 @@ CONFIG_ARCH_IMX9=y
@@ -144,6 +153,15 @@ index ce8cbde68e8..9f03fb286e8 100644
  CONFIG_SPL_GPIO=y
  CONFIG_SPL_LIBCOMMON_SUPPORT=y
  CONFIG_SPL_LIBGENERIC_SUPPORT=y
+@@ -37,7 +38,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_OF_SYSTEM_SETUP=y
+-CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx95-15x15-frdm.dtb"
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
 -- 
 2.34.1
 

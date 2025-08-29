@@ -7,7 +7,7 @@ TARGET_DIR=${1:-/tmp/rootfs}
 KEYRING="/usr/share/keyrings/debian-archive-keyring.gpg"
 MIRRORS=(http://deb.debian.org/debian http://ftp.cn.debian.org/debian http://ftp.de.debian.org/debian )
 
-PACKAGES=(
+DEFAULT_PACKAGES=(
   init udev sudo vim apt file zstd parted fdisk dosfstools iputils-ping isc-dhcp-client
   wget curl ca-certificates systemd systemd-sysv psmisc ethtool iproute2 openssh-server
   openssh-client patchelf htop util-linux lshw keyutils wpasupplicant strongswan-starter
@@ -17,12 +17,21 @@ PACKAGES=(
   pipewire-pulse wireplumber locales libspa-0.2-bluetooth net-tools
 )
 
+PACKAGES=("${DEFAULT_PACKAGES[@]}")
+if [ $# -gt 1 ]; then
+  EXTRA_PACKAGES=("${@:2}")
+  PACKAGES+=("${EXTRA_PACKAGES[@]}")
+fi
+
+#echo "Packages to install: $(IFS=,; echo "${PACKAGES[*]}")"
+
 echo "Running mmdebstrap with mirrors: ${MIRRORS[@]}"
 
 echo "$(IFS=,; echo "${PACKAGES[*]}")"
 
 mmdebstrap \
   --arch=$ARCH \
+  --skip=download/bytecode \
   --variant=standard \
   --components=main,contrib \
   --keyring="$KEYRING" \

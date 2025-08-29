@@ -20,18 +20,20 @@ case "${board_id}" in
         ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
         ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
         /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
-
+        rm -rf /boot/firmware/{imx93*,imx95*,imx8mp*}
         ;;
 
     imx8mp*)
         ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
         ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
         /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
         ;;
 
     imx91*)
         rm -rf /etc/systemd/system/display-manager.service
         ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
+        rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*,imx8mp*}
         systemctl enable weston || true
         ;;
 
@@ -39,6 +41,7 @@ case "${board_id}" in
         ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
         [ -f /usr/lib/libg2d-viv.so.2.4.0 ] && rm -f /usr/lib/libg2d-viv.so.2.4.0
         rm -rf /etc/systemd/system/display-manager.service
+        rm -rf /boot/firmware/{imx95*,imx8mm*,imx8mp*}
 
         ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
         systemctl enable weston || true
@@ -47,6 +50,7 @@ case "${board_id}" in
     imx95*)
         ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
         /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        rm -rf /boot/firmware/{imx93*,imx8mm*,imx8mp*}
         ;;
 
     ls1028a*)

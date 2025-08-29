@@ -13,7 +13,7 @@ spc:
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"spc") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

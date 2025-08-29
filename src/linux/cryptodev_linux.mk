@@ -12,7 +12,7 @@ cryptodev_linux:
 	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
 	 fi && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -a $(DESTARCH) -r $(DISTROTYPE):$(DISTROVARIANT); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 \
 	 cd $(PKGDIR)/linux/cryptodev_linux && \

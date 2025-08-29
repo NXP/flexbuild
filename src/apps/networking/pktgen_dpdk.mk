@@ -10,7 +10,7 @@ pktgen_dpdk: dpdk
 	 $(call download_repo,pktgen_dpdk,apps/networking) && \
 	 $(call patch_apply,pktgen_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 \
 	 $(call fbprint_b,"pktgen_dpdk") && \

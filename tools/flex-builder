@@ -22,23 +22,19 @@ Most used example with automated build:
 
 Most used example with separate command:
  bld bsp -m imx93frdm            # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for single machine
- bld rfs [ -r debian:desktop ]   # generate Debian-based Desktop rootfs  (with more graphics/multimedia packages for Desktop)
- bld rfs -r debian:server        # generate Debian-based Server rootfs   (with more server related packages, no GUI Desktop)
- bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
- bld linux [ -p IMX|LS]          # compile linux kernel for all arm64 IMX or LS machines
+ bld rfs -m imx8mpevk            # generate Debian-based rootfs for imx8mpevk
+ bld linux [ -m <machine> ]      # compile linux kernel for all arm64 IMX or LS machines
  bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
- bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
- bld apps                        # compile NXP-specific components against the runtime dependencies of Debian Desktop rootfs for i.MX machines
- bld apps -r debian:server -p LS # compile NXP-specific components against the runtime dependencies of Debian Server rootfs for LS machines
- bld merge-apps [ -r <type> ]    # merge NXP-specific components into target Debian rootfs (Desktop by default,add '-r debian:server' for Server)
- bld packrfs [ -r <type> ]       # pack and compress target rootfs as rootfs_xx.tar.zst (or add '-r debian:server' for Server)
- bld packapps [ -r <type> ]      # pack and compress target app components as apps_xx.tar.zst (add '-p LS' for Layerscape platforms)
+ bld boot -m imx91evk            # generate boot partition tarball (including kernel,dtb,modules,distro bootscript)
+ bld apps -m ls1028ardb          # compile NXP-specific components against the runtime dependencies
+ bld merge-apps -m <machine>     # merge NXP-specific components into target Debian rootfs
+ bld packrfs -m <machine>        # pack and compress target rootfs as rootfs_xx.tar.zst
  bld docker                      # create or attach docker container to build in docker
  bld clean                       # clean all obsolete firmware/linux/apps binary images except distro rootfs
- bld clean-apps [ -r <type> ]    # clean the obsolete NXP-specific apps components binary images
- bld clean-rfs [ -r <type> ]     # clean target debian-based server arm64 rootfs
+ bld clean-apps                  # clean the obsolete NXP-specific apps components binary images
  bld clean-bsp                   # clean obsolete BSP (u-boot/atf/firmware) images
  bld clean-linux                 # clean obsolete linux image
+ bld clean-rfs -m <machine>      # clean target debian-based server arm64 rootfs
  bld list                        # list enabled machines and supported various components
 
 Most used options:
@@ -533,10 +529,10 @@ flex_auto_build() {
 
     DISTROVARIANT=server
     bld linux -a $DESTARCH -p $SOCFAMILY
-    bld linux-headers -r debian:"$DISTROVARIANT" -a $DESTARCH
-    bld rfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
+    bld linux-headers -m $MACHINE
+    bld rfs -m $MACHINE
     bld linux-modules -a $DESTARCH -p $SOCFAMILY
-    bld apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
+    bld apps -m $MACHINE
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
     bld distroscr -a $DESTARCH -p $SOCFAMILY
     bld bsp -a $DESTARCH -p $SOCFAMILY

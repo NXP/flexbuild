@@ -19,7 +19,7 @@ ifeq ($(CONFIG_ROS), "y")
 	     $(call fbprint_n,"ROS was already installed in $(RFSDIR)/opt/ros2_jazzy") && exit; \
 	 fi && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"ROS2") && \
 	 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o $(RFSDIR)/usr/share/keyrings/ros-archive-keyring.gpg && \

@@ -17,7 +17,7 @@ sof_zephyr:
 	     tar xf sof_zephyr.tar.gz --strip-components 1; \
 	 fi && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"sof_zephyr") && \
 	 cd $(MMDIR)/sof_zephyr && \

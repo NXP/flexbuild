@@ -8,7 +8,7 @@ ovs_dpdk: dpdk
 	 $(call download_repo,ovs_dpdk,apps/networking) && \
 	 $(call patch_apply,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then \
 		sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/ && \

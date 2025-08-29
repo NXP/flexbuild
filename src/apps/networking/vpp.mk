@@ -15,7 +15,7 @@ vpp: dpdk
 	 $(call download_repo,vpp,apps/networking,git) && \
 	 $(call patch_apply,vpp,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"vpp") && \
 	 export CROSS_PREFIX=aarch64-linux-gnu && \

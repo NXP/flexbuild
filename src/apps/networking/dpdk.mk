@@ -19,10 +19,10 @@ dpdk:
 	 $(call download_repo,dpdk,apps/networking) && \
 	 $(call patch_apply,dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 if [ ! -f $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)/.config ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
 	 \
 	 $(call fbprint_b,"dpdk") && \

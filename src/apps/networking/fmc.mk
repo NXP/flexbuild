@@ -22,10 +22,10 @@ fmc: fmlib
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"fmc") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

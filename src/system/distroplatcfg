@@ -17,61 +17,41 @@ board_id=$(get_board_id)
 
 case "${board_id}" in
     imx8mm*)
-        sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
-        sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
-        sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
-        #rm -rf /etc/systemd/system/display-manager.service
-        ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
         ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
-        /usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
-        /usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
+        ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
         /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
 
         ;;
 
     imx8mp*)
-        sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
-        sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
-        sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
-        #rm -rf /etc/systemd/system/display-manager.service
-        ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
         ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
         ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
         /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         ;;
 
     imx91*)
-        sed -i '/^use-g2d=true/s/^/# /' /etc/xdg/weston/weston.ini
-        sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
-        sed -i '/gopoint/d' /etc/xdg/weston/weston.ini
-        #ln -sf /lib/systemd/system/weston.service /etc/systemd/system/graphical.target.wants/weston.service
         rm -rf /etc/systemd/system/display-manager.service
+        ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
         systemctl enable weston || true
         ;;
 
     imx93*)
         ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
         [ -f /usr/lib/libg2d-viv.so.2.4.0 ] && rm -f /usr/lib/libg2d-viv.so.2.4.0
-        sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
-        #ln -sf /lib/systemd/system/weston.service /etc/systemd/system/graphical.target.wants/weston.service
         rm -rf /etc/systemd/system/display-manager.service
-        rm -rf /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
-        rm -rf /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
-        rm -rf /usr/lib/libclutter-gst-3.0.so*
+
+        ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
         systemctl enable weston || true
         ;;
 
+    imx95*)
+        ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
+        /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        ;;
+
     ls1028a*)
-        #sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
-        #sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
-        #sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
+        ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini
         rm -rf /etc/systemd/system/display-manager.service
-        #ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
-        sed -i -e 's/^use-g2d=true/#&/' \
-            -e '0,/^\[launcher\]$/{s/^\[launcher\]$/#[launcher]/}' \
-            -e '0,/^icon=\/opt\/gopoint-apps\/icon\/icon_demo_launcher\.png$/{s/^icon=\/opt\/gopoint-apps\/icon\/icon_demo_launcher\.png$/#&/}' \
-            -e '0,/^path=\/usr\/bin\/gopoint$/{s/^path=\/usr\/bin\/gopoint$/#&/}' \
-            /etc/xdg/weston/weston.ini
         systemctl enable weston || true
         ;;
 
@@ -108,6 +88,8 @@ systemctl disable NetworkManager-wait-online --now 2>/dev/null || true
 /usr/sbin/update-initramfs -u 2>/dev/null || true
 
 systemctl disable platcfg.service 2>/dev/null || true
+
+dpkg --configure -a
 
 systemctl daemon-reload
 if [[ $PPID -eq 1 ]] && [[ -f /etc/systemd/system/graphical.target.wants/weston.service ]]; then

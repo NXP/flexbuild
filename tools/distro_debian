@@ -6,16 +6,15 @@
 
 
 build_distro_rfs_debian() {
-    [ $DISTROTYPE = debian ] && \
-		[ -f $RFSDIR/etc/buildinfo ] && \
-		grep -q "Debian" "$RFSDIR/etc/buildinfo" && \
-		log_mute echo "$RFSDIR already exists!" && exit 0
+    [ $DISTROTYPE = debian ] && [ -f $RFSDIR/etc/buildinfo ] && \
+    log_mute echo "$RFSDIR already exists!" && exit 0
 	rfs_umount
 
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
-	mkdir -p $RFSDIR
-    fbprint_n "Generating initial rootfs: $RFSDIR ... " && cd $FBDIR
+    fbprint_n "Generating initial rootfs: $RFSDIR"
+    fbprint_n "This might take some time, please be patient ... "
+    cd $FBDIR
     test -c $RFSDIR/dev/pts/ptmx && $sudopt umount $RFSDIR/dev/pts
     test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
     [ -n "$RFSDIR" ] && $sudopt rm -rf $RFSDIR/*
@@ -34,73 +33,61 @@ build_distro_rfs_debian() {
 	        fbprint_d $RFSDIR && exit || echo Building $RFSDIR from scratch
     fi
 
-    if [ ! -f $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH/etc/buildinfo ]; then
-		show_one_line $sudopt bash $FBDIR/configs/debian/debian_${DISTROVARIANT}_$DESTARCH.sh $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH
-    fi
-
-    [ -f $RFSDIR/etc/buildinfo ] || $sudopt rsync -aHAX $PKGDIR/${DEBIAN_CODENAME}_${DISTROVARIANT}_$DESTARCH/* $RFSDIR
-
-    if [ $DISTROVARIANT = server -o $DISTROVARIANT = desktop ]; then
-		if grep -q "Bootloader" $RFSDIR/etc/buildinfo; then
-			rfs_mount
-			log_mute echo "Rootfs already exists, exit..." && exit 0
-		fi
-
-		rfs_mount
-
-		show_one_line $sudopt chroot $RFSDIR apt-get update
+    if [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" = "base" ]; then
+        PKGS=''
+        NEWRFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64
+        RFSCMD=$FBDIR/configs/debian/debian_base_arm64.sh
+    else
 		case "$MACHINE" in
 			   imx8*|imx95*)    PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"; log_mute echo imx8 package...  ;;
 			   imx9*)           PKGS="$ls_pkgs $imx9_pkgs" ; log_mute echo imx9 package... ;;
 			   l*)  	        PKGS="$ls_pkgs" ; log_mute echo ls  package... ;;
 			   *)               PKGS="$ls_pkgs $imx9_pkgs" ; log_mute echo imx9 package... ;;
 		esac
-
-        install_success=false
-        MAX_RETRIES=3
-        for ((attempt=1; attempt<=$MAX_RETRIES; attempt++)); do
-            log_mute echo "Try to generate rootfs for the $attempt time..."
-            if show_one_line $sudopt chroot $RFSDIR apt-get install --no-install-recommends -y $PKGS; then
-                install_success=true
-                break
-            else
-                if [ $attempt -lt $MAX_RETRIES ]; then
-                    sleep 5
-                    show_one_line $sudopt chroot apt update --fix-missing > /dev/null 2>&1
-                fi
-            fi
-        done
-        if ! $install_success; then
-            echo "Generating rootfs failed, please try again."
-            exit 1
-        fi
-
-	    echo -e "Debian GNU/Linux 13" | $sudopt tee -a $RFSDIR/etc/buildinfo 1>/dev/null
-
-		# clean cached packages
-		log_mute $sudopt chroot $RFSDIR apt clean
-		log_mute $sudopt chroot $RFSDIR apt autoclean
-		log_mute $sudopt chroot $RFSDIR apt autoremove -y
-
-        rfs_umount
+        NEWRFSDIR=$RFSDIR
+        RFSCMD=$FBDIR/configs/debian/debian_server_arm64.sh
     fi
+    [ -f $NEWRFSDIR/etc/buildinfo ] && log_mute echo "$NEWRFSDIR already exists!" && exit 0
+
+	mkdir -p $NEWRFSDIR
+    show_one_line $sudopt bash $RFSCMD $NEWRFSDIR $PKGS
+	echo -e "Debian GNU/Linux 13" | $sudopt tee -a $NEWRFSDIR/etc/buildinfo 1>/dev/null
+
+    case "$MACHINE" in
+    ls1028*)
+        mkdir -p $NEWRFSDIR/etc/xdg/weston
+        cp -f $FBDIR/src/system/weston/weston.ini.ls1028 $NEWRFSDIR/etc/xdg/weston/
+        ;;
+    imx*)
+        mkdir -p $NEWRFSDIR/etc/xdg/weston
+        cp -f $FBDIR/src/system/weston/weston.ini* $NEWRFSDIR/etc/xdg/weston/
+        # for gnome desktop
+        if [ -f $NEWRFSDIR/etc/pam.d/gdm-password ]; then
+            cp -f $FBDIR/src/system/daemon.conf $NEWRFSDIR/etc/gdm3
+            cp -f $FBDIR/src/system/gdm-password $NEWRFSDIR/etc/pam.d
+            cp -f $FBDIR/src/system/gdm.service $NEWRFSDIR/lib/systemd/system/
+            ln -sf /lib/systemd/system/gdm.service $NEWRFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
+        fi
+        ;;
+    esac
+
 
     # fix absolute path for libz.so symlink when cross compiling apitrace
-    $sudopt ln -sf libz.so.1 $RFSDIR/usr/lib/aarch64-linux-gnu/libz.so
+    $sudopt ln -sf libz.so.1 $NEWRFSDIR/usr/lib/aarch64-linux-gnu/libz.so
 
     # fixup for libtinfo.so needed by tsntool
-    $sudopt ln -sf libtinfo.so.6 $RFSDIR/usr/lib/aarch64-linux-gnu/libtinfo.so
+    $sudopt ln -sf libtinfo.so.6 $NEWRFSDIR/usr/lib/aarch64-linux-gnu/libtinfo.so
 
     # fixup for Qt6 app cross-compiling
-    $sudopt ln -sf libQt6Quick.so.6 $RFSDIR/usr/lib/aarch64-linux-gnu/libQt6Quick.so
-    $sudopt ln -sf libQt6OpenGL.so.6 $RFSDIR/usr/lib/aarch64-linux-gnu/libQt6OpenGL.so
-    $sudopt ln -sf libQt6QmlModels.so.6 $RFSDIR/usr/lib/aarch64-linux-gnu/libQt6QmlModels.so
-    $sudopt ln -sf libQt6Qml.so.6 $RFSDIR/usr/lib/aarch64-linux-gnu/libQt6Qml.so
+    $sudopt ln -sf libQt6Quick.so.6 $NEWRFSDIR/usr/lib/aarch64-linux-gnu/libQt6Quick.so
+    $sudopt ln -sf libQt6OpenGL.so.6 $NEWRFSDIR/usr/lib/aarch64-linux-gnu/libQt6OpenGL.so
+    $sudopt ln -sf libQt6QmlModels.so.6 $NEWRFSDIR/usr/lib/aarch64-linux-gnu/libQt6QmlModels.so
+    $sudopt ln -sf libQt6Qml.so.6 $NEWRFSDIR/usr/lib/aarch64-linux-gnu/libQt6Qml.so
 
-    #echo -e 'export PYTHONPATH=$PYTHONPATH:/usr/lib/python3.13/dist-packages:/usr/lib/python3/dist-packages' | $sudopt tee -a $RFSDIR/etc/profile 1>/dev/null
+    #echo -e 'export PYTHONPATH=$PYTHONPATH:/usr/lib/python3.13/dist-packages:/usr/lib/python3/dist-packages' | $sudopt tee -a $NEWRFSDIR/etc/profile 1>/dev/null
 
     # fix ping: socket: Operation not permitted
-    $sudopt chmod u+s $RFSDIR/bin/ping
+    $sudopt chmod u+s $NEWRFSDIR/bin/ping
 
-    fbprint_d $RFSDIR
+    fbprint_d $NEWRFSDIR
 }

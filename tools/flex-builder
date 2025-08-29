@@ -518,34 +518,6 @@ generate_distro_boot_script() {
 }
 
 
-build_rfs_and_apps() {
-    if [ "$BUILD_DEBIAN_BASE" = y ]; then
-        bld rfs -r debian:base -a $DESTARCH -p $SOCFAMILY
-        bld merge-apps -r debian:base -a $DESTARCH -p $SOCFAMILY
-        bld packrfs -r debian:base -a $DESTARCH -p $SOCFAMILY
-    fi
-
-    DISTROVARIANT=server
-    bld rfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
-    bld linux-headers -r debian:"$DISTROVARIANT" -a $DESTARCH
-    bld apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
-    bld merge-apps -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
-    bld packrfs -r debian:"$DISTROVARIANT" -a $DESTARCH -p $SOCFAMILY
-
-    if [ "$BUILD_YOCTO_RFS" = y ]; then
-        bld rfs -r poky:devel -a $DESTARCH
-        bld apps -r poky:devel -a $DESTARCH
-        bld rfs -r poky:tiny -a $DESTARCH
-        bld packrfs -r poky:tiny -a $DESTARCH
-    fi
-
-    if [ "$BUILD_BUILDROOT_RFS" = y ]; then
-        bld rfs -r buildroot:tiny -a $DESTARCH
-        bld itb -r buildroot:tiny -a $DESTARCH
-    fi
-}
-
-
 flex_auto_build() {
     if echo "$BUILDARG" | grep -q fragment:; then
         export FRAGMENT_CFG=$(echo $BUILDARG | cut -d: -f2); unset BUILDARG
@@ -569,7 +541,6 @@ flex_auto_build() {
     bld distroscr -a $DESTARCH -p $SOCFAMILY
     bld bsp -a $DESTARCH -p $SOCFAMILY
     bld boot -a $DESTARCH -p $SOCFAMILY
-	#build_rfs_and_apps
 
     bld merge-apps -m $MACHINE
     bld packrfs -m $MACHINE
@@ -852,9 +823,8 @@ do
              $DISTROTYPE != buildroot -a $DISTROTYPE != poky ]; then
             fbprint_e "invalid argument $DISTROTYPE for distro type, valid type: debian, poky, buildroot" && exit 1
         fi
-        if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" != server -a \
-            "$DISTROVARIANT" != full -a "$DISTROVARIANT" != base -a "$DISTROVARIANT" != base -a "$DISTROVARIANT" != desktop ]; then
-            fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: desktop, server, full, base" && exit 1
+        if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" != base ]; then
+            fbprint_e "Invalid/Obsolete: please use 'bld rfs -m <machine>' " && exit 1
         elif [ $DISTROTYPE = buildroot -o $DISTROTYPE = poky ] && \
              [ "$DISTROVARIANT" != tiny -a "$DISTROVARIANT" != devel -a "$DISTROVARIANT" != imaevm ]; then
             fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: tiny, devel, devel:custom, imaevm" && exit 1
@@ -1215,7 +1185,7 @@ case "$1" in
         convert_rfs_raw_to_ext4; exit
         ;;
     packrfs)
-	check_board_valid
+        [ -n ${DISTROVARIANT} -a "$DISTROVARIANT" != base ] && check_board_valid
         pack_distro_rfs; exit
         ;;
     packapp|packapps)

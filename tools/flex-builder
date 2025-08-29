@@ -919,7 +919,6 @@ elif [ $SOCFAMILY = IMX ]; then
     . $FBDIR/configs/board/common/imx_memorylayout.cfg
 fi
 
-. $FBDIR/tools/repo_update
 . $FBDIR/tools/getvariable
 . $FBDIR/tools/secure_sign_image
 . $FBDIR/tools/create_bootpartition
@@ -1110,19 +1109,19 @@ export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE K
 
 case "$1" in
     repo-fetch)
-        git_repo_update fetch $2; exit
+        echo "Invalid command"; exit
         ;;
     repo-update)
-        git_repo_update latest $2; exit
+        echo "Invalid command"; exit
         ;;
     repo-commit)
-        git_repo_update commit $2; exit
+        echo "Invalid command"; exit
         ;;
     repo-tag)
-        git_repo_update tag $2; exit
+        echo "Invalid command"; exit
         ;;
     repo-branch)
-        git_repo_update branch $2; exit
+        echo "Invalid command"; exit
         ;;
     clean)
         do_clean $@; exit

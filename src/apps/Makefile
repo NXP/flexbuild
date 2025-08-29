@@ -9,7 +9,6 @@
 
 SHELL=/bin/bash
 include $(FBDIR)/configs/$(CONFIGLIST)
-#include $(FBDIR)/include/repo.mk
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk
 include $(FBDIR)/include/patch_apply.mk
@@ -40,4 +39,3 @@ ml:	      $(ML_REPO_LIST)
 
 
 include $(sort $(wildcard $(FBDIR)/src/apps/*/*.mk))
-#include $(FBDIR)/include/repo_update.inc

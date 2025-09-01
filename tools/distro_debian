@@ -12,7 +12,7 @@ build_distro_rfs_debian() {
 
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
-    fbprint_n "Generating initial rootfs: $RFSDIR"
+    fbprint_n "Generating rootfs: $RFSDIR"
     cd $FBDIR
     test -c $RFSDIR/dev/pts/ptmx && $sudopt umount $RFSDIR/dev/pts
     test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
@@ -52,23 +52,8 @@ build_distro_rfs_debian() {
     $sudopt bash $RFSCMD $NEWRFSDIR $PKGS
 
 	if [ "$DISTROVARIANT" != "base" ]; then
-		case "$MACHINE" in
-		ls1028*)
-			mkdir -p $NEWRFSDIR/etc/xdg/weston
-			cp -f $FBDIR/src/system/weston/weston.ini.ls1028 $NEWRFSDIR/etc/xdg/weston/
-			;;
-		imx*)
-			mkdir -p $NEWRFSDIR/etc/xdg/weston
-			cp -f $FBDIR/src/system/weston/weston.ini* $NEWRFSDIR/etc/xdg/weston/
-			# for gnome desktop
-			if [ -f $NEWRFSDIR/etc/pam.d/gdm-password ]; then
-				cp -f $FBDIR/src/system/gdm/daemon.conf $NEWRFSDIR/etc/gdm3
-				cp -f $FBDIR/src/system/gdm/gdm-password $NEWRFSDIR/etc/pam.d
-				cp -f $FBDIR/src/system/gdm/gdm.service $NEWRFSDIR/lib/systemd/system/
-				ln -sf /lib/systemd/system/gdm.service $NEWRFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
-			fi
-			;;
-		esac
+        fbprint_n "Configure the rootfs..."
+        log_mute bash $FBDIR/configs/debian/debian_post_rootfs.sh $NEWRFSDIR
 	fi
 
 

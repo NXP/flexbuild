@@ -13,7 +13,6 @@ build_distro_rfs_debian() {
     [ `whoami` = root ] && sudopt="" || sudopt=sudo
 
     fbprint_n "Generating initial rootfs: $RFSDIR"
-    fbprint_n "This might take some time, please be patient ... "
     cd $FBDIR
     test -c $RFSDIR/dev/pts/ptmx && $sudopt umount $RFSDIR/dev/pts
     test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
@@ -49,8 +48,8 @@ build_distro_rfs_debian() {
     fi
     [ -f $NEWRFSDIR/etc/buildinfo ] && log_mute echo "$NEWRFSDIR already exists!" && exit 0
 
-	mkdir -p $NEWRFSDIR
-    show_one_line $sudopt bash $RFSCMD $NEWRFSDIR $PKGS
+    rm -rf $NEWRFSDIR && mkdir -p $NEWRFSDIR
+    $sudopt bash $RFSCMD $NEWRFSDIR $PKGS
 	echo -e "Debian GNU/Linux 13" | $sudopt tee -a $NEWRFSDIR/etc/buildinfo 1>/dev/null
 
     case "$MACHINE" in

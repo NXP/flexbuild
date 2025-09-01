@@ -20,7 +20,7 @@ imx_isp: imx_gpu_g2d gpu_viv libdrm
 	     mv isp-imx-* imx_isp && rm -f imxisp.bin; \
 	 fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
-		 bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+		 bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 \
 	 $(call fbprint_b,"imx_isp") && \

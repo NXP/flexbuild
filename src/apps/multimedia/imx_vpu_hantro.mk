@@ -20,7 +20,7 @@ imx_vpu_hantro:
 	 fi && \
 	 \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/hantrodec.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"imx_vpu_hantro") && \
 	 cd imx_vpu_hantro && \

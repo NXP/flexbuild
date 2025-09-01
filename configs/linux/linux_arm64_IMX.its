@@ -151,6 +151,24 @@
 			compression = "none";
 			load = <0x90000000>;
 		};
+		imx95evk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-11x11-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx95frdm-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-11x11-frdm.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
 	};
 
 	configurations {
@@ -230,6 +248,18 @@
 			description = "Boot Linux kernel";
 			kernel = "kernel";
 			fdt = "imx93frdm-dtb";
+			ramdisk = "initrd";
+		};
+		imx95evk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx95evk-dtb";
+			ramdisk = "initrd";
+		};
+		imx95frdm {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx95frdm-dtb";
 			ramdisk = "initrd";
 		};
 	};

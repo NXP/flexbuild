@@ -25,7 +25,7 @@ fi
 
 #echo "Packages to install: $(IFS=,; echo "${PACKAGES[*]}")"
 
-echo "Running mmdebstrap with mirrors: ${MIRRORS[@]}"
+echo "sources.list: ${MIRRORS[@]}"
 
 # echo "$(IFS=,; echo "${PACKAGES[*]}")"
 

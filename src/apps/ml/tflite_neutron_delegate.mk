@@ -14,7 +14,6 @@ tflite_neutron_delegate: tflite neutron
 	$(call patch_apply,tflite_neutron_delegate,apps/ml) && \
 	$(call fbprint_b,"tflite_neutron_delegate") && \
 	cd $(MLDIR)/tflite_neutron_delegate && \
-	echo $(CROSS_COMPILE) && \
 	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include" && \

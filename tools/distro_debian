@@ -50,25 +50,26 @@ build_distro_rfs_debian() {
 
     rm -rf $NEWRFSDIR && mkdir -p $NEWRFSDIR
     $sudopt bash $RFSCMD $NEWRFSDIR $PKGS
-	echo -e "Debian GNU/Linux 13" | $sudopt tee -a $NEWRFSDIR/etc/buildinfo 1>/dev/null
 
-    case "$MACHINE" in
-    ls1028*)
-        mkdir -p $NEWRFSDIR/etc/xdg/weston
-        cp -f $FBDIR/src/system/weston/weston.ini.ls1028 $NEWRFSDIR/etc/xdg/weston/
-        ;;
-    imx*)
-        mkdir -p $NEWRFSDIR/etc/xdg/weston
-        cp -f $FBDIR/src/system/weston/weston.ini* $NEWRFSDIR/etc/xdg/weston/
-        # for gnome desktop
-        if [ -f $NEWRFSDIR/etc/pam.d/gdm-password ]; then
-            cp -f $FBDIR/src/system/gdm/daemon.conf $NEWRFSDIR/etc/gdm3
-            cp -f $FBDIR/src/system/gdm/gdm-password $NEWRFSDIR/etc/pam.d
-            cp -f $FBDIR/src/system/gdm/gdm.service $NEWRFSDIR/lib/systemd/system/
-            ln -sf /lib/systemd/system/gdm.service $NEWRFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
-        fi
-        ;;
-    esac
+	if [ "$DISTROVARIANT" != "base" ]; then
+		case "$MACHINE" in
+		ls1028*)
+			mkdir -p $NEWRFSDIR/etc/xdg/weston
+			cp -f $FBDIR/src/system/weston/weston.ini.ls1028 $NEWRFSDIR/etc/xdg/weston/
+			;;
+		imx*)
+			mkdir -p $NEWRFSDIR/etc/xdg/weston
+			cp -f $FBDIR/src/system/weston/weston.ini* $NEWRFSDIR/etc/xdg/weston/
+			# for gnome desktop
+			if [ -f $NEWRFSDIR/etc/pam.d/gdm-password ]; then
+				cp -f $FBDIR/src/system/gdm/daemon.conf $NEWRFSDIR/etc/gdm3
+				cp -f $FBDIR/src/system/gdm/gdm-password $NEWRFSDIR/etc/pam.d
+				cp -f $FBDIR/src/system/gdm/gdm.service $NEWRFSDIR/lib/systemd/system/
+				ln -sf /lib/systemd/system/gdm.service $NEWRFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
+			fi
+			;;
+		esac
+	fi
 
 
     # fix absolute path for libz.so symlink when cross compiling apitrace

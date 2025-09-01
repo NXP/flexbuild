@@ -21,28 +21,25 @@ Most used example with automated build:
  bld -m lx2160ardb               # same as above, for lx2160ardb platform
 
 Most used example with separate command:
- bld bsp -m imx93frdm            # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for single machine
- bld rfs -m imx8mpevk            # generate Debian-based rootfs for imx8mpevk
- bld linux [ -m <machine> ]      # compile linux kernel for all arm64 IMX or LS machines
- bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
- bld boot -m imx91evk            # generate boot partition tarball (including kernel,dtb,modules,distro bootscript)
- bld apps -m ls1028ardb          # compile NXP-specific components against the runtime dependencies
- bld merge-apps -m <machine>     # merge NXP-specific components into target Debian rootfs
- bld packrfs -m <machine>        # pack and compress target rootfs as rootfs_xx.tar.zst
+ bld bsp -m imx91evk             # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for imx91evk
+ bld rfs -m imx95evk             # generate Debian-based rootfs for imx95evk
+ bld linux -m ls1046ardb         # compile linux kernel for ls1046ardb
+ bld atf -m lx2160ardb -b sd      # compile atf image for SD boot on lx2160ardb
+ bld boot -m imx91evk            # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for imx91evk
+ bld apps -m ls1028ardb          # compile NXP-specific components against the runtime dependencies for ls1028ardb
+ bld merge-apps -m imx8mmevk     # merge NXP-specific components into imx8mmevk Debian rootfs
+ bld packrfs -m imx93frdm        # pack and compress target rootfs as rootfs_<distro_version>_debian_imx93frdm_arm64.tar.zst
  bld docker                      # create or attach docker container to build in docker
  bld clean                       # clean all obsolete firmware/linux/apps binary images except distro rootfs
  bld clean-apps                  # clean the obsolete NXP-specific apps components binary images
  bld clean-bsp                   # clean obsolete BSP (u-boot/atf/firmware) images
  bld clean-linux                 # clean obsolete linux image
- bld clean-rfs -m <machine>      # clean target debian-based server arm64 rootfs
+ bld clean-rfs -m imx91sfrdm     # clean target debian-based rootfs for imx91sfrdm
  bld list                        # list enabled machines and supported various components
 
 Most used options:
  -m, --machine         target machine, e.g. imx8mpevk, imx8mmevk, imx91frdm, imx93frdm, imx93evk, lx2160ardb, ls1046ardb, ls1028ardb, etc
- -r, --rootfs          specify flavor of target rootfs, valid argument: debian|poky|buildroot:base|desktop|server|tiny|devel
- -a, --arch            target arch of processor, valid argument: arm64, arm32 (arm64 by default if unspecified)
  -b, --boottype        type of boot media, valid argument: sd, emmc, nor, qspi, xspi, nand
- -p, --portfolio       specify portfolio of SoC, valid argument: IMX, LS (IMX by default if unspecified)
 
 See docs/flexbuild_usage.md and docs/build_and_deploy_distro.md for more information about the available commands.
 EOF
@@ -1199,7 +1196,7 @@ case "$1" in
         generate_bootpartition_tarball; exit
         ;;
     auto|autobuild)
-        bld auto_build -a $DESTARCH 2>&1 | \
+        bld auto_build -a $DESTARCH | \
         tee $FBDIR/logs/autobuild-${MACHINE}-log-`date +%Y%m%d%H%M`.txt
         exit
         ;;

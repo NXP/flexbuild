@@ -11,7 +11,7 @@ imx_pxp_g2d:
 	 $(call download_repo,imx_pxp_g2d,apps/graphics) && \
 	 $(call patch_apply,imx_pxp_g2d,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/pxp_device.h ]; then \
-	     bld linux-headers -m $(MACHINE);
+	     bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 $(call fbprint_b,"imx_pxp_g2d") && \

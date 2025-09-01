@@ -27,7 +27,7 @@ fi
 
 echo "Running mmdebstrap with mirrors: ${MIRRORS[@]}"
 
-echo "$(IFS=,; echo "${PACKAGES[*]}")"
+# echo "$(IFS=,; echo "${PACKAGES[*]}")"
 
 mmdebstrap \
   --arch=$ARCH \

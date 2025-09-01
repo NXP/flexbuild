@@ -63,9 +63,9 @@ build_distro_rfs_debian() {
         cp -f $FBDIR/src/system/weston/weston.ini* $NEWRFSDIR/etc/xdg/weston/
         # for gnome desktop
         if [ -f $NEWRFSDIR/etc/pam.d/gdm-password ]; then
-            cp -f $FBDIR/src/system/daemon.conf $NEWRFSDIR/etc/gdm3
-            cp -f $FBDIR/src/system/gdm-password $NEWRFSDIR/etc/pam.d
-            cp -f $FBDIR/src/system/gdm.service $NEWRFSDIR/lib/systemd/system/
+            cp -f $FBDIR/src/system/gdm/daemon.conf $NEWRFSDIR/etc/gdm3
+            cp -f $FBDIR/src/system/gdm/gdm-password $NEWRFSDIR/etc/pam.d
+            cp -f $FBDIR/src/system/gdm/gdm.service $NEWRFSDIR/lib/systemd/system/
             ln -sf /lib/systemd/system/gdm.service $NEWRFSDIR/etc/systemd/system/graphical.target.wants/gdm.service
         fi
         ;;

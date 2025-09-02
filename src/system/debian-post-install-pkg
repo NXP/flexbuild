@@ -1,135 +1,127 @@
 #!/bin/bash
-#
-# Copyright 2024 NXP
-#
-# SPDX-License-Identifier: BSD-3-Clause
-#
-# Shengzhou Liu <shengzhou.liu@nxp.com>
-#
-# Install NXP-specific packages and extra deb packages for Debian on i.MX and Layerscape platforms.
+set -euo pipefail
+IFS=$'\n\t'
 
 LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1012aqds ls1028ardb ls1028aqds ls1043ardb ls1043aqds ls1046ardb ls1046aqds ls1046afrwy ls1088ardb ls1088aqds ls2088ardb ls2088aqds lx2160ardb lx2160aqds lx2162aqds"
 IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95evk imx95frdm"
-show_one_line() {
-	echo
-	"$@" 2>&1 | while IFS= read -r line; do
-		printf "\033[1A\033[2K\r%s\n" "$line"
-	done
-}
+DEFAULT_DL_URL="https://www.nxp.com/lgfiles/sdk/lsdk2512"
 
+show_one_line() {
+    "$@" 2>&1 | while IFS= read -r line; do
+        printf "\033[1A\033[2K\r%s\n" "$line"
+    done
+}
 
 check_board_valid() {
-	if [ -z "${MACHINE}" ] || [ "$MACHINE" = "all" ]; then
-		echo -e "Error: Please specify the board, for example: bld -m imx8mpevk \n"
-		exit 1
-	fi
-	if ! echo "$LS_MACHINE_LIST" | grep -qw "$MACHINE" && ! echo "$IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
-		echo "Error: Invalid board: '$MACHINE'."
-		echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
-		echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
-		exit 1
-	fi
+    if [ -z "${MACHINE:-}" ] || [ "$MACHINE" = "all" ]; then
+        echo -e "Error: Please specify the board, e.g., 'bld -m imx8mpevk'.\n"
+        exit 1
+    fi
+    if ! echo "$LS_MACHINE_LIST $IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
+        echo "Error: Invalid board: '$MACHINE'."
+        echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
+        echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
+        exit 1
+    fi
 }
 
-set -e
-
-DEFAULT_DL_URL=https://www.nxp.com/lgfiles/sdk/lsdk2512
-
-
-source /usr/bin/board_id.sh
-board_id=$(get_board_id)
-
-if [[ -n "$1" && ! "$1" =~ ^http ]]; then
-  echo run 'debian-post-install-pkg url' to install packages from specified url address.
-  echo Or run 'debian-post-install-pkg' to install packages from default url
-  exit
-fi
-
-source /etc/extra_packages_list
-
-if ! `ping deb.debian.org -c 2 1>/dev/null 2>&1`; then
-  echo ERROR: unable to access deb.debian.org !
-  echo Please check your network to ensure the access to external Internet.
-  exit
-fi
-
-if [ -n "$http_proxy" ]; then
-  if ! grep -i -q 'acquire::http::proxy' /etc/apt/apt.conf 2>/dev/null; then
-	echo Please set HTTP proxy in /etc/apt/apt.conf
-	exit
-  fi
-fi
-
-[ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
-
-echo -e "Preparing to install packages ..."
-show_one_line sudo apt-get update -y 
-
-case "${board_id}" in
-    imx95*)
-        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx95evk.deb
-        PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"
-        ;;
-    imx8*)
-        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb
-        PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"
-        ;;
-    imx91*|imx93*)
-        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb
-        PKGS="$ls_pkgs $imx9_pkgs"
-        ;;
-    l*)
-        NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb
-        PKGS="$ls_pkgs"
-        ;;
-    *)
-        NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb
-        PKGS="$ls_pkgs $imx9_pkgs"
-        ;;
-esac
-
-install_success=false
-MAX_RETRIES=3
-for ((attempt=1; attempt<=$MAX_RETRIES; attempt++)); do
-    echo "Try to generate rootfs for the $attempt time..."
-    if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y apt-utils $base_pkgs $PKGS; then
-        install_success=true
-        break
-    else
-        if [ $attempt -lt $MAX_RETRIES ]; then
-            sleep 5
-            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt update --fix-missing > /dev/null 2>&1
-        fi
+check_network() {
+    if ! ping -c 2 deb.debian.org &>/dev/null; then
+        echo "ERROR: Unable to access deb.debian.org. Check network connectivity."
+        exit 1
     fi
-done
-if ! $install_success; then
-    echo "Generating rootfs failed, please try again."
-    exit 1
-fi
 
-echo -e "Installing Debian packages successfully."
+    if [ -n "${http_proxy:-}" ] && ! grep -iq 'acquire::http::proxy' /etc/apt/apt.conf 2>/dev/null; then
+        echo "ERROR: HTTP proxy is set in environment but not configured in /etc/apt/apt.conf"
+        exit 1
+    fi
+}
 
-[ -n "$1" ] && pkglink=$1 || pkglink=$DEFAULT_DL_URL
+apt_install_with_retry() {
+    local packages="$*"
+    local max_retries=3
+    local success=false
 
-echo -e "Downloading and installing NXP-specific packages ..."
-rm -rf ${NXPAPPSPKG}
-wget --tries=2 --timeout=100 --continue --progress=bar --verbose $pkglink/$NXPAPPSPKG || { echo "Downloading ${NXPAPPSPKG} failed, please try again. "; exit 1; }
-show_one_line dpkg -i --force-overwrite ${NXPAPPSPKG}
-rm -rf ${NXPAPPSPKG}
+    for ((attempt=1; attempt<=max_retries; attempt++)); do
+        echo "Installing packages (attempt $attempt)..."
+        if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y $packages; then
+            success=true
+            break
+        else
+            echo "Warning: Attempt $attempt failed, retrying in 5 seconds..."
+            sleep 5
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get update --fix-missing &>/dev/null
+        fi
+    done
 
-echo -e "Installing NXP-specific packages successfully."
+    if ! $success; then
+        echo "ERROR: Failed to install packages after $max_retries attempts."
+        exit 1
+    fi
+}
 
-#show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get reinstall -y $reinst_pkgs
+download_and_install_deb() {
+    local url="$1"
+    local deb="$2"
+    rm -f "$deb"
 
-sudo apt-get clean
-sudo apt-get autoclean
-sudo apt-get autoremove -y
+    echo "Downloading $deb ..."
+    if ! wget --tries=3 --timeout=100 --continue --progress=bar --verbose "$url/$deb"; then
+        echo "ERROR: Download $deb failed. Please try again."
+        exit 1
+    fi
 
-[ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
+    echo "Installing $deb ..."
+    show_one_line sudo dpkg -i --force-overwrite "$deb"
+    rm -f "$deb"
+}
 
-echo -e "Installing NXP-specific packages for Debian $1 successfully."
+main() {
+    source /usr/bin/board_id.sh
+    local board_id
+    board_id=$(get_board_id)
 
-echo -e "\nStart to configure the system ..."
-/usr/bin/distroplatcfg
+    MACHINE="$board_id"
+    check_board_valid
 
-echo -e "\nSystem is ready, please reboot the system now."
+    if [[ -n "${1:-}" && ! "$1" =~ ^http ]]; then
+        echo "Usage: debian-post-install-pkg [url]"
+        exit 0
+    fi
+
+    source /etc/extra_packages_list || true
+    check_network
+
+    [ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
+
+    echo "Updating package list..."
+    show_one_line sudo apt-get update -y
+
+    case "$board_id" in
+        imx95*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx95evk.deb; PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs";;
+        imx8*)  NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb; PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs";;
+        imx91*|imx93*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS="$ls_pkgs $imx9_pkgs";;
+        l*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb; PKGS="$ls_pkgs";;
+        *) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS="$ls_pkgs $imx9_pkgs";;
+    esac
+
+    apt_install_with_retry apt-utils $base_pkgs $PKGS
+
+    local pkglink="${1:-$DEFAULT_DL_URL}"
+    download_and_install_deb "$pkglink" "$NXPAPPSPKG"
+
+    echo "Cleaning up..."
+    sudo apt-get clean
+    sudo apt-get autoclean
+    sudo apt-get autoremove -y
+
+    [ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
+
+    echo "Configuring system..."
+    /usr/bin/distroplatcfg
+
+    echo "System is ready. Please reboot now."
+}
+
+main "$@"
+

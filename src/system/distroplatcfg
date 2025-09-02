@@ -1,101 +1,98 @@
 #!/bin/bash
+set +e
 
-# Copyright 2019-2024 NXP
-#
-# SPDX-License-Identifier: BSD-3-Clause
-#
-# Shengzhou Liu <shengzhou.liu@nxp.com>
+log() { echo "[INFO] $*"; }
 
-# Runtime Dynamic Configuration for single distro image on various NXP i.MX/Layerscape platforms.
+safe_run() {
+    "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        echo "[WARN] Command failed: $* (exit code $status)"
+    fi
+    return $status
+}
 
-set -e
-
+log "Sourcing board_id.sh..."
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 
 : ${board_id:?}
 
+log "Detected board: $board_id"
+
 case "${board_id}" in
     imx8mm*)
-        ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
-        ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
-        /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
-        rm -rf /boot/firmware/{imx93*,imx95*,imx8mp*}
+        safe_run ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
+        safe_run ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
+        safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mp*}
         ;;
-
     imx8mp*)
-        ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
-        ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
-        /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
-        rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
+        safe_run ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
+        safe_run ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
+        safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
         ;;
-
     imx91*)
-        rm -rf /etc/systemd/system/display-manager.service
-        ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
-        rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*,imx8mp*}
-        systemctl enable weston || true
+        safe_run rm -rf /etc/systemd/system/display-manager.service
+        safe_run ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
+        safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*,imx8mp*}
+        safe_run systemctl enable weston
         ;;
-
     imx93*)
-        ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
-        [ -f /usr/lib/libg2d-viv.so.2.4.0 ] && rm -f /usr/lib/libg2d-viv.so.2.4.0
-        rm -rf /etc/systemd/system/display-manager.service
-        rm -rf /boot/firmware/{imx95*,imx8mm*,imx8mp*}
-
-        ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
-        systemctl enable weston || true
+        safe_run ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
+        [ -f /usr/lib/libg2d-viv.so.2.4.0 ] && safe_run rm -f /usr/lib/libg2d-viv.so.2.4.0
+        safe_run rm -rf /etc/systemd/system/display-manager.service
+        safe_run rm -rf /boot/firmware/{imx95*,imx8mm*,imx8mp*}
+        safe_run ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
+        safe_run systemctl enable weston
         ;;
-
     imx95*)
-        ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
-        /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
-        rm -rf /boot/firmware/{imx93*,imx8mm*,imx8mp*}
+        safe_run ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
+        safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        safe_run rm -rf /boot/firmware/{imx93*,imx8mm*,imx8mp*}
         ;;
-
     ls1028a*)
-        ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini
-        rm -rf /etc/systemd/system/display-manager.service
-        systemctl enable weston || true
+        safe_run ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini
+        safe_run rm -rf /etc/systemd/system/display-manager.service
+        safe_run systemctl enable weston
         ;;
-
     ls1043*|ls1046*)
-        ln -sf /lib/systemd/system/fmc.service /etc/systemd/system/multi-user.target.wants/fmc.service
+        safe_run ln -sf /lib/systemd/system/fmc.service /etc/systemd/system/multi-user.target.wants/fmc.service
         ;;
 esac
 
-sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
-
-/usr/bin/hostnamectl set-hostname "${board_id}"
-
-systemctl disable strongswan.service --now || true
+safe_run sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
+safe_run /usr/bin/hostnamectl set-hostname "${board_id}"
+safe_run systemctl disable strongswan.service --now
 
 ### network config
 # disable rename network interface
-ln -sf /dev/null /etc/udev/rules.d/80-net-setup-link.rules
+safe_run ln -sf /dev/null /etc/udev/rules.d/80-net-setup-link.rules
 
 # disable legacy networking service
-systemctl disable networking --now 2>/dev/null || true
+safe_run systemctl disable networking --now
 
-# use systemd-networkd
-systemctl enable systemd-networkd --now 2>/dev/null || true
+safe_run systemctl enable systemd-networkd --now
 
 # disable systemd-networkd-wait-online to speed up the boot
-systemctl disable systemd-networkd-wait-online --now 2>/dev/null || true
-systemctl disable NetworkManager-wait-online --now 2>/dev/null || true
+safe_run systemctl disable systemd-networkd-wait-online --now
+safe_run systemctl disable NetworkManager-wait-online --now
 
-/usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
+safe_run /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/
+safe_run /usr/sbin/ldconfig
+safe_run /usr/sbin/depmod -a
+safe_run /usr/sbin/update-initramfs -u
 
-/usr/sbin/ldconfig
+# disable itself because it runs only ones.
+safe_run systemctl disable platcfg.service
 
-/usr/sbin/depmod -a
-/usr/sbin/update-initramfs -u 2>/dev/null || true
+safe_run dpkg --configure -a
+safe_run systemctl daemon-reload
 
-systemctl disable platcfg.service 2>/dev/null || true
-
-dpkg --configure -a
-
-systemctl daemon-reload
 if [[ $PPID -eq 1 ]] && [[ -f /etc/systemd/system/graphical.target.wants/weston.service ]]; then
-    systemctl start weston
+    safe_run systemctl start weston
 fi
+
+log "Board initialization finished."
+

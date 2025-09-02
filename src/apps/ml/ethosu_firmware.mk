@@ -7,7 +7,7 @@
 # COMPATIBLE_MACHINE: imx93
 
 ethosu_firmware:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:5} != imx93 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,ethosu_firmware,apps/ml) && \
 	 $(call patch_apply,ethosu_firmware,apps/ml) && \
 	 $(call fbprint_b,"ethosu_firmware") && \

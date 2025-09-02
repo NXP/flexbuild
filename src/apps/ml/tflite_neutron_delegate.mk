@@ -1,10 +1,8 @@
-# Copyright 2023-2024 NXP
+# Copyright 2025 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-# TensorFlow Lite Ethos-u Delegate on imx93
-
-# DEPEND: tensorflow-lite ethosu-driver-stack libpython3.13-dev
+# DEPEND: tensorflow-lite neutron
 
 
 #tflite_neutron_delegate:

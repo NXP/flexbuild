@@ -153,7 +153,7 @@
 		};
 		imx95evk-dtb {
 			description = "Flattened Device Tree blob";
-			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-11x11-evk.dtb");
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-15x15-evk.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";
@@ -162,7 +162,7 @@
 		};
 		imx95frdm-dtb {
 			description = "Flattened Device Tree blob";
-			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-11x11-frdm.dtb");
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-15x15-frdm.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";

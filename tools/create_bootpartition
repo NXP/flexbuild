@@ -48,7 +48,7 @@ generate_bootpartition_tarball() {
         [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY
         [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY
         [ ! -d $FBOUTDIR/bsp/imx_mcore_demos ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY
-        [ ! -f $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY
+        [ ! -f $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -m imx93evk
         [ ! -f $DESTDIR/usr/lib/firmware/mali_csffw.bin ] && bld mali_imx -m imx95evk
 
         cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware

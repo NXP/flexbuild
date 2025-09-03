@@ -593,7 +593,7 @@ check_host_dependent_pkg() {
 	fbprint_n "Prepare the build environment on host ... "
 
     show_one_line sudo apt-get autoclean && log_mute sudo apt-get update -y
-    show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $host_dependent_packages
+    show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${host_dependent_packages[@]}"
 
     if [ ! -f ~/.gitconfig ] || [[ ! `grep 'name =' ~/.gitconfig` ]]; then
         echo [user] > ~/.gitconfig

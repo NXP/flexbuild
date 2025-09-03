@@ -38,10 +38,10 @@ build_distro_rfs_debian() {
         RFSCMD=$FBDIR/configs/debian/debian_base_arm64.sh
     else
 		case "$MACHINE" in
-			   imx8*|imx95*)    PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs"; log_mute echo imx8 package...  ;;
-			   imx9*)           PKGS="$ls_pkgs $imx9_pkgs" ; log_mute echo imx9 package... ;;
-			   l*)  	        PKGS="$ls_pkgs" ; log_mute echo ls  package... ;;
-			   *)               PKGS="$ls_pkgs $imx9_pkgs" ; log_mute echo imx9 package... ;;
+			   imx8*|imx95*)    PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}"); log_mute echo imx8 package...  ;;
+			   imx9*)           PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}"); log_mute echo imx9 package... ;;
+			   l*)  	        PKGS=("${ls_pkgs[@]}"); log_mute echo ls  package... ;;
+			   *)               PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}"); log_mute echo imx9 package... ;;
 		esac
         NEWRFSDIR=$RFSDIR
         RFSCMD=$FBDIR/configs/debian/debian_server_arm64.sh
@@ -49,7 +49,7 @@ build_distro_rfs_debian() {
     [ -f $NEWRFSDIR/etc/buildinfo ] && log_mute echo "$NEWRFSDIR already exists!" && exit 0
 
     rm -rf $NEWRFSDIR && mkdir -p $NEWRFSDIR
-    $sudopt bash $RFSCMD $NEWRFSDIR $PKGS
+    $sudopt bash $RFSCMD "$NEWRFSDIR" "${PKGS[@]}"
 
 
     # fix absolute path for libz.so symlink when cross compiling apitrace

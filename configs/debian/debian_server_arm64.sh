@@ -120,10 +120,10 @@ printf "\nexport DISPLAY=:0\nexport WAYLAND_DISPLAY=wayland-0" >> /root/.bashrc
 printf "/usr/lib\n" >> /etc/ld.so.conf.d/01-sdk.conf
 printf " * Support:   https://www.nxp.com/support\n" >> /etc/update-motd.d/20-help-text
 printf " * Licensing: https://lsdk.github.io/eula\n" >> /etc/update-motd.d/20-help-text
-printf "NXP Linux SDK 2512 Debian Distro (optimized with NXP-specific hardware acceleration)\n" >> /etc/issue
 printf "Build: $(date --rfc-3339 seconds)\n" >> /etc/buildinfo
 EOF
 
+printf "$DISTRIB_NAME $DISTRIB_VERSION Debian $DEBIAN_VERSION (optimized with NXP-specific hardware acceleration)\n" >> $ROOTDIR/etc/issue
 # ---- Board-specific customization on host ----
 # echo "[POST_ROOTFS] Board-specific configuration"
 

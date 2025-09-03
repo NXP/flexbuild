@@ -12,6 +12,26 @@ safe_run() {
     return $status
 }
 
+# Safely enable systemd service
+safe_enable_service() {
+    local service=$1
+    if systemctl list-unit-files | grep -q "^$service.service"; then
+        safe_run systemctl enable "$service" --now
+    else
+        log "Service '$service' does not exist"
+    fi
+}
+
+# Safely disable systemd service
+safe_disable_service() {
+    local service=$1
+    if systemctl list-unit-files | grep -q "^$service.service"; then
+        safe_run systemctl disable "$service" --now
+    else
+        log "Service '$service' does not exist"
+    fi
+}
+
 log "Sourcing board_id.sh..."
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
@@ -24,68 +44,81 @@ case "${board_id}" in
     imx8mm*)
         safe_run ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
         safe_run ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
-        safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
         safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mp*}
         ;;
     imx8mp*)
         safe_run ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
         safe_run ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
-        safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
         safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
         ;;
     imx91*)
         safe_run rm -rf /etc/systemd/system/display-manager.service
         safe_run ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
         safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*,imx8mp*}
-        safe_run systemctl enable weston
+        safe_enable_service weston
         ;;
     imx93*)
         safe_run ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
-        [ -f /usr/lib/libg2d-viv.so.2.4.0 ] && safe_run rm -f /usr/lib/libg2d-viv.so.2.4.0
+        if [ -f /usr/lib/libg2d-pxp.so.2.4.0 ]; then
+            safe_run rm -f /usr/lib/libg2d-viv.so.2.4.0
+        fi
         safe_run rm -rf /etc/systemd/system/display-manager.service
         safe_run rm -rf /boot/firmware/{imx95*,imx8mm*,imx8mp*}
         safe_run ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
-        safe_run systemctl enable weston
+        safe_enable_service weston
         ;;
     imx95*)
         safe_run ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
-        safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
         safe_run rm -rf /boot/firmware/{imx93*,imx8mm*,imx8mp*}
         ;;
     ls1028a*)
         safe_run ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini
         safe_run rm -rf /etc/systemd/system/display-manager.service
-        safe_run systemctl enable weston
+        safe_enable_service weston
         ;;
     ls1043*|ls1046*)
         safe_run ln -sf /lib/systemd/system/fmc.service /etc/systemd/system/multi-user.target.wants/fmc.service
         ;;
 esac
 
-safe_run sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
+if [ -f /usr/lib/udev/rules.d/50-firmware.rules ]; then
+    safe_run sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
+fi
 safe_run /usr/bin/hostnamectl set-hostname "${board_id}"
-safe_run systemctl disable strongswan.service --now
+
+safe_disable_service strongswan
 
 ### network config
 # disable rename network interface
 safe_run ln -sf /dev/null /etc/udev/rules.d/80-net-setup-link.rules
 
 # disable legacy networking service
-safe_run systemctl disable networking --now
+safe_disable_service networking
 
-safe_run systemctl enable systemd-networkd --now
+safe_enable_service systemd-networkd
 
 # disable systemd-networkd-wait-online to speed up the boot
-safe_run systemctl disable systemd-networkd-wait-online --now
-safe_run systemctl disable NetworkManager-wait-online --now
+safe_disable_service systemd-networkd-wait-online
+safe_disable_service NetworkManager-wait-online
 
-safe_run /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/
+if [ -d /usr/share/glib-2.0/schemas/ ]; then
+    safe_run /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
+fi
 safe_run /usr/sbin/ldconfig
 safe_run /usr/sbin/depmod -a
 safe_run /usr/sbin/update-initramfs -u
 
 # disable itself because it runs only ones.
-safe_run systemctl disable platcfg.service
+safe_disable_service platcfg
 
 safe_run dpkg --configure -a
 safe_run systemctl daemon-reload

@@ -2,7 +2,7 @@
 
 get_board_id() {
 	local board_id="unknown"
-	local machine_content="$1"
+    local machine_content="${1:-}"
 
 	if [ -z "$machine_content" ]; then
 		if [ ! -f "/sys/devices/soc0/machine" ]; then

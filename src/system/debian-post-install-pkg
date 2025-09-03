@@ -38,13 +38,13 @@ check_network() {
 }
 
 apt_install_with_retry() {
-    local packages="$*"
+    local packages=("$@")
     local max_retries=3
     local success=false
 
     for ((attempt=1; attempt<=max_retries; attempt++)); do
         echo "Installing packages (attempt $attempt)..."
-        if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y $packages; then
+        if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y "${packages[@]}"; then
             success=true
             break
         else
@@ -98,14 +98,14 @@ main() {
     show_one_line sudo apt-get update -y
 
     case "$board_id" in
-        imx95*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx95evk.deb; PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs";;
-        imx8*)  NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb; PKGS="$ls_pkgs $imx9_pkgs $imx8_pkgs";;
-        imx91*|imx93*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS="$ls_pkgs $imx9_pkgs";;
-        l*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb; PKGS="$ls_pkgs";;
-        *) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS="$ls_pkgs $imx9_pkgs";;
+        imx95*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx95evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}");;
+        imx8*)  NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}");;
+        imx91*|imx93*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}");;
+        l*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb; PKGS=("${ls_pkgs[@]}");;
+        *) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}");;
     esac
 
-    apt_install_with_retry apt-utils $base_pkgs $PKGS
+    apt_install_with_retry apt-utils "${base_pkgs[@]}" "${PKGS[@]}"
 
     local pkglink="${1:-$DEFAULT_DL_URL}"
     download_and_install_deb "$pkglink" "$NXPAPPSPKG"

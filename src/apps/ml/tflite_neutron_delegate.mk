@@ -19,6 +19,8 @@ tflite_neutron_delegate: tflite neutron
 	export CMAKE_TLS_VERIFY=0 && \
 	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	rm -rf build_$(DISTROTYPE)_$(ARCH) && \
+	mkdir -p $(RFSDIR)/usr/include/neutron && \
+	cp -f $(DESTDIR)/usr/include/neutron/* $(RFSDIR)/usr/include/neutron && \
 	cp -f $(DESTDIR)/usr/lib/libNeutronDriver* $(RFSDIR)/usr/lib/ && \
 	mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	cmake  -S $(MLDIR)/tflite_neutron_delegate \

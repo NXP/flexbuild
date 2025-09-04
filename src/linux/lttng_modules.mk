@@ -8,7 +8,7 @@ lttng_modules:
 	 $(call download_repo,linux,linux) && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && mkdir -p $$opdir && \
 	 if ! grep CONFIG_STACKTRACE=y $$opdir/.config 1>/dev/null 2>&1; then \
-	     bld linux -B fragment:lttng.config -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -B fragment:lttng.config -m $(MACHINE); \
 	 fi && \
 	 cd $(PKGDIR)/linux/lttng_modules && \
 	 $(call fbprint_b,"LTTng modules") && \

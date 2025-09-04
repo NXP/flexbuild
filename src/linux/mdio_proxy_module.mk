@@ -9,7 +9,7 @@ mdio_proxy_module:
 	 $(call download_repo,mdio_proxy_module,linux) && \
 	 $(call download_repo,linux,linux) && \
 	 if [ ! -d $(FBOUTDIR)/linux/kernel/$(DESTARCH)/$(SOCFAMILY) ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && mkdir -p $$opdir && \
 	 \

@@ -9,7 +9,7 @@ cryptodev_linux:
 	 $(call download_repo,cryptodev_linux,linux) && \
 	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \
 	 if [ ! -f $$opdir/include/config/auto.conf ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -m $(MACHINE); \

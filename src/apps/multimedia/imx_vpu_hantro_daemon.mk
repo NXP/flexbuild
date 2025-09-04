@@ -22,12 +22,6 @@ imx_vpu_hantro_daemon: imx_vpu_hantro imx_vpu_hantro_vc
 	     tar xf imx_vpu_hantro_daemon.tar.gz && rm -rf imx_vpu_hantro_daemon.tar.gz; \
 	     mv imx-vpu-hantro-daemon-* imx_vpu_hantro_daemon; \
 	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libhantro.so ]; then \
-	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/ewl.h ]; then \
-	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
-	 fi && \
 	 $(call fbprint_b,"imx_vpu_hantro_daemon") && \
 	 cd $(MMDIR)/imx_vpu_hantro_daemon && \
 	 sed -e 's|HANTRO_VC8000E_LIB_DIR =.*|HANTRO_VC8000E_LIB_DIR = $(DESTDIR)/usr/lib|' \

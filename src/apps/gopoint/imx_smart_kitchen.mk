@@ -11,10 +11,10 @@ imx_smart_kitchen:
 	 $(call download_repo,imx_smart_kitchen,apps/gopoint,git) && \
 	 $(call patch_apply,imx_smart_kitchen,apps/gopoint) && \
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
-#	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	     bld nxp_afe -m $(MACHINE); \
 #	 fi && \
 #	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
-#	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	     bld imx_voiceui -m $(MACHINE); \
 #	 fi && \
 #	 \
 #	 cd $(GPDIR)/imx_smart_kitchen && \

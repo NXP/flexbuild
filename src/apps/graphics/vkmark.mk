@@ -7,12 +7,11 @@
 # DEPENDS: libvulkan1 libassimp-dev libglm-dev
 
 
-vkmark:
+vkmark: vulkan_headers
 ifeq ($(CONFIG_VKMARK),y)
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,vkmark,apps/graphics) && \
 	 $(call patch_apply,vkmark,apps/graphics) && \
-	 bld vulkan_headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
 	 $(call fbprint_b,"vkmark") && \
 	 cd $(GRAPHICSDIR)/vkmark && \
 	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \

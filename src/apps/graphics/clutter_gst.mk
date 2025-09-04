@@ -13,18 +13,9 @@
 
 #clutter_gst:
 clutter_gst: gst_plugins_bad cogl libdrm
-	@[ $${MACHINE:0:4} != imx8 ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:5} != imx95 ] && exit || \
 	 $(call download_repo,clutter_gst,apps/graphics,submod) && \
 	 $(call patch_apply,clutter_gst,apps/graphics) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
-	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libcogl.so ]; then \
-	     bld cogl -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libdrm.so ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 $(call fbprint_b,"clutter_gst") && \
 	 sudo cp -Pf $(DESTDIR)/usr/lib/{libGLESv2.so*,libVSC.so,libEGL.so*,libGAL.so*,libgbm.so*,libcogl.so*,libdrm.so*,libgst*.so*} \
 	 $(RFSDIR)/usr/lib && \

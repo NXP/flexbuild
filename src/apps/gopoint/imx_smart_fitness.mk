@@ -14,9 +14,6 @@ imx_smart_fitness: nnstreamer
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
 	 $(call download_repo,imx_smart_fitness,apps/gopoint) && \
 	 $(call patch_apply,imx_smart_fitness,apps/gopoint) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libnnstreamer.so ]; then \
-	     bld nnstreamer -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 $(call fbprint_b,"imx_smart_fitness") && \
 	 sudo cp -rf $(DESTDIR)//usr/include/nnstreamer $(RFSDIR)//usr/include && \
 	 cd $(GPDIR)/imx_smart_fitness && \

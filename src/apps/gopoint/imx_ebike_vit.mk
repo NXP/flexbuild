@@ -10,10 +10,10 @@ imx_ebike_vit:
 	 $(call download_repo,imx_ebike_vit,apps/gopoint,git) && \
 	 $(call patch_apply,imx_ebike_vit,apps/gopoint) && \
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
-#	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	     bld nxp_afe -m $(MACHINE); \
 #	 fi && \
 #	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
-#	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	     bld imx_voiceui -m $(MACHINE); \
 #	 fi && \
 	 \
 	 $(call fbprint_b,"imx_ebike_vit") && \

@@ -10,12 +10,6 @@ imx_vpuwrap: imx_vpu_hantro imx_vpu_hantro_vc
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,imx_vpuwrap,apps/multimedia) && \
 	 $(call patch_apply,imx_vpuwrap,apps/multimedia) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libcodec.so ]; then \
-	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/hevcencapi.h ]; then \
-	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 $(call fbprint_b,"imx_vpuwrap") && \
 	 cd $(MMDIR)/imx_vpuwrap && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/hantro_dec -I$(DESTDIR)/usr/include/hantro_enc" && \

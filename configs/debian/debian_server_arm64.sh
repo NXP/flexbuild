@@ -5,7 +5,7 @@ SUITE=trixie
 ARCH=arm64
 ROOTDIR=${1:-/tmp/rootfs}
 KEYRING="/usr/share/keyrings/debian-archive-keyring.gpg"
-MIRRORS=(http://deb.debian.org/debian http://ftp.cn.debian.org/debian http://ftp.de.debian.org/debian )
+MIRRORS=(http://ftp.cn.debian.org/debian http://ftp.de.debian.org/debian )
 
 DEFAULT_PACKAGES=(
   init udev sudo vim apt file zstd parted fdisk dosfstools iputils-ping isc-dhcp-client
@@ -31,8 +31,9 @@ echo "sources.list: ${MIRRORS[@]}"
 
 mmdebstrap \
   --arch=$ARCH \
-  --aptopt='Acquire::Retries=3' \
+  --aptopt='Acquire::Retries=5' \
   --aptopt='Acquire::http::Timeout=30' \
+  --aptopt='Acquire::https::Timeout=30' \
   --aptopt='APT::Get::Assume-Yes=true' \
   --aptopt='DPkg::Options::=--force-confnew' \
   --aptopt='Acquire::Languages="none"' \

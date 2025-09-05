@@ -36,6 +36,9 @@ case "${board_id}" in
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
         safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mp*}
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
         ;;
     imx8mp*)
         safe_run ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
@@ -44,6 +47,9 @@ case "${board_id}" in
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
         safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
         ;;
     imx91*)
         safe_run rm -rf /etc/systemd/system/display-manager.service
@@ -67,6 +73,9 @@ case "${board_id}" in
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
         safe_run rm -rf /boot/firmware/{imx93*,imx8mm*,imx8mp*}
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
         ;;
     ls1028a*)
         safe_run ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini

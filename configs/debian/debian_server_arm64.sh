@@ -71,6 +71,8 @@ install -D -m 644 src/system/blacklist.conf        "$ROOTDIR"/etc/modprobe.d/bla
 install -D -m 644 src/system/ts.conf               "$ROOTDIR"/etc/ts.conf.bak
 install -D -m 755 src/system/board_id.sh           "$ROOTDIR"/usr/bin/board_id.sh
 install -D -m 644 src/system/80-wired.network      "$ROOTDIR"/usr/lib/systemd/network/80-wired.network
+install -D -m 755 src/system/debian-post-install-pkg "$ROOTDIR"/usr/bin/
+install -D -m 644 configs/debian/extra_packages_list "$ROOTDIR"/etc/
 
 # ---- Rootfs configuration inside chroot ----
 #echo "[POST_ROOTFS] Configuring rootfs in chroot"
@@ -96,7 +98,7 @@ grep -q '^PermitRootLogin' /etc/ssh/sshd_config || echo "PermitRootLogin yes" >>
 grep -q '^PermitEmptyPasswords' /etc/ssh/sshd_config || echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config
 
 # systemd service symlinks
-ln -sf /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service
+# ln -sf /lib/systemd/system/platcfg.service /etc/systemd/system/multi-user.target.wants/platcfg.service
 ln -sf /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/boot.mount
 
 # Symlinks and firmware
@@ -143,7 +145,7 @@ case "$MACHINE" in
 		install -D -m 644 "$FBDIR"/src/system/weston/weston.ini.ls1028 \
 			"$ROOTDIR"/etc/xdg/weston/weston.ini
         ;;
-    imx*)
+    imx95*|imx8*)
         mkdir -p "$ROOTDIR"/etc/xdg/weston
         cp -f "$FBDIR"/src/system/weston/weston.ini* "$ROOTDIR"/etc/xdg/weston/
         if [ -f "$ROOTDIR"/etc/pam.d/gdm-password ]; then
@@ -152,6 +154,10 @@ case "$MACHINE" in
             install -D -m 644 "$FBDIR"/src/system/gdm/gdm.service "$ROOTDIR"/lib/systemd/system/
             ln -sf /lib/systemd/system/gdm.service "$ROOTDIR"/etc/systemd/system/graphical.target.wants/gdm.service
         fi
+        ;;
+    imx9*)
+        mkdir -p "$ROOTDIR"/etc/xdg/weston
+        cp -f "$FBDIR"/src/system/weston/weston.ini* "$ROOTDIR"/etc/xdg/weston/
         ;;
 esac
 

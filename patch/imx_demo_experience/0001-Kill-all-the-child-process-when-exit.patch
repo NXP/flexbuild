@@ -1,0 +1,36 @@
+From 7df82e9229206aa844fbcd79417b706982672e73 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Wed, 7 May 2025 01:00:38 -0700
+Subject: [PATCH] Kill all the child process when exit
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ engine/DemoManager.cpp | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/engine/DemoManager.cpp b/engine/DemoManager.cpp
+index 0a91f7a..d3a8efb 100644
+--- a/engine/DemoManager.cpp
++++ b/engine/DemoManager.cpp
+@@ -28,11 +28,13 @@ void DemoManager::demoButtonClick(QString command){
+     if(demoRun == -1){
+         demoRun = runProcess(command);
+     }else{
+-        QProcess *proc = processes.find(demoRun).value();
+-        QProcess ckill;
+-        ckill.start("pkill", QStringList() << "-P" << QString::number(demoRun));
+-        ckill.waitForFinished();
+-        proc->kill();
++	QProcess killer;
++		killer.start("sh", QStringList() << "-c" <<
++			"kill -9 $(pstree -p " + QString::number(demoRun) + " | grep -o '([0-9]\\+)' | tr -d '()')");
++		killer.waitForFinished();
++
++		QProcess *proc = processes.find(demoRun).value();
++		proc->kill();
+     }
+ }
+ 
+-- 
+2.34.1
+

@@ -30,6 +30,12 @@ log "Detected board: $board_id"
 
 case "${board_id}" in
     imx8mm*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
         safe_run ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
         safe_run ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
@@ -41,12 +47,19 @@ case "${board_id}" in
         /usr/bin/update-desktop-database
         ;;
     imx8mp*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
         safe_run ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
         safe_run ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
         safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
+        safe_run ln -sf weston.ini.imx8mp /etc/xdg/weston/weston.ini
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
@@ -68,6 +81,12 @@ case "${board_id}" in
         safe_run systemctl enable weston
         ;;
     imx95*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
         safe_run ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0

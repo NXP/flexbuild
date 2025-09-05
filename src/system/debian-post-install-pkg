@@ -66,7 +66,7 @@ download_and_install_deb() {
     rm -f "$deb"
 
     echo "Downloading $deb ..."
-    if ! wget --tries=3 --timeout=100 --continue --progress=bar --verbose "$url/$deb"; then
+    if ! wget --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress "$url/$deb"; then
         echo "ERROR: Download $deb failed. Please try again."
         exit 1
     fi

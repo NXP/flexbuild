@@ -79,6 +79,7 @@ imx9_pkgs=(
 imx8_pkgs=(
 	libgnome-desktop-3-dev chromium dmz-cursor-theme gnome-core
 	libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
+    gnome-sound-recorder rhythmbox
 )
 
 bak=(

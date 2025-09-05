@@ -20,6 +20,7 @@ gpu_viv:
 	 fi && \
 	 cd $(GRAPHICSDIR)/gpu_viv && \
 	 cp -rfa gpu-core/* $(DESTDIR) && \
+	 cp -rfa gpu-core/* $(RFSDIR) && \
 	 ln -sf libvulkan_VSI.so $(DESTDIR)/usr/lib/libvulkan.so.1 && \
          ln -sf libvulkan.so.1 $(DESTDIR)/usr/lib/libvulkan.so && \
 	 rm -f $(DESTDIR)/usr/lib/libGL.so* && \

@@ -18,8 +18,11 @@ ethosu_driver_stack: flatbuffers
 	 $(call patch_apply,ethosu_driver_stack,apps/ml) && \
 	 $(call fbprint_b,"ethosu_driver_stack") && \
 	 cd $(MLDIR)/ethosu_driver_stack && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	 export CC="$(CROSS_COMPILE)gcc" && \
+	 export CXX="$(CROSS_COMPILE)g++" && \
+	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(RFSDIR)/usr/lib" && \
+	 export CPPFLAGS="--sysroot=$(RFSDIR) -I$(RFSDIR)/usr/include" && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH)/dist && \
 	 cmake  -S $(MLDIR)/ethosu_driver_stack \
 		-B $(MLDIR)/ethosu_driver_stack/build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \

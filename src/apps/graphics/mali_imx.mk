@@ -21,6 +21,7 @@ mali_imx:
 	 mkdir -p $(DESTDIR)/etc && mkdir -p $(DESTDIR)/usr && \
 	 cp -af ./etc/* $(DESTDIR)/etc/ && \
 	 cp -af ./usr/* $(DESTDIR)/usr/ && \
+	 rsync -a ./usr/ $(RFSDIR)/usr/ --exclude=lib/firmware && \
 	 rm -rf $(DESTDIR)/usr/lib/firmware && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libGLESv2.so,libGLESv2.so.2,libgbm.so.1,libvulkan.so,libvulkan.so.1,libEGL.so,libEGL.so.1} && \
 	 $(call fbprint_d,"mali_imx")

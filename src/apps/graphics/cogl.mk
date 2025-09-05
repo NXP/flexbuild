@@ -32,6 +32,7 @@ cogl: $(DEP_COGL)
 		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" && \
 	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)" && \
 	 \
+	 [ -f Makefile ] && $(MAKE) distclean &>/dev/null || true && \
 	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \

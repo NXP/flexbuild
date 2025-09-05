@@ -17,10 +17,8 @@ clutter_gst: gst_plugins_bad cogl libdrm
 	 $(call download_repo,clutter_gst,apps/graphics,submod) && \
 	 $(call patch_apply,clutter_gst,apps/graphics) && \
 	 $(call fbprint_b,"clutter_gst") && \
-	 sudo cp -Pf $(DESTDIR)/usr/lib/{libGLESv2.so*,libVSC.so,libEGL.so*,libGAL.so*,libgbm.so*,libcogl.so*,libdrm.so*,libgst*.so*} \
-	 $(RFSDIR)/usr/lib && \
+	 sudo cp -Pf $(DESTDIR)/usr/lib/{libcogl.so*,libdrm.so*,libgst*.so*} $(RFSDIR)/usr/lib && \
 	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
-	 sudo cp $(DESTDIR)/usr/lib/libgbm_viv.so* $(RFSDIR)/usr/lib && \
 	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgbm.so,libcogl.so,libgstallocators-1.0.so*,libclutter-gst-3.0.so.0} && \
 	 \
 	 cd $(GRAPHICSDIR)/clutter_gst && \
@@ -30,6 +28,7 @@ clutter_gst: gst_plugins_bad cogl libdrm
 			-I$(DESTDIR)/usr/include/clutter-1.0 -I$(RFSDIR)/usr/include" && \
 	 export GST_PLUGIN_SCANNER_1_0=$(GRAPHICSDIR)/clutter_gst/gst-plugin-scanner-dummy && \
 	 \
+	 [ -f Makefile ] && $(MAKE) distclean &>/dev/null || true && \
 	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \

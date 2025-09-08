@@ -615,7 +615,7 @@ check_host_dependent_pkg() {
 
     # for imx95 m core toolchain
     if [ ! -d /usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin ] && [[ "$MACHINE" =~ ^imx(95|94) ]]; then
-        wget --no-check-certificate \
+        wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress \
             https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi.tar.xz \
             -O /tmp/arm-toolchain.tar.xz
         sudo tar -xf /tmp/arm-toolchain.tar.xz -C /usr

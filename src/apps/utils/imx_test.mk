@@ -11,7 +11,7 @@ imx_test: libdrm alsa_lib
 	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,imx_test,apps/utils) && \
 	 $(call patch_apply,imx_test,apps/utils) && \
-	 if [ ! -f $(DESTDIR)/usr/include/linux/mxc_asrc.h ]; then \
+	 if [ ! -d $(DESTDIR)/usr/include/linux ]; then \
 	     bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 sudo cp -rf $(DESTDIR)/usr/include/alsa $(RFSDIR)/usr/include && \

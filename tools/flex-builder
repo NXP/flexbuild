@@ -21,25 +21,29 @@ Most used example with automated build:
  bld -m lx2160ardb               # same as above, for lx2160ardb platform
 
 Most used example with separate command:
- bld bsp -m imx91evk             # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for imx91evk
- bld rfs -m imx95evk             # generate Debian-based rootfs for imx95evk
- bld linux -m ls1046ardb         # compile linux kernel for ls1046ardb
- bld atf -m lx2160ardb -b sd      # compile atf image for SD boot on lx2160ardb
- bld boot -m imx91evk            # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for imx91evk
- bld apps -m ls1028ardb          # compile NXP-specific components against the runtime dependencies for ls1028ardb
- bld merge-apps -m imx8mmevk     # merge NXP-specific components into imx8mmevk Debian rootfs
- bld packrfs -m imx93frdm        # pack and compress target rootfs as rootfs_<distro_version>_debian_imx93frdm_arm64.tar.zst
- bld docker                      # create or attach docker container to build in docker
- bld clean                       # clean all obsolete firmware/linux/apps binary images except distro rootfs
- bld clean-apps                  # clean the obsolete NXP-specific apps components binary images
+ bld bsp -m <machine>             # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for <machine>
+ bld atf -m <machine> -b sd      # compile atf image for SD boot on <machine>
+ bld boot -m <machine>           # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for <machine>
+ bld linux -m <machine>          # compile linux kernel for <machine>
+
+ bld apps -m <machine>           # compile NXP-specific components against the runtime dependencies for <machine>
+ bld merge-apps -m <machine>     # merge NXP-specific components into <machine> Debian rootfs
+
+ bld rfs -m <machine>            # generate Debian-based rootfs for <machine>
+ bld packrfs -m <machine>        # pack and compress target rootfs as rootfs_<distro_version>_debian_<machine>_arm64.tar.zst
+
  bld clean-bsp                   # clean obsolete BSP (u-boot/atf/firmware) images
  bld clean-linux                 # clean obsolete linux image
- bld clean-rfs -m imx91sfrdm     # clean target debian-based rootfs for imx91sfrdm
+ bld clean-apps -m <machine>     # clean the obsolete <machine>-specific apps components binary images
+ bld clean                       # equal to "bld clean bsp" + "bld clean linux" + "bld clean-apps -m <machine>"
+ bld clean-rfs -m <machine>      # clean target debian-based rootfs for <machine>
+
+ bld docker                      # create or attach docker container to build in docker
  bld list                        # list enabled machines and supported various components
 
 Most used options:
  -m, --machine         target machine, e.g. imx8mpevk, imx8mmevk, imx91frdm, imx93frdm, imx93evk, lx2160ardb, ls1046ardb, ls1028ardb, etc
- -b, --boottype        type of boot media, valid argument: sd, emmc, nor, qspi, xspi, nand
+ -b, --boottype        type of boot media, valid argument: sd, emmc, nor, qspi, xspi, nand. for imx platform, only sd boot is supported.
 
 See docs/flexbuild_usage.md and docs/build_and_deploy_distro.md for more information about the available commands.
 EOF
@@ -525,15 +529,15 @@ flex_auto_build() {
     starttime=`date +'%Y-%m-%d %H:%M:%S'`
 
     DISTROVARIANT=server
-    bld linux -a $DESTARCH -p $SOCFAMILY
+    bld linux -m $MACHINE
     bld linux-headers -m $MACHINE
     bld rfs -m $MACHINE
-    bld linux-modules -a $DESTARCH -p $SOCFAMILY
+    bld linux-modules -m $MACHINE
     bld apps -m $MACHINE
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
-    bld distroscr -a $DESTARCH -p $SOCFAMILY
-    bld bsp -a $DESTARCH -p $SOCFAMILY
-    bld boot -a $DESTARCH -p $SOCFAMILY
+    bld distroscr -m $MACHINE
+    bld bsp -m $MACHINE
+    bld boot -m $MACHINE
 
     bld merge-apps -m $MACHINE
     bld packrfs -m $MACHINE

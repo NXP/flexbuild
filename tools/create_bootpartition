@@ -45,7 +45,7 @@ generate_bootpartition_tarball() {
     mkdir -p $bootpartdir/firmware
     if [ $SOCFAMILY = IMX ]; then
         [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld sof_zephyr -m imx93evk
-        [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -m imx93evk
+        [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -m imx8mpevk
         [ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY
         [ ! -d $FBOUTDIR/bsp/imx_mcore_demos ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY
         [ ! -f $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -m imx93evk
@@ -76,7 +76,7 @@ generate_bootpartition_tarball() {
 	if [ "$MACHINE" = all ]; then
 		bld distroscrall -a $DESTARCH -p $SOCFAMILY
 	else
-		bld distroscr -a $DESTARCH -p $SOCFAMILY -m $MACHINE
+		bld distroscr -m $MACHINE
 	fi
 
     ls $FBOUTDIR/bsp/u-boot/$socseries*/*boot.scr | grep -E $scrmask | xargs -I {} cp {} $bootpartdir

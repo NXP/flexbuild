@@ -662,7 +662,7 @@ do_clean() {
     clean_bsp_components
     clean_linux_components
     clean_apps_components
-    rm -f $FBDIR/*
+    rm -f $FBDIR/logs/*
     fbprint_d "clean all old images except distro rootfs"
 }
 

@@ -50,7 +50,9 @@ apt_install_with_retry() {
         else
             echo "Warning: Attempt $attempt failed, retrying in 5 seconds..."
             sleep 5
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get clean &>/dev/null
             show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get update --fix-missing &>/dev/null
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get --fix-broken install &>/dev/null
         fi
     done
 
@@ -65,7 +67,7 @@ download_and_install_deb() {
     local deb="$2"
     rm -f "$deb"
 
-    echo "Downloading $deb ..."
+    echo -e "\nDownloading $deb ..."
     if ! wget --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress "$url/$deb"; then
         echo "ERROR: Download $deb failed. Please try again."
         exit 1

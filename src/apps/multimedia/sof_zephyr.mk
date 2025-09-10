@@ -15,13 +15,10 @@ sof_zephyr:
 	     $(WGET) $(repo_sof_zephyr_tar_url) -O sof_zephyr.tar.gz $(LOG_MUTE); \
 		 [ $$? -ne 0 ] && { echo "Downloading $(repo_sof_zephyr_tar_url) failed."; exit 1; } || \
 	     tar xf sof_zephyr.tar.gz --strip-components 1; \
-	 fi && \
-	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -m $(MACHINE); \
+		 rm -f sof_zephyr.tar.gz; \
 	 fi && \
 	 $(call fbprint_b,"sof_zephyr") && \
 	 cd $(MMDIR)/sof_zephyr && \
-	 rm -f sof_zephyr.tar.gz && \
 	 mkdir -p $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/imx && \
 	 cp -Prf sof* $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/imx && \
 	 $(call fbprint_d,"sof_zephyr")

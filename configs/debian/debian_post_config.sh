@@ -59,8 +59,8 @@ ln -sf /lib/systemd/system/boot.mount /etc/systemd/system/local-fs.target.wants/
 ln -sf /boot/tools/perf /usr/local/bin/perf
 ln -sf /sbin/init /init
 ln -sf /boot/modules /lib/modules
-rm -rf /lib/firmware
-ln -sf /boot/firmware /lib/firmware
+# rm -rf /lib/firmware
+# ln -sf /boot/firmware /lib/firmware
 
 # fix absolute path for libz.so symlink when cross compiling apitrace
 ln -sf libz.so.1 /usr/lib/aarch64-linux-gnu/libz.so

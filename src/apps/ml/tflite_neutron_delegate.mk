@@ -6,8 +6,8 @@
 
 TFLITE_BUILD_DIR = "$(MLDIR)"/tflite/build_debian_arm64
 
-tflite_neutron_delegate:
-#tflite_neutron_delegate: tflite neutron
+#tflite_neutron_delegate:
+tflite_neutron_delegate: tflite neutron
 	@[ $${MACHINE:0:5} != imx95 ] && exit || \
 	$(call download_repo,tflite_neutron_delegate,apps/ml) && \
 	$(call patch_apply,tflite_neutron_delegate,apps/ml) && \
@@ -38,14 +38,14 @@ tflite_neutron_delegate:
 		-DFP16_SOURCE_DIR=$(TFLITE_BUILD_DIR)/FP16-source \
 		-DFXDIV_SOURCE_DIR=$(TFLITE_BUILD_DIR)/FXdiv-source \
 		-DPTHREADPOOL_SOURCE_DIR=$(TFLITE_BUILD_DIR)/pthreadpool-source \
-		-DABSL_SOURCE_DIR=$(TFLITE_BUILD_DIR)/abseil-cpp \
-		-DCPUINFO_SOURCE_DIR=$(TFLITE_BUILD_DIR)/cpuinfo \
-		-DEIGEN_SOURCE_DIR=$(TFLITE_BUILD_DIR)/eigen \
 		-DFARMHASH_SOURCE_DIR=$(TFLITE_BUILD_DIR)/farmhash \
-		-DFLATBUFFERS_SOURCE_DIR=$(TFLITE_BUILD_DIR)/flatbuffers \
-		-DGEMMLOWP_SOURCE_DIR=$(TFLITE_BUILD_DIR)/gemmlowp \
-		-DRUY_SOURCE_DIR=$(TFLITE_BUILD_DIR)/ruy \
-		-DXNNPACK_SOURCE_DIR=$(TFLITE_BUILD_DIR)/xnnpack \
+		-DFETCHCONTENT_SOURCE_DIR_FLATBUFFERS=$(TFLITE_BUILD_DIR)/flatbuffers \
+		-DFETCHCONTENT_SOURCE_DIR_RUY=$(TFLITE_BUILD_DIR)/ruy \
+		-DFETCHCONTENT_SOURCE_DIR_XNNPACK=$(TFLITE_BUILD_DIR)/xnnpack \
+		-DFETCHCONTENT_SOURCE_DIR_GEMMLOWP=$(TFLITE_BUILD_DIR)/gemmlowp \
+		-DFETCHCONTENT_SOURCE_DIR_ABSEIL-CPP=$(TFLITE_BUILD_DIR)/abseil-cpp \
+		-DFETCHCONTENT_SOURCE_DIR_CPUINFO=$(TFLITE_BUILD_DIR)/cpuinfo \
+		-DFETCHCONTENT_SOURCE_DIR_EIGEN=$(TFLITE_BUILD_DIR)/eigen \
 		-Wno-dev -DCMAKE_POLICY_DEFAULT_CMP0169=OLD \
 		-DCMAKE_SYSTEM_NAME=Linux \
 		-DTFLITE_HOST_TOOLS_DIR="/usr" \

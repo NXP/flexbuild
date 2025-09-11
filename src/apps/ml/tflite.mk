@@ -37,10 +37,19 @@ tflite:
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CMAKE_TLS_VERIFY=0 && \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
+	 if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
+		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
+		cd build_$(DISTROTYPE)_$(ARCH);  \
+		rm -rf CMakeCache.txt Makefile cmake_install.cmake compile_commands.json \
+			CMakeFiles bin lib/*.so* lib/*.a \
+			example_proto_generated examples/*.o \
+			tools/*.o tmp/* ; \
+		find . -type d -name "CMakeFiles" -exec rm -rf {} + ; \
+		cd ..; \
+	 fi && \
 	 cmake  -S tensorflow/lite \
 		-B build_$(DISTROTYPE)_$(ARCH) \
+		-DFETCHCONTENT_BASE_DIR="$(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/_deps" \
 		-DCMAKE_POLICY_DEFAULT_CMP0169=OLD \
 		-DCMAKE_POLICY_DEFAULT_CMP0177=OLD \
 		-DCMAKE_BUILD_TYPE=release \

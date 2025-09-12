@@ -1141,6 +1141,7 @@ case "$1" in
         show_lists; exit
         ;;
     fw|bsp)
+		check_board_valid
         generate_composite_firmware; exit
         ;;
     fwall|bspall)

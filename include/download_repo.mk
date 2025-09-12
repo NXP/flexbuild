@@ -109,3 +109,23 @@ endef
 #
 
 WGET := wget --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress
+
+#
+# wrap the wget command, MD5SUM check ??
+# $1=package_link_name $2=package_target_name
+#
+define dl_by_wget
+	if [ -f $(FBDIR)/dl/$(2) ]; then \
+		echo "[INFO] $(1) already exists" $(LOG_MUTE); \
+	else \
+		echo "[INFO] Downloading $(repo_$(1)_url)"; \
+		mkdir -p $(FBDIR)/dl; \
+		$(WGET) $(repo_$(1)_url)  -O $(FBDIR)/dl/$(2) $(LOG_MUTE); \
+		if [ $$? -ne 0 ]; then \
+			echo "Downloading $(repo_$(1)_url) failed." && exit 1; \
+		else \
+			echo "[INFO] Downloading Done" $(LOG_MUTE); \
+		fi; \
+	fi
+endef
+

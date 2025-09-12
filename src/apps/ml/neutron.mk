@@ -10,8 +10,8 @@ neutron:
 	$(call patch_apply,neutron,apps/ml) && \
 	$(call fbprint_b,"neutron") && \
 	cd $(MLDIR)/neutron && \
-	install -d $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/ && \
-	install -m 0644 imx95/firmware/* $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/ && \
+	install -d $(DESTDIR)/lib/firmware && \
+	install -m 0644 imx95/firmware/* $(DESTDIR)/lib/firmware && \
 	install -d $(DESTDIR)/usr/include/neutron && \
 	cp -f imx95/include/* $(DESTDIR)/usr/include/neutron && \
 	cp --no-preserve=ownership -d -f imx95/library/* $(DESTDIR)/usr/lib/ && \

@@ -19,10 +19,7 @@ endif
 
 imx_dsp:
 	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	if [ ! -f "$(FBDIR)"/dl/imx_dsp.bin ]; then \
-		$(WGET) $(repo_imx_dsp_bin_url) -O $(FBDIR)/dl/imx_dsp.bin $(LOG_MUTE); \
-		[ $$? -ne 0 ] && { echo "Downloading $(repo_imx_dsp_bin_url) failed."; exit 1; } || true; \
-	fi && \
+	$(call dl_by_wget,imx_dsp_bin,imx_dsp.bin) && \
 	$(call fbprint_b,"imx_dsp") && \
 	cd $(MMDIR) && \
 	if [ ! -d "$(MMDIR)"/imx_dsp ]; then \

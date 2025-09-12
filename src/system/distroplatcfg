@@ -41,7 +41,6 @@ case "${board_id}" in
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
-        safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mp*}
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
@@ -58,7 +57,6 @@ case "${board_id}" in
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
-        safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*}
         safe_run ln -sf weston.ini.imx8mp /etc/xdg/weston/weston.ini
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
             /usr/share/applications/chromium.desktop
@@ -67,7 +65,6 @@ case "${board_id}" in
     imx91*)
         safe_run rm -rf /etc/systemd/system/display-manager.service
         safe_run ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
-        safe_run rm -rf /boot/firmware/{imx93*,imx95*,imx8mm*,imx8mp*}
         safe_run systemctl enable weston
         ;;
     imx93*)
@@ -76,7 +73,6 @@ case "${board_id}" in
             safe_run rm -f /usr/lib/libg2d-viv.so.2.4.0
         fi
         safe_run rm -rf /etc/systemd/system/display-manager.service
-        safe_run rm -rf /boot/firmware/{imx95*,imx8mm*,imx8mp*}
         safe_run ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
         safe_run systemctl enable weston
         ;;
@@ -91,7 +87,6 @@ case "${board_id}" in
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
-        safe_run rm -rf /boot/firmware/{imx93*,imx8mm*,imx8mp*}
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database

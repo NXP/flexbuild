@@ -12,41 +12,18 @@ DEFAULT_REPO_TAG: "lf-6.12.20-2.0.0"
 DEBIAN_CODENAME: "trixie"
 DEBIAN_VERSION:  "13"
 
-# default build options for CI auto build
-BUILD_YOCTO_RFS: n
-BUILD_BUILDROOT_RFS: n
-
-# enable/disable custom packagegroups
-PKG_GROUPS_GRAPHICS: y
-PKG_GROUPS_MULTIMEDIA: y
-PKG_GROUPS_NETWORKING: y
-PKG_GROUPS_UTILS: y
-PKG_GROUPS_SECURITY: y
-PKG_GROUPS_ML: y
-PKG_GROUPS_GOPOINT: y
-PKG_GROUPS_ROBOTICS: n
-
 # default IMX if '-p' option is not specified, change to LS for Layerscape SoC
 DEFAULT_SOC_FAMILY: IMX
 
 # force build in docker environment
 FORCE_BUILD_IN_DOCKER: y
 
-# choose one of the 3 ways to fetch/update repo for various use cases
-UPDATE_REPO_PER_TAG: y
-UPDATE_REPO_PER_BRANCH: n
-UPDATE_REPO_PER_COMMIT: n
-
-
-# Optionally, fetch the prebuilt SDK rootfs instead of building from scratch
-FETCH_PREBUILT_SDK_RFS: n
+# The URL for pre-built images
 #DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/sdk"
 DISTRO_SVR_URL: "http://sun.ap.freescale.net/dash/debian"
 
 # fuse provisioning
 CONFIG_FUSE_PROVISIONING: n
-
-INSTALL_DESKTOP_TEST_PACKAGES: n
 
 # user can customize the default path of components source and build output path
 DEFAULT_OUT_PATH: $FBDIR/build_${DISTRIB_VERSION}
@@ -57,8 +34,6 @@ DEFAULT_PKGDIR: $FBDIR/components_${DISTRIB_VERSION}
 KERNEL_CONFIG:
   ARM64_LS:  "defconfig lsdk.config"
   ARM64_IMX: "imx_v8_defconfig"
-  ARM32_LS:  "multi_v7_defconfig multi_v7_lpae.config lsdk.config"
-  ARM32_IMX: "imx_v7_defconfig"
 
 
 # DPAA2 MC firmware version

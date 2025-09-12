@@ -11,10 +11,11 @@ uefi_machine_list = ls1043ardb ls1046ardb ls2088ardb lx2160ardb
 uefi_bin_url = https://github.com/nxp-qoriq/qoriq-uefi-binary.git
 
 
-layerscape_fw: rcw mc_bin mc_utils fm_ucode qe_ucode dp_fw_cadence phy_cortina phy_inphi pfe_bin ddr_phy_bin
+layerscape_fw: rcw mc_bin mc_utils fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin ddr_phy_bin
 	@touch $(FBDIR)/logs/.lsfwdone
 
 
+UTILSDIR = $(PKGDIR)/apps/utils
 
 uefi uefi_bin:
 	 $(call fbprint_b,"uefi_bin") && \
@@ -63,16 +64,11 @@ qe_ucode:
 
 
 dp_fw_cadence:
-	@if [ ! -d $(BSPDIR)/firmware-imx ]; then \
-			cd $(BSPDIR) && rm -f firmware_imx*; \
-			$(WGET) $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE); \
-			[ $$? -ne 0 ] && { echo "Downloading $(repo_firmware_imx_bin_url) failed."; exit 1; } || \
-			chmod +x firmware_imx.bin; \
-			./firmware_imx.bin --auto-accept --force $(LOG_MUTE); \
-			mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
+	@if [ ! -d $(UTILSDIR)/firmware_imx ]; then \
+		bld firmware_imx -m $(MACHINE); \
 	 fi && \
 	 if [ ! -L $(FBOUTDIR)/bsp/dp_fw_cadence ]; then \
-	     ln -sf $(BSPDIR)/firmware-imx/firmware/hdmi/cadence $(FBOUTDIR)/bsp/dp_fw_cadence; \
+	     ln -sf $(UTILSDIR)/firmware_imx/firmware/hdmi/cadence $(FBOUTDIR)/bsp/dp_fw_cadence; \
 	 fi && \
 	 $(call fbprint_d,"dp_fw_cadence")
 

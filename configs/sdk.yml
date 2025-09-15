@@ -12,6 +12,16 @@ DEFAULT_REPO_TAG: "lf-6.12.20-2.0.0"
 DEBIAN_CODENAME: "trixie"
 DEBIAN_VERSION:  "13"
 
+# enable/disable custom packagegroups
+PKG_GROUPS_GRAPHICS: y
+PKG_GROUPS_MULTIMEDIA: y
+PKG_GROUPS_NETWORKING: y
+PKG_GROUPS_UTILS: y
+PKG_GROUPS_SECURITY: y
+PKG_GROUPS_ML: y
+PKG_GROUPS_GOPOINT: y
+PKG_GROUPS_ROBOTICS: n
+
 # default IMX if '-p' option is not specified, change to LS for Layerscape SoC
 DEFAULT_SOC_FAMILY: IMX
 

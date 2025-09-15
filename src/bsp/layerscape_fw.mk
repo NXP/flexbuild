@@ -11,7 +11,7 @@ uefi_machine_list = ls1043ardb ls1046ardb ls2088ardb lx2160ardb
 uefi_bin_url = https://github.com/nxp-qoriq/qoriq-uefi-binary.git
 
 
-layerscape_fw: rcw mc_bin mc_utils fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin ddr_phy_bin
+layerscape_fw: rcw mc_bin mc_utils fm_ucode qe_ucode dp_fw_cadence phy_cortina phy_inphi pfe_bin ddr_phy_bin
 	@touch $(FBDIR)/logs/.lsfwdone
 
 
@@ -66,9 +66,6 @@ qe_ucode:
 dp_fw_cadence:
 	@if [ ! -d $(UTILSDIR)/firmware_imx ]; then \
 		bld firmware_imx -m $(MACHINE); \
-	 fi && \
-	 if [ ! -L $(FBOUTDIR)/bsp/dp_fw_cadence ]; then \
-	     ln -sf $(UTILSDIR)/firmware_imx/firmware/hdmi/cadence $(FBOUTDIR)/bsp/dp_fw_cadence; \
 	 fi && \
 	 $(call fbprint_d,"dp_fw_cadence")
 

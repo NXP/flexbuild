@@ -80,34 +80,34 @@ generate_bootpartition_tarball() {
 
     # check UEFI
     if [ "$CONFIG_UEFI_BIN" = y -a $SOCFAMILY = LS -a $DESTARCH = arm64 ]; then
-	generate_uefi_grub_cfg
-	mkdir -p $bootpartdir/grub
-	find  $FBOUTDIR/bsp/uefi/ -name "*grub.cfg" | xargs -I {} cp {} $bootpartdir/grub
-	[ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin
-	cp $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI $bootpartdir/grub
+        generate_uefi_grub_cfg
+        mkdir -p $bootpartdir/grub
+        find  $FBOUTDIR/bsp/uefi/ -name "*grub.cfg" | xargs -I {} cp {} $bootpartdir/grub
+        [ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin
+        cp $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI $bootpartdir/grub
     fi
 
     # secure boot headers
     if [ $SOCFAMILY = LS -a "$SECURE" = y ]; then
-	[ -n "$BOOTTYPE" ] && boottype=$BOOTTYPE
-	for brd in $machinelist; do
-	    [ ! -f $FBOUTDIR/firmware/secboot_hdrs/${MACHINE:0:10}/hdr_dtb.out ] && \
-	    bld signimg -m $brd -a $DESTARCH
-	done
-	cp -rf $FBOUTDIR/bsp/secboot_hdrs $bootpartdir
-	ls $FBOUTDIR/bsp/secboot_hdrs/*/*bs.out | grep $scrmask | xargs -I {} cp {} $bootpartdir
+        [ -n "$BOOTTYPE" ] && boottype=$BOOTTYPE
+        for brd in $machinelist; do
+            [ ! -f $FBOUTDIR/firmware/secboot_hdrs/${MACHINE:0:10}/hdr_dtb.out ] && \
+            bld signimg -m $brd -a $DESTARCH
+        done
+        cp -rf $FBOUTDIR/bsp/secboot_hdrs $bootpartdir
+        ls $FBOUTDIR/bsp/secboot_hdrs/*/*bs.out | grep $scrmask | xargs -I {} cp {} $bootpartdir
     fi
 
     # check IMA/EVM
     if [ "$IMA_EVM" = y -a $SOCFAMILY = LS ]; then
-	[ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
-	bld rfs -r buildroot:imaevm -a $DESTARCH
+        [ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
+        bld rfs -r buildroot:imaevm -a $DESTARCH
 
-	cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $bootpartdir/initramfs.img
-	for brd in $LS_MACHINE_LIST; do
-	    [ -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr ] && \
-	    cp -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr $bootpartdir
-	done
+        cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $bootpartdir/initramfs.img
+        for brd in $LS_MACHINE_LIST; do
+            [ -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr ] && \
+            cp -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr $bootpartdir
+        done
     fi
 
     # install kernel tools/perf

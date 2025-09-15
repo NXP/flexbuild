@@ -9,7 +9,7 @@ define imx_mkimage_target
 	$(call download_repo,imx_mkimage,bsp) && \
 	$(call patch_apply,imx_mkimage,bsp) && \
     \
-    if [ ! -d $(UTILSDIR)/firmware_imx ]; then \
+    if [ "$(SOCFAMILY)" = "IMX" ] || [[ "$(MACHINE)" == ls1028a* ]]; then \
 		bld firmware_imx -m $(MACHINE); \
     fi && \
     if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
@@ -30,7 +30,9 @@ define imx_mkimage_target
 		./imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
     fi && \
 	\
-	bld mcore_demo -m $(MACHINE) && \
+	if [ "$(SOCFAMILY)" = "IMX" ]; then \
+		bld mcore_demo -m $(MACHINE); \
+	fi && \
     \
     cd $(BSPDIR)/imx_mkimage && \
     mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \

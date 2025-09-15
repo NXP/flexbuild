@@ -9,9 +9,7 @@ define imx_mkimage_target
 	$(call download_repo,imx_mkimage,bsp) && \
 	$(call patch_apply,imx_mkimage,bsp) && \
     \
-    if [ "$(SOCFAMILY)" = "IMX" ] || [[ "$(MACHINE)" == ls1028a* ]]; then \
-		bld firmware_imx -m $(MACHINE); \
-    fi && \
+	bld firmware_imx -m $(MACHINE); \
     if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
 		cd $(BSPDIR) && rm -f imx-seco.bin && $(WGET) $(repo_seco_bin_url) -O imx-seco.bin $(LOG_MUTE) && chmod +x imx-seco.bin && \
 		./imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
@@ -30,10 +28,6 @@ define imx_mkimage_target
 		./imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
     fi && \
 	\
-	if [ "$(SOCFAMILY)" = "IMX" ]; then \
-		bld mcore_demo -m $(MACHINE); \
-	fi && \
-    \
     cd $(BSPDIR)/imx_mkimage && \
     mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
 	$(MAKE) clean $(LOG_MUTE) && \
@@ -150,6 +144,7 @@ define imx_mkimage_target
             ;; \
 		imx8ulp*) \
 			SOC_FAMILY=iMX8ULP; \
+			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx8ulp-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx8ulpa2-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
@@ -214,6 +209,8 @@ define imx_mkimage_target
             ;; \
         imx93frdm) \
 			SOC_FAMILY=iMX93; \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx93-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
@@ -230,6 +227,8 @@ define imx_mkimage_target
             ;; \
         imx93evk) \
 			SOC_FAMILY=iMX93; \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx93-11x11-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
@@ -249,6 +248,8 @@ define imx_mkimage_target
             ;; \
         imx95evk) \
 			SOC_FAMILY=iMX95; \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
@@ -268,6 +269,8 @@ define imx_mkimage_target
             ;; \
         imx95frdm) \
 			SOC_FAMILY=iMX95; \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \

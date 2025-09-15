@@ -64,10 +64,8 @@ qe_ucode:
 
 
 dp_fw_cadence:
-	@if [ ! -d $(UTILSDIR)/firmware_imx ]; then \
-		bld firmware_imx -m $(MACHINE); \
-	 fi && \
-	 $(call fbprint_d,"dp_fw_cadence")
+	@bld firmware_imx -m $(MACHINE); \
+	$(call fbprint_d,"dp_fw_cadence")
 
 
 

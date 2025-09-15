@@ -62,6 +62,7 @@ repo:
 
   firmware_imx_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.28-994fa14.bin
+    md5:  2e4037eb1971d4be2e22b31cdf5bf50a
     # /lib/firmware for ddr,hdmi,dp,vpu,easrc,epdc,xcvr,xuvi
 
   imx_firmware:
@@ -273,6 +274,7 @@ repo:
   mali_imx_bin:
     url:  http://sun.ap.freescale.net/dash/debian/lsdk2512/mali-imx-r54.0-aarch64-6.12.20.bin
     #url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/mali-imx-r54.0-aarch64-6.12.20.bin
+    md5:  7ebc277f1fb66774bf4ff9ec2cc20e38
 
   imx_pxp_g2d:
     url:  https://github.com/nxp-imx/imx-g2d-pxp.git
@@ -355,6 +357,7 @@ repo:
 #  SOF firmware architecture is based on Zephyr RTOS
   sof_zephyr_tar:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-zephyr-2.13.0-3d67d3f.tar.gz
+    md5:  2a6d226d36bbecf8fcb455dc037c44ee
 
 # i.MX optimized Audio and Video core codec libraries
   imx_codec_bin:
@@ -363,6 +366,7 @@ repo:
 # DSP firmware
   imx_dsp_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.10-ea4fe3f.bin
+    md5:  5400a078994256004a37be2ed7d187d4
 
 # DSP AACPlus decoder
   imx_dsp_codec_ext_bin:
@@ -402,6 +406,10 @@ repo:
   firmwared:
     url: https://github.com/teg/firmwared.git
     ver: 2e6b5db
+
+  wireless_regdb_tar:
+    url: https://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2025.02.20.tar.xz
+    md5: 7454c55208ca51bae6461ca7932559ab
 
 #  buildroot:
 #    url:  https://github.com/buildroot/buildroot.git

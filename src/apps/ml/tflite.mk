@@ -14,25 +14,12 @@ model-mobv1 = https://storage.googleapis.com/download.tensorflow.org/models/mobi
 
 TFLITE_VERSION = tensorflow-lite-2.18.0
 
-tflite:
+tflite: flatbuffers
 	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
 	 $(call download_repo,tflite,apps/ml) && \
 	 $(call patch_apply,tflite,apps/ml) && \
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 cd $(MLDIR)/tflite && \
-	 if ! flatc --version 2>/dev/null | grep -qE '^flatc version 24\.'; then \
-        echo "flatc is not available, instlling flatbuffers 24.3.25..." && \
-		rm -f v24.3.25.tar.gz && \
-		$(WGET) https://github.com/google/flatbuffers/archive/refs/tags/v24.3.25.tar.gz $(LOG_MUTE) && \
-        tar -xf v24.3.25.tar.gz && \
-        cd flatbuffers-24.3.25 && \
-        cmake -DCMAKE_BUILD_TYPE=Release . $(LOG_MUTE) && \
-        make -j$(nproc) $(LOG_MUTE) && \
-        sudo make install $(LOG_MUTE) && \
-        cd ..; \
-     else \
-        echo "flatc is OK" $(LOG_MUTE); \
-     fi && \
 	 [ ! -f mobilenet.tgz ] && $(WGET) $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

@@ -108,7 +108,7 @@ endef
 # define the default wget command
 #
 
-WGET := wget --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress
+WGET := wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress
 
 #
 # wrap the wget command, MD5SUM check ??
@@ -118,14 +118,25 @@ define dl_by_wget
 	if [ -f $(FBDIR)/dl/$(2) ]; then \
 		echo "[INFO] $(1) already exists" $(LOG_MUTE); \
 	else \
-		echo "[INFO] Downloading $(repo_$(1)_url)"; \
-		mkdir -p $(FBDIR)/dl; \
-		$(WGET) $(repo_$(1)_url)  -O $(FBDIR)/dl/$(2) $(LOG_MUTE); \
+		echo "[INFO] Downloading $(1)"; \
+		mkdir -p $(FBDIR)/dl /tmp; \
+		rm -f /tmp/$(2); \
+		$(WGET) $(repo_$(1)_url)  -O /tmp/$(2) $(LOG_MUTE); \
 		if [ $$? -ne 0 ]; then \
-			echo "Downloading $(repo_$(1)_url) failed." && exit 1; \
-		else \
-			echo "[INFO] Downloading Done" $(LOG_MUTE); \
+			echo "Downloading $(1) failed." && exit 1; \
 		fi; \
+		if [ -z "$(repo_$(1)_md5)" ]; then \
+			echo "[WARN] No expected MD5 for $(1); skip checksum." $(LOG_MUTE); \
+		else \
+			md5=$$(md5sum /tmp/$(2) | awk '{print $$1}'); \
+			if [ "$$md5" != "$(repo_$(1)_md5)" ]; then \
+				echo "[ERROR] MD5 mismatch for $(1): expected $(repo_$(1)_md5), got $$md5"; \
+				rm -f /tmp/$(2); \
+				exit 1; \
+			fi; \
+		fi; \
+		mv /tmp/$(2) $(FBDIR)/dl; \
+		echo "[INFO] Downloading Done" $(LOG_MUTE); \
 	fi
 endef
 

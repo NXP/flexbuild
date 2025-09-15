@@ -13,8 +13,10 @@ DEBIAN_CODENAME: "trixie"
 DEBIAN_VERSION:  "13"
 
 # enable/disable custom packagegroups
-PKG_GROUPS_GRAPHICS: y
-PKG_GROUPS_MULTIMEDIA: y
+# This feature is intended for advanced users.
+# Improper configuration may lead to build failures
+# or cause the system to operate incorrectly.
+# It is strongly recommended not to modify this setting.
 PKG_GROUPS_NETWORKING: y
 PKG_GROUPS_UTILS: y
 PKG_GROUPS_SECURITY: y
@@ -26,6 +28,7 @@ PKG_GROUPS_ROBOTICS: n
 DEFAULT_SOC_FAMILY: IMX
 
 # force build in docker environment
+# must be 'y'
 FORCE_BUILD_IN_DOCKER: y
 
 # The URL for pre-built images

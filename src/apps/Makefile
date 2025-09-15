@@ -8,6 +8,8 @@
 #
 
 SHELL=/bin/bash
+.SHELLFLAGS := $(SHFLAGS)
+
 include $(FBDIR)/configs/$(CONFIGLIST)
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk

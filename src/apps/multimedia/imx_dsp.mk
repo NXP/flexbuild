@@ -20,13 +20,13 @@ endif
 imx_dsp:
 	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
 	$(call dl_by_wget,imx_dsp_bin,imx_dsp.bin) && \
-	$(call fbprint_b,"imx_dsp") && \
 	cd $(MMDIR) && \
 	if [ ! -d "$(MMDIR)"/imx_dsp ]; then \
 		chmod +x $(FBDIR)/dl/imx_dsp.bin; \
 		$(FBDIR)/dl/imx_dsp.bin --auto-accept --force $(LOG_MUTE); \
 		mv imx-dsp* imx_dsp; \
 	fi && \
+	$(call fbprint_b,"imx_dsp") && \
 	cd "$(MMDIR)"/imx_dsp && \
 	./configure CC=aarch64-linux-gnu-gcc \
 	   --bindir=/unit_tests \

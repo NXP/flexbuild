@@ -34,7 +34,7 @@ build_distro_rfs_debian() {
 
     if [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" = "base" ]; then
         PKGS=''
-        NEWRFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64
+        NEWRFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_debian_base
         RFSCMD=$FBDIR/configs/debian/debian_base_arm64.sh
     else
 		case "$MACHINE" in

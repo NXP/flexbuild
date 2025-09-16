@@ -10,16 +10,15 @@
 
 imx_dpu_g2d:
 	@[ $${MACHINE:0:5} != imx95 ] && exit || \
-	 $(call fbprint_b,"imx_dpu_g2d") && \
-	 cd $(GRAPHICSDIR) && \
-	 if [ ! -d $(GRAPHICSDIR)/imx_dpu_g2d ]; then \
-		 rm -rf imx_dpu_g2d*; \
-	     $(WGET) $(repo_imx_dpu_g2d_bin_url) -O imx_dpu_g2d.bin $(LOG_MUTE); \
-		 [ $$? -ne 0 ] && { echo "Downloading $(repo_imx_dpu_g2d_bin_url) failed."; exit 1; } || \
-	     chmod +x imx_dpu_g2d.bin && ./imx_dpu_g2d.bin --auto-accept --force $(LOG_MUTE); \
-	     mv imx-dpu-g2d-* imx_dpu_g2d && rm -f imx_dpu_g2d.bin; \
-	 fi && \
-	 cd imx_dpu_g2d && \
-	 cp -Pf g2d/usr/lib/*.so* $(DESTDIR)/usr/lib/ && \
-	 cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/ && \
-	 $(call fbprint_d,"imx_dpu_g2d")
+	$(call dl_by_wget,imx_dpu_g2d_bin,imx_dpu_g2d.bin) && \
+	cd $(GRAPHICSDIR) && \
+	if [ ! -d "$(GRAPHICSDIR)"/imx_dpu_g2d ]; then \
+		chmod +x $(FBDIR)/dl/imx_dpu_g2d.bin; \
+		$(FBDIR)/dl/imx_dpu_g2d.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-dpu-g2d-* imx_dpu_g2d; \
+	fi && \
+	$(call fbprint_b,"imx_dpu_g2d") && \
+	cd imx_dpu_g2d && \
+	cp -Pf g2d/usr/lib/*.so* $(DESTDIR)/usr/lib/ && \
+	cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/ && \
+	$(call fbprint_d,"imx_dpu_g2d")

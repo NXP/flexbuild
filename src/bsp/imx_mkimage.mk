@@ -11,21 +11,20 @@ define imx_mkimage_target
     \
 	bld firmware_imx -m $(MACHINE); \
     if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
-		cd $(BSPDIR) && rm -f imx-seco.bin && $(WGET) $(repo_seco_bin_url) -O imx-seco.bin $(LOG_MUTE) && chmod +x imx-seco.bin && \
-		./imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
+		cd $(BSPDIR) && $(call dl_by_wget,seco_bin,imx-seco.bin) && chmod +x $(FBDIR)/dl/imx-seco.bin && \
+		$(FBDIR)/dl/imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco; \
     fi && \
     if [ ! -d $(BSPDIR)/fw_ele ]; then \
-		cd $(BSPDIR) && rm -f fw_ele.bin && $(WGET) $(repo_fw_ele_bin_url) -O fw_ele.bin $(LOG_MUTE) && chmod +x fw_ele.bin && \
-		./fw_ele.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele && rm -f fw_ele.bin; \
+		cd $(BSPDIR) && $(call dl_by_wget,fw_ele_bin,fw_ele.bin) && chmod +x $(FBDIR)/dl/fw_ele.bin && \
+		$(FBDIR)/dl/fw_ele.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele; \
     fi && \
     if [ ! -d $(BSPDIR)/fw_upower ]; then \
-		cd $(BSPDIR) && rm -f fw_upower.bin && $(WGET) $(repo_fw_upower_bin_url) -O fw_upower.bin $(LOG_MUTE) && chmod +x fw_upower.bin && \
-		./fw_upower.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower && rm -f fw_upower.bin; \
+		cd $(BSPDIR) && $(call dl_by_wget,fw_upower_bin,fw_upower.bin) && chmod +x $(FBDIR)/dl/fw_upower.bin && \
+		$(FBDIR)/dl/fw_upower.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower; \
     fi && \
     if [ ! -d $(BSPDIR)/imx-scfw ]; then \
-		cd $(BSPDIR) && rm -f imx-scfw.bin && \
-		$(WGET) $(repo_scfw_bin_url) -O imx-scfw.bin $(LOG_MUTE) && chmod +x imx-scfw.bin && \
-		./imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
+		cd $(BSPDIR) && $(call dl_by_wget,scfw_bin,imx-scfw.bin) && chmod +x $(FBDIR)/dl/imx-scfw.bin && \
+		$(FBDIR)/dl/imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw; \
     fi && \
 	\
     cd $(BSPDIR)/imx_mkimage && \

@@ -435,6 +435,9 @@ repo:
   tflite:
     url: https://github.com/nxp-imx/tensorflow-imx.git
 
+  model-mobv1:
+    url: https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_08_02/mobilenet_v1_1.0_224_quant.tgz
+
   tflite_vx_delegate:
     url: https://github.com/nxp-imx/tflite-vx-delegate-imx.git
 

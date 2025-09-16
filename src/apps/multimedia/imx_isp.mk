@@ -11,14 +11,13 @@
 
 imx_isp: imx_gpu_g2d gpu_viv libdrm
 	@[ $${MACHINE:0:6} != imx8mp ] && exit || \
-	 cd $(MMDIR) && \
-	 if [ ! -d $(MMDIR)/imx_isp ]; then \
-		 rm -rf imx_isp*; \
-	     $(WGET) $(repo_imx_isp_bin_url) -O imxisp.bin $(LOG_MUTE); \
-		 [ $$? -ne 0 ] && { echo "Downloading $(repo_imx_isp_bin_url) failed."; exit 1; } || \
-	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept --force $(LOG_MUTE); \
-	     mv isp-imx-* imx_isp && rm -f imxisp.bin; \
-	 fi && \
+	$(call dl_by_wget,imx_isp_bin,imxisp.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_isp ]; then \
+		chmod +x $(FBDIR)/dl/imxisp.bin; \
+		$(FBDIR)/dl/imxisp.bin --auto-accept --force $(LOG_MUTE); \
+		mv isp-imx-* imx_isp; \
+	fi && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
 		 bld linux-headers -m $(MACHINE); \
 	 fi && \

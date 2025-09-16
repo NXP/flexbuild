@@ -10,14 +10,13 @@
 
 imx_vpu_hantro:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 cd $(MMDIR) && \
-	 if [ ! -d imx_vpu_hantro ]; then \
-		 rm -rf imx_vpu_hantro*; \
-	     $(WGET) $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin $(LOG_MUTE); \
-		 [ $$? -ne 0 ] && { echo "Downloading $(repo_vpu_hantro_bin_url) failed."; exit 1; } || \
-		 chmod +x vpu_hantro.bin && ./vpu_hantro.bin --auto-accept --force $(LOG_MUTE); \
-	     mv imx-vpu-hantro-* imx_vpu_hantro && rm -f vpu_hantro.bin; \
-	 fi && \
+	$(call dl_by_wget,vpu_hantro_bin,vpu_hantro.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_vpu_hantro ]; then \
+		chmod +x $(FBDIR)/dl/vpu_hantro.bin; \
+		$(FBDIR)/dl/vpu_hantro.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-vpu-hantro-* imx_vpu_hantro; \
+	fi && \
 	 \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/hantrodec.h ]; then \
 	     bld linux-headers -m $(MACHINE); \

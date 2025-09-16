@@ -20,7 +20,10 @@ tflite: flatbuffers
 	 $(call patch_apply,tflite,apps/ml) && \
 	 $(call fbprint_b,"tensorflow-lite") && \
 	 cd $(MLDIR)/tflite && \
-	 [ ! -f mobilenet.tgz ] && $(WGET) $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
+	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then \
+		$(call dl_by_wget,model-mobv1,mobilenet.tgz); \
+		tar xf $(FBDIR)/dl/mobilenet.tgz; \
+	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CMAKE_TLS_VERIFY=0 && \

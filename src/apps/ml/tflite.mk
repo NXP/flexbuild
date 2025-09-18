@@ -10,7 +10,6 @@
 
 # run ./benchmark_model --external_delegate_path=<patch_to_libvx_delegate.so> --graph=<tflite_model.tflite>
 
-model-mobv1 = https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_08_02/mobilenet_v1_1.0_224_quant.tgz
 
 TFLITE_VERSION = tensorflow-lite-2.18.0
 
@@ -22,7 +21,9 @@ tflite: flatbuffers
 	 cd $(MLDIR)/tflite && \
 	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then \
 		$(call dl_by_wget,model-mobv1,mobilenet.tgz); \
-		tar xf $(FBDIR)/dl/mobilenet.tgz; \
+	 fi && \
+	 if ! ls mobilenet_v1* >/dev/null 2>&1; then \
+		 tar xf $(FBDIR)/dl/mobilenet.tgz; \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \

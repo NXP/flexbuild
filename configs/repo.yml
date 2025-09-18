@@ -327,6 +327,9 @@ repo:
   gstreamer:
     url:  https://github.com/nxp-imx/gstreamer.git
 
+  gst_python_tar:
+    url:  https://gstreamer.freedesktop.org/src/gst-python/gst-python-1.26.0.tar.xz
+
   gst_plugins_base:
     url:  https://github.com/nxp-imx/gst-plugins-base.git
 

@@ -4,7 +4,7 @@
 
 
 #gst_python:
-gst_python: gstreamer1.0 gstreamer1.0-plugins-base
+gst_python: gstreamer gst_plugins_base
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	$(call dl_by_wget,gst_python_tar,gst-python.tar.xz) && \
 	if [ ! -d "$(MMDIR)"/gst_python ]; then \
@@ -19,6 +19,10 @@ gst_python: gstreamer1.0 gstreamer1.0-plugins-base
 	export PYTHONPATH="$(RFSDIR)/usr/lib/python3.13/site-packages:$$PYTHONPATH" && \
 	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	mkdir -p $(RFSDIR)/usr/lib && \
+	cp -a $(DESTDIR)/usr/lib/libgstbase-1.0.so* \
+		$(DESTDIR)/usr/lib/libgstanalytics-1.0.so* \
+		$(RFSDIR)/usr/lib/ && \
 	meson setup build \
 		-Dtests=disabled \
 		-Dplugin=enabled \

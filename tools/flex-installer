@@ -39,9 +39,8 @@ OPTION:
  -p, --partition    Customize configurable partitions of target disk, default is "-p 3P=512M:8G:-1" if not specified
  -f, --firmware	    The composite firmware image to be programmed into SD card
  -F, --force        Force partition and format target disk regardless of the existing data in disk
- -e, --efi	    Used for the case of UEFI as bootloader instead of U-Boot, valid argument: dtb or acpi
  -m, --machine	    Target machine name to specify the name of composite firmware for automatical deployment
- -u, --url	    Specify URL of distro webserver to override the default one for automatically downloading distro
+ -u, --url	        Specify URL of distro webserver to override the default one for automatically downloading distro
  -o, --offset       Specify the offset to burn firmware to SD card (e.g. 1k, 4k, 32k, 33k)
  -v, --version	    Print version info
 
@@ -75,6 +74,9 @@ Examples for various usage scenarios:
 EOF
     exit
 }
+
+ls_machine_list='ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
+imx_machine_list='imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm '
 
 search_dev() {
     devlist=`ls /dev/sd?`
@@ -550,6 +552,13 @@ download_distro() {
     print_n "Downloaded distro images [Done]"
 }
 
+check_board_valid() {
+    [ -z "$1" ] && exit 1
+    [[ " $ls_machine_list " =~ " $1 " ]] || [[ " $imx_machine_list " =~ " $1 " ]] && exit 0
+
+    print_w "Please specify correct '-m <machine>'"
+	print_n "Valid machine name: $imx_machine_list $ls_machine_list" && exit 1
+}
 
 print_e() {
     echo -e "${RED}$1 ${NC}"
@@ -584,7 +593,7 @@ while true
 do
 	case "$1" in
 	-m|--machine)
-		machine=$2; shift;;
+		machine=$2; check_board_valid $machine; shift;;
 	-f|--firmware)
 		firmware=$2; shift;;
 	-s|--startblock)
@@ -640,9 +649,6 @@ if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $ins
      -a $instruction != install -a $instruction != list -a $instruction != backup -a $instruction != mkwic ]; then
     print_e "Invalid instruction $instruction, valid: auto, pf, download, install, list, backup"; exit
 fi
-
-ls_machine_list='ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"
@@ -729,10 +735,7 @@ rootpartition=$mntdir/${devpartname}${rootpartnum}
 backuppartition=$mntdir/${devpartname}${backuppartnum}
 
 if [ $instruction = auto -o $instruction = download ]; then
-    if [ -z "$machine" ] || ! echo "$ls_machine_list $imx_machine_list" | grep -q "$machine "; then
-        print_w "Please specify correct '-m <machine>'"
-	print_n "Valid machine name: $imx_machine_list $ls_machine_list"; exit
-    fi
+    check_board_valid $machine
     if echo $machine | grep -q imx; then
 	portfolio=IMX
     else

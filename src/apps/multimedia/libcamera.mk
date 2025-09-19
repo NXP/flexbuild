@@ -15,7 +15,7 @@ endif
 
 #libcamera:
 libcamera: gstreamer gst_plugins_base $(DEP_LIBCAM)
-	@[ $${MACHINE:0:6} != imx8mm -a $${MACHINE:0:5} != imx95 ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:5} != imx95 ] && exit || \
 	 $(call download_repo,libcamera,apps/multimedia) && \
 	 $(call patch_apply,libcamera,apps/multimedia) && \
 	 $(call fbprint_b,"libcamera") && \

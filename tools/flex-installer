@@ -553,11 +553,19 @@ download_distro() {
 }
 
 check_board_valid() {
-    [ -z "$1" ] && exit 1
-    [[ " $ls_machine_list " =~ " $1 " ]] || [[ " $imx_machine_list " =~ " $1 " ]] && exit 0
-
-    print_w "Please specify correct '-m <machine>'"
-	print_n "Valid machine name: $imx_machine_list $ls_machine_list" && exit 1
+	if [ -z "$1" ] || [ "$1" = "all" ]; then
+		echo -e "Error: Please specify the board, for example: bld -m imx8mpevk \n"
+		exit 1
+	fi
+    if [[ " $ls_machine_list " =~ " $1 " ]] || [[ " $imx_machine_list " =~ " $1 " ]]; then
+        return 0
+    else
+        echo "Error: Invalid board: '$1'."
+        echo "Valid machine name:"
+        echo "LS_MACHINE_LIST: $ls_machine_list"
+        echo "IMX_MACHINE_LIST: $imx_machine_list"
+        exit 1
+    fi
 }
 
 print_e() {

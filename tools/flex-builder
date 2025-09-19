@@ -410,11 +410,14 @@ check_board_valid() {
 		echo -e "Error: Please specify the board, for example: bld -m imx8mpevk \n"
 		exit 1
 	fi
-    [[ " $ls_machine_list " =~ " $1 " ]] || [[ " $imx_machine_list " =~ " $1 " ]] && exit 0
-    echo "Error: Invalid board: '$MACHINE'."
-    echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
-    echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
-    exit 1
+    if [[ " $LS_MACHINE_LIST " =~ " $1 " ]] || [[ " $IMX_MACHINE_LIST " =~ " $1 " ]]; then
+        return 0
+    else
+        echo "Error: Invalid board: '$MACHINE'."
+        echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
+        echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
+        exit 1
+    fi
 }
 
 check_binfmt_qemu() {
@@ -1140,7 +1143,7 @@ case "$1" in
         show_lists; exit
         ;;
     fw|bsp)
-		check_board_valid
+		check_board_valid $MACHINE
         generate_composite_firmware; exit
         ;;
     fwall|bspall)
@@ -1150,7 +1153,7 @@ case "$1" in
         fbprint_d "Build all composite firmware"; exit
         ;;
     distroscr)
-		check_board_valid
+		check_board_valid $MACHINE
         generate_distro_bootscr $MACHINE
         exit
         ;;
@@ -1174,6 +1177,7 @@ case "$1" in
         exit
         ;;
     rfs)
+        check_board_valid $MACHINE
         generate_distro_rfs; exit
         ;;
     download)
@@ -1183,7 +1187,7 @@ case "$1" in
         convert_rfs_raw_to_ext4; exit
         ;;
     packrfs)
-        [ -n ${DISTROVARIANT} -a "$DISTROVARIANT" != base ] && check_board_valid
+        [ -n ${DISTROVARIANT} -a "$DISTROVARIANT" != base ] && check_board_valid $MACHINE
         pack_distro_rfs; exit
         ;;
     packapp|packapps)
@@ -1241,7 +1245,7 @@ case $1 in
         ;;
 
     app|apps)
-		check_board_valid
+		check_board_valid $MACHINE
         if [ ! -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY} ]; then
             $MAKE -C $FBDIR/src $1
             #touch $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
@@ -1252,7 +1256,7 @@ case $1 in
 
     *)
         check_component_valid $1
-		check_board_valid
+		check_board_valid $MACHINE
         $MAKE -C $FBDIR/src $1
         ;;
 esac

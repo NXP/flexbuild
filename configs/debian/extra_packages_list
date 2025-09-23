@@ -54,7 +54,7 @@ ls_pkgs=(
     libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev
     uuid-dev libpython3.13-dev python3-pip python3-pybind11 python3-pil
     python3-flatbuffers python3-decorator python3-numpy python3-attr python3-psutil
-    python3-lxml libwaffle-dev libpciaccess-dev clinfo
+    python3-lxml libwaffle-dev libpciaccess-dev clinfo libcogl-pango-dev
     liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libvorbis-dev
     libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd
 )
@@ -85,6 +85,6 @@ imx9_pkgs=(
 imx8_pkgs=(
 	libgnome-desktop-3-dev chromium dmz-cursor-theme gnome-core
 	libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
-    gnome-sound-recorder rhythmbox libcogl-pango-dev
+    gnome-sound-recorder rhythmbox
 )
 

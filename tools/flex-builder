@@ -790,6 +790,9 @@ NC='\e[0m'
 
 [ $# -eq 0 ] && usage && exit
 DESTARCH=arm64
+LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | cut -d= -f2 | sed -e '/qds/d' | xargs echo`
+IMX_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=imx' | cut -d= -f2 | xargs echo`
+
 
 ARGS=$(getopt -a -o m:j:a:b:c:f:r:i:p:k:B:T:setvhF \
 -l machine:,jobs:,arch:,boottype:,component:,cfgfile:,rootfs:,instruction:,portfolio:,buildarg:,cot:,secure,encap,ima-evm,keyid:,version,help,force -- "$@")
@@ -800,7 +803,7 @@ while true
 do
     case "$1" in
     -m|--machine)
-        MACHINE=$2; log_mute echo MACHINE: $MACHINE; shift;;
+        MACHINE=$2; check_board_valid $MACHINE; log_mute echo MACHINE: $MACHINE; shift;;
     -j|--jobs)
         JOBS=$2; echo JOBS: $JOBS; shift;;
     -a|--arch)
@@ -979,7 +982,7 @@ tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.
 base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
 initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.cpio.gz
 
-[ $DISTROVARIANT != base -a "$MACHINE" != all ] && sudo mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
+[ $DISTROVARIANT != base -a "$MACHINE" != all -a $DISTROTYPE != poky ] && sudo mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
 mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
 mkdir -p $PKGDIR/linux $FBDIR/logs
 mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}
@@ -1125,9 +1128,11 @@ case "$1" in
         echo "Invalid command"; exit
         ;;
     clean)
+		check_board_valid $MACHINE
         do_clean $@; exit
         ;;
     clean-rfs)
+		check_board_valid $MACHINE
         do_clean_rfs; exit
         ;;
     clean-bsp)
@@ -1137,6 +1142,7 @@ case "$1" in
         clean_linux_components; exit
         ;;
     clean-apps)
+		check_board_valid $MACHINE
         clean_apps_components; exit
         ;;
     list)

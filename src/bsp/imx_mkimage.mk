@@ -210,7 +210,6 @@ define imx_mkimage_target
 			SOC_FAMILY=iMX93; \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
-			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx93-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
             cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX93/; \
@@ -227,7 +226,6 @@ define imx_mkimage_target
         imx93evk) \
 			SOC_FAMILY=iMX93; \
 			bld mcore_demo -m $(MACHINE); \
-			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx93-11x11-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
@@ -249,7 +247,6 @@ define imx_mkimage_target
 			SOC_FAMILY=iMX95; \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
-			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
 			cp $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
@@ -269,7 +266,6 @@ define imx_mkimage_target
         imx95frdm) \
 			SOC_FAMILY=iMX95; \
 			bld mcore_demo -m $(MACHINE); \
-			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \

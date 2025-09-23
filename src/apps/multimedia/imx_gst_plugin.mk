@@ -7,6 +7,14 @@
 
 # depends on imx-codec imx-parser libdrm gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
 
+
+
+ifeq ($(filter imx9%,$(MACHINE)),$(MACHINE))
+	DEP_GST_PLUGIN = MX9
+else
+	DEP_GST_PLUGIN = MX8
+endif
+
 #imx_gst_plugin:
 imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
 	@[ $(SOCFAMILY) != IMX ] && exit || \
@@ -22,6 +30,8 @@ imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap 
 	 if [ ! -f $(RFSDIR)/usr/include/imx-mm/audio-codec/fsl_unia.h ]; then \
 	     sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include; \
 	 fi && \
+	 cp -af $(DESTDIR)/usr/lib/libgstaudio-1.0.so* $(RFSDIR)/usr/lib/ && \
+	 cp -af $(DESTDIR)/usr/lib/libgstpbutils-1.0.so* $(RFSDIR)/usr/lib/ && \
 	 \
 	 $(call fbprint_b,"imx_gst_plugin") && \
 	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
@@ -29,10 +39,10 @@ imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap 
 	      -Dc_args="-O2 -pipe -g -feliminate-unused-debug-types -Wno-unused-variable -Wno-format -Wno-unused-value \
 			-Wno-unused-function -Wno-error=nonnull -Wno-error=implicit-function-declaration -DNO_G2D=1 \
 			-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/gstreamer-1.0" \
-	      -Dc_link_args="-L$(DESTDIR)/usr/lib  -lasound " \
+	      -Dc_link_args="-L$(DESTDIR)/usr/lib/gstreamer-1.0 -L$(DESTDIR)/usr/lib -lgsttag-1.0 -lasound " \
 	      --prefix=/usr --buildtype=release \
 	      --cross-file meson.cross \
-	      -Dplatform=$(shell if [ "$${MACHINE:0:4}" = "imx9" ]; then echo "MX9"; else echo "MX8"; fi) $(LOG_MUTE) && \
+	      -Dplatform=$(DEP_GST_PLUGIN) $(LOG_MUTE) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/beep_registry_1.0.arm.cf && \
 	 $(call fbprint_d,"imx_gst_plugin")

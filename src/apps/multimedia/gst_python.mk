@@ -33,4 +33,8 @@ gst_python: gstreamer gst_plugins_base
 		--libdir=lib \
 		--wrap-mode=nodownload $(LOG_MUTE) && \
 	ninja -j $(JOBS) -C build install -v $(LOG_MUTE) && \
+	mv $(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst_analytics.cpython-313-x86_64-linux-gnu.so \
+		$(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst_analytics.cpython-313-aarch64-linux-gnu.so && \
+	mv $(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst.cpython-313-x86_64-linux-gnu.so \
+		$(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst.cpython-313-aarch64-linux-gnu.so && \
 	$(call fbprint_d,"gst_python")

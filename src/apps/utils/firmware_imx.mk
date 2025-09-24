@@ -21,4 +21,4 @@ firmware_imx:
 		imx95*) cp ./firmware/vpu/wave633c_codec_fw.bin $(DESTDIR)/lib/firmware ;; \
 		ls1028a*) ln -sf $(UTILSDIR)/firmware_imx/firmware/hdmi/cadence $(FBOUTDIR)/bsp/dp_fw_cadence ;; \
 	esac && \
-	$(call fbprint_d,"firmware_imx [Done]")
+	$(call fbprint_d,"firmware_imx")

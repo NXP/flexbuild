@@ -9,14 +9,22 @@
 
 
 
-ifeq ($(filter imx9%,$(MACHINE)),$(MACHINE))
-	DEP_GST_PLUGIN = MX9
+ifeq ($(filter imx93%,$(MACHINE)),$(MACHINE))
+	_GST_PLUGIN_PLAT = MX9
+	DEP_GST_PLUGIN = imx_pxp_g2d
+else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
+	_GST_PLUGIN_PLAT = MX8
+	DEP_GST_PLUGIN = imx_gpu_g2d
+else ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
+	_GST_PLUGIN_PLAT = MX9
+	DEP_GST_PLUGIN = imx_dpu_g2d
 else
-	DEP_GST_PLUGIN = MX8
+	_GST_PLUGIN_PLAT = MX9
+	DEP_GST_PLUGIN = imx_pxp_g2d
 endif
 
 #imx_gst_plugin:
-imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
+imx_gst_plugin: $(DEP_GST_PLUGIN) imx_lib libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,imx_gst_plugin,apps/multimedia) && \
 	 $(call patch_apply,imx_gst_plugin,apps/multimedia) && \
@@ -42,7 +50,7 @@ imx_gst_plugin: libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap 
 	      -Dc_link_args="-L$(DESTDIR)/usr/lib/gstreamer-1.0 -L$(DESTDIR)/usr/lib -lgsttag-1.0 -lasound " \
 	      --prefix=/usr --buildtype=release \
 	      --cross-file meson.cross \
-	      -Dplatform=$(DEP_GST_PLUGIN) $(LOG_MUTE) && \
+	      -Dplatform=$(_GST_PLUGIN_PLAT) $(LOG_MUTE) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/beep_registry_1.0.arm.cf && \
 	 $(call fbprint_d,"imx_gst_plugin")

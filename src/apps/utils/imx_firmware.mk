@@ -17,4 +17,4 @@ imx_firmware:
 	 echo Installing Murata WIFI/BT firmware && \
 	 cp -f $(UTILSDIR)/imx_firmware/cyw-wifi-bt/*/{*.bin,*.clm_blob,*.txt} $(DESTDIR)/lib/firmware/brcm/ && \
 	 cp -f $(UTILSDIR)/imx_firmware/cyw-wifi-bt/*/*.hcd $(DESTDIR)/lib/firmware/ && \
-	 $(call fbprint_d,"Installing [Done]")
+	 $(call fbprint_d,"imx_firmware")

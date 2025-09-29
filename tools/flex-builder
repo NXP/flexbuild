@@ -1183,7 +1183,7 @@ case "$1" in
         exit
         ;;
     rfs)
-        check_board_valid $MACHINE
+        [ -n ${DISTROVARIANT} -a "$DISTROVARIANT" != base ] && check_board_valid $MACHINE
         generate_distro_rfs; exit
         ;;
     download)

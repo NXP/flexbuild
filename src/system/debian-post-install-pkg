@@ -2,9 +2,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1012aqds ls1028ardb ls1028aqds ls1043ardb ls1043aqds ls1046ardb ls1046aqds ls1046afrwy ls1088ardb ls1088aqds ls2088ardb ls2088aqds lx2160ardb lx2160aqds lx2162aqds"
+DISTRVER=lsdk2512
+
+LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb "
 IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95evk imx95frdm"
-DEFAULT_DL_URL="https://www.nxp.com/lgfiles/sdk/lsdk2512"
+DEFAULT_DL_URL="https://www.nxp.com/lgfiles/sdk/$DISTRVER"
 
 show_one_line() {
     "$@" 2>&1 | while IFS= read -r line; do
@@ -100,11 +102,11 @@ main() {
     show_one_line sudo apt-get update -y
 
     case "$board_id" in
-        imx95*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx95evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}");;
-        imx8*)  NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx8mpevk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}");;
-        imx91*|imx93*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}");;
-        l*) NXPAPPSPKG=nxp_apps_debian_lsdk2512_ls1028ardb.deb; PKGS=("${ls_pkgs[@]}");;
-        *) NXPAPPSPKG=nxp_apps_debian_lsdk2512_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}");;
+        imx95*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx95evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}");;
+        imx8*)  NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx8mpevk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}" "${imx8_pkgs[@]}");;
+        imx93*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}");;
+        imx91*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx91evk.deb; PKGS=("${ls_pkgs[@]}" "${imx9_pkgs[@]}");;
+        l*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_ls1028ardb.deb; PKGS=("${ls_pkgs[@]}");;
     esac
 
     apt_install_with_retry apt-utils "${base_pkgs[@]}" "${PKGS[@]}"

@@ -7,7 +7,7 @@
 
 
 alsa_state:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call fbprint_b,"alsa_state") && \
 	 install -d $(DESTDIR)/var/lib/alsa && \
 	 install -m 0644 $(FBDIR)/src/system/alsa_state/asound.state $(DESTDIR)/var/lib/alsa && \

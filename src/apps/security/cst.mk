@@ -5,7 +5,7 @@
 
 
 cst:
-	@[ $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base -o $(SOCFAMILY) != LS ] && exit || \
+	@[ $(SOCFAMILY) != LS ] && exit || \
 	 $(call download_repo,cst,apps/security) && \
 	 $(call patch_apply,cst,apps/security) && \
 	 $(call fbprint_b,"CST") && \

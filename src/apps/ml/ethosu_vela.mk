@@ -12,7 +12,7 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
 
 ethosu_vela:
-	@[ $${MACHINE:0:5} != imx93 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:5} != imx93  ] && exit || \
 	 $(call download_repo,ethosu_vela,apps/ml) && \
 	 $(call patch_apply,ethosu_vela,apps/ml) && \
 	 $(call fbprint_b,"ethosu_vela") && \

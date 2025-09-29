@@ -15,8 +15,7 @@ DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool"
 
 
 dpdk:
-	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call download_repo,dpdk,apps/networking) && \
+	 @$(call download_repo,dpdk,apps/networking) && \
 	 $(call patch_apply,dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
 	     bld rfs -m $(MACHINE); \

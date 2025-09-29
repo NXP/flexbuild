@@ -5,7 +5,7 @@
 # libssl-dev for opensslconf.h
 
 secure_obj: optee_os optee_client
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
 	 $(call download_repo,secure_obj,apps/security) && \
 	 $(call patch_apply,secure_obj,apps/security) && \
 	 $(call fbprint_b,"secure_obj") && \

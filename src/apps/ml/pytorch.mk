@@ -13,7 +13,7 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
 
 pytorch:
 ifeq ($(CONFIG_PYTORCH),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
 	 $(call download_repo,pytorch,apps/ml) && \
 	 $(call patch_apply,pytorch,apps/ml) && \
 	 $(call fbprint_b,"pytorch") && \

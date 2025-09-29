@@ -6,7 +6,7 @@
 
 optee_test: optee_client optee_os
 ifeq ($(CONFIG_OPTEE),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
 	 $(call download_repo,optee_test,apps/security) && \
 	 $(call patch_apply,optee_test,apps/security) && \
 	 \

@@ -5,8 +5,7 @@
 
 keyctl_caam:
 ifeq ($(CONFIG_OPENSSL),y)
-	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call download_repo,keyctl_caam,apps/security) && \
+	 @$(call download_repo,keyctl_caam,apps/security) && \
 	 $(call patch_apply,keyctl_caam,apps/security) && \
 	 $(call fbprint_b,"keyctl_caam") && \
 	 cd $(SECDIR)/keyctl_caam && \

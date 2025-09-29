@@ -8,7 +8,7 @@
 
 
 alsa_lib:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,alsa_lib,apps/multimedia) && \
 	 $(call patch_apply,alsa_lib,apps/multimedia) && \
 	 $(call fbprint_b,"alsa_lib") && \

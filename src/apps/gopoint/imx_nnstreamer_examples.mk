@@ -14,7 +14,7 @@ GPNT_APPS_FOLDER = /opt/gopoint-apps
 IMX_NNSTREANER_DIR = $(GPNT_APPS_FOLDER)/scripts/machine_learning/nnstreamer
 
 imx_nnstreamer_examples: gstreamer
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,imx_nnstreamer_examples,apps/gopoint) && \
 	 $(call patch_apply,imx_nnstreamer_examples,apps/gopoint) && \
 	 $(call fbprint_b,"imx_nnstreamer_examples") && \

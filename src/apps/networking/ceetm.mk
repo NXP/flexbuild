@@ -6,7 +6,7 @@
 iproute2_src_url ?= https://mirrors.edge.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.13.0.tar.gz
 
 ceetm:
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != LS  ] && exit || \
 	 $(call download_repo,ceetm,apps/networking) && \
 	 $(call patch_apply,ceetm,apps/networking) && \
 	 $(call fbprint_b,"CEETM") && \

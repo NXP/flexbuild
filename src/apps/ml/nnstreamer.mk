@@ -8,7 +8,7 @@
 
 #nnstreamer:
 nnstreamer: gst_plugins_base tflite nnstreamer_edge
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,nnstreamer,apps/ml) && \
 	 $(call patch_apply,nnstreamer,apps/ml) && \
 	 cd $(MLDIR)/nnstreamer && \

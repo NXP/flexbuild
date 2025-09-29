@@ -8,7 +8,7 @@
 
 
 imx_dspc_asrc:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	$(call dl_by_wget,imx_dspc_asrc_bin,imx_dspc_asrc.bin) && \
 	cd $(MMDIR) && \
 	if [ ! -d "$(MMDIR)"/imx_dspc_asrc ]; then \

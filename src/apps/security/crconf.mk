@@ -5,8 +5,7 @@
 
 
 crconf:
-	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call download_repo,crconf,apps/security) && \
+	 @$(call download_repo,crconf,apps/security) && \
 	 $(call patch_apply,crconf,apps/security) && \
 	 $(call fbprint_b,"crconf") && \
 	 sed -i -e 's/CC =/CC ?=/' -e 's/DESTDIR=/DESTDIR?=/' $(SECDIR)/crconf/Makefile && \

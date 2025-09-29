@@ -12,7 +12,7 @@
 
 
 firmwared:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,firmwared,apps/utils) && \
 	 $(call patch_apply,firmwared,apps/utils) && \
 	 $(call fbprint_b,"firmwared") && \

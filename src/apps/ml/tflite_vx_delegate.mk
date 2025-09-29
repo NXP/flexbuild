@@ -16,7 +16,7 @@
 
 #tflite_vx_delegate:
 tflite_vx_delegate: tflite tim_vx
-	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:4} != imx8  ] && exit || \
 	$(call download_repo,tflite_vx_delegate,apps/ml) && \
 	$(call patch_apply,tflite_vx_delegate,apps/ml) && \
 	$(call fbprint_b,"tflite_vx_delegate") && \

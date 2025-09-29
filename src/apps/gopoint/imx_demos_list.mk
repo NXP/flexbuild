@@ -10,7 +10,7 @@ GPNT_APPS_FOLDER = /opt/gopoint-apps
 
 
 imx_demos_list:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,imx_demos_list,apps/gopoint) && \
 	 $(call patch_apply,imx_demos_list,apps/gopoint) && \
 	 $(call fbprint_b,"imx_demos_list") && \

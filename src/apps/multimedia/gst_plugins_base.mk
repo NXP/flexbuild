@@ -21,7 +21,7 @@ endif
 
 #gst_plugins_base:
 gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer alsa_lib wayland_protocols
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,gst_plugins_base,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_base && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \

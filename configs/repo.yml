@@ -228,6 +228,9 @@ repo:
     url:  https://github.com/NXPPlugNTrust/se05x-openssl-provider.git
     tag:  v01.00.02
 
+  imx_secure_enclave:
+    url:  https://github.com/nxp-imx/imx-secure-enclave.git
+
 
 
 # graphics component repositories

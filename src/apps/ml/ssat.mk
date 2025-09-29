@@ -5,7 +5,7 @@
 # Shell Script Automated Tester (unit testing executable files)
 
 ssat:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,ssat,apps/ml) && \
 	 $(call patch_apply,ssat,apps/ml) && \
 	 $(call fbprint_b,"ssat") && \

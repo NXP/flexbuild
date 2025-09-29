@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 libdrm:
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a ] && exit || \
 	 $(call download_repo,libdrm,apps/graphics) && \
 	 $(call patch_apply,libdrm,apps/graphics) && \
 	 $(call fbprint_b,"libdrm") && \

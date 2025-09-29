@@ -6,7 +6,7 @@
 
 
 gst_plugins_good: gst_plugins_base libdrm
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,gst_plugins_good,apps/multimedia) && \
 	 $(call patch_apply,gst_plugins_good,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_good && \

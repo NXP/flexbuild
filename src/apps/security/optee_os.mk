@@ -6,7 +6,7 @@
 
 optee_os:
 ifeq ($(CONFIG_OPTEE),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
 	 $(call download_repo,optee_os,apps/security) && \
 	 $(call patch_apply,optee_os,apps/security) && \
 	 $(call fbprint_b,"optee_os") && \

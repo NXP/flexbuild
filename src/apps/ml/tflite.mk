@@ -14,7 +14,7 @@
 TFLITE_VERSION = tensorflow-lite-2.18.0
 
 tflite: flatbuffers
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,tflite,apps/ml) && \
 	 $(call patch_apply,tflite,apps/ml) && \
 	 $(call fbprint_b,"tensorflow-lite") && \

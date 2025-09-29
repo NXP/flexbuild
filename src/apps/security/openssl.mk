@@ -6,8 +6,7 @@
 
 
 openssl:
-	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call download_repo,openssl,apps/security,submod) && \
+	 @$(call download_repo,openssl,apps/security,submod) && \
 	 $(call patch_apply,openssl,apps/security) && \
 	 if [ ! -d $(DESTDIR)/usr/local/include/crypto ]; then \
 	     bld cryptodev_linux -m $(MACHINE); \

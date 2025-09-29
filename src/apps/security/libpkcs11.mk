@@ -5,7 +5,7 @@
 
 
 libpkcs11: secure_obj
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
 	 $(call download_repo,libpkcs11,apps/security) && \
 	 $(call patch_apply,libpkcs11,apps/security) && \
 	 $(call fbprint_b,"libpkcs11") && \

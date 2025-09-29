@@ -11,7 +11,7 @@
 
 
 flatbuffers:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,flatbuffers,apps/ml) && \
 	 $(call patch_apply,flatbuffers,apps/ml) && \
 	 $(call fbprint_b,"flatbuffers") && \

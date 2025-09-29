@@ -18,7 +18,7 @@ endif
 
 
 imx_dsp:
-	@[ $${MACHINE:0:4} != imx8 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $${MACHINE:0:4} != imx8  ] && exit || \
 	$(call dl_by_wget,imx_dsp_bin,imx_dsp.bin) && \
 	cd $(MMDIR) && \
 	if [ ! -d "$(MMDIR)"/imx_dsp ]; then \

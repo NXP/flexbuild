@@ -6,7 +6,7 @@
 
 optee_client:
 ifeq ($(CONFIG_OPTEE),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
 	 $(call download_repo,optee_client,apps/security) && \
 	 $(call patch_apply,optee_client,apps/security) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \

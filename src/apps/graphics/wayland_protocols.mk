@@ -5,8 +5,7 @@
 
 
 wayland_protocols:
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a ] && exit || \
 	 $(call download_repo,wayland_protocols,apps/graphics) && \
 	 $(call patch_apply,wayland_protocols,apps/graphics) && \
 	 $(call fbprint_b,"wayland_protocols") && \

@@ -10,7 +10,7 @@
 # DEPENDS: gtest
 
 nnstreamer_edge:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,nnstreamer_edge,apps/ml) && \
 	 $(call patch_apply,nnstreamer_edge,apps/ml) && \
 	 $(call fbprint_b,"nnstreamer_edge") && \

@@ -6,8 +6,7 @@
 
 
 gpu_viv:
-	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:7} != ls1028a -o \
-	 $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:7} != ls1028a ] && exit || \
 	$(call dl_by_wget,gpu_viv_bin,gpu_viv.bin) && \
 	cd $(GRAPHICSDIR) && \
 	if [ ! -d "$(GRAPHICSDIR)"/gpu_viv ]; then \

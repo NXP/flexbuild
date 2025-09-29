@@ -9,7 +9,7 @@
 
 
 nxp_wlan_bt:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,linux,linux) 1>/dev/null && \
 	 $(call download_repo,nxp_wlan_bt,linux) && \
 	 kerneloutdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \

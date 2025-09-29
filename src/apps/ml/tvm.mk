@@ -19,7 +19,7 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 tvm:
 #tvm: tim_vx
 ifeq ($(CONFIG_TVM),y)
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,tvm,apps/ml,submod) && \
 	 $(call patch_apply,tvm,apps/ml) && \
 	 sudo cp $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib && \

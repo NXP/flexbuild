@@ -17,7 +17,6 @@ tflite: flatbuffers
 	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,tflite,apps/ml) && \
 	 $(call patch_apply,tflite,apps/ml) && \
-	 $(call fbprint_b,"tensorflow-lite") && \
 	 cd $(MLDIR)/tflite && \
 	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then \
 		$(call dl_by_wget,model-mobv1,mobilenet.tgz); \
@@ -25,6 +24,7 @@ tflite: flatbuffers
 	 if ! ls mobilenet_v1* >/dev/null 2>&1; then \
 		 tar xf $(FBDIR)/dl/mobilenet.tgz; \
 	 fi && \
+	 $(call fbprint_b,"tensorflow-lite") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 export CMAKE_TLS_VERIFY=0 && \

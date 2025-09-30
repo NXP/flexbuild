@@ -16,35 +16,70 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import urllib.request
+import requests
+from requests.adapters import HTTPAdapter, Retry
+from tqdm import tqdm
 from typing import Optional
 
 class DownloadError(Exception):
     """Custom download exception"""
     pass
 
-def download_file(url: str, output_path: str) -> None:
-    """Download file with progress display"""
-    def progress(count, block_size, total_size):
-        if total_size > 0:
-            percent = min(100, int(count * block_size * 100 / total_size))
-            #sys.stdout.write(f"\rDownloading... {percent}%")
-            sys.stdout.flush()
-        else:
-            # Handle cases where total size is unknown
-            #sys.stdout.write(f"\rDownloading... {count * block_size:,} bytes")
-            sys.stdout.flush()
+def download_file(url: str, output_path: str, retries: int = 3, timeout: int = 30, use_tqdm: bool = False) -> None:
+    """Download file with resume and retry support using requests.
+    Args:
+        url: Download URL.
+        output_path: Destination file path.
+        retries: Number of retry attempts.
+        timeout: Timeout in seconds.
+        use_tqdm: Whether to show tqdm progress bar.
+    """
 
-    #print(f"\nFetching: {url}")
+    # Ensure parent directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # Configure requests session with retry strategy
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=retries,
+        backoff_factor=2,        # exponential backoff: 2s, 4s, 8s...
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "OPTIONS"]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+
+    # If partial file exists, try to resume download
+    resume_byte_pos = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+    headers = {"Range": f"bytes={resume_byte_pos}-"} if resume_byte_pos > 0 else {}
+
     try:
-        urllib.request.urlretrieve(url, output_path)
-        #urllib.request.urlretrieve(url, output_path, reporthook=progress)
-    except urllib.error.HTTPError as e:
-        raise DownloadError(f"HTTP Error {e.code}: {e.reason}")
-    except urllib.error.URLError as e:
-        raise DownloadError(f"URL Error: {e.reason}")
+        with session.get(url, headers=headers, timeout=timeout, stream=True) as response:
+            # If server does not support Range, it will return 200 → overwrite file
+            mode = "ab" if response.status_code == 206 else "wb"
+            total_size = int(response.headers.get("Content-Length", 0)) + resume_byte_pos
 
-    #sys.stdout.write("\n")
+            with open(output_path, mode) as f, tqdm(
+                total=total_size if total_size > 0 else None,
+                initial=resume_byte_pos,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                desc="Downloading",
+                disable=not use_tqdm,
+            ) as pbar:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if not chunk:
+                        continue
+                    f.write(chunk)
+                    pbar.update(len(chunk))
+
+        #sys.stdout.write("Download complete.\n")
+    except requests.exceptions.RequestException as e:
+        if os.path.exists(output_path):
+            os.remove(output_path)  # remove partial file on failure
+        raise DownloadError(f"Download failed: {e}") from e
 
 def verify_hash(file_path: str, expected_hash: str) -> None:
     """Verify file hash (supports SHA256/MD5)"""

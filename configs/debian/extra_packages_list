@@ -26,7 +26,8 @@ host_dependent_packages=(
     protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome
     rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
     libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser
-    efitools itstool python3-jinja2 python3-ply python3-yaml
+    efitools itstool python3-jinja2 python3-ply python3-yaml python3-requests
+    python3-tqdm
 )
 
 

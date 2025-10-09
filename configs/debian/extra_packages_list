@@ -62,7 +62,7 @@ ls_pkgs=(
 
 
 
-imx9_pkgs=(
+imx_pkgs=(
 	libinput-tools libqt6core6t64 qt6-base-dev qt6-wayland qt6-declarative-dev
 	qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window
 	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript
@@ -83,7 +83,7 @@ imx9_pkgs=(
 )
 
 
-imx8_pkgs=(
+gnome_pkgs=(
 	libgnome-desktop-3-dev chromium dmz-cursor-theme gnome-core
 	libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
     gnome-sound-recorder rhythmbox

@@ -12,21 +12,25 @@ define dl_from_github
 	mkdir -p $(FBDIR)/dl && \
 	md5=$(repo_$(1)_md5) && \
 	if [ -n "$${md5}" ]; then \
-		python3 $(FBDIR)/tools/dl_github.py \
+		if ! python3 $(FBDIR)/tools/dl_github.py \
 			--dl-dir=$(FBDIR)/dl \
 			--url=$(2) \
 			--version=$(3) \
 			--subdir=$(1) \
-			--hash=$$md5 \
-			|| { echo Downloading with md5 failed; exit 1; } \
+			--hash=$$md5; then \
+			echo "Downloading with md5 failed, fallback to clone ..."; \
+			$(call rawgit,$(1),$(2),$(3),submod) || { echo "Clone failed"; exit 1; }; \
+		fi \
 	else \
-		python3 $(FBDIR)/tools/dl_github.py \
+		if ! python3 $(FBDIR)/tools/dl_github.py \
 			--dl-dir=$(FBDIR)/dl \
 			--url=$(2) \
 			--version=$(3) \
-			--subdir=$(1) \
-			|| { echo Downloading without md5 failed; exit 1; } \
-	fi; \
+			--subdir=$(1); then \
+			echo "Downloading without md5 failed, fallback to clone ..."; \
+			$(call rawgit,$(1),$(2),$(3),submod) || { echo "Clone failed"; exit 1; }; \
+		fi \
+	fi && \
 	echo "[INFO] Downloading Done" $(LOG_MUTE)
 endef
 
@@ -51,7 +55,7 @@ define rawgit
 	mkdir -p $(FBDIR)/dl && \
 	tar -czf $(1)_$(3).tar.gz $(1)/ && \
 	mv $(1)_$(3).tar.gz $(FBDIR)/dl && \
-	rm -rf /tmp/$(1); \
+	rm -rf /tmp/$(1) && \
 	echo "[INFO] Package created: $(1)_$(3).tar.gz" $(LOG_MUTE)
 endef
 
@@ -59,15 +63,19 @@ endef
 # $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.gz only}
 #
 define download_repo
-	_URL=$(repo_$(1)_url); \
-	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)); \
+	_URL=$(repo_$(1)_url) && \
+	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)) && \
 	\
-	[ -z "$${_URL}" ] && { echo $${_URL} is not defined ; exit 1; }; \
-	[ -z "$${_VER}" ] && { echo Repo version $${_VER}is not defined ; exit 1; }; \
+	if [ -z "$${_URL}" ]; then \
+		echo $${_URL} is not defined ; exit 1; \
+	fi && \
+	if [ -z "$${_VER}" ]; then \
+		echo Repo version $${_VER}is not defined ; exit 1; \
+	fi && \
 	\
-	mkdir -p $(PKGDIR)/$(2); \
-	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.gz; \
-	_TARGET_DIR=$(PKGDIR)/$(2)/$(1); \
+	mkdir -p $(PKGDIR)/$(2) && \
+	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.gz && \
+	_TARGET_DIR=$(PKGDIR)/$(2)/$(1) && \
 	\
 	if [ -s "$${_PKG_FILE}" ]; then \
 		echo "[INFO] Package exists: $(1)_$${_VER} " $(LOG_MUTE); \
@@ -97,9 +105,9 @@ define clone_repo
 		echo "[INFO] Target already exists" $(LOG_MUTE); \
 	else \
 		echo "[INFO] Clone $(1) ..."; \
-		cd $(PKGDIR)/$(2); \
+		cd $(PKGDIR)/$(2) && \
 		git clone $(repo_$(1)_url) $(1) $(LOG_MUTE) && \
-		cd $(1) && git submodule update --init --recursive $(LOG_MUTE); \
+		cd $(1) && git submodule update --init --recursive $(LOG_MUTE) && \
 		echo "[INFO] Clone DONE."; \
 	fi
 endef
@@ -119,23 +127,23 @@ define dl_by_wget
 		echo "[INFO] $(1) already exists" $(LOG_MUTE); \
 	else \
 		echo "[INFO] Downloading $(1)"; \
-		mkdir -p $(FBDIR)/dl /tmp; \
-		rm -f /tmp/$(2); \
-		$(WGET) $(repo_$(1)_url)  -O /tmp/$(2) $(LOG_MUTE); \
+		mkdir -p $(FBDIR)/dl /tmp && \
+		rm -f /tmp/$(2) && \
+		$(WGET) $(repo_$(1)_url)  -O /tmp/$(2) $(LOG_MUTE) && \
 		if [ $$? -ne 0 ]; then \
 			echo "Downloading $(1) failed." && exit 1; \
-		fi; \
+		fi && \
 		if [ -z "$(repo_$(1)_md5)" ]; then \
 			echo "[WARN] No expected MD5 for $(1); skip checksum." $(LOG_MUTE); \
 		else \
-			md5=$$(md5sum /tmp/$(2) | awk '{print $$1}'); \
+			md5=$$(md5sum /tmp/$(2) | awk '{print $$1}') && \
 			if [ "$$md5" != "$(repo_$(1)_md5)" ]; then \
-				echo "[ERROR] MD5 mismatch for $(1): expected $(repo_$(1)_md5), got $$md5"; \
-				rm -f /tmp/$(2); \
+				echo "[ERROR] MD5 mismatch for $(1): expected $(repo_$(1)_md5), got $$md5" && \
+				rm -f /tmp/$(2) && \
 				exit 1; \
-			fi; \
-		fi; \
-		mv /tmp/$(2) $(FBDIR)/dl; \
+			fi \
+		fi && \
+		mv /tmp/$(2) $(FBDIR)/dl && \
 		echo "[INFO] Downloading Done" $(LOG_MUTE); \
 	fi
 endef

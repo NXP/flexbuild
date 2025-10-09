@@ -54,8 +54,32 @@ def download_file(url: str, output_path: str, retries: int = 3, timeout: int = 3
     resume_byte_pos = os.path.getsize(output_path) if os.path.exists(output_path) else 0
     headers = {"Range": f"bytes={resume_byte_pos}-"} if resume_byte_pos > 0 else {}
 
+    # export GITHUB_TOKEN=your_personal_access_token
+    # Add GitHub token if available to avoid rate limiting
+    github_token = os.getenv("GITHUB_TOKEN")
+    if github_token:
+        headers["Authorization"] = f"token {github_token}"
+
     try:
         with session.get(url, headers=headers, timeout=timeout, stream=True) as response:
+            # deal with the rate limit and other error
+            if response.status_code == 403:
+                try:
+                    error_info = response.json()
+                    if "API rate limit exceeded" in error_info.get("message", ""):
+                        #raise DownloadError(
+                        #    f"GitHub API rate limit exceeded.\n"
+                        #    f"Message: {error_info['message']}\n"
+                        #    f"See: {error_info['documentation_url']}"
+                        #)
+                        sys.exit(1)
+                except ValueError:
+                    raise DownloadError("Access denied or rate limited (403), and response is not JSON.")
+
+            if response.status_code not in (200, 206):
+                sys.exit(1)
+                #raise DownloadError(f"Unexpected status code: {response.status_code}")
+
             # If server does not support Range, it will return 200 → overwrite file
             mode = "ab" if response.status_code == 206 else "wb"
             total_size = int(response.headers.get("Content-Length", 0)) + resume_byte_pos

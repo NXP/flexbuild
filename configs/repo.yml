@@ -15,7 +15,7 @@ repo:
 
   mbedtls:
     url:  https://github.com/Mbed-TLS/mbedtls.git
-    tag:  v2.28.10
+    tag:  v3.6.4
 
   mc_utils:
     url:  https://github.com/nxp-qoriq/mc-utils.git

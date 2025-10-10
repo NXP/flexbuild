@@ -11,7 +11,6 @@ bldstr = "BUILD_STRING=$(DEFAULT_REPO_TAG)"
 atf:
 	@$(call download_repo,atf,bsp) && \
 	 $(call download_repo,uboot,bsp) && \
-	 $(call download_repo,mbedtls,bsp,submod) && \
 	 if [ "$(MACHINE)" = all ]; then $(call fbprint_w,"Please specify '-m <machine>'") && exit 0; fi && \
 	 if [ -z "$(BOOTTYPE)" ]; then $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; fi && \
 	 cd $(BSPDIR)/atf && \
@@ -29,9 +28,12 @@ atf:
 	     if [ $${MACHINE:0:5} = lx216 ] && [ ! -f $(PKGDIR)/bsp/atf/ddr4_pmu_train_dmem.bin ]; then \
 		 bld ddr_phy_bin; \
 	     fi && \
+		 if [ ! -d $(PKGDIR)/apps/security/mbedtls ]; then \
+			bld mbedtls -m $(MACHINE); \
+		 fi && \
 	     if [ "$(COT)" = arm-cot -o "$(COT)" = arm-cot-with-verified-boot ]; then \
 		 secureopt="TRUSTED_BOARD_BOOT=1 CST_DIR=$(PKGDIR)/apps/security/cst \
-			    GENERATE_COT=1 MBEDTLS_DIR=$(PKGDIR)/bsp/mbedtls"; \
+			    GENERATE_COT=1 MBEDTLS_DIR=$(PKGDIR)/apps/security/mbedtls"; \
 		 outputdir="arm-cot"; \
 		 mkdir -p $$outputdir build/$$platform/release; \
 		 [ -f $$outputdir/rot_key.pem ] && cp -f $$outputdir/*.pem build/$$platform/release/; \

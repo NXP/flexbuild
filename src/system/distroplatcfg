@@ -41,7 +41,7 @@ case "${board_id}" in
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
-        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
         ;;
@@ -61,7 +61,7 @@ case "${board_id}" in
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
         safe_run ln -sf weston.ini.imx8mp /etc/xdg/weston/weston.ini
-        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
         ;;
@@ -90,7 +90,7 @@ case "${board_id}" in
         if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
             safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
         fi
-        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --no-sandbox --ozone-platform=wayland --password-store=basic --disable-gpu %U|' \
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
         ;;

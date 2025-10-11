@@ -535,3 +535,7 @@ repo:
   gtec_demo_framework:
     url: https://github.com/nxp-imx/gtec-demo-framework.git
     tag: 6.5.0
+
+  imx_ele:
+    url: https://github.com/nxp-imx-support/imx-ele-demo.git
+    ver: 2134fee

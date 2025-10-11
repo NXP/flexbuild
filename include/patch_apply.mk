@@ -28,3 +28,32 @@ define patch_apply
 		echo "[INFO] Applying patches ... DONE " $(LOG_MUTE); \
 	fi
 endef
+
+
+
+
+
+
+#
+# $(1)=patch_dir, $(2)=target_dir $(3)=patchpattern
+#
+define patch_apply_simple
+	patchpattern=$(or $(3),*.patch) && \
+	\
+	if [ -d $(1) ] && [ ! -f $(2)/.patchdone  ]; then \
+		if [ ! -d "$(2)" ] ; then \
+			echo "Aborting.  '$(2)' is not a directory." $(LOG_MUTE); \
+			exit 1; \
+		fi && \
+		\
+		echo "[INFO] Applying patches ..."; \
+		for i in $$(ls "$(1)"/$$patchpattern 2>/dev/null); do \
+			[ -d "$$i" ] && echo "Ignoring subdirectory '$$i' " $(LOG_MUTE) && continue; \
+			echo '' $(LOG_MUTE); \
+			echo "Applying $$i ... " $(LOG_MUTE); \
+			patch -f -p1 -d $(2) < "$$i" $(LOG_MUTE); \
+		done && \
+		touch $(2)/.patchdone && \
+		echo "[INFO] Applying patches ... DONE " $(LOG_MUTE); \
+	fi
+endef

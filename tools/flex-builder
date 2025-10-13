@@ -828,7 +828,7 @@ do
             fbprint_e "invalid argument $DISTROTYPE for distro type, valid type: debian, poky, buildroot" && exit 1
         fi
         if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" != base ]; then
-            fbprint_e "Invalid/Obsolete: please use 'bld rfs -m <machine>' " && exit 1
+            fbprint_e "Invalid/Obsolete: please use 'bld rfs [ -r debian:<base> ] -m <machine>' " && exit 1
         elif [ $DISTROTYPE = buildroot -o $DISTROTYPE = poky ] && \
              [ "$DISTROVARIANT" != tiny -a "$DISTROVARIANT" != devel -a "$DISTROVARIANT" != imaevm ]; then
             fbprint_e "invalid $DISTROVARIANT for DISTROVARIANT argument, valid: tiny, devel, devel:custom, imaevm" && exit 1

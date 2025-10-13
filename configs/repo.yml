@@ -539,3 +539,7 @@ repo:
   imx_ele:
     url: https://github.com/nxp-imx-support/imx-ele-demo.git
     ver: 2134fee
+
+  imx_video2texture:
+    url: https://github.com/nxp-imx-support/imx-video-to-texture.git
+    ver: ee77a45

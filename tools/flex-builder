@@ -844,7 +844,7 @@ do
     -B|--buildarg)
         BUILDARG=$2; echo "BUILDARG: $BUILDARG"; shift;;
     -s|--secure)
-        SECURE=y && echo "SECURE: $SECURE" && secureopt="-s";;
+        SECURE=y && log_mute echo "SECURE: $SECURE" && secureopt="-s";;
     -e|--encap)
         ENCAP=y && SECURE=y && echo "ENCAP: $ENCAP" && secureopt="-e";;
     -t|--ima-evm)

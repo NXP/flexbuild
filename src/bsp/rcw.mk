@@ -9,6 +9,7 @@
 rcw:
 	@[ $(SOCFAMILY) != LS ] && exit || \
 	 $(call download_repo,rcw,bsp) && \
+     $(call fbprint_b,"RCW for $(MACHINE)") && \
 	 cd $(BSPDIR) && mkdir -p $(FBOUTDIR)/bsp/rcw
 ifeq ($(MACHINE), all)
 	@cd $(BSPDIR) && \

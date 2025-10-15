@@ -10,10 +10,10 @@ include imx_mkimage.mk
 
 uboot u-boot:
 	 $(call download_repo,uboot,bsp) && \
+	 $(call patch_apply,uboot,bsp) && \
 	 curbrch=$(or $(repo_uboot_ver),$(DEFAULT_REPO_TAG)) && \
 	 $(call fbprint_b,"u-boot $$curbrch for $(MACHINE)") && \
 	 cd $(BSPDIR)/uboot && \
-	 $(call patch_apply,uboot,bsp) && \
 	 if [ "$(BOOTTYPE)" = tfa -a "$(COT)" = arm-cot-with-verified-boot ]; then \
 	     uboot_cfg=$(MACHINE)_tfa_verified_boot_defconfig; \
 	 elif [ -n "$(UBOOT_CONFIG)" ]; then \

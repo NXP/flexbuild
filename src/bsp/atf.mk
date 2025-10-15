@@ -10,16 +10,19 @@ bldstr = "BUILD_STRING=$(DEFAULT_REPO_TAG)"
 
 atf:
 	@$(call download_repo,atf,bsp) && \
-    $(call download_repo,uboot,bsp) && \
     if [ "$(MACHINE)" = all ]; then \
         $(call fbprint_w,"Please specify '-m <machine>'") && exit 0; \
     fi && \
     if [ -z "$(BOOTTYPE)" ]; then \
         $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; \
     fi && \
+	if [ "$(SECURE)" = y ]; then \
+		$(call fbprint_b,"ATF for $(MACHINE) $(BOOTTYPE) boot [secure mode]"); \
+	else \
+		$(call fbprint_b,"ATF for $(MACHINE) $(BOOTTYPE) boot"); \
+	fi && \
     cd $(BSPDIR)/atf && \
     curbrch=$(or $(repo_atf_ver),$(DEFAULT_REPO_TAG)) && \
-    $(call fbprint_b,"ATF $$curbrch for $(MACHINE)") && \
     $(MAKE) realclean $(LOG_MUTE) && \
     mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE); \
     platform=$(MACHINE); \
@@ -88,7 +91,6 @@ atf:
     fi && \
     if [ $(SOCFAMILY) = LS ]; then \
         if [ ! -f $$rcwbin ]; then \
-            $(call fbprint_b,"RCW  for $(MACHINE)"); \
             bld rcw -m $(MACHINE); \
             test -f $$rcwbin || { $(call fbprint_e,"$$rcwbin not exist"); exit;} \
         fi; \
@@ -113,9 +115,6 @@ atf:
     if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
         if [ ! -f $$bl33 ]; then \
             echo building dependent $$bl33 ... $(LOG_MUTE); \
-            if [ ! -f $$ubootcfg ]; then \
-                $(call fbprint_e,Not found the dependent $$ubootcfg) && exit; \
-            fi; \
             bld uboot -m $$platform -b tfa; \
         fi; \
     elif [ $(BL33TYPE) = uefi ]; then \
@@ -154,4 +153,8 @@ atf:
         cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
     fi && \
     ls -l $(FBOUTDIR)/bsp/atf/$(MACHINE)/* ${LOG_MUTE} && \
-    $(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot")
+	if [ "$(SECURE)" = y ]; then \
+		$(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot [secure mode]"); \
+	else \
+		$(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot"); \
+	fi

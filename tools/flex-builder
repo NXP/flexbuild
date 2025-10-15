@@ -923,6 +923,11 @@ elif [ $SOCFAMILY = IMX ]; then
     . $FBDIR/configs/board/common/imx_memorylayout.cfg
 fi
 
+# enable secure boot when SECURE=y
+if [ "$SECURE" = "y" ]; then
+   SECURE_TYPE="secure"
+fi
+
 . $FBDIR/tools/getvariable
 . $FBDIR/tools/secure_sign_image
 . $FBDIR/tools/create_bootpartition

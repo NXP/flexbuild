@@ -866,7 +866,6 @@ do
 shift
 done
 
-
 [ -z "$CFGLISTYML" ] && CFGLISTYML=sdk.yml
 
 python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/repo.yml $FBDIR/configs/.repo_pool
@@ -894,6 +893,12 @@ elif [ ${MACHINE:0:7} = ls1021a ]; then
 elif `echo $MACHINE | grep -qE 'ls|lx'`; then
     DESTARCH=arm64 && SOCFAMILY=LS
 fi
+
+if [ "$SECURE" = y ] && [ "$SOCFAMILY" = "IMX" ]; then
+    echo "Secure boot is not supported on IMX platform"
+    exit 1
+fi
+
 
 [ -z "$SOCFAMILY" ] && SOCFAMILY=$DEFAULT_SOC_FAMILY
 
@@ -982,6 +987,25 @@ fi
 
 [ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && log_mute echo $DISTROTYPE desktop supports only arm64 && exit
 
+if [ "$1" = docker ]; then
+    if ! which docker 1>/dev/null 2>&1; then
+        fbprint_e "Ensure docker is installed properly on the host machine!"; exit
+    fi
+    if ! docker ps  1>/dev/null 2>&1; then
+        fbprint_e "Ensure you can run 'docker ps' if you are in a docker group"; exit
+    fi
+    [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && check_binfmt_qemu
+    [ ! -b /dev/loop0 ] && sudo losetup -f
+    flexbuild_launch_docker; exit
+elif [ "$1" = connect ]; then
+    host_connect_target $2 $3; exit
+elif [ "$1" = disconnect ]; then
+    host_disconnect_target $2; exit
+elif [ "$1" = push ]; then
+    host_push_image_to_target $2 $3; exit
+fi
+
+
 linux_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${SOCFAMILY}_${DESTARCH}.itb
 tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb
 base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
@@ -1041,24 +1065,6 @@ if [ ! -f $FBDIR/logs/.checkproxydone ]; then
         echo 127.0.0.1   fbdebian | sudo tee -a /etc/hosts 1>/dev/null
     fi
     check_proxy && touch $FBDIR/logs/.checkproxydone
-fi
-
-if [ "$1" = docker ]; then
-    if ! which docker 1>/dev/null 2>&1; then
-        fbprint_e "Ensure docker is installed properly on the host machine!"; exit
-    fi
-    if ! docker ps  1>/dev/null 2>&1; then
-        fbprint_e "Ensure you can run 'docker ps' if you are in a docker group"; exit
-    fi
-    [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && check_binfmt_qemu
-    [ ! -b /dev/loop0 ] && sudo losetup -f
-    flexbuild_launch_docker; exit
-elif [ "$1" = connect ]; then
-    host_connect_target $2 $3; exit
-elif [ "$1" = disconnect ]; then
-    host_disconnect_target $2; exit
-elif [ "$1" = push ]; then
-    host_push_image_to_target $2 $3; exit
 fi
 
 if [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && [ $DISTROTYPE != buildroot ]; then

@@ -16,7 +16,7 @@ show_one_line() {
 
 check_board_valid() {
     if [ -z "${MACHINE:-}" ] || [ "$MACHINE" = "all" ]; then
-        echo -e "Error: Please specify the board, e.g., 'bld -m imx8mpevk'.\n"
+        echo -e "Error: can't detect the board name, please check if DTB is used correctly.\n"
         exit 1
     fi
     if ! echo "$LS_MACHINE_LIST $IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then

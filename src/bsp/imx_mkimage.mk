@@ -5,27 +5,39 @@
 
 UTILSDIR = $(PKGDIR)/apps/utils
 
+define dl_imx_seco
+	if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
+		cd $(BSPDIR) && $(call dl_by_wget,seco_bin,imx-seco.bin) && chmod +x $(FBDIR)/dl/imx-seco.bin && \
+		$(FBDIR)/dl/imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco; \
+	fi
+endef
+
+define dl_fw_ele
+    if [ ! -d $(BSPDIR)/fw_ele ]; then \
+		cd $(BSPDIR) && $(call dl_by_wget,fw_ele_bin,fw_ele.bin) && chmod +x $(FBDIR)/dl/fw_ele.bin && \
+		$(FBDIR)/dl/fw_ele.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele; \
+    fi
+endef
+
+define dl_fw_upower
+    if [ ! -d $(BSPDIR)/fw_upower ]; then \
+		cd $(BSPDIR) && $(call dl_by_wget,fw_upower_bin,fw_upower.bin) && chmod +x $(FBDIR)/dl/fw_upower.bin && \
+		$(FBDIR)/dl/fw_upower.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower; \
+    fi
+endef
+
+define dl_imx_scfw
+    if [ ! -d $(BSPDIR)/imx-scfw ]; then \
+		cd $(BSPDIR) && $(call dl_by_wget,scfw_bin,imx-scfw.bin) && chmod +x $(FBDIR)/dl/imx-scfw.bin && \
+		$(FBDIR)/dl/imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw; \
+    fi
+endef
+
 define imx_mkimage_target
 	$(call download_repo,imx_mkimage,bsp) && \
 	$(call patch_apply,imx_mkimage,bsp) && \
     \
 	bld firmware_imx -m $(MACHINE); \
-    if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
-		cd $(BSPDIR) && $(call dl_by_wget,seco_bin,imx-seco.bin) && chmod +x $(FBDIR)/dl/imx-seco.bin && \
-		$(FBDIR)/dl/imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco; \
-    fi && \
-    if [ ! -d $(BSPDIR)/fw_ele ]; then \
-		cd $(BSPDIR) && $(call dl_by_wget,fw_ele_bin,fw_ele.bin) && chmod +x $(FBDIR)/dl/fw_ele.bin && \
-		$(FBDIR)/dl/fw_ele.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele; \
-    fi && \
-    if [ ! -d $(BSPDIR)/fw_upower ]; then \
-		cd $(BSPDIR) && $(call dl_by_wget,fw_upower_bin,fw_upower.bin) && chmod +x $(FBDIR)/dl/fw_upower.bin && \
-		$(FBDIR)/dl/fw_upower.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower; \
-    fi && \
-    if [ ! -d $(BSPDIR)/imx-scfw ]; then \
-		cd $(BSPDIR) && $(call dl_by_wget,scfw_bin,imx-scfw.bin) && chmod +x $(FBDIR)/dl/imx-scfw.bin && \
-		$(FBDIR)/dl/imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw; \
-    fi && \
 	\
     cd $(BSPDIR)/imx_mkimage && \
     mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
@@ -45,6 +57,7 @@ define imx_mkimage_target
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
 			cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MP flash_evk $(LOG_MUTE); \
 			;; \
 		imx8mp*) \
@@ -60,6 +73,7 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MP flash_evk $(LOG_MUTE); \
 			;; \
 		imx8mm*) \
@@ -75,6 +89,7 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MM flash_evk $(LOG_MUTE); \
 			;; \
 		imx8mn*) \
@@ -90,6 +105,7 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MN flash_evk $(LOG_MUTE); \
 			;; \
 		imx8mq*) \
@@ -105,10 +121,13 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8M flash_evk $(LOG_MUTE); \
 			;; \
         imx8qm*) \
 			SOC_FAMILY=iMX8QM; \
+			$(call dl_imx_scfw); \
+			$(call dl_imx_seco); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/fsl-imx8qm-mek.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp -f $(BSPDIR)/imx-scfw/mx8qm-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QM/scfw_tcm.bin; \
@@ -122,10 +141,13 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8QM flash $(LOG_MUTE); \
             ;; \
         imx8qx*) \
 			SOC_FAMILY=iMX8QX; \
+			$(call dl_imx_scfw); \
+			$(call dl_imx_seco); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/fsl-imx8dx-mek.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QX/scfw_tcm.bin; \
@@ -139,10 +161,13 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
-            $(MAKE) SOC=iMX8QX flash  $(LOG_MUTE); \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX8QX flash $(LOG_MUTE); \
             ;; \
 		imx8ulp*) \
 			SOC_FAMILY=iMX8ULP; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx8ulp-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
@@ -159,10 +184,13 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8ULP flash_singleboot_m33 $(LOG_MUTE); \
 			;; \
         imx91s*) \
 			SOC_FAMILY=iMX91; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx91-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
@@ -173,10 +201,13 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
+			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
             ;; \
         imx91frdm) \
 			SOC_FAMILY=iMX91; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx91-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
@@ -187,10 +218,13 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
+			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
             ;; \
         imx91evk) \
 			SOC_FAMILY=iMX91; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx91-11x11-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
             cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
@@ -204,10 +238,13 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
             ;; \
         imx93frdm) \
 			SOC_FAMILY=iMX93; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx93-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
@@ -221,10 +258,13 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
+			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
             ;; \
         imx93evk) \
 			SOC_FAMILY=iMX93; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx93-11x11-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
@@ -241,10 +281,12 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
             ;; \
         imx95evk) \
 			SOC_FAMILY=iMX95; \
+			$(call dl_fw_ele); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
@@ -261,10 +303,12 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
             ;; \
         imx95frdm) \
 			SOC_FAMILY=iMX95; \
+			$(call dl_fw_ele); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp -f $$opdir/arch/arm/dts/imx95-15x15-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
@@ -281,6 +325,7 @@ define imx_mkimage_target
 			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
 				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
 			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
             ;; \
     esac && \

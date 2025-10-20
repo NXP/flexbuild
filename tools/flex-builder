@@ -110,7 +110,7 @@ generate_composite_firmware() {
                     fi
                     [ ${MACHINE:0:7} = ls1021a -o $SOCFAMILY = IMX ] && compopt=uboot || compopt=atf
                     if [ $bootloader = uboot ]; then
-                        img=$(eval echo '$'COMPOSITE_IMG1_FILE_"$btype""$secstr""$brd_extname")
+                        img=$(eval echo '$COMPOSITE_IMG1_FILE_"$btype""$secstr""$brd_extname"')
                     elif [ $bootloader = uefi ]; then
                         img=$COMPOSITE_IMG2_FILE_uefi
                     fi
@@ -118,7 +118,7 @@ generate_composite_firmware() {
                         bld $compopt -b $btype -m $MACHINE $secarg $blarg
                     fi
                     [ $MACHINE = ls1012afrwy ] && secfile=IMG7 || secfile=IMG4
-                    img=$(eval echo '$'COMPOSITE_"$secfile"_FILE_"$btype"_sec)
+                    img=$(eval echo '$COMPOSITE_"$secfile"_FILE_"$btype"_sec')
                     [ -n "$img" -a "$sectype" = secure -a ! -f $FBOUTDIR/$img ] && \
                     bld signimg -m $MACHINE -b $btype
                 done
@@ -1273,7 +1273,7 @@ case $1 in
 
     *)
         check_component_valid $1
-		check_board_valid $MACHINE
+		[ $1 != perf ] && check_board_valid $MACHINE
         $MAKE -C $FBDIR/src $1
         ;;
 esac

@@ -1,15 +1,15 @@
-From e515edba27d5c0b194d6f2db3622adfde9a100e8 Mon Sep 17 00:00:00 2001
+From 191c61dbcad350e234a14782debda728ebea34b8 Mon Sep 17 00:00:00 2001
 From: Yuantian Tang <andy.tang@nxp.com>
 Date: Fri, 26 Sep 2025 00:55:36 -0700
 Subject: [PATCH] remove specific demos for some boards
 
 Signed-off-by: Andy Tang <andy.tang@nxp.com>
 ---
- demos.json | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ demos.json | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/demos.json b/demos.json
-index dd3b65a..f560158 100644
+index dd3b65a..9f2d2af 100644
 --- a/demos.json
 +++ b/demos.json
 @@ -76,7 +76,7 @@
@@ -100,15 +100,6 @@ index dd3b65a..f560158 100644
 -            "compatible": "imx8mm, imx8mp, imx8mpfrdm",
 +            "compatible": "imx",
              "description": "Enhancements to Traffic Scheduling: Time-Aware Shaper. It separates communication on the Ethernet network into configurable length, repeating time cycles, thereby contributing to the delivery of time-critical traffic. Each network node's egress ports have per-queue traffic windows which may be opened/closed at specified times.The talker-to-listener path across the network may be dedicated to this priority traffic alone, at real-time (T), causing the talker's traffic to be delivered reliably and deterministically across the network."
-         }]
-     }]
-@@ -298,7 +298,7 @@
-             "source": "",
-             "icon": "ele-demo-icon.svg",
-             "screenshot": "ele-demo-screenshot.jpg",
--            "compatible": "imx93, imx93frdm",
-+            "compatible": "imx",
-             "description": "The EdgeLock® Secure Enclave (ELE) is an independent security domain that provides security services, which include key management, random number generation, data storage, execution of cryptographic services, etc.This application is developed to make some of the ELE functionalities visible."
          }]
      }]
 -- 

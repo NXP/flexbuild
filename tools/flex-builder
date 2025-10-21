@@ -44,6 +44,7 @@ Most used example with separate command:
 Most used options:
  -m, --machine         target machine, e.g. imx8mpevk, imx8mmevk, imx91frdm, imx93frdm, imx93evk, lx2160ardb, ls1046ardb, ls1028ardb, etc
  -b, --boottype        type of boot media, valid argument: sd, emmc, nor, qspi, xspi, nand. for imx platform, only sd boot is supported.
+ -s, --secure          Enable secure boot option for Layerscape platform.
 
 See docs/flexbuild_usage.md and docs/build_and_deploy_distro.md for more information about the available commands.
 EOF
@@ -1143,7 +1144,7 @@ case "$1" in
         do_clean $@; exit
         ;;
     clean-rfs)
-		check_board_valid $MACHINE
+		[ -n ${DISTROVARIANT} -a "$DISTROVARIANT" != base ] && check_board_valid $MACHINE
         do_clean_rfs; exit
         ;;
     clean-bsp)

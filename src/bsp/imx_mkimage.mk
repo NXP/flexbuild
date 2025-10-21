@@ -57,6 +57,13 @@ define imx_mkimage_target
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
 			cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MP flash_evk $(LOG_MUTE); \
 			;; \
@@ -70,8 +77,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MP flash_evk $(LOG_MUTE); \
@@ -86,8 +97,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MM flash_evk $(LOG_MUTE); \
@@ -102,8 +117,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8MN flash_evk $(LOG_MUTE); \
@@ -118,8 +137,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8M flash_evk $(LOG_MUTE); \
@@ -138,8 +161,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8QM flash $(LOG_MUTE); \
@@ -158,8 +185,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX8QX flash $(LOG_MUTE); \
@@ -181,8 +212,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX8ULP flash_singleboot_m33 $(LOG_MUTE); \
@@ -201,6 +236,13 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
             ;; \
@@ -218,6 +260,13 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
             ;; \
@@ -235,8 +284,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
@@ -258,6 +311,13 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
             ;; \
@@ -278,8 +338,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
@@ -300,8 +364,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
@@ -322,8 +390,12 @@ define imx_mkimage_target
 				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
 				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
 				$$opdir/u-boot-nodtb.bin; \
-			if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-				cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \

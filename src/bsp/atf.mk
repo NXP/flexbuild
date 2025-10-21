@@ -107,9 +107,9 @@ atf:
     if [ "$(CONFIG_OPTEE)" = y ]; then \
         if [ $${MACHINE:0:6} = lx2162 ] || ! `echo $$platform|grep -qE 'qds'`; then \
             [ $(SOCFAMILY) = LS ] && platsoc=arm-plat-ls || platsoc=arm-plat-imx; \
-            bl32=$(PKGDIR)/apps/security/optee_os/out/$$platsoc/core/tee_$${MACHINE:0:10}.bin; \
+            bl32=$(PKGDIR)/apps/security/optee_os/out/$$platsoc/core/tee_$(MACHINE).bin; \
             bl32opt="BL32=$$bl32" && spdopt="SPD=opteed"; \
-            [ ! -f $$bl32 ] && CONFIG_OPTEE=y bld optee_os -m $$platform; \
+            [ ! -f $$bl32 ] && CONFIG_OPTEE=y bld optee_os -m $(MACHINE); \
         fi; \
     fi; \
     if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
@@ -148,7 +148,7 @@ atf:
     elif [ $(SOCFAMILY) = IMX ]; then \
         [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
         [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
-        $(MAKE) -j$(JOBS) PLAT=$$plat $(bldstr) bl31 $(LOG_MUTE) && \
+        $(MAKE) -j$(JOBS) PLAT=$$plat $(bldstr) bl31 $$bl32opt $$spdopt $(LOG_MUTE) && \
         mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE) && \
         cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
     fi && \

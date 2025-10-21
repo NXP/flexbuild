@@ -24,7 +24,6 @@ secure_obj: optee_os optee_client
 	 export KERNEL_SRC=$(KERNEL_PATH) && \
 	 export KERNEL_BUILD=$$kerneloutdir && \
 	 export INSTALL_MOD_PATH=$$kerneloutdir/tmp && \
-	 $(call fbprint_n,"Using KERNEL_BUILD $$kerneloutdir") && \
 	 export SECURE_STORAGE_PATH=$(SECDIR)/secure_obj/secure_storage_ta/ta && \
 	 export OPENSSL_PATH=$(SECDIR)/openssl && \
 	 mkdir -p $(DESTDIR)/usr/local/secure_obj/$(KERNEL_BRANCH) && \

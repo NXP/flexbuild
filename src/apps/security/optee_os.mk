@@ -36,7 +36,7 @@ ifeq ($(CONFIG_OPTEE),y)
 				;; \
 		esac && \
 		 $(MAKE) PLATFORM=imx PLATFORM_FLAVOR=$$brd ARCH=arm CFG_TEE_TA_LOG_LEVEL=0 CFG_TEE_CORE_LOG_LEVEL=0 $(LOG_MUTE) && \
-		 $(CROSS_COMPILE)objcopy -v -O binary out/arm-plat-imx/core/tee.elf out/arm-plat-imx/core/tee_$(MACHINE).bin $(LOG_MUTE) && \
+		 mv out/arm-plat-imx/core/tee-raw.bin out/arm-plat-imx/core/tee_$(MACHINE).bin $(LOG_MUTE) && \
 		 mkdir -p $(DESTDIR)/usr/lib/optee_armtz && \
 		 cp -f out/arm-plat-imx/export-ta_arm64/ta/*.ta $(DESTDIR)/usr/lib/optee_armtz/; \
 	fi && \

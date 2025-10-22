@@ -17,10 +17,16 @@ atf:
         $(call fbprint_w,"Please specify '-b <boottype>'") && exit 0; \
     fi && \
 	if [ "$(SECURE)" = y ]; then \
-		$(call fbprint_b,"ATF for $(MACHINE) $(BOOTTYPE) boot [secure mode]"); \
+		sboot_info="[secure mode]"; \
 	else \
-		$(call fbprint_b,"ATF for $(MACHINE) $(BOOTTYPE) boot"); \
+		sboot_info=""; \
 	fi && \
+	if [ "$(CONFIG_OPTEE)" = y ]; then \
+		optee_info="[OPTEE enabled]"; \
+	else \
+		optee_info=""; \
+	fi && \
+	$(call fbprint_b,"ATF for $(MACHINE) $(BOOTTYPE) boot $${sboot_info} $${optee_info}"); \
     cd $(BSPDIR)/atf && \
     curbrch=$(or $(repo_atf_ver),$(DEFAULT_REPO_TAG)) && \
     $(MAKE) realclean $(LOG_MUTE) && \
@@ -153,8 +159,4 @@ atf:
         cp -f build/$$plat/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/; \
     fi && \
     ls -l $(FBOUTDIR)/bsp/atf/$(MACHINE)/* ${LOG_MUTE} && \
-	if [ "$(SECURE)" = y ]; then \
-		$(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot [secure mode]"); \
-	else \
-		$(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot"); \
-	fi
+    $(call fbprint_d,"ATF for $(MACHINE) $${bootmode} boot $${sboot_info} $${optee_info}")

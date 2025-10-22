@@ -45,6 +45,7 @@ Most used options:
  -m, --machine         target machine, e.g. imx8mpevk, imx8mmevk, imx91frdm, imx93frdm, imx93evk, lx2160ardb, ls1046ardb, ls1028ardb, etc
  -b, --boottype        type of boot media, valid argument: sd, emmc, nor, qspi, xspi, nand. for imx platform, only sd boot is supported.
  -s, --secure          Enable secure boot option for Layerscape platform.
+ -o, --optee           Enable OPTEE function for target platform.
 
 See docs/flexbuild_usage.md and docs/build_and_deploy_distro.md for more information about the available commands.
 EOF
@@ -795,8 +796,8 @@ LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | c
 IMX_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=imx' | cut -d= -f2 | xargs echo`
 
 
-ARGS=$(getopt -a -o m:j:a:b:c:f:r:i:p:k:B:T:setvhF \
--l machine:,jobs:,arch:,boottype:,component:,cfgfile:,rootfs:,instruction:,portfolio:,buildarg:,cot:,secure,encap,ima-evm,keyid:,version,help,force -- "$@")
+ARGS=$(getopt -a -o m:j:a:b:c:f:r:i:p:k:B:T:soetvhF \
+-l machine:,jobs:,arch:,boottype:,component:,cfgfile:,rootfs:,instruction:,portfolio:,buildarg:,cot:,secure,optee,encap,ima-evm,keyid:,version,help,force -- "$@")
 
 [ $? -ne 0 ] && usage
 eval set -- "${ARGS}"
@@ -846,6 +847,8 @@ do
         BUILDARG=$2; echo "BUILDARG: $BUILDARG"; shift;;
     -s|--secure)
         SECURE=y && log_mute echo "SECURE: $SECURE" && secureopt="-s";;
+    -o|--optee)
+        CONFIG_OPTEE=y && log_mute echo "OPTEE is enabled";;
     -e|--encap)
         ENCAP=y && SECURE=y && echo "ENCAP: $ENCAP" && secureopt="-e";;
     -t|--ima-evm)
@@ -896,7 +899,7 @@ elif `echo $MACHINE | grep -qE 'ls|lx'`; then
 fi
 
 if [ "$SECURE" = y ] && [ "$SOCFAMILY" = "IMX" ]; then
-    echo "Secure boot is not supported on IMX platform"
+    echo "Please build secure boot images on IMX platform manually."
     exit 1
 fi
 
@@ -1118,7 +1121,7 @@ PKG_CONFIG_PATH=$DESTDIR/usr/lib/pkgconfig:$RFSDIR/usr/lib/pkgconfig:$RFSDIR/usr
 
 export ARCH DESTARCH CROSS_COMPILE FBDIR DESTDIR RFSDIR JOBS COMPONENT MACHINE KERNEL_TREE \
        KERNEL_PATH KERNEL_OUTPUT_PATH INSTALL_MOD_PATH KERNEL_CFG BOOTTYPE MAKE CONFIGLIST \
-       CFGLISTYML BUILDARG DISTROTYPE DISTROVARIANT DISTROVARIANTOPT HOSTARCH SYSARCH SECURE \
+       CFGLISTYML BUILDARG DISTROTYPE DISTROVARIANT DISTROVARIANTOPT HOSTARCH SYSARCH SECURE CONFIG_OPTEE\
        SOCFAMILY BL33TYPE DISTRIB_NAME SOCARCH COT DISTRIB_VERSION BOARD_VARIANTS \
        UBOOT_CONFIG CODENAME DISTRO_VERSION UBUNTU_VERSION FORCE LD_LIBRARY_PATH \
        PKG_CONFIG_SYSROOT_DIR PKG_CONFIG_PATH DEFAULT_REPO_TAG LOG_MUTE KERNEL_BRANCH SHFLAGS

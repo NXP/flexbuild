@@ -41,7 +41,7 @@ atf:
             rcwbin=`grep ^rcw_$(BOOTTYPE)= $(FBDIR)/configs/board/$(MACHINE).conf | cut -d'"' -f2`; \
         fi; \
         if [ $${MACHINE:0:5} = lx216 ] && [ ! -f $(PKGDIR)/bsp/atf/ddr4_pmu_train_dmem.bin ]; then \
-            bld ddr_phy_bin; \
+            bld ddr_phy_bin -m $(MACHINE); \
         fi && \
         if [ ! -d $(PKGDIR)/apps/security/mbedtls ]; then \
             bld mbedtls -m $(MACHINE); \
@@ -75,7 +75,7 @@ atf:
             bl33=$(FBOUTDIR)/bsp/u-boot/$${platform}/uboot_$${platform}_tfa_SECURE_BOOT.bin; \
             secext=_sec; \
         fi; \
-        [ ! -f $(PKGDIR)/apps/security/cst/srk.pub ] && bld cst; \
+        [ ! -f $(PKGDIR)/apps/security/cst/srk.pub ] && bld cst -m $(MACHINE); \
         cp -f $(PKGDIR)/apps/security/cst/srk.* $(PKGDIR)/bsp/atf; \
     else \
         if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
@@ -104,7 +104,7 @@ atf:
     if [ "$(CONFIG_FUSE_PROVISIONING)" = y ]; then \
         fusefile=$(PKGDIR)/apps/security/cst/fuse_scr.bin && \
         fuseopt="fip_fuse FUSE_PROG=1 FUSE_PROV_FILE=$$fusefile" && \
-        if [ ! -d $(PKGDIR)/apps/security/cst ]; then bld cst; fi && \
+        if [ ! -d $(PKGDIR)/apps/security/cst ]; then bld cst -m $(MACHINE); fi && \
         $(call fbprint_b,"dependent fuse_scr.bin") && \
         cd $(PKGDIR)/apps/security/cst && \
         ./gen_fusescr input_files/gen_fusescr/$$chassistype/input_fuse_file && \

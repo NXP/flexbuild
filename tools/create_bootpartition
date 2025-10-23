@@ -64,7 +64,7 @@ generate_bootpartition_tarball() {
         generate_uefi_grub_cfg
         mkdir -p $bootpartdir/grub
         find $FBOUTDIR/bsp/uefi/ -name "*grub.cfg" | xargs -I {} cp {} $bootpartdir/grub
-        [ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin
+        [ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin -m $MACHINE
         cp $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI $bootpartdir/grub
     fi
 
@@ -92,7 +92,7 @@ generate_bootpartition_tarball() {
     fi
 
     # install kernel tools/perf
-    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf
+    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf -m $MACHINE
     [ -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && mkdir -p $bootpartdir/tools && \
         cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf $bootpartdir/tools
 

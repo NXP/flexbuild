@@ -128,7 +128,7 @@ generate_composite_firmware() {
         done
     done
 
-    [ $SOCFAMILY = LS -a ! -f $FBDIR/logs/.lsfwdone ] && bld layerscape_fw
+    [ $SOCFAMILY = LS -a ! -f $FBDIR/logs/.lsfwdone ] && bld layerscape_fw -m $MACHINE
 
     [ ! -f $FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb ] && \
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
@@ -138,7 +138,7 @@ generate_composite_firmware() {
 
 
 generate_initrd_cpio() {
-    [ -f $RFSDIR/etc/buildinfo ] || bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH
+    [ -f $RFSDIR/etc/buildinfo ] || bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH -m $MACHINE
     fbprint_n "Generating ${initrdimg##*/}"
     if [ -d $RFSDIR/sys/devices ]; then
         [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
@@ -284,7 +284,7 @@ convert_rfs_raw_to_ext4() {
     [ -n "$BUILDARG" ] && size=$BUILDARG
     if [ ! -f $rawrfs/etc/buildinfo ]; then
         echo $rawrfs not exist, generating it ..
-        bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH
+        bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH -m $MACHINE
     fi
     local rfsname=${rawrfs##*/}
     rfsname=$FBOUTDIR/images/$rfsname.ext4
@@ -1227,7 +1227,7 @@ case "$1" in
         generate_bootpartition_tarball; exit
         ;;
     auto|autobuild)
-        bld auto_build -a $DESTARCH | \
+        bld auto_build -a $DESTARCH -m ${MACHINE} | \
         tee $FBDIR/logs/autobuild-${MACHINE}-log-`date +%Y%m%d%H%M`.txt
         exit
         ;;

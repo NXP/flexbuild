@@ -10,7 +10,7 @@
 secure_sign_image() {
     # $1: <machine>,  $2: <boottype>
     [ ! -f $FBDIR/configs/board/$1.conf ] && echo $FBDIR/configs/board/$1.conf not exist! && exit
-    [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst
+    [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst -m $1
     [ $MACHINE = ls1012afrwy ] && secfile=IMG7 || secfile=IMG4
     if ! grep -q ${secfile}_FILE_${2}_sec $FBDIR/configs/board/$1.conf; then exit; fi
     . $FBDIR/configs/board/$1.conf
@@ -60,12 +60,12 @@ secure_sign_image() {
 	fi
     fi
 
-    [ -f $pfe_fw ] || bld pfe_bin
+    [ -f $pfe_fw ] || bld pfe_bin -m $1
     [ ${1:0:7} = ls1012a ] && cp $pfe_fw $PKGDIR/apps/security/cst/pfe.itb && log_mute echo "Copying PFE"
 
     if [ ${1:0:7} = ls1088a -o ${1:0:7} = ls2088a -o ${1:0:5} = lx216 ]; then
-	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin
-	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils
+	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin -m $1
+	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils -m $1
 	cp -f $FBOUTDIR/$COMPOSITE_IMG11_FILE $PKGDIR/apps/security/cst/mc.itb
 	cp -f $FBOUTDIR/$COMPOSITE_IMG12_FILE $PKGDIR/apps/security/cst/dpl.dtb
 	cp -f $FBOUTDIR/$COMPOSITE_IMG13_FILE $PKGDIR/apps/security/cst/dpc.dtb

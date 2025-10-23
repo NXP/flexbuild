@@ -11,6 +11,15 @@ define imx_mkimage_target
         git am $(FBDIR)/patch/imx_mkimage/*.patch $(LOG_MUTE) && touch .patchdone; \
     fi && \
     \
+    if [ -n "$(IMX_MKIMAGE_PATCHES)" ] && [ ! -f $(BSPDIR)/imx_mkimage/.patchdone ]; then \
+        cd $(BSPDIR)/imx_mkimage && \
+        for patch in $(IMX_MKIMAGE_PATCHES); do \
+            $(call fbprint_n,"Applying imx_mkimage patch $(FBDIR)/patch/imx_mkimage/$$patch for $(MACHINE)") && \
+            git am $(FBDIR)/patch/imx_mkimage/$$patch; \
+        done; \
+        touch .patchdone; \
+    fi; \
+    \
     if [ ! -d $(BSPDIR)/firmware-imx ]; then \
 	cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && chmod +x firmware_imx.bin && \
 	./firmware_imx.bin --auto-accept $(LOG_MUTE) && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \

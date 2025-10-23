@@ -45,12 +45,12 @@ apt_install_with_retry() {
     local success=false
 
     for ((attempt=1; attempt<=max_retries; attempt++)); do
-        echo "Installing packages (attempt $attempt)..."
+        echo "Installing packages (attempt $attempt)"
         if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y "${packages[@]}"; then
             success=true
             break
         else
-            echo "Warning: Attempt $attempt failed, retrying in 5 seconds..."
+            echo "Warning: Attempt $attempt failed, retrying in 5 seconds"
             sleep 5
             show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get clean &>/dev/null
             show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get update --fix-missing &>/dev/null
@@ -69,13 +69,13 @@ download_and_install_deb() {
     local deb="$2"
     rm -f "$deb"
 
-    echo -e "\nDownloading $deb ..."
+    echo -e "\nDownloading $deb"
     if ! wget --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress "$url/$deb"; then
         echo "ERROR: Download $deb failed. Please try again."
         exit 1
     fi
 
-    echo "Installing $deb ..."
+    echo "Installing $deb"
     show_one_line sudo dpkg -i --force-overwrite "$deb"
     rm -f "$deb"
 }
@@ -98,7 +98,7 @@ main() {
 
     [ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
 
-    echo "Updating package list..."
+    echo "Updating package list"
     show_one_line sudo apt-get update -y
 
     case "$board_id" in
@@ -114,14 +114,14 @@ main() {
     local pkglink="${1:-$DEFAULT_DL_URL}"
     download_and_install_deb "$pkglink" "$NXPAPPSPKG"
 
-    echo "Cleaning up..."
+    echo "Cleaning up"
     sudo apt-get clean
     sudo apt-get autoclean
     sudo apt-get autoremove -y
 
     [ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
 
-    echo "Configuring system..."
+    echo "Configuring system"
     /usr/bin/distroplatcfg
 
     echo "System is ready. Please reboot now."

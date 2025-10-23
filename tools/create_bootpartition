@@ -7,7 +7,7 @@
 generate_bootpartition_tarball() {
     # check kernel image
     [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release ] && \
-        echo Building the dependent $kernel_img ... && \
+        echo Building the dependent $kernel_img && \
         bld linux -p $SOCFAMILY -a $DESTARCH
 
     [ ! -d $PKGDIR/linux/cryptodev_linux ] && bld linux-modules -p $SOCFAMILY -a $DESTARCH
@@ -21,7 +21,7 @@ generate_bootpartition_tarball() {
     [ -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz ] && \
         cp -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz $bootpartdir
 
-    fbprint_n "Installing kernel and dtb ..."
+    fbprint_n "Installing kernel and dtb "
     [ -f $tiny_itb ] && cp -f $tiny_itb $bootpartdir
     [ -f $base_itb ] && cp -f $base_itb $bootpartdir
     kernelrelease=$(cat $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release)
@@ -34,13 +34,13 @@ generate_bootpartition_tarball() {
     fi
 
     # install kernel modules
-    fbprint_n "Installing kernel modules ..."
+    fbprint_n "Installing kernel modules "
     cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules $bootpartdir
     modversion=$(ls $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules|xargs echo|cut -d' ' -f1)
     rm -f $bootpartdir/modules/$modversion/{build,source}
 
     # install distro boot script
-    fbprint_n "Installing distro boot script ..."
+    fbprint_n "Installing distro boot script "
     if [ $DESTARCH = arm64 -a $SOCFAMILY = LS ]; then
         socseries=l; scrmask="-v ls1021atwr"
     elif [ $DESTARCH = arm32 -a $SOCFAMILY = LS ]; then

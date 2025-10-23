@@ -5,7 +5,7 @@ ROOTDIR=${1:-/tmp/rootfs}
 [ -d "$ROOTDIR" ] || { echo "Rootfs directory $ROOTDIR not found"; exit 1; }
 
 # ---- Host-side file copy ----
-echo -e "\n[INFO] setting up rootfs ..."
+echo -e "\n[INFO] setting up rootfs "
 
 mkdir -p "$ROOTDIR"/usr/local/bin \
          "$ROOTDIR"/lib/systemd/system \

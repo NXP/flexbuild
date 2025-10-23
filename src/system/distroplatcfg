@@ -20,7 +20,7 @@ safe_disable_service() {
     fi
 }
 
-log "Sourcing board_id.sh..."
+log "Sourcing board_id.sh"
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 

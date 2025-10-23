@@ -58,7 +58,7 @@ check_toolchain() {
     if [ $DESTARCH = arm32 ] && [ $HOSTARCH = x86_64 -o $HOSTARCH = aarch64 -o $HOSTARCH = i686 ]; then
         [ -f /usr/bin/arm-linux-gnueabihf-gcc ] && gccversion=$(arm-linux-gnueabihf-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
         if [ $gccversion = 0 ]; then
-            fbprint_w "Installing toolchain for arm32 ..."
+            fbprint_w "Installing toolchain for arm32"
             log_mute sudo apt-get install -y crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf g++-arm-linux-gnueabihf
         elif ! echo $tc_version | grep -q `echo $gccversion|cut -d. -f1` && [ $DISTROTYPE != buildroot ]; then
             fbprint_w "Please build on Debian $DEBIAN_VERSION host or build in docker (run 'bld docker') to use the verified toolchain"
@@ -69,7 +69,7 @@ check_toolchain() {
     elif [ $DESTARCH = arm64 ] && [ $HOSTARCH = x86_64 -o $HOSTARCH = armv7l -o $HOSTARCH = i686 ]; then
         [ -f /usr/bin/aarch64-linux-gnu-gcc ] && gccversion=$(aarch64-linux-gnu-gcc --version | head -1 | cut -d' ' -f4) || gccversion=0
         if [ $gccversion = 0 ]; then
-            fbprint_w "Installing toolchain for arm64 ..."
+            fbprint_w "Installing toolchain for arm64"
             log_mute sudo apt-get install -y crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
         elif ! echo $tc_version | grep -q `echo $gccversion | cut -d. -f1` &&  [ $DISTROTYPE != buildroot ]; then
             fbprint_w "The existing toolchain version $gccversion on this host may result in build failure for some components."
@@ -139,7 +139,7 @@ generate_composite_firmware() {
 
 generate_initrd_cpio() {
     [ -f $RFSDIR/etc/buildinfo ] || bld rfs -r $DISTROTYPE:$DISTROVARIANT -a $DESTARCH
-    fbprint_n "Generating ${initrdimg##*/} ..."
+    fbprint_n "Generating ${initrdimg##*/}"
     if [ -d $RFSDIR/sys/devices ]; then
         [ -d $RFSDIR/sys/kernel/security ] && sudo umount $RFSDIR/sys/kernel/security || true
         sudo umount $RFSDIR/sys
@@ -288,7 +288,7 @@ convert_rfs_raw_to_ext4() {
     fi
     local rfsname=${rawrfs##*/}
     rfsname=$FBOUTDIR/images/$rfsname.ext4
-    echo Creating $size $rfsname ...
+    echo Creating $size $rfsname
     qemu-img create -f raw $rfsname $size
     if mount | grep images/gstrfsmnt; then
         sudo umount $FBOUTDIR/images/gstrfsmnt
@@ -303,7 +303,7 @@ convert_rfs_raw_to_ext4() {
         sudo umount $FBOUTDIR/images/gstrfsmnt
     fi
     rm -rf $FBOUTDIR/images/gstrfsmnt
-    echo compressing $rfsname ...
+    echo compressing $rfsname
     tar czf $rfsname.gz $rfsname && rm -f $rfsname
     fbprint_d $rfsname.gz
 }
@@ -349,7 +349,7 @@ pack_distro_rfs() {
     rname=${RFSDIR##*/}
 
     tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
-    fbprint_n "Generating $tarname ..."
+    fbprint_n "Generating $tarname"
     cd $RFSDIR && sudo tar --exclude=proc --exclude=sys --exclude=dev --exclude=run --zstd -C "$RFSDIR" -cf $FBOUTDIR/images/$tarname *
     cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
     log_mute ls -lh $FBOUTDIR/images/${rname}*
@@ -488,19 +488,19 @@ host_push_image_to_target() {
     fi
     localmntdir=`cat /etc/mtab | grep $2 | cut -d' ' -f2 | head -1`
     if [ $1 = kernel ]; then
-        [ ! -f $kernel_img ] && fbprint_n "Generating kernel image ..." && \
+        [ ! -f $kernel_img ] && fbprint_n "Generating kernel image" && \
         bld linux -a $DESTARCH -p $SOCFAMILY
 
-        [ -d $localmntdir/boot ] && fbprint_n "Pushing kernel to target $2 ..." && \
+        [ -d $localmntdir/boot ] && fbprint_n "Pushing kernel to target $2 " && \
         find $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY -maxdepth 1 -type f -exec cp -f {} $localmntdir/boot/ \;
 
-        [ -d $localmntdir/boot/modules ] && fbprint_n "Pushing modules to target $2 ..." && \
+        [ -d $localmntdir/boot/modules ] && fbprint_n "Pushing modules to target $2 " && \
         cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules/* $localmntdir/boot/modules/
         fbprint_d "Push kernel and modules to target $2"
     elif [ $1 = apps -o $1 = ml ]; then
         [ $1 = ml ] && srcdir=${DESTDIR}_ml || srcdir=$DESTDIR
         [ "`find $srcdir -type f`" = "" ] && fbprint_w "$srcdir is empty, please run 'bld <component>' to generate the apps" && exit
-        fbprint_n "Pushing apps $srcdir to target $2 ..."; cp -Prf --preserve=mode,timestamps $srcdir/* $localmntdir/ && \
+        fbprint_n "Pushing apps $srcdir to target $2 "; cp -Prf --preserve=mode,timestamps $srcdir/* $localmntdir/ && \
         fbprint_d "Push apps $srcdir to target $2"
     else
         fbprint_w "Invalid parameter $1, valid parameter is: kernel, apps, ml"; exit
@@ -598,7 +598,7 @@ check_debian_version() {
 }
 
 check_host_dependent_pkg() {
-	fbprint_n "Prepare the build environment on host ... "
+	fbprint_n "Prepare the build environment on host "
 
     show_one_line sudo apt-get autoclean && log_mute sudo apt-get update -y
     show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${host_dependent_packages[@]}"
@@ -673,7 +673,7 @@ do_clean() {
 
 do_clean_rfs() {
     if [ $DISTROTYPE = poky ]; then
-        echo cleaning $pokytmpdir ... && sudo rm -rf $pokytmpdir
+        echo cleaning $pokytmpdir && sudo rm -rf $pokytmpdir
         sudo rm -rf $FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}
         fbprint_d "clean $pokytmpdir"
     elif [ $DISTROTYPE = buildroot ]; then

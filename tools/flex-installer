@@ -218,7 +218,7 @@ partition_format_disk() {
 	print_w "The target /dev/$devname can't be the running device in which $rootdev is running as rootfs"
 	print_w "You can choose a non-running device or do the installation in TinyLinux environment" && exit
     fi
-    print_n "Partitioning /dev/$devname ..."
+    print_n "Partitioning /dev/$devname"
     [ -z "$force_opt" -a ${devname:0:4} != loop -a $instruction != pf ] && [ $actual_pnum -ge 3 ] && check_distro_in_disk
 
     optimal_io_size=$(sudo cat /sys/block/$devname/queue/optimal_io_size)
@@ -268,7 +268,7 @@ partition_format_disk() {
 	sudo parted -a $aligntype -s /dev/$devname mkpart $parttype ${s_p}MiB $end
     done
 
-    print_n "Formatting partitions ..."
+    print_n "Formatting partitions"
     [ -f /usr/bin/man -a  ${devname:0:4} != loop  ] && man ext4 | grep -q metadata_csum && metadataopt=",^metadata_csum"
     for ((i=1; i<=$totalparts; i++)); do
 	if [ $i = "$bootpartnum" ]; then
@@ -314,7 +314,7 @@ flex_install_distro() {
     if [ -n "$bootimg" -o $instruction = auto ] && [ -d $bootimg_n -o -f $bootimg_n ]; then
         [ -f $bootpartition/buildinfo ] && echo Cleaning the existing data in $bootdev && \
         sudo rm -rf $bootpartition/*
-        echo Installing $bootimg_n to $bootdev  ...
+        echo Installing $bootimg_n to $bootdev
         [ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
         [ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
         [ $bootimgtype = zst ] && zstd -d -f $bootimg_n && sudo tar xfm ${bootimg_n%.*} -C $bootpartition
@@ -342,7 +342,7 @@ flex_install_distro() {
     if [ -n "$rootfsimg" -o $instruction = auto ] && [ -d $rootfsimg_n -o -f $rootfsimg_n ]; then
 	check_running_rfs $rootdev
 	[ -d $rootpartition/var/lib ] && check_directory $rootpartition
-	echo Installing $rootfsimg_n to $rootdev ...
+	echo Installing $rootfsimg_n to $rootdev
 	if mount | grep -q "$rootdev on / type"; then
 	    print_w "Can't install rootfs image to the running root filesystem" && exit
 	fi
@@ -365,7 +365,7 @@ flex_install_distro() {
 	    [ -z "$uuid_boot" ] && print_e "Failed to get PARTUUID on $bootdev, please partition and format /dev/$devname" && exit
 	    bootmountfile=$rootpartition/lib/systemd/system/boot.mount
 	    if [ -f $bootmountfile ] && grep -q '^What=UUID=' $bootmountfile; then
-                echo setting UUID $uuid_boot for boot partition $bootdev ...
+                echo setting UUID $uuid_boot for boot partition $bootdev
 		mkdir -p $rootpartition/boot
 		sudo chmod 666 $bootmountfile
                 sudo sed -i s/What=UUID=.*/What=UUID=$uuid_boot/ $bootmountfile
@@ -411,7 +411,7 @@ flex_install_distro() {
 	fi
     fi
 
-    echo syncing data ...
+    echo syncing data
     sync
     umount_device
 
@@ -534,19 +534,19 @@ download_distro() {
 	    echo -e "${firmware_url##*/} already exists"
 	elif [ $instruction = download ] || [ "$machine" != ls2088ardb -a "$machine" != ls1012ardb -a \
 	       "$machine" != ls1012afrwy -a "$enable_efi" != y ]; then
-	    echo -e "\n Downloading $firmware_url ..." && curl -ROfk $firmware_url;
+	    echo -e "\n Downloading $firmware_url " && curl -ROfk $firmware_url;
 	    [ $? != 0 ] && print_w "Not found $firmware_url" || ls -l ${firmware_url##*/}
 	fi
     fi
     if [ -f ${bootimg_url##*/} ]; then
 	echo -e "${bootimg_url##*/} already exists"
     else
-	echo -e "\n Downloading $bootimg_url ..." && curl -ROfk $bootimg_url
+	echo -e "\n Downloading $bootimg_url " && curl -ROfk $bootimg_url
     fi
     if [ -f ${rootfsimg_url##*/} ]; then
 	echo -e "${rootfsimg_url##*/} already exists"
     else
-	echo -e "\n Downloading $rootfsimg_url ..." && curl -ROfk $rootfsimg_url
+	echo -e "\n Downloading $rootfsimg_url " && curl -ROfk $rootfsimg_url
     fi
     [ $? != 0 ] && print_e "Failed to download distro images" && exit
     print_n "Downloaded distro images [Done]"
@@ -811,7 +811,7 @@ elif [ $instruction = mkwic ]; then
     [ ! -e $rootfsimg_n ] && print_e "Not found $rootfsimg_n" && exit 1
     [ ! -e $bootimg_n ] && print_e "Not found $bootimg_n" && exit 1
     [ ! -e $firmware_n ] && print_e "Not found $firmware_n" && exit 1
-    print_n "Creating sdcard.wic, waiting ..."
+    print_n "Creating sdcard.wic, waiting"
     rm -f sdcard.wic && dd if=/dev/zero of=sdcard.wic bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB
     loopdev=$(sudo losetup -j sdcard.wic | cut -d' ' -f1)
     if [ -n "$loopdev" ]; then
@@ -830,7 +830,7 @@ elif [ $instruction = mkwic ]; then
 elif [ $instruction = backup ]; then
     mount_device
     [ -z "$backupdir" ] && backupdir=$backuppartition; mkdir -p $backupdir; timestamp=$(date +%Y%m%d%H%M)
-    print_n "Backup $backupdir/backup_rootfs_$timestamp.tgz ..."
+    print_n "Backup $backupdir/backup_rootfs_$timestamp.tgz"
     cd $rootpartition && sudo tar --zstd -cf $backupdir/backup_rootfs_$timestamp.tar.zst *
     du -sh $backupdir/backup*.tar.zst
     print_n "Backup completed successfully"

@@ -15,7 +15,7 @@ freespace=$(parted /dev/$device unit '%' print free | grep 'Free Space' | tail -
 
 if [[ ${freespace%.*} -gt 0 ]]; then
     echo $freespace of /dev/$device is free
-    echo resize it to full space ...
+    echo resize it to full space
     echo ",+" | sfdisk -N 2 /dev/$device --no-reread
     partprobe
     resize2fs /dev/$rootpart

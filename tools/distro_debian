@@ -18,19 +18,6 @@ build_distro_rfs_debian() {
     test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
     [ -n "$RFSDIR" ] && $sudopt rm -rf $RFSDIR/*
 
-    if [ "$FETCH_PREBUILT_SDK_RFS" = y -a "$FORCE" != y ]; then
-        echo FETCH_PREBUILT_SDK_RFS is enable by default in $CFGLISTYML
-        rootfsn=rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.tar.zst
-        rootfs_url=$DISTRO_SVR_URL/$DISTRIB_VERSION/$rootfsn
-        if [ ! -f $FBOUTDIR/images/$rootfsn ]; then
-           cd $FBOUTDIR/images
-           log_mute wget --progress=bar:force $rootfs_url || true
-           cd -
-	    fi
-	    [ -f $FBOUTDIR/images/$rootfsn ] && echo Extracting $rootfsn && \
-	        $sudopt tar -I zstd -xf $FBOUTDIR/images/$rootfsn -C $RFSDIR && \
-	        fbprint_d $RFSDIR && exit || echo Building $RFSDIR from scratch
-    fi
 
     if [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" = "base" ]; then
         PKGS=''
@@ -38,10 +25,10 @@ build_distro_rfs_debian() {
         RFSCMD=$FBDIR/configs/debian/debian_base_arm64.sh
     else
 		case "$MACHINE" in
-			   imx8*|imx95*)    PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}"); log_mute echo gnome package...  ;;
-			   imx9*)           PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}"); log_mute echo imx package... ;;
-			   l*)  	        PKGS=("${ls_pkgs[@]}"); log_mute echo ls  package... ;;
-			   *)               PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}"); log_mute echo imx package... ;;
+			   imx8*|imx95*)    PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}"); log_mute echo gnome package ;;
+			   imx9*)           PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}"); log_mute echo imx package ;;
+			   l*)  	        PKGS=("${ls_pkgs[@]}"); log_mute echo ls  package ;;
+			   *)               PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}"); log_mute echo imx package ;;
 		esac
         NEWRFSDIR=$RFSDIR
         RFSCMD=$FBDIR/configs/debian/debian_server_arm64.sh

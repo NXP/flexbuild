@@ -120,7 +120,7 @@ atf:
     fi; \
     if [ $(BL33TYPE) = uboot -a $(SOCFAMILY) = LS ]; then \
         if [ ! -f $$bl33 ]; then \
-            echo building dependent $$bl33 ... $(LOG_MUTE); \
+            echo building dependent $$bl33 $(LOG_MUTE); \
             bld uboot -m $$platform -b tfa; \
         fi; \
     elif [ $(BL33TYPE) = uefi ]; then \

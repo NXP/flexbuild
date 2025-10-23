@@ -14,7 +14,7 @@ cst:
 	 sed -i 's/-g -Wall/-g -Wno-deprecated-declarations -Wall/' Makefile && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 if [ -n "$(SECURE_PRI_KEY)" ]; then \
-	     echo Using specified $(SECURE_PRI_KEY) and $(SECURE_PUB_KEY) ... $(LOG_MUTE) ; \
+	     echo Using specified $(SECURE_PRI_KEY) and $(SECURE_PUB_KEY) $(LOG_MUTE) ; \
 	     cp -f $(SECURE_PRI_KEY) $(SECDIR)/cst/srk.pri; \
 	     cp -f $(SECURE_PUB_KEY) $(SECDIR)/cst/srk.pub; \
 	 elif [ ! -f srk.pri -o ! -f srk.pub ]; then \

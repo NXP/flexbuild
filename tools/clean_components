@@ -6,7 +6,7 @@
 
 
 clean_bsp_components() {
-	echo "[INFO] Clean the BSP ..."
+	echo "[INFO] Clean the BSP "
     rm -rf $FBOUTDIR/bsp
     rm -rf $PKGDIR/bsp/*
 	rm -f $FBDIR/logs/.lsfwdone
@@ -15,7 +15,7 @@ clean_bsp_components() {
 
 
 clean_linux_components() {
-	echo "[INFO] Clean the linux ..."
+	echo "[INFO] Clean the linux "
     rm -rf $FBOUTDIR/linux
 	rm -rf $PKGDIR/linux/*
 	echo "[INFO] Done."
@@ -23,7 +23,7 @@ clean_linux_components() {
 
 
 clean_apps_components() {
-	echo "[INFO] Clean the apps ..."
+	echo "[INFO] Clean the apps "
     rm -rf $DESTDIR
 	rm -rf $PKGDIR/apps/*
 	echo "[INFO] Done."

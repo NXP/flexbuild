@@ -7,7 +7,7 @@
 # $1=pkg_name $2=url $3=branch/tag/commit
 #
 define dl_from_github
-    echo "[INFO] Downloading $(1)_$(3).tar.gz..."; \
+    echo "[INFO] Downloading $(1)_$(3).tar.gz"; \
 	rm -f $(FBDIR)/dl/$(1)_$(3).tar.gz && \
 	mkdir -p $(FBDIR)/dl && \
 	md5=$(repo_$(1)_md5) && \
@@ -18,7 +18,7 @@ define dl_from_github
 			--version=$(3) \
 			--subdir=$(1) \
 			--hash=$$md5; then \
-			echo "Downloading with md5 failed, fallback to clone ..."; \
+			echo "Downloading with md5 failed, fallback to clone "; \
 			$(call rawgit,$(1),$(2),$(3),submod) || { echo "Clone failed"; exit 1; }; \
 		fi \
 	else \
@@ -27,7 +27,7 @@ define dl_from_github
 			--url=$(2) \
 			--version=$(3) \
 			--subdir=$(1); then \
-			echo "Downloading without md5 failed, fallback to clone ..."; \
+			echo "Downloading without md5 failed, fallback to clone "; \
 			$(call rawgit,$(1),$(2),$(3),submod) || { echo "Clone failed"; exit 1; }; \
 		fi \
 	fi && \
@@ -38,7 +38,7 @@ endef
 # $1=pkg_name $2=url $3=branch/tag/commit $4={git: keep git info}
 #
 define rawgit
-	echo "[INFO] Cloning $(1) (with submodules) ... "; \
+	echo "[INFO] Cloning $(1) (with submodules)  "; \
 	rm -rf /tmp/$(1) && \
 	_TMP_DIR=/tmp/$(1) && \
 	mkdir -p $${_TMP_DIR} && \
@@ -104,7 +104,7 @@ define clone_repo
 	if [ -d $(PKGDIR)/$(2)/$(1) ]; then \
 		echo "[INFO] Target already exists" $(LOG_MUTE); \
 	else \
-		echo "[INFO] Clone $(1) ..."; \
+		echo "[INFO] Clone $(1) "; \
 		cd $(PKGDIR)/$(2) && \
 		git clone $(repo_$(1)_url) $(1) $(LOG_MUTE) && \
 		cd $(1) && git submodule update --init --recursive $(LOG_MUTE) && \

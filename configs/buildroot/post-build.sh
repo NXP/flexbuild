@@ -18,7 +18,7 @@ if [ $DESTARCH = arm64 ]; then
 	releasestamp="Built at: `date +'%Y-%m-%d %H:%M:%S'`" && \
 	echo $releasestamp > $DESTDIR/etc/buildinfo
     fi
-    echo merge apps components from $DESTDIR to ${TARGET_DIR} ...
+    echo merge apps components from $DESTDIR to ${TARGET_DIR}
     cp -rf $DESTDIR/* ${TARGET_DIR}/
 fi
 

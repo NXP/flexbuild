@@ -8,7 +8,7 @@
 
 mcore_demo:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	echo -e "\nInstalling mcore demos for $(MACHINE) ..." && \
+	echo -e "\nInstalling mcore demos for $(MACHINE) && \
 	mkdir -p $(UTILSDIR)/mcore_demo && \
 	cd $(UTILSDIR)/mcore_demo && \
 	case $(MACHINE) in \

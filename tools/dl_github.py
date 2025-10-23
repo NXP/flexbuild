@@ -42,7 +42,7 @@ def download_file(url: str, output_path: str, retries: int = 3, timeout: int = 3
     session = requests.Session()
     retry_strategy = Retry(
         total=retries,
-        backoff_factor=2,        # exponential backoff: 2s, 4s, 8s...
+        backoff_factor=2,        # exponential backoff: 2s, 4s, 8s
         status_forcelist=[500, 502, 503, 504],
         allowed_methods=["HEAD", "GET", "OPTIONS"]
     )
@@ -252,7 +252,7 @@ def download_and_process(
         download_file(archive_url, temp_file)
 
         # 2. Extract original archive
-        # sys.stdout.write(f"Checking and repacking ... \n")
+        # sys.stdout.write(f"Checking and repacking  \n")
         extracted_dir = os.path.join(temp_dir, "extracted")
         os.makedirs(extracted_dir)
         try:

@@ -19,12 +19,12 @@ secure_sign_image() {
     [ "$IMA_EVM" = y -a ! -f $FBOUTDIR/$bootscript_enforce ] && bld distroscr -t -m $1
     [ "$ENCAP" = y -a ! -f $FBOUTDIR/$bootscript_dec ] && bld distroscr -e -m $1
 
-    [ ! -f $kernel_img ] && echo $kernel_img not exist, generating it ... && \
+    [ ! -f $kernel_img ] && echo $kernel_img not exist, generating it && \
     bld linux -p $SOCFAMILY -a $DESTARCH
 
     [ ! -f $tiny_itb ] && bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
 
-    fbprint_n "Signing $2boot images for $1 ..."
+    fbprint_n "Signing $2boot images for $1 "
     [ "$ENCAP" = y ] && cp $FBOUTDIR/$bootscript_dec $PKGDIR/apps/security/cst/bootscript_dec && log_mute echo "Copying bootscript_decap"
 
     if [ "$IMA_EVM" = y ]; then

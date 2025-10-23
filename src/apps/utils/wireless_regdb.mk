@@ -12,7 +12,7 @@
 wireless_regdb:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	$(call dl_by_wget,wireless_regdb_tar,wireless_regdb.tar.xz) && \
-	echo "Extracting wireless_regdb ..." && \
+	echo "Extracting wireless_regdb" && \
 	if [ ! -d "$(UTILSDIR)"/wireless_regdb ]; then \
 		mkdir -p "$(UTILSDIR)"/wireless_regdb; \
 		tar -xf $(FBDIR)/dl/wireless_regdb.tar.xz --strip-components=1 --wildcards -C $(UTILSDIR)/wireless_regdb; \

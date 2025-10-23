@@ -32,8 +32,7 @@ DEFAULT_SOC_FAMILY: IMX
 FORCE_BUILD_IN_DOCKER: y
 
 # The URL for pre-built images
-#DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/sdk"
-DISTRO_SVR_URL: "http://sun.ap.freescale.net/dash/debian"
+DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/sdk"
 
 # fuse provisioning
 CONFIG_FUSE_PROVISIONING: n

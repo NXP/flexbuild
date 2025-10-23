@@ -45,32 +45,32 @@ define imx_mkimage_target
     fi && \
     \
     if echo $1 | grep -qE ^imx8mp; then \
-	SOC=iMX8MP; SOC_FAMILY=iMX8M; target=flash_evk; \
+	SOC=iMX8MP; SOC_FAMILY=iMX8M; target=$${IMX_MKIMAGE_TARGET:-flash_evk}; \
     elif echo $1 | grep -qE ^imx8mm; then \
-	SOC=iMX8MM; SOC_FAMILY=iMX8M; target=flash_evk; \
+	SOC=iMX8MM; SOC_FAMILY=iMX8M; target=$${IMX_MKIMAGE_TARGET:-flash_evk}; \
     elif echo $1 | grep -qE ^imx8mn; then \
-	SOC=iMX8MN; SOC_FAMILY=iMX8M; target=flash_evk; \
+	SOC=iMX8MN; SOC_FAMILY=iMX8M; target=$${IMX_MKIMAGE_TARGET:-flash_evk}; \
     elif echo $1 | grep -qE ^imx8mq; then \
-	SOC=iMX8M; SOC_FAMILY=iMX8M; target=flash_evk; \
+	SOC=iMX8M; SOC_FAMILY=iMX8M; target=$${IMX_MKIMAGE_TARGET:-flash_evk}; \
     elif echo $1 | grep -qE ^imx8qm; then \
-	SOC=iMX8QM; SOC_FAMILY=iMX8QM; target=flash_spl; \
+	SOC=iMX8QM; SOC_FAMILY=iMX8QM; target=$${IMX_MKIMAGE_TARGET:-flash_spl}; \
 	cp -f $(BSPDIR)/imx-scfw/mx8qm-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QM/scfw_tcm.bin; \
 	cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qmb0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QM; \
     elif echo $1 | grep -qE ^imx8qx; then \
-	SOC=iMX8QX; SOC_FAMILY=iMX8QX; target=flash_spl; \
+	SOC=iMX8QX; SOC_FAMILY=iMX8QX; target=$${IMX_MKIMAGE_TARGET:-flash_spl}; \
 	cp -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QX/scfw_tcm.bin; \
 	cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qx*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QX; \
     elif echo $1 | grep -qE ^imx8ulp; then \
-	SOC=iMX8ULP; SOC_FAMILY=iMX8ULP; target=flash_singleboot_m33; \
+	SOC=iMX8ULP; SOC_FAMILY=iMX8ULP; target=$${IMX_MKIMAGE_TARGET:-flash_singleboot_m33}; \
 	cp $(BSPDIR)/fw_ele/mx8ulpa2-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
 	cp $(BSPDIR)/fw_upower/upower_a1.bin $(BSPDIR)/imx_mkimage/iMX8ULP/upower.bin; \
 	cp $(BSPDIR)/imx_mcore_demos/imx8ulp-m33-demo/imx8ulp_m33_TCM_rpmsg_lite_str_echo_rtos.bin $(BSPDIR)/imx_mkimage/iMX8ULP/m33_image.bin; \
     elif echo $1 | grep -qE ^imx91; then \
-	SOC=iMX91; SOC_FAMILY=iMX91; target=flash_singleboot; \
+	SOC=iMX91; SOC_FAMILY=iMX91; target=$${IMX_MKIMAGE_TARGET:-flash_singleboot}; \
 	cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
 	cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX91/; \
     elif echo $1 | grep -qE ^imx93; then \
-	SOC=iMX93; SOC_FAMILY=iMX93; target=flash_singleboot; \
+	SOC=iMX93; SOC_FAMILY=iMX93; target=$${IMX_MKIMAGE_TARGET:-flash_singleboot}; \
 	cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
 	cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX93/; \
 	cp $(BSPDIR)/imx_mcore_demos/imx93-m33-demo/imx93-11x11-evk_m33_TCM_rpmsg_lite_str_echo_rtos.bin \

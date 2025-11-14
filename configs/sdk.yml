@@ -20,20 +20,20 @@ BUILD_YOCTO_RFS: n
 BUILD_BUILDROOT_RFS: n
 
 # enable/disable custom packagegroups
-PKG_GROUPS_GRAPHICS: y
-PKG_GROUPS_MULTIMEDIA: y
-PKG_GROUPS_NETWORKING: y
-PKG_GROUPS_UTILS: y
-PKG_GROUPS_SECURITY: y
-PKG_GROUPS_ML: y
-PKG_GROUPS_GOPOINT: y
+PKG_GROUPS_GRAPHICS: n
+PKG_GROUPS_MULTIMEDIA: n
+PKG_GROUPS_NETWORKING: n
+PKG_GROUPS_UTILS: n
+PKG_GROUPS_SECURITY: n
+PKG_GROUPS_ML: n
+PKG_GROUPS_GOPOINT: n
 PKG_GROUPS_ROBOTICS: n
 
 # default IMX if '-p' option is not specified, change to LS for Layerscape SoC
 DEFAULT_SOC_FAMILY: IMX
 
 # force build in docker environment
-FORCE_BUILD_IN_DOCKER: y
+FORCE_BUILD_IN_DOCKER: n
 
 # choose one of the 3 ways to fetch/update repo for various use cases
 UPDATE_REPO_PER_TAG: y
@@ -58,7 +58,7 @@ DEFAULT_PKGDIR: $FBDIR/components_${DISTRIB_VERSION}
 # default kernel config list
 KERNEL_CONFIG:
   ARM64_LS:  "defconfig lsdk.config"
-  ARM64_IMX: "imx_v8_defconfig"
+  ARM64_IMX: "imx_v8_defconfig imx8_phytec_distro.config imx8_phytec_platform.config"
   ARM32_LS:  "multi_v7_defconfig multi_v7_lpae.config lsdk.config"
   ARM32_IMX: "imx_v7_defconfig"
 
@@ -76,7 +76,8 @@ repo:
     url:  https://github.com/nxp-imx/imx-atf.git
 
   uboot:
-    url:  https://github.com/nxp-imx/uboot-imx.git
+    url:  https://git.phytec.de/u-boot-imx
+    tag:  v2022.04_2.2.2-phy5 
 
   rcw:
     url:  https://github.com/nxp-qoriq/rcw.git
@@ -139,8 +140,8 @@ repo:
 
 # kernel and modules git repositories
   linux:
-    url:  https://github.com/nxp-imx/linux-imx.git
-    tag:  lf-6.6.52-2.2.0
+    url:  https://git.phytec.de/linux-imx
+    tag:  v5.15.71_2.2.2-phy3
 
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git

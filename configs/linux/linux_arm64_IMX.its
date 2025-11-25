@@ -1,4 +1,8 @@
 /*
+ * NOTE: When building for imx8mm_phygate-tauri-l, all other DTB and configuration nodes are filtered out automatically by the build system.
+ * Only the imx8mm_phygate-tauri DTB and configuration will be included in the final ITB image for this board.
+ */
+/*
  * Copyright 2018-2025 NXP
  *
  * Shengzhou Liu <Shengzhou.Liu@nxp.com>
@@ -73,6 +77,15 @@
 		imx8mmevk-dtb {
 			description = "Flattened Device Tree blob";
 			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mm-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx8mm_phygate-tauri-dtb {
+			description = "Flattened Device Tree blob for Phygate Tauri i.MX8MM";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx8mm-phygate-tauri.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";
@@ -176,6 +189,12 @@
 			description = "Boot Linux kernel";
 			kernel = "kernel";
 			fdt = "imx8mmevk-dtb";
+			ramdisk = "initrd";
+		};
+		imx8mm_phygate-tauri {
+			description = "Boot Linux kernel for Phygate Tauri i.MX8MM";
+			kernel = "kernel";
+			fdt = "imx8mm_phygate-tauri-dtb";
 			ramdisk = "initrd";
 		};
 		imx8mnevk {

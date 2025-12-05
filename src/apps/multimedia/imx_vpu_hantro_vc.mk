@@ -7,15 +7,15 @@
 
 
 imx_vpu_hantro_vc:
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call fbprint_b,"imx_vpu_hantro_vc") && \
-	 cd $(MMDIR) && \
-	 if [ ! -d imx_vpu_hantro_vc ]; then \
-	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_vc_bin_url) -O vpu_hantro_vc.bin $(LOG_MUTE) && \
-	     chmod +x vpu_hantro_vc.bin && \
-	     ./vpu_hantro_vc.bin --auto-accept $(LOG_MUTE) && \
-	     mv imx-vpu-hantro-vc-* imx_vpu_hantro_vc && rm -f vpu_hantro_vc.bin; \
-	 fi && \
-	 cp -Prf $(MMDIR)/imx_vpu_hantro_vc/usr $(DESTDIR)/ && \
-	 cp -Prf $(MMDIR)/imx_vpu_hantro_vc/unit_tests $(DESTDIR) && \
-	 $(call fbprint_d,"imx_vpu_hantro_vc")
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	$(call dl_by_wget,vpu_hantro_vc_bin,vpu_hantro_vc.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_vpu_hantro_vc ]; then \
+		chmod +x $(FBDIR)/dl/vpu_hantro_vc.bin; \
+		$(FBDIR)/dl/vpu_hantro_vc.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-vpu-hantro-vc-* imx_vpu_hantro_vc; \
+	fi && \
+	$(call fbprint_b,"imx_vpu_hantro_vc") && \
+	cp -Prf $(MMDIR)/imx_vpu_hantro_vc/usr $(DESTDIR)/ && \
+	cp -Prf $(MMDIR)/imx_vpu_hantro_vc/unit_tests $(DESTDIR) && \
+	$(call fbprint_d,"imx_vpu_hantro_vc")

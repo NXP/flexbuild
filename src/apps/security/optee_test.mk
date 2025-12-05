@@ -4,22 +4,22 @@
 
 
 
-optee_test:
+optee_test: optee_client optee_os
 ifeq ($(CONFIG_OPTEE),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,optee_test,apps/security) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libteec.so.1.0 ]; then \
-	     CONFIG_OPTEE=y bld optee_client -m $(MACHINE); \
-	 fi && \
-	 if [ ! -d $(SECDIR)/optee_os/out/arm-plat-ls/export-ta_arm64 ]; then \
-	     CONFIG_OPTEE=y bld optee_os -m ls1028ardb -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
+	@[ $(DESTARCH) != arm64  ] && exit || \
+	 $(call download_repo,optee_test,apps/security) && \
+	 $(call patch_apply,optee_test,apps/security) && \
 	 \
 	 $(call fbprint_b,"optee_test") && \
+	 if [ $(SOCFAMILY) = "IMX" ]; then \
+		socfamily=imx; \
+	 else \
+		socfamily=ls; \
+	 fi && \
 	 cd $(SECDIR)/optee_test && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 $(MAKE) CFG_ARM64=y OPTEE_CLIENT_EXPORT=$(DESTDIR)/usr \
-	         TA_DEV_KIT_DIR=$(SECDIR)/optee_os/out/arm-plat-ls/export-ta_arm64 $(LOG_MUTE) && \
+	         TA_DEV_KIT_DIR=$(SECDIR)/optee_os/out/arm-plat-"$$socfamily"/export-ta_arm64 $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/lib/optee_armtz && \
 	 cp $(SECDIR)/optee_test/out/ta/*/*.ta $(DESTDIR)/usr/lib/optee_armtz && \
 	 cp $(SECDIR)/optee_test/out/xtest/xtest $(DESTDIR)/usr/bin && \

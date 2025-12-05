@@ -5,14 +5,9 @@
 # depends on libasound2 and libasound2-dev
 
 imx_alsa_plugin: alsa_lib imx_sw_pdm
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_alsa_plugin,apps/multimedia) && \
-	 if  [ ! -f $(DESTDIR)/usr/lib/pkgconfig/alsa.pc ]; then \
-	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/imx-mm/audio-codec/swpdm/imx-swpdm.h ]; then \
-	     bld imx_sw_pdm -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,imx_alsa_plugin,apps/multimedia) && \
+	 $(call patch_apply,imx_alsa_plugin,apps/multimedia) && \
 	 sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include && \
 	 sudo ln -sf libasound.so.2 $(RFSDIR)/usr/lib/aarch64-linux-gnu/libasound.so && \
 	 \

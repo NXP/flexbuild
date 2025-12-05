@@ -9,44 +9,41 @@
 # depends on libsbc-dev libsndfile1-dev libwebp-dev
 
 
+#gst_plugins_bad:
 gst_plugins_bad: gst_plugins_base
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,gst_plugins_bad,apps/multimedia) && \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,gst_plugins_bad,apps/multimedia) && \
+	 $(call patch_apply,gst_plugins_bad,apps/multimedia) && \
 	 cd $(MMDIR)/gst_plugins_bad && \
-         if [ ! -f .patchdone ]; then \
-             git am $(FBDIR)/patch/gst_plugins_bad/*.patch $(LOG_MUTE) && touch .patchdone; \
-         fi && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
-	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \
-	     sed -i 's/1\.1/0.61/' meson.build; \
+	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build; \
 	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstopengl.so ]; then \
-	     bld gst_plugins_base -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
 	 $(call fbprint_b,"gst_plugins_bad") && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1} && \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} && \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}; \
 	 fi && \
+	 \
 	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib && \
 	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/ && \
 	 sudo cp -rf $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include && \
-	 sudo cp -rf $(DESTDIR)/usr/share/{wayland-protocols,pkgconfig} $(RFSDIR)/usr/share && \
-	 sudo cp -f $(DESTDIR)/usr/lib/{libgsttag-1.0.so*,libgstallocators-1.0.so} $(RFSDIR)/usr/lib && \
-	 \
+	 sudo cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/ && \
+	 sudo cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/ && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
 			  -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/lib/gstreamer-1.0/include \
 			  -I$(DESTDIR)/usr/include/gstreamer-1.0 -I$(RFSDIR)/usr/include" \
-		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-			       -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0" \
-		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
-				 -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0" \
+		-Dc_link_args="-Wl,--as-needed \
+				-L$(DESTDIR)/usr/lib -Wl,-rpath-link=$(DESTDIR)/usr/lib \
+				-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
+			    -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0" \
+		-Dcpp_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu \
+				 -ludev -lbsd -lpthread -lgstbase-1.0 -lgstreamer-1.0 -lgstallocators-1.0 -Wl,-rpath-link=$(DESTDIR)/usr/lib" \
 		--prefix=/usr --buildtype=release \
 		--cross-file meson.cross \
 		--strip \

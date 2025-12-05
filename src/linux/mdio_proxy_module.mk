@@ -6,13 +6,12 @@
 
 mdio_proxy_module:
 	@[ $(SOCFAMILY) != LS ] && exit || true && \
-	 $(call repo-mngr,fetch,mdio_proxy_module,linux) && \
-	 $(call repo-mngr,fetch,$(KERNEL_TREE),linux) && \
+	 $(call download_repo,mdio_proxy_module,linux) && \
+	 $(call download_repo,linux,linux) && \
 	 if [ ! -d $(FBOUTDIR)/linux/kernel/$(DESTARCH)/$(SOCFAMILY) ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
-	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir && \
+	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && mkdir -p $$opdir && \
 	 \
 	 cd $(PKGDIR)/linux/mdio_proxy_module && \
 	 $(call fbprint_b,"mdio-proxy-module") && \

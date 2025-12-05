@@ -6,31 +6,14 @@
 # NNStreamer - Stream Pipeline Paradigm for Neural Network Applications
 # NNStreamer is a GStreamer plugin allowing to construct neural network applications with stream pipeline paradigm.
 
-nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,nnstreamer,apps/ml) && \
-	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/gstreamer-1.0/libgstopengl.so ]; then \
-	     bld gst_plugins_base -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libtensorflow-lite.so ]; then \
-	     bld tflite -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libnnstreamer-edge.so ]; then \
-	     bld nnstreamer_edge -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libtvm.so ]; then \
-	     bld tvm -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+#nnstreamer:
+nnstreamer: gst_plugins_base tflite nnstreamer_edge
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,nnstreamer,apps/ml) && \
+	 $(call patch_apply,nnstreamer,apps/ml) && \
 	 cd $(MLDIR)/nnstreamer && \
 	 rm -rf build_debian_arm64 && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/nnstreamer/*.patch $(LOG_MUTE) && touch .patchdone; \
-     fi && \
 	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
-	 sed -i 's/cpp_std=c++14/cpp_std=c++17/' meson.build && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
 	 \
@@ -38,12 +21,15 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
 	 export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -fcanon-prefix-map" && \
+	 cp -af $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib && \
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file meson.cross \
 		--prefix=/usr --buildtype=release \
 		--strip \
 		-Dc_args="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
-		-Dcpp_args="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include -I$(MLDIR)/tvm/3rdparty/dmlc-core/include \
+		-Dcpp_args="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include \
+				-I$(RFSDIR)/usr/lib/aarch64-linux-gnu/python3-numpy/numpy/_core/include \
+				-I$(MLDIR)/tvm/3rdparty/dmlc-core/include \
 			    -I$(MLDIR)/tflite/build_debian_arm64/abseil-cpp -I$(MLDIR)/tflite \
 			    -Wno-error=comment -Wno-sign-compare -Wno-error=unused-parameter -Wno-error=redundant-decls" \
 		-Dc_link_args="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" \
@@ -58,6 +44,6 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge tvm
 		-Dpython3-support=enabled \
 		-Dnnstreamer-edge-support=enabled \
 		-Dtflite2-support=enabled \
-		-Dtvm-support=enabled $(LOG_MUTE) && \
+		-Dtvm-support=disabled $(LOG_MUTE) && \
 	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"nnstreamer")

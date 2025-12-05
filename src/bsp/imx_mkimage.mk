@@ -3,106 +3,403 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-define imx_mkimage_target
-    if [ ! -d $(BSPDIR)/imx_mkimage ]; then \
-        $(call repo-mngr,fetch,imx_mkimage,bsp); \
-    fi && \
-    if [ -d $(FBDIR)/patch/imx_mkimage ] && [ ! -f .patchdone ]; then \
-        git am $(FBDIR)/patch/imx_mkimage/*.patch $(LOG_MUTE) && touch .patchdone; \
-    fi && \
-    \
-    if [ ! -d $(BSPDIR)/firmware-imx ]; then \
-	cd $(BSPDIR) && wget -q $(repo_firmware_imx_bin_url) -O firmware_imx.bin $(LOG_MUTE) && chmod +x firmware_imx.bin && \
-	./firmware_imx.bin --auto-accept $(LOG_MUTE) && mv firmware-imx* firmware-imx && rm -f firmware_imx.bin; \
-    fi && \
-    if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
-	cd $(BSPDIR) && wget -q $(repo_seco_bin_url) -O imx-seco.bin $(LOG_MUTE) && chmod +x imx-seco.bin && \
-	./imx-seco.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco && rm -f imx-seco.bin; \
-    fi && \
+UTILSDIR = $(PKGDIR)/apps/utils
+
+define dl_imx_seco
+	if [ ! -d $(BSPDIR)/imx-seco/firmware/seco ]; then \
+		cd $(BSPDIR) && $(call dl_by_wget,seco_bin,imx-seco.bin) && chmod +x $(FBDIR)/dl/imx-seco.bin && \
+		$(FBDIR)/dl/imx-seco.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_seco_bin_url)` imx-seco; \
+	fi
+endef
+
+define dl_fw_ele
     if [ ! -d $(BSPDIR)/fw_ele ]; then \
-	cd $(BSPDIR) && wget -q $(repo_fw_ele_bin_url) -O fw_ele.bin $(LOG_MUTE) && chmod +x fw_ele.bin && \
-	./fw_ele.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele && rm -f fw_ele.bin; \
-    fi && \
+		cd $(BSPDIR) && $(call dl_by_wget,fw_ele_bin,fw_ele.bin) && chmod +x $(FBDIR)/dl/fw_ele.bin && \
+		$(FBDIR)/dl/fw_ele.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_ele_bin_url)` fw_ele; \
+    fi
+endef
+
+define dl_fw_upower
     if [ ! -d $(BSPDIR)/fw_upower ]; then \
-	cd $(BSPDIR) && wget -q $(repo_fw_upower_bin_url) -O fw_upower.bin $(LOG_MUTE) && chmod +x fw_upower.bin && \
-	./fw_upower.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower && rm -f fw_upower.bin; \
-    fi && \
-    if [ ! -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin ]; then \
-	wget -q $(repo_scfw_bin_url) -O imx-scfw.bin $(LOG_MUTE) && chmod +x imx-scfw.bin && \
-	./imx-scfw.bin --auto-accept $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw && rm -f imx-scfw.bin; \
-    fi && \
-    if [ ! -d $(BSPDIR)/imx_mcore_demos ]; then \
-	bld mcore_demo; \
-    fi && \
+		cd $(BSPDIR) && $(call dl_by_wget,fw_upower_bin,fw_upower.bin) && chmod +x $(FBDIR)/dl/fw_upower.bin && \
+		$(FBDIR)/dl/fw_upower.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_fw_upower_bin_url)` fw_upower; \
+    fi
+endef
+
+define dl_imx_scfw
+    if [ ! -d $(BSPDIR)/imx-scfw ]; then \
+		cd $(BSPDIR) && $(call dl_by_wget,scfw_bin,imx-scfw.bin) && chmod +x $(FBDIR)/dl/imx-scfw.bin && \
+		$(FBDIR)/dl/imx-scfw.bin --auto-accept --force $(LOG_MUTE) && mv `basename -s .bin $(repo_scfw_bin_url)` imx-scfw; \
+    fi
+endef
+
+define imx_mkimage_target
+	$(call download_repo,imx_mkimage,bsp) && \
+	$(call patch_apply,imx_mkimage,bsp) && \
     \
-    if echo $1 | grep -qE ^imx8mp; then \
-	SOC=iMX8MP; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8mm; then \
-	SOC=iMX8MM; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8mn; then \
-	SOC=iMX8MN; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8mq; then \
-	SOC=iMX8M; SOC_FAMILY=iMX8M; target=flash_evk; \
-    elif echo $1 | grep -qE ^imx8qm; then \
-	SOC=iMX8QM; SOC_FAMILY=iMX8QM; target=flash_spl; \
-	cp -f $(BSPDIR)/imx-scfw/mx8qm-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QM/scfw_tcm.bin; \
-	cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qmb0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QM; \
-    elif echo $1 | grep -qE ^imx8qx; then \
-	SOC=iMX8QX; SOC_FAMILY=iMX8QX; target=flash_spl; \
-	cp -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QX/scfw_tcm.bin; \
-	cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qx*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QX; \
-    elif echo $1 | grep -qE ^imx8ulp; then \
-	SOC=iMX8ULP; SOC_FAMILY=iMX8ULP; target=flash_singleboot_m33; \
-	cp $(BSPDIR)/fw_ele/mx8ulpa2-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
-	cp $(BSPDIR)/fw_upower/upower_a1.bin $(BSPDIR)/imx_mkimage/iMX8ULP/upower.bin; \
-	cp $(BSPDIR)/imx_mcore_demos/imx8ulp-m33-demo/imx8ulp_m33_TCM_rpmsg_lite_str_echo_rtos.bin $(BSPDIR)/imx_mkimage/iMX8ULP/m33_image.bin; \
-    elif echo $1 | grep -qE ^imx91; then \
-	SOC=iMX91; SOC_FAMILY=iMX91; target=flash_singleboot; \
-	cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
-	cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX91/; \
-    elif echo $1 | grep -qE ^imx93; then \
-	SOC=iMX93; SOC_FAMILY=iMX93; target=flash_singleboot; \
-	cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
-	cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX93/; \
-	cp $(BSPDIR)/imx_mcore_demos/imx93-m33-demo/imx93-11x11-evk_m33_TCM_rpmsg_lite_str_echo_rtos.bin \
-	   $(BSPDIR)/imx_mkimage/iMX93/m33_image.bin; \
-    fi && \
-    cp -f $(BSPDIR)/firmware-imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
-    \
+	bld firmware_imx -m $(MACHINE); \
+	\
     cd $(BSPDIR)/imx_mkimage && \
-    $(MAKE) clean $(LOG_MUTE) && $(MAKE) bin $(LOG_MUTE) && \
-    $(MAKE) SOC=$$SOC_FAMILY mkimage_imx8 $(LOG_MUTE) && \
+    mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$(MACHINE) && \
+	$(MAKE) clean $(LOG_MUTE) && \
     \
-    bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$$brd.bin && \
-    if [ "$(CONFIG_OPTEE)" = "y" -a ! -f "$$bl32" ]; then \
-		bld optee_os -m $$brd; \
-    fi && \
-    [ $${MACHINE:0:7} = imx8ulp ] && plat=$${MACHINE:0:7} || plat=$${MACHINE:0:6} && \
-    [ $${MACHINE:0:4} = imx9 ] && plat=$${MACHINE:0:5} || true && \
-    cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
-	$(BSPDIR)/firmware-imx/firmware/hdmi/cadence/signed*_imx8m.bin \
-	$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
-	$$opdir/arch/arm/dts/*$${plat}*.dtb \
-	$$opdir/u-boot-nodtb.bin && \
-	if [ $${MACHINE} = imx8mpfrdm ]; then \
-        cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
-	fi && \
-    if [ "$(CONFIG_OPTEE)" = "y" -a -f "$$bl32" ]; then \
-	cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
-    fi && \
-    cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot && \
-    cp -f $(BSPDIR)/atf/build/$$plat/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/ && \
+    bl32=$(PKGDIR)/apps/security/optee_os/out/arm-plat-imx/core/tee_$(MACHINE).bin && \
     \
-    if [ $${MACHINE:0:6} = imx8qm ];  then \
-	$(MAKE) SOC=iMX8QM -C iMX8QM -f soc.mak $$target $(LOG_MUTE) ; \
-    elif [ $${MACHINE:0:6} = imx8qx ]; then \
-	$(MAKE) SOC=iMX8QX REV=B0 -C iMX8QX -f soc.mak $$target $(LOG_MUTE) ; \
-    elif [ $${MACHINE:0:5} = imx91 ]; then \
-        $(MAKE) SOC=iMX91 REV=A0 -C iMX91 -f soc.mak $$target $(LOG_MUTE) ; \
-    elif [ $${MACHINE:0:5} = imx93 ]; then \
-	$(MAKE) SOC=iMX93 REV=A1 -C iMX93 -f soc.mak $$target $(LOG_MUTE) ; \
-    fi && \
-    $(MAKE) SOC=$$SOC $(REV_OPTION) $$target $(LOG_MUTE); \
-    mkdir -p $(FBOUTDIR)/bsp/imx-mkimage/$$brd && \
-    cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$$brd/flash.bin;
+	case $(MACHINE) in \
+		imx8mpfrdm) \
+			SOC_FAMILY=iMX8M; \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8mp/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			cp -f $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/imx8mp-evk.dtb; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8MP flash_evk $(LOG_MUTE); \
+			;; \
+		imx8mp*) \
+			SOC_FAMILY=iMX8M; \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx8mp-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8mp/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8MP flash_evk $(LOG_MUTE); \
+			;; \
+		imx8mm*) \
+			SOC_FAMILY=iMX8M; \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx8mm-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8mm/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8MM flash_evk $(LOG_MUTE); \
+			;; \
+		imx8mn*) \
+			SOC_FAMILY=iMX8M; \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx8mn-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8mn/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8MN flash_evk $(LOG_MUTE); \
+			;; \
+		imx8mq*) \
+			SOC_FAMILY=iMX8M; \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx8mq-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8mq/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8M flash_evk $(LOG_MUTE); \
+			;; \
+        imx8qm*) \
+			SOC_FAMILY=iMX8QM; \
+			$(call dl_imx_scfw); \
+			$(call dl_imx_seco); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/fsl-imx8qm-mek.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp -f $(BSPDIR)/imx-scfw/mx8qm-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QM/scfw_tcm.bin; \
+            cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qmb0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QM; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8qm/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8QM flash $(LOG_MUTE); \
+            ;; \
+        imx8qx*) \
+			SOC_FAMILY=iMX8QX; \
+			$(call dl_imx_scfw); \
+			$(call dl_imx_seco); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/fsl-imx8dx-mek.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp -f $(BSPDIR)/imx-scfw/mx8qx-mek-scfw-tcm.bin $(BSPDIR)/imx_mkimage/iMX8QX/scfw_tcm.bin; \
+            cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qx*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8QX; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8qx/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX8QX flash $(LOG_MUTE); \
+            ;; \
+		imx8ulp*) \
+			SOC_FAMILY=iMX8ULP; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx8ulp-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp $(BSPDIR)/fw_ele/mx8ulpa2-ahab-container.img $(BSPDIR)/imx_mkimage/iMX8ULP; \
+            cp $(BSPDIR)/fw_upower/upower_a1.bin $(BSPDIR)/imx_mkimage/iMX8ULP/upower.bin; \
+            cp $(UTILSDIR)/mcore_demo/imx8ulp-m33-demo/imx8ulp_m33_TCM_rpmsg_lite_str_echo_rtos.bin \
+               $(BSPDIR)/imx_mkimage/iMX8ULP/m33_image.bin; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx8ulp/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX8ULP flash_singleboot_m33 $(LOG_MUTE); \
+			;; \
+        imx91s*) \
+			SOC_FAMILY=iMX91; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx91-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
+            cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX91/; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx91/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
+            ;; \
+        imx91frdm) \
+			SOC_FAMILY=iMX91; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx91-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
+            cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX91/; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx91/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
+            ;; \
+        imx91evk) \
+			SOC_FAMILY=iMX91; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx91-11x11-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp $(BSPDIR)/fw_ele/mx91a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX91; \
+            cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX91/; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx91/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX91 flash_singleboot $(LOG_MUTE) ; \
+            ;; \
+        imx93frdm) \
+			SOC_FAMILY=iMX93; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx93-11x11-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
+            cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX93/; \
+            cp $(UTILSDIR)/mcore_demo/imx93-m33-demo/imx93-11x11-evk_m33_TCM_rpmsg_lite_str_echo_rtos.bin \
+               $(BSPDIR)/imx_mkimage/iMX93/m33_image.bin; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx93/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
+            ;; \
+        imx93evk) \
+			SOC_FAMILY=iMX93; \
+			$(call dl_fw_ele); \
+			$(call dl_fw_upower); \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/dts/upstream/src/arm64/freescale/imx93-11x11-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+            cp $(BSPDIR)/fw_ele/mx93a*-ahab-container.img $(BSPDIR)/imx_mkimage/iMX93; \
+            cp $(BSPDIR)/fw_upower/upower_a*.bin $(BSPDIR)/imx_mkimage/iMX93/; \
+            cp $(UTILSDIR)/mcore_demo/imx93-m33-demo/imx93-11x11-evk_m33_TCM_rpmsg_lite_str_echo_rtos.bin \
+               $(BSPDIR)/imx_mkimage/iMX93/m33_image.bin; \
+			cp -f $$opdir/tools/mkimage $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/mkimage_uboot; \
+			cp -f $(BSPDIR)/atf/build/imx93/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+            $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
+            ;; \
+        imx95evk) \
+			SOC_FAMILY=iMX95; \
+			$(call dl_fw_ele); \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
+			cp $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
+				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \
+			cp -f $(BSPDIR)/atf/build/imx95/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_sm/build/mx95evk/m33_image.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
+            ;; \
+        imx95frdm) \
+			SOC_FAMILY=iMX95; \
+			$(call dl_fw_ele); \
+			bld mcore_demo -m $(MACHINE); \
+			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp -f $$opdir/arch/arm/dts/imx95-15x15-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
+			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
+			cp $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
+				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \
+			cp -f $(BSPDIR)/atf/build/imx95/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_sm/build/mx95evk/m33_image.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
+				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
+				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
+				$$opdir/u-boot-nodtb.bin; \
+			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
+				if [ ! -f "$$bl32" ]; then \
+					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
+				else \
+					cp -f $$bl32 $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/tee.bin; \
+				fi; \
+			fi;  \
+			cd $(BSPDIR)/imx_mkimage; \
+			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
+            ;; \
+    esac && \
+    cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$(MACHINE)/flash.bin;
 endef

@@ -1,0 +1,38 @@
+From bee529aa487b58a635715eb4919e2c267b7b490a Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Tue, 5 Aug 2025 19:52:19 -0700
+Subject: [PATCH] Remove regor since it was not used
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ ethosu/vela/vela.py | 1 -
+ setup.py            | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/ethosu/vela/vela.py b/ethosu/vela/vela.py
+index ac4fb62..1157d6e 100755
+--- a/ethosu/vela/vela.py
++++ b/ethosu/vela/vela.py
+@@ -56,7 +56,6 @@ from .tflite_model_semantic import TFLiteSemantic
+ from .tflite_supported_operators import TFLiteSupportedOperators
+ from .tosa_model_semantic import TosaSemantic
+ from .tosa_supported_operators import TosaSupportedOperators
+-from ethosu import regor
+ 
+ TFLITE_MAGIC = 0x334C4654
+ TOSA_MAGIC = 0x41534F54
+diff --git a/setup.py b/setup.py
+index 7b8c33b..bd1da7c 100644
+--- a/setup.py
++++ b/setup.py
+@@ -243,6 +243,6 @@ setup(
+     version=vela_version,
+     long_description=long_description,
+     long_description_content_type="text/markdown",
+-    ext_modules=[mlw_module, ethosu_regor],
++    ext_modules=[mlw_module],
+     cmdclass={"build_ext": MakeOrCMakeBuild},  # type: ignore[dict-item]
+ )
+-- 
+2.34.1
+

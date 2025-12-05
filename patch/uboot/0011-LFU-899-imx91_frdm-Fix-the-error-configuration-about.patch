@@ -1,0 +1,31 @@
+From 74b672e9bd43db7e23dc016c8945a066d86b4aa3 Mon Sep 17 00:00:00 2001
+From: Steven Yang <zhao.yang_1@nxp.com>
+Date: Fri, 11 Jul 2025 16:01:04 +0800
+Subject: [PATCH 11/24] LFU-899 imx91_frdm: Fix the error configuration about
+ path of imx91-11x11-frdm.dtb
+
+Fix the path error of "imx91-11x11-frdm.dtb" when building u-boot
+image with imx91_11x11_frdm_inline_ecc_defconfig.
+
+Signed-off-by: Steven Yang <zhao.yang_1@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+---
+ configs/imx91_11x11_frdm_inline_ecc_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configs/imx91_11x11_frdm_inline_ecc_defconfig b/configs/imx91_11x11_frdm_inline_ecc_defconfig
+index ea54ec5f763..e91798f7119 100644
+--- a/configs/imx91_11x11_frdm_inline_ecc_defconfig
++++ b/configs/imx91_11x11_frdm_inline_ecc_defconfig
+@@ -12,7 +12,7 @@ CONFIG_ENV_OFFSET=0x700000
+ CONFIG_ENV_SECT_SIZE=0x10000
+ CONFIG_IMX_CONFIG="arch/arm/mach-imx/imx9/imximage.cfg"
+ CONFIG_DM_GPIO=y
+-CONFIG_DEFAULT_DEVICE_TREE="freescale/imx91-11x11-frdm"
++CONFIG_DEFAULT_DEVICE_TREE="imx91-11x11-frdm"
+ CONFIG_USB_TCPC=y
+ CONFIG_TARGET_IMX91_11X11_FRDM=y
+ CONFIG_OF_LIBFDT_OVERLAY=y
+-- 
+2.34.1
+

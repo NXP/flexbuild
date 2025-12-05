@@ -1,0 +1,54 @@
+From 27aa15e8f0fa044650f01c1fb8d5d1bcec38434f Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 20 May 2025 18:19:08 +0900
+Subject: [PATCH 13/56] MLK-26283: imx8: media-dev: remove call subdev
+ link_setup
+
+When using sensors driver without link_setup callback in core_ops,
+imx8-media-dev would fail to create links with sensors.
+Remove media_entity_call link_setup when trying to create links
+with v4l2subdev.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Guoniu Zhou <guoniu.zhou@nxp.com>
+---
+ drivers/staging/media/imx/imx8-media-dev.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-media-dev.c b/drivers/staging/media/imx/imx8-media-dev.c
+index 47f5d0bdc1fb..a9812ed9ca24 100644
+--- a/drivers/staging/media/imx/imx8-media-dev.c
++++ b/drivers/staging/media/imx/imx8-media-dev.c
+@@ -509,14 +509,6 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
+ 						&source->pads[source_pad], 0);
+ 			if (ret)
+ 				return ret;
+-
+-			/* Notify MIPI sensor subdev entity */
+-			ret = media_entity_call(source, link_setup,
+-						&source->pads[source_pad],
+-						&sink->pads[sink_pad],
+-						0);
+-			if (ret)
+-				return ret;
+ 			v4l2_info(&mxc_md->v4l2_dev,
+ 				  "created link [%s] => [%s]\n",
+ 				  source->name, sink->name);
+@@ -570,14 +562,6 @@ static int mxc_md_create_links(struct mxc_md *mxc_md)
+ 							0);
+ 				if (ret)
+ 					return ret;
+-
+-				/* Notify MIPI sensor subdev entity */
+-				ret = media_entity_call(source, link_setup,
+-							&source->pads[source_pad + j],
+-							&sink->pads[sink_pad + j],
+-							0);
+-				if (ret)
+-					return ret;
+ 			}
+ 			v4l2_info(&mxc_md->v4l2_dev,
+ 				  "created link [%s] => [%s]\n",
+-- 
+2.34.1
+

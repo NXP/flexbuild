@@ -1,0 +1,29 @@
+From d1bfe28d16874675d9b759afbfa980a909f22418 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Thu, 17 Apr 2025 17:15:37 +0900
+Subject: [PATCH 11/56] LF-15515 clk: imx: pll144xx: add 400Mhz entries for
+ pll1443x
+
+Add 400Mhz entries so the PLL can be configured.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Jacky Bai <ping.bai@nxp.com>
+---
+ drivers/clk/imx/clk-pll14xx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/clk/imx/clk-pll14xx.c b/drivers/clk/imx/clk-pll14xx.c
+index 5e66dbb6f4ef..65f0fa052058 100644
+--- a/drivers/clk/imx/clk-pll14xx.c
++++ b/drivers/clk/imx/clk-pll14xx.c
+@@ -64,6 +64,7 @@ static const struct imx_pll14xx_rate_table imx_pll1443x_tbl[] = {
+ 	PLL_1443X_RATE(650000000U, 325, 3, 2, 0),
+ 	PLL_1443X_RATE(594000000U, 198, 2, 2, 0),
+ 	PLL_1443X_RATE(519750000U, 173, 2, 2, 16384),
++	PLL_1443X_RATE(400000000U, 200, 3, 2, 0),
+ 	PLL_1443X_RATE(393216000U, 262, 2, 3, 9437),
+ 	PLL_1443X_RATE(361267200U, 361, 3, 3, 17511),
+ 	PLL_1443X_RATE(245760000U, 328, 4, 3, 0xae15),
+-- 
+2.34.1
+

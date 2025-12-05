@@ -9,34 +9,38 @@
 # DPU on imx8dx, imx8qxp, imx8qm
 # GPU on others
 
-ifeq ($(MACHINE),imx93evk)
-  BUILD_IMPLEMENTATION = pxp
-else ifeq ($(MACHINE),imx8qm)
-  BUILD_IMPLEMENTATION = dpu
-else ifeq ($(MACHINE),imx8dx)
-  BUILD_IMPLEMENTATION = dpu
-else ifeq ($(MACHINE),imx8qxp)
-  BUILD_IMPLEMENTATION = dpu
+ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_dpu_g2d_v2
+	BUILD_IMPLEMENTATION = dpu95
+else ifeq ($(filter imx91%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_pxp_g2d
+	BUILD_IMPLEMENTATION = pxp
+else ifeq ($(filter imx93%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_pxp_g2d
+	BUILD_IMPLEMENTATION = pxp
+else ifeq ($(filter imx943%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_pxp_g2d
+	BUILD_IMPLEMENTATION = pxp
+else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_gpu_g2d gpu_viv imx_dpu_g2d_v1
+	BUILD_IMPLEMENTATION = gpu-drm
 else
-  BUILD_IMPLEMENTATION = gpu-drm
+	DEP_G2D =
+	BUILD_IMPLEMENTATION =
 endif
 
 
-imx_g2d_samples: imx_gpu_g2d
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,imx_g2d_samples,apps/graphics) && \
-	 \
-	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so.2 ]; then \
-	     bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+imx_g2d_samples: $(DEP_G2D)
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,imx_g2d_samples,apps/graphics) && \
+	 $(call patch_apply,imx_g2d_samples,apps/graphics) && \
 	 $(call fbprint_b,"imx_g2d_samples for $(BUILD_IMPLEMENTATION)") && \
 	 cd $(GRAPHICSDIR)/imx_g2d_samples && \
-	 sudo cp $(DESTDIR)/usr/lib/{libOpenCL.so*,libSPIRV_viv.so*} $(RFSDIR)/usr/lib && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export BUILD_IMPLEMENTATION=$(BUILD_IMPLEMENTATION) && \
 	 export SDKTARGETSYSROOT=$(RFSDIR) && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include" && \
-	 export LDFLAGS="-L$(DESTDIR)/usr/lib" && \
+	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-rpath-link=$(DESTDIR)/usr/lib" && \
 	 $(MAKE) clean && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) $(LOG_MUTE) && \

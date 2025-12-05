@@ -14,19 +14,20 @@
 
 # COMPATIBLE_MACHINE: imx8mp
 
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
-tvm: tim_vx
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,tvm,apps/ml) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libtim-vx.so ]; then \
-	     bld tim_vx -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+tvm:
+#tvm: tim_vx
+ifeq ($(CONFIG_TVM),y)
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,tvm,apps/ml,submod) && \
+	 $(call patch_apply,tvm,apps/ml) && \
 	 sudo cp $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib && \
 	 $(call fbprint_b,"tvm") && \
 	 cd $(MLDIR)/tvm && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cmake  -S $(MLDIR)/tvm \
 		-B $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH) \
@@ -50,3 +51,4 @@ tvm: tim_vx
 	 cp ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples && \
 	 cp ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/ && \
 	 $(call fbprint_d,"tvm")
+endif

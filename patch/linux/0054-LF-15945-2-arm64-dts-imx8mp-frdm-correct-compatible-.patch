@@ -1,0 +1,30 @@
+From 5a49932b412fc20cce8f20ebf27210c08d13b308 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 29 Jul 2025 12:28:36 +0900
+Subject: [PATCH 54/56] LF-15945-2: arm64: dts: imx8mp-frdm: correct compatible
+ name
+
+Correct FRDM-IMX8MP board compatible name to frdm-imx8mp
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx8mp-frdm.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+index e28293f285c4..2591abc42624 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm.dts
+@@ -11,7 +11,7 @@
+ 
+ / {
+ 	model = "NXP FRDM-IMX8MPLUS";
+-	compatible = "fsl,imx8mp-frdm", "fsl,imx8mp";
++	compatible = "fsl,frdm-imx8mp", "fsl,imx8mp";
+ 
+ 	chosen {
+ 		stdout-path = &uart2;
+-- 
+2.34.1
+

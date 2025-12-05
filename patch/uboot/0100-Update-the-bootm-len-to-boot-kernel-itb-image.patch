@@ -1,0 +1,167 @@
+From d617a63ffaedf598a04aa6cbd02fb2a39f2db3e3 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 4 Aug 2025 20:12:26 -0700
+Subject: [PATCH] Update the bootm len to boot kernel itb image
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ configs/imx8mm_evk_defconfig              | 1 +
+ configs/imx8mp_evk_defconfig              | 2 +-
+ configs/imx8mp_frdm_defconfig             | 2 +-
+ configs/imx91_11x11_evk_defconfig         | 2 ++
+ configs/imx91_11x11_frdm_defconfig        | 2 ++
+ configs/imx91_11x11_frdm_imx91s_defconfig | 2 ++
+ configs/imx93_11x11_evk_defconfig         | 2 ++
+ configs/imx93_11x11_frdm_defconfig        | 2 ++
+ configs/imx95_15x15_evk_defconfig         | 3 ++-
+ configs/imx95_15x15_frdm_defconfig        | 3 ++-
+ 10 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/configs/imx8mm_evk_defconfig b/configs/imx8mm_evk_defconfig
+index 067880fafeb..3b6173928ea 100644
+--- a/configs/imx8mm_evk_defconfig
++++ b/configs/imx8mm_evk_defconfig
+@@ -34,6 +34,7 @@ CONFIG_BOOTCOMMAND="run sr_ir_v2_cmd; bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_OF_SYSTEM_SETUP=y
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
++CONFIG_SYS_BOOTM_LEN=0x4000000
+ CONFIG_BOARD_LATE_INIT=y
+ CONFIG_BOARD_EARLY_INIT_F=y
+ CONFIG_SPL_BOARD_INIT=y
+diff --git a/configs/imx8mp_evk_defconfig b/configs/imx8mp_evk_defconfig
+index 8358796f135..e903ffd155c 100644
+--- a/configs/imx8mp_evk_defconfig
++++ b/configs/imx8mp_evk_defconfig
+@@ -23,7 +23,7 @@ CONFIG_SPL_TEXT_BASE=0x920000
+ CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
+ CONFIG_SPL_BSS_START_ADDR=0x96e000
+ CONFIG_SPL_BSS_MAX_SIZE=0x2000
+-CONFIG_SYS_BOOTM_LEN=0x2000000
++CONFIG_SYS_BOOTM_LEN=0x4000000
+ CONFIG_SYS_LOAD_ADDR=0x40400000
+ CONFIG_SPL=y
+ CONFIG_SPL_IMX_ROMAPI_LOADADDR=0x48000000
+diff --git a/configs/imx8mp_frdm_defconfig b/configs/imx8mp_frdm_defconfig
+index d9ac3426546..eb56755dd28 100644
+--- a/configs/imx8mp_frdm_defconfig
++++ b/configs/imx8mp_frdm_defconfig
+@@ -23,7 +23,7 @@ CONFIG_SPL_TEXT_BASE=0x920000
+ CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
+ CONFIG_SPL_BSS_START_ADDR=0x96e000
+ CONFIG_SPL_BSS_MAX_SIZE=0x2000
+-CONFIG_SYS_BOOTM_LEN=0x2000000
++CONFIG_SYS_BOOTM_LEN=0x4000000
+ CONFIG_SYS_LOAD_ADDR=0x40400000
+ CONFIG_SPL=y
+ CONFIG_SPL_IMX_ROMAPI_LOADADDR=0x48000000
+diff --git a/configs/imx91_11x11_evk_defconfig b/configs/imx91_11x11_evk_defconfig
+index 52be6f8ab9f..63a59f554c7 100644
+--- a/configs/imx91_11x11_evk_defconfig
++++ b/configs/imx91_11x11_evk_defconfig
+@@ -34,6 +34,8 @@ CONFIG_SYS_MEMTEST_END=0x90000000
+ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_SIGNATURE=y
++CONFIG_FIT_EXTERNAL_OFFSET=0x3000
++CONFIG_SPL_LOAD_FIT=y
+ CONFIG_OF_SYSTEM_SETUP=y
+ CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx91-11x11-evk.dtb"
+diff --git a/configs/imx91_11x11_frdm_defconfig b/configs/imx91_11x11_frdm_defconfig
+index 614a1989682..b7ff04454c2 100644
+--- a/configs/imx91_11x11_frdm_defconfig
++++ b/configs/imx91_11x11_frdm_defconfig
+@@ -34,6 +34,8 @@ CONFIG_SYS_MEMTEST_END=0x90000000
+ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_SIGNATURE=y
++CONFIG_FIT_EXTERNAL_OFFSET=0x3000
++CONFIG_SPL_LOAD_FIT=y
+ CONFIG_OF_SYSTEM_SETUP=y
+ CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx91-11x11-frdm.dtb"
+diff --git a/configs/imx91_11x11_frdm_imx91s_defconfig b/configs/imx91_11x11_frdm_imx91s_defconfig
+index 18ca717edd4..e75294060e5 100644
+--- a/configs/imx91_11x11_frdm_imx91s_defconfig
++++ b/configs/imx91_11x11_frdm_imx91s_defconfig
+@@ -35,6 +35,8 @@ CONFIG_SYS_MEMTEST_END=0x90000000
+ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_SIGNATURE=y
++CONFIG_FIT_EXTERNAL_OFFSET=0x3000
++CONFIG_SPL_LOAD_FIT=y
+ CONFIG_OF_SYSTEM_SETUP=y
+ CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx91-11x11-frdm-imx91s.dtb"
+diff --git a/configs/imx93_11x11_evk_defconfig b/configs/imx93_11x11_evk_defconfig
+index ad2ac9d744a..b81b4c4c740 100644
+--- a/configs/imx93_11x11_evk_defconfig
++++ b/configs/imx93_11x11_evk_defconfig
+@@ -31,6 +31,8 @@ CONFIG_SYS_MEMTEST_END=0x90000000
+ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_SIGNATURE=y
++CONFIG_FIT_EXTERNAL_OFFSET=0x3000
++CONFIG_SPL_LOAD_FIT=y
+ CONFIG_OF_SYSTEM_SETUP=y
+ CONFIG_BOOTCOMMAND="run sr_ir_v2_cmd;bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx93-11x11-evk.dtb"
+diff --git a/configs/imx93_11x11_frdm_defconfig b/configs/imx93_11x11_frdm_defconfig
+index 623ed1eb650..a5eeef29afb 100644
+--- a/configs/imx93_11x11_frdm_defconfig
++++ b/configs/imx93_11x11_frdm_defconfig
+@@ -31,6 +31,8 @@ CONFIG_SYS_MEMTEST_END=0x90000000
+ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_SIGNATURE=y
++CONFIG_FIT_EXTERNAL_OFFSET=0x3000
++CONFIG_SPL_LOAD_FIT=y
+ CONFIG_OF_SYSTEM_SETUP=y
+ CONFIG_BOOTCOMMAND="run sr_ir_v2_cmd;bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx93-11x11-frdm.dtb"
+diff --git a/configs/imx95_15x15_evk_defconfig b/configs/imx95_15x15_evk_defconfig
+index ef7e2f05fb7..e5246253263 100644
+--- a/configs/imx95_15x15_evk_defconfig
++++ b/configs/imx95_15x15_evk_defconfig
+@@ -3,6 +3,7 @@ CONFIG_ARCH_IMX9=y
+ CONFIG_TEXT_BASE=0x90200000
+ CONFIG_SYS_MALLOC_LEN=0x2000000
+ CONFIG_SYS_MALLOC_F_LEN=0x10000
++CONFIG_SYS_BOOTM_LEN=0x4000000
+ CONFIG_SPL_GPIO=y
+ CONFIG_SPL_LIBCOMMON_SUPPORT=y
+ CONFIG_SPL_LIBGENERIC_SUPPORT=y
+@@ -37,7 +38,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_OF_SYSTEM_SETUP=y
+-CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx95-15x15-evk-adv7535-ap1302.dtb"
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
+diff --git a/configs/imx95_15x15_frdm_defconfig b/configs/imx95_15x15_frdm_defconfig
+index ce8cbde68e8..88b56d1adce 100644
+--- a/configs/imx95_15x15_frdm_defconfig
++++ b/configs/imx95_15x15_frdm_defconfig
+@@ -3,6 +3,7 @@ CONFIG_ARCH_IMX9=y
+ CONFIG_TEXT_BASE=0x90200000
+ CONFIG_SYS_MALLOC_LEN=0x2000000
+ CONFIG_SYS_MALLOC_F_LEN=0x10000
++CONFIG_SYS_BOOTM_LEN=0x4000000
+ CONFIG_SPL_GPIO=y
+ CONFIG_SPL_LIBCOMMON_SUPPORT=y
+ CONFIG_SPL_LIBGENERIC_SUPPORT=y
+@@ -37,7 +38,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_OF_SYSTEM_SETUP=y
+-CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx95-15x15-frdm.dtb"
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
+-- 
+2.34.1
+

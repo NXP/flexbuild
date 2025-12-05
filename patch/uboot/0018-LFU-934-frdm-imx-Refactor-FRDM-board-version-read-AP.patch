@@ -1,0 +1,212 @@
+From 6fa9ca4b43740fead2e6998f6c269a4669ff9aa4 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 21 Oct 2025 15:13:47 +0900
+Subject: [PATCH 18/24] LFU-934 frdm-imx: Refactor FRDM board version read API
+
+FRDM board can read board version through ADC.
+Already have function that directly prints the board version.
+To enable future operations based on the board version,
+refactor this function into an API that returns the board version.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Ye Li <ye.li@nxp.com>
+---
+ board/freescale/imx91_frdm/imx91_frdm.c       | 21 ++++++++++++-------
+ .../imx91_frdm_imx91s/imx91_frdm_imx91s.c     | 20 +++++++++++-------
+ board/freescale/imx93_frdm/imx93_frdm.c       | 21 ++++++++++++-------
+ board/freescale/imx95_frdm/imx95_frdm.c       | 18 +++++++++-------
+ 4 files changed, 48 insertions(+), 32 deletions(-)
+
+diff --git a/board/freescale/imx91_frdm/imx91_frdm.c b/board/freescale/imx91_frdm/imx91_frdm.c
+index 74b58810f19..b9dbd0e5db6 100644
+--- a/board/freescale/imx91_frdm/imx91_frdm.c
++++ b/board/freescale/imx91_frdm/imx91_frdm.c
+@@ -278,12 +278,10 @@ static void board_gpio_init(void)
+ 	dm_gpio_set_value(&ext_pwren_desc, 1);
+ }
+ 
+-static int print_board_version(void)
++static int get_board_version(int *rev, int *data)
+ {
+ 	int i, ret;
+ 	struct udevice *dev;
+-	unsigned int rev[2];
+-	unsigned int data[2];
+ 
+ 	ret = uclass_first_device_check(UCLASS_ADC, &dev);
+ 
+@@ -315,17 +313,24 @@ static int print_board_version(void)
+ 			else
+ 				rev[i] = 6;
+ 		}
+-		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++		return 0;
+ 	} else {
+-		printf("BOARD: unknown\n");
++		return -1;
+ 	}
+-
+-	return 0;
+ }
+ 
+ int board_init(void)
+ {
+-	print_board_version();
++	int ret;
++	unsigned int rev[2];
++	unsigned int data[2];
++
++	ret = get_board_version(rev, data);
++	if (ret == 0)
++		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++	else
++		printf("BOARD: Unable to determine board version\n");
++
+ #ifdef CONFIG_USB_TCPC
+ 	setup_typec();
+ #endif
+diff --git a/board/freescale/imx91_frdm_imx91s/imx91_frdm_imx91s.c b/board/freescale/imx91_frdm_imx91s/imx91_frdm_imx91s.c
+index 4fe8fd195d7..1c7651a1097 100644
+--- a/board/freescale/imx91_frdm_imx91s/imx91_frdm_imx91s.c
++++ b/board/freescale/imx91_frdm_imx91s/imx91_frdm_imx91s.c
+@@ -219,12 +219,10 @@ static void board_gpio_init(void)
+ 	dm_gpio_set_value(&ext_pwren_desc, 1);
+ }
+ 
+-static int print_board_version(void)
++static int get_board_version(int *rev, int *data)
+ {
+ 	int i, ret;
+ 	struct udevice *dev;
+-	unsigned int rev[2];
+-	unsigned int data[2];
+ 
+ 	ret = uclass_first_device_check(UCLASS_ADC, &dev);
+ 
+@@ -256,17 +254,23 @@ static int print_board_version(void)
+ 			else
+ 				rev[i] = 6;
+ 		}
+-		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++		return 0;
+ 	} else {
+-		printf("BOARD: unknown\n");
++		return -1;
+ 	}
+-
+-	return 0;
+ }
+ 
+ int board_init(void)
+ {
+-	print_board_version();
++	int ret;
++	unsigned int rev[2];
++	unsigned int data[2];
++
++	ret = get_board_version(rev, data);
++	if (ret == 0)
++		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++	else
++		printf("BOARD: Unable to determine board version\n");
+ 
+ #ifdef CONFIG_USB_TCPC
+ 	setup_typec();
+diff --git a/board/freescale/imx93_frdm/imx93_frdm.c b/board/freescale/imx93_frdm/imx93_frdm.c
+index 914573eb3f5..505366c17ca 100644
+--- a/board/freescale/imx93_frdm/imx93_frdm.c
++++ b/board/freescale/imx93_frdm/imx93_frdm.c
+@@ -264,12 +264,10 @@ static void board_gpio_init(void)
+ 	dm_gpio_set_value(&desc, 1);
+ }
+ 
+-static int print_board_version(void)
++static int get_board_version(int *rev, int *data)
+ {
+ 	int i, ret;
+ 	struct udevice *dev;
+-	unsigned int rev[2];
+-	unsigned int data[2];
+ 
+ 	ret = uclass_first_device_check(UCLASS_ADC, &dev);
+ 
+@@ -301,17 +299,24 @@ static int print_board_version(void)
+ 			else
+ 				rev[i] = 6;
+ 		}
+-		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++		return 0;
+ 	} else {
+-		printf("BOARD: unknown\n");
++		return -1;
+ 	}
+-
+-	return 0;
+ }
+ 
+ int board_init(void)
+ {
+-	print_board_version();
++	int ret;
++	unsigned int rev[2];
++	unsigned int data[2];
++
++	ret = get_board_version(rev, data);
++	if (ret == 0)
++		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++	else
++		printf("BOARD: Unable to determine board version\n");
++
+ #ifdef CONFIG_USB_TCPC
+ 	setup_typec();
+ #endif
+diff --git a/board/freescale/imx95_frdm/imx95_frdm.c b/board/freescale/imx95_frdm/imx95_frdm.c
+index 3e3e589a566..37be02c1409 100644
+--- a/board/freescale/imx95_frdm/imx95_frdm.c
++++ b/board/freescale/imx95_frdm/imx95_frdm.c
+@@ -332,12 +332,10 @@ void lvds_backlight_on(void)
+ 	dm_i2c_write(dev, 0x8, &reg, 1);
+ }
+ 
+-static int print_board_version(void)
++static int get_board_version(int *rev, int *data)
+ {
+ 	int i, ret;
+ 	struct udevice *dev;
+-	unsigned int rev[2];
+-	unsigned int data[2];
+ 
+ 	ret = uclass_first_device_check(UCLASS_ADC, &dev);
+ 
+@@ -369,19 +367,23 @@ static int print_board_version(void)
+ 			else
+ 				rev[i] = 6;
+ 		}
+-		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++		return 0;
+ 	} else {
+-		printf("BOARD: unknown\n");
++		return -1;
+ 	}
+-
+-	return 0;
+ }
+ 
+ int board_init(void)
+ {
+ 	int ret;
++	unsigned int rev[2];
++	unsigned int data[2];
+ 
+-	print_board_version();
++	ret = get_board_version(rev, data);
++	if (ret == 0)
++		printf("BOARD: V%d.%d(ADC2:%d,ADC3:%d)\n", rev[0], rev[1], data[0], data[1]);
++	else
++		printf("BOARD: Unable to determine board version\n");
+ 
+ 	ret = imx9_scmi_power_domain_enable(IMX95_PD_HSIO_TOP, true);
+ 	if (ret) {
+-- 
+2.34.1
+

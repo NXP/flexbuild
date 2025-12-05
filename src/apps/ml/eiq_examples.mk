@@ -8,9 +8,10 @@
 
 
 eiq_examples:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,eiq_examples,apps/ml) && \
+	 $(call patch_apply,eiq_examples,apps/ml) && \
 	 $(call fbprint_b,"eiq_examples") && \
-	 $(call repo-mngr,fetch,eiq_examples,apps/ml) && \
 	 cd $(MLDIR)/eiq_examples && \
 	 install -d $(DESTDIR)/usr/bin/eiq-examples && \
 	 cp -rfa * $(DESTDIR)/usr/bin/eiq-examples && \

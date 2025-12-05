@@ -8,8 +8,10 @@
 
 fmc: fmlib
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,fmc,apps/networking) && \
-	 $(call repo-mngr,fetch,eth_config,apps/networking) && \
+	 $(call download_repo,fmc,apps/networking) && \
+	 $(call patch_apply,fmc,apps/networking) && \
+	 $(call download_repo,eth_config,apps/networking) && \
+	 $(call patch_apply,eth_config,apps/networking) && \
 	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then \
 	     mkdir -p $(DESTDIR)/etc/fmc/config && \
 	     cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config; \
@@ -19,14 +21,11 @@ fmc: fmlib
 	 elif [ $(DISTROTYPE) = buildroot ]; then \
 	     xmlhdr=$(RFSDIR)/../host/include/libxml2; \
 	 fi && \
-	 if [ ! -d $(NETDIR)/fmlib/include/fmd/Peripherals -o ! -f $(DESTDIR)/usr/lib/libfm-arm.a ]; then \
-	     bld fmlib -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
-	 fi && \
 	 if [ ! -f $$xmlhdr/libxml/parser.h ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p LS; \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 if [ ! -d $(KERNEL_PATH)/include/uapi/linux/fmd ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"fmc") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

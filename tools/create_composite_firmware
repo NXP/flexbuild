@@ -22,90 +22,68 @@
 # Usage: bld fw -m <machine>  [ -b <boottype> ]
 #
 
-
-
 create_composite_firmware() {
     if [ -z "${BOOTTYPE}" -o "${BOOTTYPE}" = all ] && [ -n "$BOOT_TYPE" ]; then
-	BOOTTYPELIST=${BOOT_TYPE}
+        BOOTTYPELIST=${BOOT_TYPE}
     elif [ -n "${BOOTTYPE}" ]; then
-	BOOTTYPELIST=${BOOTTYPE}
+        BOOTTYPELIST=${BOOTTYPE}
     else
-	BOOTTYPELIST=sd
+        BOOTTYPELIST=sd
     fi
 
-    [ -z "${BOOTLOADER_TYPE}" ] && BOOTLOADER_TYPE=uboot
 
     [ -z "${DISK_BOOTLOADER_OFFSET}" ] && DISK_BOOTLOADER_OFFSET=4096
 
-    for bootloader in ${BOOTLOADER_TYPE}; do
-	for boottype in ${BOOTTYPELIST}; do
-	    if [ "${MULTI_BOOTTYPE}" = "true" -a "${bootloader}" = "uefi" ]; then
-		uefi_file=$(eval echo '$'uefi_"$boottype")
-		[ -f $FBOUTDIR/$uefi_file ] || continue
-	    fi
+    for boottype in ${BOOTTYPELIST}; do
 
-	    for sectype in $SECURE_TYPE; do
-		if [ "${sectype}" = "secure" ]; then
-		    secopt=_sec && secstr=_secure
-		    [ "$bootloader" = "uefi" ] && break
-		else
-		    secopt="" && secstr=""
-		fi
+        if [ "${SECURE_TYPE}" = "secure" ]; then
+            secopt=_sec && secstr=_secure
+        else
+            secopt="" && secstr=""
+        fi
 
-		[ "${bootloader}" = "uefi" ] && blname="${boottype}boot_uefi" || blname="${boottype}boot${secstr}"
-		fw_img=$FBOUTDIR/images/firmware_${MACHINE}_${blname}.img
-		rm -f ${fw_img} && img_offset="" && img_file=""
+        blname="${boottype}boot${secstr}"
+        fw_img=$FBOUTDIR/images/firmware_${MACHINE}_${blname}.img
+        rm -f ${fw_img} && img_offset="" && img_file=""
 
-		[ -n "$BOARD_VARIANTS" ] && brdvariants=$BOARD_VARIANTS || brdvariants=brd
+        for i in $(seq 1 ${MAX_COMPOSITE_IMG_NUM}); do
+            img_offset=$(eval echo '$'COMPOSITE_IMG"$i"_OFFSET)
 
-		for brd in $brdvariants; do
-		    [ -z "$BOARD_VARIANTS" ] && brd_extname="" || brd_extname="_$brd"
+            if [ "${MULTI_BOOTTYPE}" = "true" ]; then
+                [ "${SECURE_TYPE}" != "secure" -a $i = $SECURE_HEADER_NUM ] && continue
+                if [ $i = 1 -o $i = $SECURE_HEADER_NUM ]; then
+                    img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$secopt")
+                else
+                    img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE"$secopt")
+                fi
 
-		    for i in $(seq 1 ${MAX_COMPOSITE_IMG_NUM}); do
-			img_offset=$(eval echo '$'COMPOSITE_IMG"$i"_OFFSET)
+                [ $i = 1 -a -z "${img_file}" ] && rm -f ${fw_img} && break
 
-			if [ "${MULTI_BOOTTYPE}" = "true" ]; then
-			    [ "${sectype}" != "secure" -a $i = $SECURE_HEADER_NUM ] && continue
-			    if [ $i = 1 -o $i = $SECURE_HEADER_NUM ]; then
-				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$secopt")
-			    elif [ "${bootloader}" = "uefi" ] && [ $i = 2 -o $i = 3 ]; then
-				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_uefi)
-			    else
-				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE"$secopt")
-			    fi
+                if [ -z "${img_file}" -a "${SECURE_TYPE}" = "secure" ] && [ $i = 1 -o $i = 2 -o $i = 5 ]; then
+                    img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_sec)
+                fi
+                [ -z "${img_file}" ] && img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE)
+                [ -z "${img_file}" -a $i = 2 ] && img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$secopt")
+            else
+                img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype")
+            fi
 
-			    [ $i = 1 -a -z "${img_file}" ] && rm -f ${fw_img} && break
+            [ $i = $MAX_COMPOSITE_IMG_NUM -a "$COMPOSITE_FW_NO_ITB_TYPE" = "$boottype" ] && break
 
-			    if [ -z "${img_file}" -a "${sectype}" = "secure" ] && [ $i = 1 -o $i = 2 -o $i = 5 ]; then
-				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_sec)
-			    fi
-			    [ -z "${img_file}" ] && img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE)
-			    [ -z "${img_file}" -a $i = 2 ] && img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$secopt")
-			else
-			    if [ $i = 1 -a -n "$brd_extname" ]; then
-				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype""$brd_extname")
-				fw_img=$FBOUTDIR/images/firmware_${MACHINE}_${blname}${brd_extname}.img && rm -f ${fw_img}
-			    else
-				img_file=$(eval echo '$'COMPOSITE_IMG"$i"_FILE_"$boottype")
-			    fi
-			fi
-
-			[ $i = $MAX_COMPOSITE_IMG_NUM -a "$COMPOSITE_FW_NO_ITB_TYPE" = "$boottype" ] && break
-
-			if [ -n "${img_file}" ]; then
-			    if [ -e "$FBOUTDIR/${img_file}" ]; then
-				log_mute echo " Writing ${img_offset} <---> ${FBOUTDIR##*/}/${img_file}"
-				if [ $i != 1 ] && [ "${boottype}" = "sd" -o "${boottype}" = "emmc" ]; then
-				    img_offset=`printf "%d - %d\n" ${img_offset} ${DISK_BOOTLOADER_OFFSET} | bc`
-				fi
-				offset=`printf "%d / 1024\n" ${img_offset} | bc`
-				dd if=$FBOUTDIR/${img_file} of=${fw_img} bs=1K seek=${offset} 2>/dev/null
-			    fi
-			fi
-		    done
-		    [ -f ${fw_img} ] && fbprint_d "${fw_img}"; echo
-		done
-	    done
-	done
+            if [ -n "${img_file}" ]; then
+                if [ -e "$FBOUTDIR/${img_file}" ]; then
+                    log_mute echo " Writing ${img_offset} <---> ${FBOUTDIR##*/}/${img_file}"
+                    if [ $i != 1 ] && [ "${boottype}" = "sd" -o "${boottype}" = "emmc" ]; then
+                        img_offset=`printf "%d - %d\n" ${img_offset} ${DISK_BOOTLOADER_OFFSET} | bc`
+                    fi
+                    offset=`printf "%d / 1024\n" ${img_offset} | bc`
+                    dd if=$FBOUTDIR/${img_file} of=${fw_img} bs=1K seek=${offset} 2>/dev/null
+                fi
+            fi
+        done
+        [ -f ${fw_img} ] && fbprint_d "${fw_img}"; echo
     done
+	if [ -f $PKGDIR/apps/security/cst/srk_hash.txt -a $SOCFAMILY = LS ]; then
+		cp -f $PKGDIR/apps/security/cst/srk* $FBOUTDIR/images/
+	fi
 }

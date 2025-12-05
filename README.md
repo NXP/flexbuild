@@ -15,7 +15,7 @@ device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
 ## Build Environment
 --------------------
 - Cross-build in Debian Docker container hosted on x86 Ubuntu or any other distro for arm64 target
-- Cross-build on x86 host machine running Debian 12 for arm64 target
+- Cross-build on x86 host machine running Debian 13 for arm64 target
 - Native-build on ARM board running Debian for arm64 target
 
 ## Host system requirement
@@ -28,16 +28,16 @@ device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
 
 ## Supported distro for target arm64
 ------------------------------------------
-- Debian-based userland    (base, desktop, server)
+- Debian-based userland
 
 
 ## Supported platforms
 ----------------------
 - __iMX platform__:  
-imx8mmevk, imx8mpevk, imx8mpfrdm, imx8mqevk, imx8ulpevk, imx93evk, imx93frdm, imx91evk, imx91frdm
+imx8mmevk, imx8mpevk, imx8mpfrdm, imx93evk, imx93frdm, imx91evk, imx91frdm, imx91sfrdm, imx95evk, imx95frdm
 
 - __Layerscape platform__:  
-ls1028ardb, ls1043ardb, ls1046ardb, ls2160ardb
+ls1028ardb, ls1043ardb, ls1046ardb, lx2160ardb
 
 
 ## Flexbuild Usage
@@ -56,32 +56,31 @@ Usage: bld -m <machine>
 
 Most used example with automated build:
 ```
+Most used example with automated build:
  bld -m imx8mpevk                # automatically build BSP + kernel + NXP-specific components + Debian RootFS for imx8mpevk platform
  bld -m lx2160ardb               # same as above, for lx2160ardb platform
- bld auto -p IMX (or -p LS)      # same as above, for all arm64 iMX (or Layerscape) platforms
 ```
 
 Most used example with separate command:
 ```
- bld bsp -m imx93frdm            # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for single machine
- bld bspall [ -p IMX|LS ]        # generate BSP composite firmware for all i.MX or LS machines
- bld rfs [ -r debian:desktop ]   # generate Debian-based Desktop rootfs  (with more graphics/multimedia packages for Desktop)
- bld rfs -r debian:server        # generate Debian-based Server rootfs   (with more server related packages, no GUI Desktop)
- bld rfs -r debian:base          # generate Debian-based base rootfs     (small footprint with base packages)
- bld linux [ -p IMX|LS]          # compile linux kernel for all arm64 IMX or LS machines
- bld atf -m lx2160rdb -b sd      # compile atf image for SD boot on lx2160ardb
- bld boot [ -p IMX|LS ]          # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for iMX/LS machines
- bld apps                        # compile NXP-specific components against the runtime dependencies of Debian Desktop rootfs for i.MX machines
- bld apps -r debian:server -p LS # compile NXP-specific components against the runtime dependencies of Debian Server rootfs for LS machines
- bld merge-apps [ -r <type> ]    # merge NXP-specific components into target Debian rootfs (Desktop by default,add '-r debian:server' for Server)
- bld packrfs [ -r <type> ]       # pack and compress target rootfs as rootfs_xx.tar.zst (or add '-r debian:server' for Server)
- bld packapps [ -r <type> ]      # pack and compress target app components as apps_xx.tar.zst (add '-p LS' for Layerscape platforms)
- bld docker                      # create or attach docker container to build in docker
- bld clean                       # clean all obsolete firmware/linux/apps binary images except distro rootfs
- bld clean-apps [ -r <type> ]    # clean the obsolete NXP-specific apps components binary images
- bld clean-rfs [ -r <type> ]     # clean target debian-based server arm64 rootfs
+ bld bsp -m <machine>             # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for <machine>
+ bld atf -m <machine> -b sd      # compile atf image for SD boot on <machine>
+ bld boot -m <machine>           # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for <machine>
+ bld linux -m <machine>          # compile linux kernel for <machine>
+
+ bld apps -m <machine>           # compile NXP-specific components against the runtime dependencies for <machine>
+ bld merge-apps -m <machine>     # merge NXP-specific components into <machine> Debian rootfs
+
+ bld rfs -m <machine>            # generate Debian-based rootfs for <machine>
+ bld packrfs -m <machine>        # pack and compress target rootfs as rootfs_<distro_version>_debian_<machine>_arm64.tar.zst
+
  bld clean-bsp                   # clean obsolete BSP (u-boot/atf/firmware) images
  bld clean-linux                 # clean obsolete linux image
+ bld clean-apps -m <machine>     # clean the obsolete <machine>-specific apps components binary images
+ bld clean -m <machine>          # equal to "bld clean bsp" + "bld clean linux" + "bld clean-apps -m <machine>"
+ bld clean-rfs -m <machine>      # clean target debian-based rootfs for <machine>
+
+ bld docker                      # create or attach docker container to build in docker
  bld list                        # list enabled machines and supported various components
  bld host-dep                    # automatically install the depended deb packages on host
 ```

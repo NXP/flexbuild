@@ -1,0 +1,33 @@
+From 74d82cec24b009b1ce9eaf08041cff87aa9f08b5 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Thu, 23 Oct 2025 14:15:26 +0900
+Subject: [PATCH 20/24] LFU-937: frdm-imx95: Modify portprd_config to support
+ larger power
+
+This patch updates the PD configuration to enable the board to
+negotiate up to 20V at 5A (100W) with compatible power sources.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Ye Li <ye.li@nxp.com>
+---
+ board/freescale/imx95_frdm/imx95_frdm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/board/freescale/imx95_frdm/imx95_frdm.c b/board/freescale/imx95_frdm/imx95_frdm.c
+index 0e380ee394f..20a2f0cf95f 100644
+--- a/board/freescale/imx95_frdm/imx95_frdm.c
++++ b/board/freescale/imx95_frdm/imx95_frdm.c
+@@ -49,8 +49,8 @@ struct tcpc_port_config portpd_config = {
+ 	.addr = 0x52,
+ 	.port_type = TYPEC_PORT_UFP,
+ 	.max_snk_mv = 20000,
+-	.max_snk_ma = 3000,
+-	.max_snk_mw = 15000,
++	.max_snk_ma = 5000,
++	.max_snk_mw = 100000,
+ 	.op_snk_mv = 9000,
+ };
+ 
+-- 
+2.34.1
+

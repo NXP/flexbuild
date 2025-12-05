@@ -1,0 +1,34 @@
+From 75c15f4911006353255ec445f1eb23c41ead4069 Mon Sep 17 00:00:00 2001
+From: Steven Yang <zhao.yang_1@nxp.com>
+Date: Tue, 22 Jul 2025 13:35:54 +0800
+Subject: [PATCH 14/24] LFU-906: imx8mp_frdm: Fix the phy address error of
+ ethernet port with eQOS IP
+
+The phy address of eQOS IP port should be 2 not 1,with the wrong address this
+ethernet port failed to work.
+
+Signed-off-by: Steven Yang <zhao.yang_1@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+---
+ arch/arm/dts/imx8mp-frdm.dts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/dts/imx8mp-frdm.dts b/arch/arm/dts/imx8mp-frdm.dts
+index f79869cbad9..82b416eb502 100644
+--- a/arch/arm/dts/imx8mp-frdm.dts
++++ b/arch/arm/dts/imx8mp-frdm.dts
+@@ -278,9 +278,9 @@
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+ 
+-		ethphy0: ethernet-phy@1 {
++		ethphy0: ethernet-phy@2 {
+ 			compatible = "ethernet-phy-ieee802.3-c22";
+-			reg = <1>;
++			reg = <2>;
+ 			eee-broken-1000t;
+ 			reset-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>;
+ 			reset-assert-us = <10000>;
+-- 
+2.34.1
+

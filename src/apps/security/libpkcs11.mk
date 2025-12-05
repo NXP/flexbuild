@@ -5,11 +5,9 @@
 
 
 libpkcs11: secure_obj
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,libpkcs11,apps/security) && \
-	 if [ ! -d $(SECDIR)/secure_obj/securekey_lib/include ]; then \
-	     bld secure_obj -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH) -p $(SOCFAMILY); \
-	 fi && \
+	@[ $(DESTARCH) != arm64  ] && exit || \
+	 $(call download_repo,libpkcs11,apps/security) && \
+	 $(call patch_apply,libpkcs11,apps/security) && \
 	 $(call fbprint_b,"libpkcs11") && \
 	 cd $(SECDIR)/libpkcs11 && \
 	 sed -e 's/^CC/#CC/' -e 's/^LD/#LD/' -e 's/s -Werror/s/' -i flags.mk && \

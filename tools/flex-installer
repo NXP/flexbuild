@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=1.28.2506
+FIVERSION=2512
 DEFAULT_PARTITION_NUMBER=4
 DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
 DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=8192
 DEFAULT_RAW_PARTITION_SIZE_MB=256
-DEFAULT_LINUX_VERSION=6.6.52
-DEFAULT_DISTRO_SVR_URL=https://www.nxp.com/lgfiles/sdk/lsdk2506
+DEFAULT_LINUX_VERSION=6.12.20
+DEFAULT_DISTRO_SVR_URL=https://www.nxp.com/lgfiles/sdk/lsdk2512
 
 
 usage ()
@@ -39,9 +39,8 @@ OPTION:
  -p, --partition    Customize configurable partitions of target disk, default is "-p 3P=512M:8G:-1" if not specified
  -f, --firmware	    The composite firmware image to be programmed into SD card
  -F, --force        Force partition and format target disk regardless of the existing data in disk
- -e, --efi	    Used for the case of UEFI as bootloader instead of U-Boot, valid argument: dtb or acpi
  -m, --machine	    Target machine name to specify the name of composite firmware for automatical deployment
- -u, --url	    Specify URL of distro webserver to override the default one for automatically downloading distro
+ -u, --url	        Specify URL of distro webserver to override the default one for automatically downloading distro
  -o, --offset       Specify the offset to burn firmware to SD card (e.g. 1k, 4k, 32k, 33k)
  -v, --version	    Print version info
 
@@ -75,6 +74,9 @@ Examples for various usage scenarios:
 EOF
     exit
 }
+
+ls_machine_list='ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
+imx_machine_list='imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm '
 
 search_dev() {
     devlist=`ls /dev/sd?`
@@ -216,7 +218,7 @@ partition_format_disk() {
 	print_w "The target /dev/$devname can't be the running device in which $rootdev is running as rootfs"
 	print_w "You can choose a non-running device or do the installation in TinyLinux environment" && exit
     fi
-    print_n "Partitioning /dev/$devname ..."
+    print_n "Partitioning /dev/$devname"
     [ -z "$force_opt" -a ${devname:0:4} != loop -a $instruction != pf ] && [ $actual_pnum -ge 3 ] && check_distro_in_disk
 
     optimal_io_size=$(sudo cat /sys/block/$devname/queue/optimal_io_size)
@@ -266,7 +268,7 @@ partition_format_disk() {
 	sudo parted -a $aligntype -s /dev/$devname mkpart $parttype ${s_p}MiB $end
     done
 
-    print_n "Formatting partitions ..."
+    print_n "Formatting partitions"
     [ -f /usr/bin/man -a  ${devname:0:4} != loop  ] && man ext4 | grep -q metadata_csum && metadataopt=",^metadata_csum"
     for ((i=1; i<=$totalparts; i++)); do
 	if [ $i = "$bootpartnum" ]; then
@@ -312,7 +314,7 @@ flex_install_distro() {
     if [ -n "$bootimg" -o $instruction = auto ] && [ -d $bootimg_n -o -f $bootimg_n ]; then
         [ -f $bootpartition/buildinfo ] && echo Cleaning the existing data in $bootdev && \
         sudo rm -rf $bootpartition/*
-        echo Installing $bootimg_n to $bootdev  ...
+        echo Installing $bootimg_n to $bootdev
         [ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
         [ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
         [ $bootimgtype = zst ] && zstd -d -f $bootimg_n && sudo tar xfm ${bootimg_n%.*} -C $bootpartition
@@ -340,7 +342,7 @@ flex_install_distro() {
     if [ -n "$rootfsimg" -o $instruction = auto ] && [ -d $rootfsimg_n -o -f $rootfsimg_n ]; then
 	check_running_rfs $rootdev
 	[ -d $rootpartition/var/lib ] && check_directory $rootpartition
-	echo Installing $rootfsimg_n to $rootdev ...
+	echo Installing $rootfsimg_n to $rootdev
 	if mount | grep -q "$rootdev on / type"; then
 	    print_w "Can't install rootfs image to the running root filesystem" && exit
 	fi
@@ -363,7 +365,7 @@ flex_install_distro() {
 	    [ -z "$uuid_boot" ] && print_e "Failed to get PARTUUID on $bootdev, please partition and format /dev/$devname" && exit
 	    bootmountfile=$rootpartition/lib/systemd/system/boot.mount
 	    if [ -f $bootmountfile ] && grep -q '^What=UUID=' $bootmountfile; then
-                echo setting UUID $uuid_boot for boot partition $bootdev ...
+                echo setting UUID $uuid_boot for boot partition $bootdev
 		mkdir -p $rootpartition/boot
 		sudo chmod 666 $bootmountfile
                 sudo sed -i s/What=UUID=.*/What=UUID=$uuid_boot/ $bootmountfile
@@ -383,33 +385,7 @@ flex_install_distro() {
 	fi
     fi
 
-    if [ "$enable_efi" = y ]; then
-	# configure grub.cfg for UEFI
-	if [ -f $bootpartition/grub/${machine}_grub.cfg ]; then
-	    partuuid_boot=`lsblk -l --output PARTUUID $bootdev | grep -`
-	    partuuid_root=`lsblk -l --output PARTUUID $rootdev | grep -`
-	    sudo touch $bootpartition/$partuuid_boot
-	    sudo sed -i -e "s/partuuid_boot/$partuuid_boot/" -e "s/partuuid_root/$partuuid_root/" $bootpartition/grub/${machine}_grub.cfg
-	    if [ "$enable_acpi" = "y" ]; then
-		sudo sed -i "s/console=.*,115200/acpi=force/g" $bootpartition/grub/${machine}_grub.cfg
-	    fi
-	fi
-	if ! mount | grep ${devpartname}$efipartnum; then
-	   sudo mount $efidev $efipartition
-	fi
-	sudo mkdir -p $efipartition/EFI/BOOT
-	if [ -f $bootpartition/grub/${machine}_grub.cfg ]; then
-	    sudo cp $bootpartition/grub/${machine}_grub.cfg $efipartition/EFI/BOOT/grub.cfg
-	fi
-	if [ -f $bootpartition/grub/BOOTAA64.EFI ]; then
-	    sudo cp $bootpartition/grub/BOOTAA64.EFI $efipartition/EFI/BOOT/
-	fi
-	if grep -q U-Boot $rootpartition/etc/buildinfo; then
-	    sudo sed -i '3d' $rootpartition/etc/buildinfo
-	fi
-    fi
-
-    echo syncing data ...
+    echo syncing data
     sync
     umount_device
 
@@ -532,24 +508,39 @@ download_distro() {
 	    echo -e "${firmware_url##*/} already exists"
 	elif [ $instruction = download ] || [ "$machine" != ls2088ardb -a "$machine" != ls1012ardb -a \
 	       "$machine" != ls1012afrwy -a "$enable_efi" != y ]; then
-	    echo -e "\n Downloading $firmware_url ..." && curl -ROfk $firmware_url;
+	    echo -e "\n Downloading $firmware_url " && curl -ROfk $firmware_url;
 	    [ $? != 0 ] && print_w "Not found $firmware_url" || ls -l ${firmware_url##*/}
 	fi
     fi
     if [ -f ${bootimg_url##*/} ]; then
 	echo -e "${bootimg_url##*/} already exists"
     else
-	echo -e "\n Downloading $bootimg_url ..." && curl -ROfk $bootimg_url
+	echo -e "\n Downloading $bootimg_url " && curl -ROfk $bootimg_url
     fi
     if [ -f ${rootfsimg_url##*/} ]; then
 	echo -e "${rootfsimg_url##*/} already exists"
     else
-	echo -e "\n Downloading $rootfsimg_url ..." && curl -ROfk $rootfsimg_url
+	echo -e "\n Downloading $rootfsimg_url " && curl -ROfk $rootfsimg_url
     fi
     [ $? != 0 ] && print_e "Failed to download distro images" && exit
     print_n "Downloaded distro images [Done]"
 }
 
+check_board_valid() {
+	if [ -z "$1" ] || [ "$1" = "all" ]; then
+		echo -e "Error: Please specify the board, for example: bld -m imx8mpevk \n"
+		exit 1
+	fi
+    if [[ " $ls_machine_list " =~ " $1 " ]] || [[ " $imx_machine_list " =~ " $1 " ]]; then
+        return 0
+    else
+        echo "Error: Invalid board: '$1'."
+        echo "Valid machine name:"
+        echo "LS_MACHINE_LIST: $ls_machine_list"
+        echo "IMX_MACHINE_LIST: $imx_machine_list"
+        exit 1
+    fi
+}
 
 print_e() {
     echo -e "${RED}$1 ${NC}"
@@ -584,7 +575,7 @@ while true
 do
 	case "$1" in
 	-m|--machine)
-		machine=$2; shift;;
+		machine=$2; check_board_valid $machine; shift;;
 	-f|--firmware)
 		firmware=$2; shift;;
 	-s|--startblock)
@@ -640,9 +631,6 @@ if [ -n "$instruction" ] && [ $instruction != auto -a $instruction != pf -a $ins
      -a $instruction != install -a $instruction != list -a $instruction != backup -a $instruction != mkwic ]; then
     print_e "Invalid instruction $instruction, valid: auto, pf, download, install, list, backup"; exit
 fi
-
-ls_machine_list='ls1012ardb ls1012afrwy ls1021atwr ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx6qpsabresd imx6qsabresd imx6sllevk imx7ulpevk imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91frdmstorm imx93evk imx93frdm '
 
 if [ "$instruction" = list ]; then
     print_n "\nSupported machine list:"
@@ -729,10 +717,7 @@ rootpartition=$mntdir/${devpartname}${rootpartnum}
 backuppartition=$mntdir/${devpartname}${backuppartnum}
 
 if [ $instruction = auto -o $instruction = download ]; then
-    if [ -z "$machine" ] || ! echo "$ls_machine_list $imx_machine_list" | grep -q "$machine "; then
-        print_w "Please specify correct '-m <machine>'"
-	print_n "Valid machine name: $imx_machine_list $ls_machine_list"; exit
-    fi
+    check_board_valid $machine
     if echo $machine | grep -q imx; then
 	portfolio=IMX
     else
@@ -800,7 +785,7 @@ elif [ $instruction = mkwic ]; then
     [ ! -e $rootfsimg_n ] && print_e "Not found $rootfsimg_n" && exit 1
     [ ! -e $bootimg_n ] && print_e "Not found $bootimg_n" && exit 1
     [ ! -e $firmware_n ] && print_e "Not found $firmware_n" && exit 1
-    print_n "Creating sdcard.wic, waiting ..."
+    print_n "Creating sdcard.wic, waiting"
     rm -f sdcard.wic && dd if=/dev/zero of=sdcard.wic bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB
     loopdev=$(sudo losetup -j sdcard.wic | cut -d' ' -f1)
     if [ -n "$loopdev" ]; then
@@ -819,7 +804,7 @@ elif [ $instruction = mkwic ]; then
 elif [ $instruction = backup ]; then
     mount_device
     [ -z "$backupdir" ] && backupdir=$backuppartition; mkdir -p $backupdir; timestamp=$(date +%Y%m%d%H%M)
-    print_n "Backup $backupdir/backup_rootfs_$timestamp.tgz ..."
+    print_n "Backup $backupdir/backup_rootfs_$timestamp.tgz"
     cd $rootpartition && sudo tar --zstd -cf $backupdir/backup_rootfs_$timestamp.tar.zst *
     du -sh $backupdir/backup*.tar.zst
     print_n "Backup completed successfully"

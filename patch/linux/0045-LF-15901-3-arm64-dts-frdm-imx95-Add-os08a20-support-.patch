@@ -1,0 +1,35 @@
+From 57a06f84d7cf7ceea136bdf1b45c468f3daaece9 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Tue, 15 Jul 2025 08:39:19 +0800
+Subject: [PATCH 45/56] LF-15901-3: arm64: dts: frdm-imx95: Add os08a20 support
+ for dual cameras
+
+Create a dtb file for dual os08a20, isp and HDMI display on FRDM-IMX95.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+Reviewed-by: Mirela Rabulea <mirela.rabulea@nxp.com>
+Reviewed-by: Robby Cai <robby.cai@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index dfc20c7a2667..d363ab99102e 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -938,6 +938,12 @@ imx95-15x15-frdm-os08a20-combo-isp-dtbs := imx95-15x15-frdm.dtb \
+ 					   imx95-19x19-evk-neoisp.dtbo
+ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-os08a20-combo-isp.dtb
+ 
++imx95-15x15-frdm-dual-os08a20-isp-dtbs := imx95-15x15-frdm.dtb \
++					  imx95-15x15-frdm-os08a20.dtbo \
++					  imx95-15x15-frdm-os08a20-combo.dtbo \
++					  imx95-19x19-evk-neoisp.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-dual-os08a20-isp.dtb
++
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g399a-rdb3.dtb
+-- 
+2.34.1
+

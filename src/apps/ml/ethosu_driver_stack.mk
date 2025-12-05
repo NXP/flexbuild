@@ -9,16 +9,20 @@
 
 # COMPATIBLE_MACHINE: imx93
 
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
 
-ethosu_driver_stack:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+ethosu_driver_stack: flatbuffers
+	@[ $${MACHINE:0:5} != imx93  ] && exit || \
+	 $(call download_repo,ethosu_driver_stack,apps/ml) && \
+	 $(call patch_apply,ethosu_driver_stack,apps/ml) && \
 	 $(call fbprint_b,"ethosu_driver_stack") && \
-	 $(call repo-mngr,fetch,ethosu_driver_stack,apps/ml) && \
 	 cd $(MLDIR)/ethosu_driver_stack && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
+	 export CC="$(CROSS_COMPILE)gcc" && \
+	 export CXX="$(CROSS_COMPILE)g++" && \
+	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(RFSDIR)/usr/lib" && \
+	 export CPPFLAGS="--sysroot=$(RFSDIR) -I$(RFSDIR)/usr/include" && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH)/dist && \
 	 cmake  -S $(MLDIR)/ethosu_driver_stack \
 		-B $(MLDIR)/ethosu_driver_stack/build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \

@@ -1,0 +1,42 @@
+From 341f1f48dd0febc1c5b9503829dd5982c98182ba Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 14 Jul 2025 19:13:37 -0700
+Subject: [PATCH] Fix the compiling error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+tvm/_ffi/_cython/./ndarray.pxi:100:66: Cannot assign type 'void (object) except *'
+to 'PyCapsule_Destructor' (alias of 'void (*)(object) noexcept').
+Exception values are incompatible. Suggest adding 'noexcept'
+to the type of '_c_dlpack_deleter'.
+
+Traceback (most recent call last):
+
+  File "/opt/samba/nxa22691/tyt_flexbuild/components_lsdk2512/
+apps/ml/tvm/python/setup.py", line 185, in <module>
+
+    ext_modules=config_cython(),
+
+                ~~~~~~~~~~~~~^^
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ python/tvm/_ffi/_cython/ndarray.pxi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python/tvm/_ffi/_cython/ndarray.pxi b/python/tvm/_ffi/_cython/ndarray.pxi
+index 9fd3aa438..812cca937 100644
+--- a/python/tvm/_ffi/_cython/ndarray.pxi
++++ b/python/tvm/_ffi/_cython/ndarray.pxi
+@@ -21,7 +21,7 @@ cdef const char* _c_str_dltensor = "dltensor"
+ cdef const char* _c_str_used_dltensor = "used_dltensor"
+ 
+ 
+-cdef void _c_dlpack_deleter(object pycaps):
++cdef void _c_dlpack_deleter(object pycaps) noexcept:
+     cdef DLManagedTensor* dltensor
+     if pycapsule.PyCapsule_IsValid(pycaps, _c_str_dltensor):
+         dltensor = <DLManagedTensor*>pycapsule.PyCapsule_GetPointer(pycaps, _c_str_dltensor)
+-- 
+2.34.1
+

@@ -9,16 +9,17 @@
 
 
 imx_vpu_hantro:
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 cd $(MMDIR) && \
-	 if [ ! -d imx_vpu_hantro ]; then \
-	     wget -q $(repo_vpu_hantro_bin_url) -O vpu_hantro.bin $(LOG_MUTE) && chmod +x vpu_hantro.bin && \
-	     ./vpu_hantro.bin --auto-accept $(LOG_MUTE) && \
-	     mv imx-vpu-hantro-* imx_vpu_hantro && rm -f vpu_hantro.bin; \
-	 fi && \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	$(call dl_by_wget,vpu_hantro_bin,vpu_hantro.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_vpu_hantro ]; then \
+		chmod +x $(FBDIR)/dl/vpu_hantro.bin; \
+		$(FBDIR)/dl/vpu_hantro.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-vpu-hantro-* imx_vpu_hantro; \
+	fi && \
 	 \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/hantrodec.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"imx_vpu_hantro") && \
 	 cd imx_vpu_hantro && \

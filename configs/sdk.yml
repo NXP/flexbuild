@@ -1,27 +1,22 @@
 # NXP Debian Linux SDK Distribution configuration for iMX and Layerscape MPU platforms
 
 DISTRIB_NAME:    "NXP Debian Linux SDK"
-DISTRIB_VERSION: "lsdk2506"
+DISTRIB_VERSION: "lsdk2512"
 RELEASE_TYPE:    "external"
 
 
 # default repo tag which can be overrided by specified tag
-DEFAULT_REPO_TAG: "lf-6.6.52-2.2.0"
+DEFAULT_REPO_TAG: "lf-6.12.20-2.0.0"
 
 # default Debian version for target userland
-DEBIAN_CODENAME: "bookworm"
-DEBIAN_VERSION:  "12"
-
-# default build options for CI auto build
-BUILD_DEBIAN_BASE: n
-BUILD_DEBIAN_SERVER: y
-BUILD_DEBIAN_DESKTOP: y
-BUILD_YOCTO_RFS: n
-BUILD_BUILDROOT_RFS: n
+DEBIAN_CODENAME: "trixie"
+DEBIAN_VERSION:  "13"
 
 # enable/disable custom packagegroups
-PKG_GROUPS_GRAPHICS: y
-PKG_GROUPS_MULTIMEDIA: y
+# This feature is intended for advanced users.
+# Improper configuration may lead to build failures
+# or cause the system to operate incorrectly.
+# It is strongly recommended not to modify this setting.
 PKG_GROUPS_NETWORKING: y
 PKG_GROUPS_UTILS: y
 PKG_GROUPS_SECURITY: y
@@ -33,22 +28,14 @@ PKG_GROUPS_ROBOTICS: n
 DEFAULT_SOC_FAMILY: IMX
 
 # force build in docker environment
+# must be 'y'
 FORCE_BUILD_IN_DOCKER: y
 
-# choose one of the 3 ways to fetch/update repo for various use cases
-UPDATE_REPO_PER_TAG: y
-UPDATE_REPO_PER_BRANCH: n
-UPDATE_REPO_PER_COMMIT: n
-
-
-# Optionally, fetch the prebuilt SDK rootfs instead of building from scratch
-FETCH_PREBUILT_SDK_RFS: n
+# The URL for pre-built images
 DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/sdk"
 
 # fuse provisioning
 CONFIG_FUSE_PROVISIONING: n
-
-INSTALL_DESKTOP_TEST_PACKAGES: n
 
 # user can customize the default path of components source and build output path
 DEFAULT_OUT_PATH: $FBDIR/build_${DISTRIB_VERSION}
@@ -59,350 +46,7 @@ DEFAULT_PKGDIR: $FBDIR/components_${DISTRIB_VERSION}
 KERNEL_CONFIG:
   ARM64_LS:  "defconfig lsdk.config"
   ARM64_IMX: "imx_v8_defconfig"
-  ARM32_LS:  "multi_v7_defconfig multi_v7_lpae.config lsdk.config"
-  ARM32_IMX: "imx_v7_defconfig"
 
 
 # DPAA2 MC firmware version
 MC_FW_VERSION:  "10.39.0"
-
-IMX_MCORE_VERSION: "2.16.000"
-
-
-repo:
-
-# BSP component repositories
-  atf:
-    url:  https://github.com/nxp-imx/imx-atf.git
-
-  uboot:
-    url:  https://github.com/nxp-imx/uboot-imx.git
-
-  rcw:
-    url:  https://github.com/nxp-qoriq/rcw.git
-
-  mbedtls:
-    url:  https://github.com/Mbed-TLS/mbedtls.git
-    tag:  mbedtls-3.6.2
-
-  mc_utils:
-    url:  https://github.com/nxp-qoriq/mc-utils.git
-    tag:  mc_release_10.39.0
-
-  mc_bin:
-    url:  https://github.com/nxp-qoriq/qoriq-mc-binary.git
-    tag:  mc_release_10.39.0
-
-  ddr_phy_bin:
-    url:  https://github.com/nxp-qoriq/ddr-phy-binary.git
-
-  qe_ucode:
-    url:  https://github.com/nxp-qoriq/qoriq-qe-ucode.git
-
-  fm_ucode:
-    url:  https://github.com/nxp-qoriq/qoriq-fm-ucode.git
-
-  pfe_bin:
-    url:  https://github.com/nxp-qoriq/qoriq-engine-pfe-bin.git
-
-  phy_cortina:
-    url:  https://github.com/nxp-qoriq/qoriq-firmware-cortina.git
-
-  phy_inphi:
-    url:  https://github.com/nxp-qoriq/qoriq-firmware-inphi.git
-
-  imx_mkimage:
-    url:  https://github.com/nxp-imx/imx-mkimage.git
-
-  seco_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-seco-5.9.4.1-0333596.bin
-
-  scfw_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.17.0-83624b9.bin
-
-  firmware_imx_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.26-d4c33ab.bin
-    # /lib/firmware for ddr,hdmi,dp,vpu,easrc,epdc,xcvr,xuvi
-
-  imx_firmware:
-    url:  https://github.com/NXP/imx-firmware.git
-    tag:  lf-6.6.52-2.2.0
-    # firmware for wifi/bt
-
-  fw_ele_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-ele-imx-1.3.0-17945fc.bin
-
-  fw_upower_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-upower-1.3.1.bin
-    # not found in release document
-
-
-# kernel and modules git repositories
-  linux:
-    url:  https://github.com/nxp-imx/linux-imx.git
-    tag:  lf-6.6.52-2.2.0
-
-  cryptodev_linux:
-    url:  https://github.com/cryptodev-linux/cryptodev-linux.git
-    tag:  cryptodev-linux-1.14
-    #commit: bb8bc7cf60d
-    
-  lttng_modules:
-    url:  https://github.com/lttng/lttng-modules.git
-    tag:  v2.13.11
-     
-  mdio_proxy_module:
-    url:  https://github.com/nxp-qoriq/mdio-proxy-module.git
-
-  isp_vvcam_module:
-    url:  https://github.com/nxp-imx/isp-vvcam.git
-
-
-# networking component repositories
-  restool:
-    url:  https://github.com/nxp-qoriq/restool.git
-
-  fmc:
-    url:  https://github.com/nxp-qoriq/fmc.git
-
-  spc:
-    url:  https://github.com/nxp-qoriq/spc.git
-
-  tsntool:
-    url:  https://github.com/nxp-qoriq/tsntool.git
-
-  dpdk:
-    url:  https://github.com/nxp-qoriq/dpdk.git
-
-  vpp:
-    url:  https://github.com/nxp-qoriq/vpp.git
-
-  ovs_dpdk:
-    url:  https://github.com/nxp-qoriq/ovs-dpdk.git
-
-  pktgen_dpdk:
-    url:  https://github.com/pktgen/pktgen-dpdk.git
-    tag:  pktgen-23.06.1
-
-  mtcp_dpdk:
-    url:  https://github.com/nxpmicro/mtcp.git
-
-  aiopsl: 
-    url:  https://github.com/nxp-qoriq/aiopsl.git
-
-  ceetm:
-    url:  https://github.com/nxp-qoriq/ceetm.git
-
-  dce:
-    url:  https://github.com/nxp-qoriq/dce.git
-
-  flib:
-    url:  https://github.com/nxp-qoriq/flib.git
-
-  fmlib:
-    url:  https://github.com/nxp-qoriq/fmlib.git
-
-  aquantia_fw_util:
-    url:  https://github.com/nxp-qoriq/aquantia-firmware-utility.git
-
-  gpp_aioptool:
-    url:  https://github.com/nxp-qoriq/gpp-aioptool.git
-
-  qbman_userspace:
-    url:  https://github.com/nxp-qoriq/qbman_userspace.git
-
-  eth_config:
-    url:  https://github.com/nxp-qoriq/eth-config.git
-
-
-# security component repositories
-  cst:
-    url:  https://github.com/nxp-qoriq/cst.git
-
-  openssl:
-    url:  https://github.com/openssl/openssl.git
-    tag:  openssl-3.0.0
-    # must use this version to match debian 12
-
-  libpkcs11:
-    url:  https://github.com/nxp-qoriq/libpkcs11.git
-
-  secure_obj:
-    url:  https://github.com/nxp-qoriq/secure_obj.git
-
-  optee_os:
-    url:  https://github.com/nxp-qoriq/optee_os.git
-
-  optee_client:
-    url:  https://github.com/nxp-qoriq/optee_client.git
-
-  optee_test:
-    url:  https://github.com/nxp-qoriq/optee_test.git
-
-  crconf:
-    url:  https://github.com/Thermi/crconf.git
-    tag:  0.4
-
-  keyctl_caam:
-    url:  https://github.com/nxp-imx/keyctl_caam.git
-
-  imx_smw:
-    url:  https://github.com/nxp-imx/imx-smw.git
-
-  ecc_example:
-    url:  https://github.com/nxp/plug-and-trust.git
-    commit: 1e17cde135868
-
-  openssl_provider_se05x:
-    url:  https://github.com/NXPPlugNTrust/se05x-openssl-provider.git
-    tag:  v01.00.02
-
-# graphics component repositories
-  wayland:
-    url:  https://gitlab.freedesktop.org/wayland/wayland.git
-    tag:  1.22.0
-
-  wayland_protocols:
-    url:  https://github.com/nxp-imx/wayland-protocols-imx.git
-
-  weston:
-    url:  https://github.com/nxp-imx/weston-imx.git
-
-  libdrm:
-    url:  https://github.com/nxp-imx/libdrm-imx.git
-
-  gpu_viv_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/imx-gpu-viv-6.4.11.p2.10-aarch64-6.6.52.bin
-
-  gputop:
-    url:  https://github.com/nxp-imx/imx-gputop.git
-
-  apitrace:
-    url:  https://github.com/nxp-imx/apitrace-imx.git
-
-  libgpuperfcnt_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/libgpuperfcnt-6.4.11.p2-6.6.52.bin
-
-  imx_gpu_g2d_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p2.8-aarch64-95408a4.bin
-
-  imx_dpu_g2d_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v1-2.2.0-7943590.bin
-
-  imx_pxp_g2d:
-    url:  https://github.com/nxp-imx/imx-g2d-pxp.git
-
-  imx_g2d_samples:
-    url:  https://github.com/nxp-imx/g2d-samples.git
-
-  cogl:
-    url:  https://gitlab.gnome.org/GNOME/cogl.git
-    tag:  1.22.8
-
-  clutter_gst:
-    url:  https://gitlab.gnome.org/GNOME/clutter-gst.git
-    tag:  3.0.27
-
-  mesa:
-    url:  https://gitlab.freedesktop.org/mesa/mesa.git
-    tag:  mesa-23.0.3
-
-
-# multimedia component repositories
-  vpu_hantro_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.34.0-a0eda50.bin
-
-  vpu_hantro_vc_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/imx-vpu-hantro-vc-1.10.1-6.6.52.bin
-
-  vpu_hantro_daemon_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.3.0-33b724c.tar.gz
-
-  basler_camera_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/basler-camera-4.2.2.24.3-d1f506a.bin
-
-  imx_isp_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2506/isp-imx-4.2.2.24-6.6.52.bin
-
-  gstreamer:
-    url:  https://github.com/nxp-imx/gstreamer.git
-
-  gst_plugins_base:
-    url:  https://github.com/nxp-imx/gst-plugins-base.git
-
-  gst_plugins_good:
-    url:  https://github.com/nxp-imx/gst-plugins-good.git
-
-  gst_plugins_bad:
-    url:  https://github.com/nxp-imx/gst-plugins-bad.git
-
-  gst_plugins_ugly:
-    url:  https://github.com/GStreamer/gst-plugins-ugly.git
-    commit: 499d3cd
-
-  imx_gst_plugin:
-    url:  https://github.com/nxp-imx/imx-gst1.0-plugin.git
-
-  imx_alsa_plugin:
-   url:   https://github.com/nxp-imx/imx-alsa-plugins.git
-
-  imx_lib:
-   url:  https://github.com/nxp-imx/imx-lib.git
-
-  alsa_lib:
-    url:  https://github.com/alsa-project/alsa-lib.git
-    tag:  v1.2.11
-
-  sof_zephyr_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-zephyr-2.10.0.tar.gz
-
-  imx_codec_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-codec-4.9.0.bin
-
-  imx_dsp_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.8.bin
-
-  imx_dsp_codec_ext_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-codec-ext-2.1.8.bin
-
-  imx_dspc_asrc_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dspc-asrc-1.0.1.bin
-
-  imx_parser_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.9.1-5d91190.bin
-
-  imx_sw_pdm_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sw-pdm-1.0.3.bin
-
-  imx_vpuwrap:
-    url:  https://github.com/nxp/imx-vpuwrap.git
-
-  cheese:
-    url:  https://gitlab.gnome.org/GNOME/cheese.git
-    tag:  43.0
-
-
-# connectivity component repositories
-  nxp_wlan_bt:
-    url:  https://github.com/nxp-imx/mwifiex.git
-
-
-# generic component repositories
-  imx_test:
-    url:  https://github.com/nxp-imx/imx-test.git
-
-  firmwared:
-    url:  https://github.com/teg/firmwared.git
-    commit: 2e6b5db43d
-
-  buildroot:
-    url:  https://github.com/buildroot/buildroot.git
-    tag:  2024.02.2
-
-  yocto_poky:
-    url:  https://git.yoctoproject.org/poky.git
-    tag:  scarthgap-5.0.2
-
-  yocto_oe:
-    url:  https://github.com/openembedded/meta-openembedded.git
-    branch: scarthgap

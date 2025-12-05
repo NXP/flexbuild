@@ -1,123 +1,175 @@
 #!/bin/bash
+set +e
 
-# Copyright 2019-2024 NXP
-#
-# SPDX-License-Identifier: BSD-3-Clause
-#
-# Shengzhou Liu <shengzhou.liu@nxp.com>
+log() { echo "[INFO] $*"; }
 
-# Runtime Dynamic Configuration for single distro image on various NXP i.MX/Layerscape platforms.
+safe_run() {
+    "$@"
+    local status=$?
+    if [[ $status -ne 0 ]]; then
+        echo "[WARN] Command failed: $* (exit code $status)"
+    fi
+    return $status
+}
 
-set -e
+# Safely disable systemd service
+safe_disable_service() {
+    local service=$1
+    if systemctl list-unit-files | grep -q "^$service.service"; then
+        safe_run systemctl disable "$service" --now
+    fi
+}
 
+# Safely mask systemd service
+safe_mask_service() {
+    local service=$1
+    if systemctl list-unit-files | grep -q "^$service.service"; then
+        safe_run systemctl mask "$service"
+    fi
+}
+
+log "Sourcing board_id.sh"
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 
-issue_content=$(tr '[:upper:]' '[:lower:]' < /etc/issue)
-case "$issue_content" in
-    *"debian desktop"*)
-        distro_type="desktop"
+: ${board_id:?}
+
+log "Detected board: $board_id"
+
+case "${board_id}" in
+    imx8mm*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
+        safe_run ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
+        safe_run ln -sf weston.ini.imx8mm /etc/xdg/weston/weston.ini
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
         ;;
-    *"debian server"*)
-        distro_type="server"
+    imx8mp*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
+        # libcamera is not supported on imx8mpevk
+        safe_run mv /usr/lib/gstreamer-1.0/libgstlibcamera.so /usr/lib/gstreamer-1.0/libgstlibcamera.so.bak
+
+        safe_run ln -sf /lib/systemd/system/imx8-isp.service /etc/systemd/system/multi-user.target.wants/imx8-isp.service
+        safe_run ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
+        safe_run ln -sf weston.ini.imx8mp /etc/xdg/weston/weston.ini
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
         ;;
-    *"debian base"*)
-        distro_type="base"
+    imx8qm*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
+        # libcamera is not supported on imx8mpevk
+        safe_run mv /usr/lib/gstreamer-1.0/libgstlibcamera.so /usr/lib/gstreamer-1.0/libgstlibcamera.so.bak
+
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
+        safe_run ln -sf weston.ini.imx8qm /etc/xdg/weston/weston.ini
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
         ;;
-    *)
-        echo "unknown distro" >&2
+    imx91*)
+        safe_run rm -rf /etc/systemd/system/display-manager.service
+        safe_run ln -sf weston.ini.imx91 /etc/xdg/weston/weston.ini
+        safe_run systemctl enable weston
+        ;;
+    imx93*)
+        safe_run ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
+        if [ -f /usr/lib/libg2d-pxp.so.2.4.0 ]; then
+            safe_run rm -f /usr/lib/libg2d-viv.so.2.4.0
+        fi
+        safe_run rm -rf /etc/systemd/system/display-manager.service
+        safe_run ln -sf weston.ini.imx93 /etc/xdg/weston/weston.ini
+        safe_run systemctl enable weston
+        ;;
+    imx95*)
+        safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
+        safe_run sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
+        safe_run grep -q 'WantedBy=graphical.target' /lib/systemd/system/gdm.service || \
+            sed -i '$a\[Install]\nWantedBy=graphical.target' /lib/systemd/system/gdm.service
+        safe_run ln -sf /lib/systemd/system/gdm.service /etc/systemd/system/graphical.target.wants/gdm.service
+
+        safe_run ln -sf weston.ini.imx95 /etc/xdg/weston/weston.ini
+        if [ -f /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0 ]; then
+            safe_run /usr/bin/patchelf --replace-needed libGL.so.1 libGLESv2.so.2 /lib/aarch64-linux-gnu/libmutter-16.so.0.0.0
+        fi
+        sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
+            /usr/share/applications/chromium.desktop
+        /usr/bin/update-desktop-database
+        ;;
+    ls1028a*)
+        safe_run ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini
+        safe_run rm -rf /etc/systemd/system/display-manager.service
+        safe_run systemctl enable weston
+        ;;
+    ls1043*|ls1046*)
+        safe_run ln -sf /lib/systemd/system/fmc.service /etc/systemd/system/multi-user.target.wants/fmc.service
         ;;
 esac
 
-: ${board_id:?}
-: ${distro_type:=unknown}
+# disable speed up firmware loading since ap1302 firmware is slow
+#if [ -f /usr/lib/udev/rules.d/50-firmware.rules ]; then
+#    safe_run sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
+#fi
+safe_run /usr/bin/hostnamectl set-hostname "${board_id}"
 
-/usr/bin/hostnamectl set-hostname "$board_id"
+safe_disable_service strongswan
 
-if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx8mp* ]]; then
-    systemctl enable imx8-isp.service
+### network config
+# disable rename network interface
+safe_run ln -sf /dev/null /etc/udev/rules.d/80-net-setup-link.rules
+
+# disable legacy networking service
+safe_disable_service networking
+
+safe_run systemctl enable systemd-networkd --now
+
+# disable wpa_supplicant since it always print logs
+safe_mask_service wpa_supplicant
+
+# disable systemd-networkd-wait-online to speed up the boot
+safe_disable_service systemd-networkd-wait-online
+safe_disable_service NetworkManager-wait-online
+
+if [ -d /usr/share/glib-2.0/schemas/ ]; then
+    safe_run /usr/bin/glib-compile-schemas /usr/share/glib-2.0/schemas/ >/dev/null 2>&1
+fi
+safe_run /usr/sbin/ldconfig
+safe_run /usr/sbin/depmod -a
+safe_run /usr/sbin/update-initramfs -u
+
+# disable itself because it runs only ones.
+systemctl disable platcfg.service &>/dev/null || true
+
+safe_run dpkg --configure -a
+safe_run systemctl daemon-reload
+
+if [[ $PPID -eq 1 ]] && [[ -f /etc/systemd/system/graphical.target.wants/weston.service ]]; then
+    safe_run systemctl start weston
 fi
 
-# vpu hantro daemon
-if [[ "$board_id" == imx8mp* ]]; then
-    ln -sf vsidaemon-IMX8MP /usr/bin/vsidaemon
-#    rm -rf /etc/systemd/system/multi-user.target.wants/firmwared.service
-elif [[ "$board_id" == imx8mq* ]]; then
-    ln -sf vsidaemon-IMX8MQ /usr/bin/vsidaemon
-elif [[ "$board_id" == imx8mm* ]]; then
-    ln -sf vsidaemon-IMX8MM /usr/bin/vsidaemon
-    ln -sf libg2d-viv-mx8mm.so.2.2.0 /usr/lib/libg2d.so.2
-    [ -f /usr/lib/libg2d-viv.so.2.2.0 ] && rm -f /usr/lib/libg2d-viv.so.2.2.0
-elif [[ "$board_id" == imx93* ]]; then
-    ln -sf libg2d-pxp.so.2.2.0 /usr/lib/libg2d.so.2
-    [ -f /usr/lib/libg2d-viv.so.2.2.0 ] && rm -f /usr/lib/libg2d-viv.so.2.2.0
-fi
+log "Board initialization finished."
 
-if [[ "$board_id" == imx8qm* || "$board_id" == imx8qxp* ]] && [[ ! -L /lib/firmware/vpu ]]; then
-    ln -sf imx/vpu /lib/firmware/vpu
-fi
-
-# imx91 don't have g2d
-if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx91* ]]; then
-    /usr/bin/sed -i '/^use-g2d=true/s/^/# /' /etc/xdg/weston/weston.ini
-    /usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
-    /usr/bin/sed -i '/gopoint/d' /etc/xdg/weston/weston.ini
-fi
-
-# for imx8mm
-if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx8mm* ]]; then
-    /usr/bin/sed -i '/^gbm-format=argb8888/s/^/# /' /etc/xdg/weston/weston.ini
-    /usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
-fi
-
-# for imx93
-if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx93* ]]; then
-    /usr/bin/sed -i '/^xwayland=true$/a modules=screen-share.so' /etc/xdg/weston/weston.ini
-fi
-
-if [[ "$distro_type" == "desktop" ]]; then
-    sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
-    sed -e  's/.*AutomaticLoginEnable.*/AutomaticLoginEnable = true/'  -e '0,/user1/s/.*user1.*/AutomaticLogin = debian/'  -i /etc/gdm3/daemon.conf
-    sed -i '$a\[Install]\nWantedBy=graphical.target\n' /lib/systemd/system/gdm.service
-    rm -rf /etc/systemd/system/display-manager.service
-fi
-
-# ap1302 firmware need it
-/usr/bin/sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
-
-# wifi module need it
-/usr/sbin/depmod -a
-/usr/sbin/update-initramfs -u
-
-if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx8* || "$board_id" == ls1028* ]]; then
-    systemctl enable gdm.service
-fi
-
-if [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx91* || "$board_id" == imx93* ]]; then
-    rm -rf /usr/lib/{libGLESv2.so*,libEGL.so*,libcogl.so*,libgstallocators-1.0.so,libvulkan.so}
-    rm -rf /usr/lib/{libdrm.so*,libgbm.so*,libgbm_viv.so}
-    rm -rf /usr/lib/libclutter-gst-3.0.so*
-
-    # default desktop is weston
-    systemctl disable gdm --now
-    systemctl enable weston
-fi
-
-
-# fmc service only for DPAA on ls1043/ls1046
-if [[ "$board_id" == ls1043a* || "$board_id" == ls1046a* ]]; then
-    systemctl enable fmc.service
-fi
-
-# for server and imx93/imx91, wifi will use 3 ports
-if [[ "$board_id" == imx9* ]] || ( [[ "$distro_type" == server ]] && ! ([[ "$board_id" == ls* ]] || [[ "$board_id" == lx* ]] )); then
-    /usr/bin/sed -i '/drv_mode=1/d' /boot/firmware/nxp/wifi_mod_para.conf
-fi
-
-systemctl disable platcfg.service
-
-systemctl daemon-reload
-
-if [[ $PPID -eq 1 ]] && [[ "$distro_type" == "desktop" ]] && [[ "$board_id" == imx91* || "$board_id" == imx93* ]]; then
-    systemctl start weston
-fi

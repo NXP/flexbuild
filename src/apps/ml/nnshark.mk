@@ -6,18 +6,14 @@
 
 # Depend: gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad libgpuperfcnt perf
 
+#nnshark:
 nnshark: gst_plugins_bad libgpuperfcnt
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,nnshark,apps/ml) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgstplay-1.0.so.0 ]; then \
-	     bld gst_plugins_bad -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libgpuperfcnt.so ]; then \
-	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+	@[ $${MACHINE:0:5} != imx8m ] && exit || \
+	 $(call download_repo,nnshark,apps/ml,submod) && \
+	 $(call patch_apply,nnshark,apps/ml) && \
 	 $(call fbprint_b,"nnshark") && \
-	 sudo cp -rf $(DESTDIR)/usr/lib/libgpuperfcnt.so* $(RFSDIR)/usr/lib/ && \
-	 sudo cp -rf $(DESTDIR)/usr/include/gpuperfcnt $(RFSDIR)/usr/include/ && \
+	 export CPPFLAGS="-I$(DESTDIR)/usr/include" && \
+	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-rpath-link,$(DESTDIR)/usr/lib" && \
 	 cd $(MLDIR)/nnshark && \
 	 sed -i 's/--exclude=gtkdocize//' autogen.sh && \
 	 ./autogen.sh --noconfigure --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \

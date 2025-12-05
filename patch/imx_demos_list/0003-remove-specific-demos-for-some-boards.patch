@@ -1,0 +1,107 @@
+From 191c61dbcad350e234a14782debda728ebea34b8 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Fri, 26 Sep 2025 00:55:36 -0700
+Subject: [PATCH] remove specific demos for some boards
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ demos.json | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/demos.json b/demos.json
+index dd3b65a..9f2d2af 100644
+--- a/demos.json
++++ b/demos.json
+@@ -76,7 +76,7 @@
+              "name": "ML Gateway",
+              "id": "ml_gate_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/ml_gateway/ml_gateway.py",
+-             "compatible": "imx8mp, imx8mpfrdm, imx8mm, imx93, imx93frdm",
++             "compatible": "imx",
+              "screenshot": "ml_gateway.jpg",
+              "icon": "ml-icon.svg",
+              "description": "ML Gateway easily configures the i.MX 8M Plus and i.MX 93 EVKs as machine learning accelerator servers and allows resource-constrained MPU systems (clients) without NPUs to connect and run ML inference. This is currently enabled for i.MX 8M Mini on the client side."
+@@ -134,7 +134,7 @@
+             "name": "LP Baby Cry Detection",
+             "id": "lp_baby_cry",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/low_power_ml/lp_baby_cry_detection.py",
+-            "compatible": "imx93, imx93frdm",
++            "compatible": "imx",
+             "screenshot": "LP-baby-cry-detection.jpg",
+             "icon": "ml-icon.svg",
+             "description": "Note: To run this example, append 'clk_ignore_unused' in u-boot 'mmcargs' env, before booting linux. An application example showing how to implement baby crying and glass breaking detection in Cortex-M33 core when Linux is in suspend mode. When the application is started, Linux enters suspend mode, and users must enter the timeout value in Cortex-M33 console. Then Cortex-M33 records one second audio input from MIC array on the i.MX 93 EVK board, and try to identify whether there is baby crying or glass breaking sound in the audio by running ML model inference. If baby crying or glass breaking sound is detected, it will wake up Cortex-A55 core and send the result to Linux through rpmsg-tty. If baby crying or glass breaking sound is not detected, it will suspend Cortex-M33 core for the configured timeout and wake up Cortex-M33 core to record one second audio again, and run the same process in an infinite loop until a baby crying or glass breaking sound is detected. An internet connection is required."
+@@ -142,7 +142,7 @@
+             "name": "LP KWS Detection",
+             "id": "lp_kws",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/low_power_ml/lp_kws_detection.py",
+-            "compatible": "imx93, imx93frdm",
++            "compatible": "imx",
+             "screenshot": "LP-kws-detection.jpg",
+             "icon": "ml-icon.svg",
+             "description": "Note: To run this example, append 'clk_ignore_unused' in u-boot 'mmcargs' env, before booting linux. An application example showing how to implement key word detection in Cortex-M33 core when Linux is in suspend mode. When the application is started, Linux enters suspend mode. Cortex-M33 will record one second audio input from MIC array on the i.MX 93 EVK board, and try to identify whether there is key word UP in the audio by running ML model inference. If key word is detected, it will wake up Cortex-A55 core and stop. If no key word is detected, it will record one second audio again, and run the same process in an infinite loop until a key word is detected. An internet connection is required."
+@@ -184,7 +184,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "two-way-video-streaming.jpg",
+-            "compatible": "imx8mp, imx8mpfrdm, imx8mm",
++            "compatible": "imx",
+             "description": "Allows user to implement a two way video streaming demo that displays video encode and decode capabilities between i.MX devices in local network."
+         },{
+             "name": "Multi Cameras Preview",
+@@ -212,7 +212,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "video-dump.jpg",
+-            "compatible": "imx8mp, imx8mpfrdm",
++            "compatible": "imx",
+             "description": "This program allows users to dump the raw frame data from a camera onto a connected drive. This demo will only work with a compatible Basler camera."
+         }],
+         "Audio":[{
+@@ -242,7 +242,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "voice-control.jpg",
+-            "compatible": "imx8mp, imx8mpfrdm, imx8mm",
++            "compatible": "imx",
+             "description": "See NXP's Voice Technology in action! Use your voice to open and close various applications. This requires 8-MIC Array Board (8MIC-RPI-MX8) installed on the i.MX hardware (Visit NXP.com for help). Please note that this will override '/etc/asound.conf' file. It will be restored if this application is gracefully terminated."
+         },
+         {
+@@ -252,7 +252,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "multimedia-player.jpg",
+-            "compatible": "imx8mm, imx8mp, imx8mpfrdm, imx93, imx93frdm",
++            "compatible": "imx",
+             "description": "This is an application for controlling an audio player using the Bluetooth communication protocol by the use of voice commands. WakeWord supported:'HEY NXP'. Voice commands supported : PLAY MUSIC, PAUSE, PREVIOUS SONG, NEXT SONG, VOLUME UP, VOLUME DOWN, MUTE, STOP, STOP PLAYER. This application requires 8-MIC Array Board (8MIC-RPI-MX8) installed on the i.MX hardware (Visit NXP.com for help)."
+         },
+         {
+@@ -262,7 +262,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "smart-kitchen-screenshot.jpg",
+-            "compatible": "imx8mm, imx8mp, imx8mpfrdm, imx93, imx93frdm",
++            "compatible": "imx8mm, imx8mp, imx93",
+             "description": "This application simulates a smart kitchen controlled by voice commands using NXP's Voice Intelligent Technology (VIT). How to use: First say a wakeword to select a kitchen's item (hood, oven or aircon) and then say one of the item's available commands (e.g. \"Hey hood, light on\"). WakeWords supported are HEY HOOD, HEY OVEN, HEY AIRCON. Global Commands are ENTER, EXIT, RUN DEMO, STOP DEMO. Hood commands are FAN OFF, FAN ON, FAN LOW, FAN HIGH, LIGHT OFF, LIGHT ON. Aircon commands are DRY MODE, COOL MODE, FAN MODE SWING OFF, SWING ON, FAN LOW, FAN HIGH. Oven commands are CLOSE DOOR, OPEN DOOR. The item's functions can also be activated by clicking on the item's controls using a mouse or touchscreen."
+         },
+         {
+@@ -272,7 +272,7 @@
+              "source": "",
+              "icon": "ebike-vit-icon.svg",
+              "screenshot": "ebike-vit-screenshot.jpg",
+-             "compatible": "imx8mm, imx8mp, imx8mpfrdm, imx93, imx93frdm",
++             "compatible": "imx8mm, imx8mp, imx93",
+              "description": "This application simulates a ebike controlled by voice commands using NXP's Voice Intelligent Technology (VIT). First say a wakeword to wake up ebike and then say one of the available commands.The supported wake words are HEY NXP, HEY E-Bike. Global Commands are NEXT PAGE, LAST PAGE, RUN DEMO, STOP DEMO. The page can also be switched by clicking on the UI using a mouse or touchscreen."
+ 	}]
+     }]
+@@ -285,7 +285,7 @@
+             "source": "",
+             "icon": "tsn.svg",
+             "screenshot": "tsn.jpg",
+-            "compatible": "imx8mm, imx8mp, imx8mpfrdm",
++            "compatible": "imx",
+             "description": "Enhancements to Traffic Scheduling: Time-Aware Shaper. It separates communication on the Ethernet network into configurable length, repeating time cycles, thereby contributing to the delivery of time-critical traffic. Each network node's egress ports have per-queue traffic windows which may be opened/closed at specified times.The talker-to-listener path across the network may be dedicated to this priority traffic alone, at real-time (T), causing the talker's traffic to be delivered reliably and deterministically across the network."
+         }]
+     }]
+-- 
+2.34.1
+

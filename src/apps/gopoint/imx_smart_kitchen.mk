@@ -7,13 +7,14 @@ SMART_KITCHEN_DIR = ${GPNT_APPS_FOLDER}/scripts/multimedia/smart-kitchen
 #POSIX_IPC_PKG = http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.tar.gz
 
 imx_smart_kitchen:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_smart_kitchen,apps/gopoint) && \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,imx_smart_kitchen,apps/gopoint,git) && \
+#	 $(call patch_apply,imx_smart_kitchen,apps/gopoint) && \
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
-#	     bld nxp_afe -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	     bld nxp_afe -m $(MACHINE); \
 #	 fi && \
 #	 if [[ ! -f $(DESTDIR)/usr/lib/nxp-afe/libvoiceseekerlight.so.2.0 ]]; then \
-#	     bld imx_voiceui -r $(DISTROTYPE):$(DISTROVARIANT); \
+#	     bld imx_voiceui -m $(MACHINE); \
 #	 fi && \
 #	 \
 #	 cd $(GPDIR)/imx_smart_kitchen && \
@@ -25,16 +26,19 @@ imx_smart_kitchen:
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	 $(call fbprint_b,"imx_smart_kitchen") && \
 	 cd $(GPDIR)/imx_smart_kitchen && \
-	 if [ -d $(FBDIR)/patch/imx_smart_kitchen ] && [ ! -f .patchdone ]; then \
-		 git am $(FBDIR)/patch/imx_smart_kitchen/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 sed -i 's|/home/root/.nxp-demo-experience|/opt/gopoint-apps|g' \
 	     main.cpp main.cpp misc/scripts/vit-notify/WWCommandNotify && \
 	 if [ ! -f lvgl/.patchdone ]; then \
-	     cp misc/patches/*.patch lvgl/ && \
-	     cp -r wayland-client/* lv_drivers/wayland/ && \
-	     cd lvgl && git am *.patch $(LOG_MUTE) && touch .patchdone && cd ..; \
+	     cd lvgl; \
+		 git am $(FBDIR)/patch/imx_smart_kitchen/0001-Added-custom_tick_get-function.patch $(LOG_MUTE); \
+		 touch .patchdone; \
 	 fi && \
+	 cd $(GPDIR)/imx_smart_kitchen && \
+	 if [ ! -f .patchdone ]; then \
+		 git am $(FBDIR)/patch/imx_smart_kitchen/0001-Update-lv_anim_set_exec_cb-with-correct-function-typ.patch $(LOG_MUTE); \
+		 touch .patchdone; \
+	 fi && \
+	 cp -r wayland-client/* lv_drivers/wayland/ && \
 	 rm -rf smart-kitchen-deploy && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d -m 755 $(DESTDIR)$(SMART_KITCHEN_DIR) && \

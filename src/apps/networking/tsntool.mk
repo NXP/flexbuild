@@ -6,10 +6,9 @@
 # depends on libnl-3-dev
 
 tsntool:
-	@[ $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	 @$(call download_repo,tsntool,apps/networking) && \
+	 $(call patch_apply,tsntool,apps/networking) && \
 	 $(call fbprint_b,"tsntool") && \
-	 $(call repo-mngr,fetch,tsntool,apps/networking) && \
-	 $(call repo-mngr,fetch,linux,linux) && \
 	 if [ ! -f $(RFSDIR)/lib/aarch64-linux-gnu/libnl-genl-3.so -a ! -f $(RFSDIR)/usr/lib/libnl-genl-3.so ]; then \
 	     echo missing libnl-genl-3.so in $(RFSDIR) && exit 1; \
 	 fi && \

@@ -18,22 +18,23 @@ endif
 
 
 imx_dsp:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"imx_dsp") && \
-	 cd $(MMDIR) && \
-	 if [ ! -d imx_dsp ]; then \
-	     wget -q $(repo_imx_dsp_bin_url) -O imx_dsp.bin $(LOG_MUTE) && \
-	     chmod +x imx_dsp.bin && ./imx_dsp.bin --auto-accept $(LOG_MUTE) && \
-	     mv imx-dsp* imx_dsp && rm -f imx_dsp.bin; \
-	 fi && \
-	 cd imx_dsp && \
-	 ./configure CC=aarch64-linux-gnu-gcc \
+	@[ $${MACHINE:0:4} != imx8  ] && exit || \
+	$(call dl_by_wget,imx_dsp_bin,imx_dsp.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_dsp ]; then \
+		chmod +x $(FBDIR)/dl/imx_dsp.bin; \
+		$(FBDIR)/dl/imx_dsp.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-dsp* imx_dsp; \
+	fi && \
+	$(call fbprint_b,"imx_dsp") && \
+	cd "$(MMDIR)"/imx_dsp && \
+	./configure CC=aarch64-linux-gnu-gcc \
 	   --bindir=/unit_tests \
 	   -datadir=/lib/firmware \
 	   --enable-armv8 \
 	   --prefix=/usr $(LOG_MUTE) && \
-	 export DESTDIR=$(FBOUTDIR)/bsp/imx_firmware && \
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
-	 $(MAKE) install $(LOG_MUTE) && \
-	 ln -sf hifi4_$(HIFI4_PLATFORM).bin $(FBOUTDIR)/bsp/imx_firmware/lib/firmware/imx/dsp/hifi4.bin && \
-	 $(call fbprint_d,"imx_dsp")
+	export DESTDIR=$(DESTDIR) && \
+	$(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	$(MAKE) install $(LOG_MUTE) && \
+	ln -sf hifi4_$(HIFI4_PLATFORM).bin $(DESTDIR)/lib/firmware/imx/dsp/hifi4.bin && \
+	$(call fbprint_d,"imx_dsp")

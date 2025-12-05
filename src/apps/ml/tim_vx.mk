@@ -10,18 +10,18 @@
 # DEPEND: gpu_viv
 
 
+#tim_vx:
 tim_vx: gpu_viv
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,tim_vx,apps/ml) && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libOpenVX.so ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+	@[ $${MACHINE:0:5} != imx8m  ] && exit || \
+	 $(call download_repo,tim_vx,apps/ml) && \
+	 $(call patch_apply,tim_vx,apps/ml) && \
 	 $(call fbprint_b,"tim_vx") && \
 	 cd $(MLDIR)/tim_vx && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(DESTDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(DESTDIR)" && \
 	 mkdir -p $(DESTDIR)/usr/include/VX && \
 	 cp -f prebuilt-sdk/*linux/include/VX/vx_khr_cnn.h $(DESTDIR)/usr/include/VX && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cmake  -S $(MLDIR)/tim_vx \
 		-B $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) \

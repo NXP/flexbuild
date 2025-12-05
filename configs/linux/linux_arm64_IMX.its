@@ -20,8 +20,8 @@
 			arch = "arm64";
 			os = "linux";
 			compression = "gzip";
-			load = <0x80280000>;
-			entry = <0x80280000>;
+			load = <0x94280000>;
+			entry = <0x94280000>;
 		};
 
 		initrd {
@@ -124,9 +124,9 @@
 			compression = "none";
 			load = <0x90000000>;
 		};
-		imx91frdmstorm-dtb {
+		imx91sfrdm-dtb {
 			description = "Flattened Device Tree blob";
-			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx91-11x11-frdm-storm.dtb");
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx91-11x11-frdm-imx91s.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";
@@ -145,6 +145,24 @@
 		imx93frdm-dtb {
 			description = "Flattened Device Tree blob";
 			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx93-11x11-frdm.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx95evk-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-15x15-evk.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+		imx95frdm-dtb {
+			description = "Flattened Device Tree blob";
+			data = /incbin/("../../build/linux/kernel/arm64/IMX/imx95-15x15-frdm.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";
@@ -214,10 +232,10 @@
 			fdt = "imx91frdm-dtb";
 			ramdisk = "initrd";
 		};
-		imx91frdmstorm {
+		imx91sfrdm {
 			description = "Boot Linux kernel";
 			kernel = "kernel";
-			fdt = "imx91frdmstorm-dtb";
+			fdt = "imx91sfrdm-dtb";
 			ramdisk = "initrd";
 		};
 		imx93evk {
@@ -230,6 +248,18 @@
 			description = "Boot Linux kernel";
 			kernel = "kernel";
 			fdt = "imx93frdm-dtb";
+			ramdisk = "initrd";
+		};
+		imx95evk {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx95evk-dtb";
+			ramdisk = "initrd";
+		};
+		imx95frdm {
+			description = "Boot Linux kernel";
+			kernel = "kernel";
+			fdt = "imx95frdm-dtb";
 			ramdisk = "initrd";
 		};
 	};

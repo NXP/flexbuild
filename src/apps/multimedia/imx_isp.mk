@@ -10,25 +10,17 @@
 # disable the v4l_drm_test
 
 imx_isp: imx_gpu_g2d gpu_viv libdrm
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 cd $(MMDIR) && \
-	 if [ ! -d $(MMDIR)/imx_isp ]; then \
-	     wget -q $(repo_imx_isp_bin_url) -O imxisp.bin $(LOG_MUTE) && \
-	     chmod +x imxisp.bin && ./imxisp.bin --auto-accept $(LOG_MUTE) && \
-	     mv isp-imx-* imx_isp && rm -f imxisp.bin; \
+	@[ $${MACHINE:0:6} != imx8mp ] && exit || \
+	$(call dl_by_wget,imx_isp_bin,imxisp.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_isp ]; then \
+		chmod +x $(FBDIR)/dl/imxisp.bin; \
+		$(FBDIR)/dl/imxisp.bin --auto-accept --force $(LOG_MUTE); \
+		mv isp-imx-* imx_isp; \
+	fi && \
+	 if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
+		 bld linux-headers -m $(MACHINE); \
 	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libg2d.so ]; then \
-	     bld imx_gpu_g2d -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libOpenCL.so ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/xf86drm.h ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-         if [ ! -f $(DESTDIR)/usr/include/linux/dma-buf.h ]; then \
-             bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-         fi && \
 	 \
 	 $(call fbprint_b,"imx_isp") && \
 	 cd imx_isp/appshell && \

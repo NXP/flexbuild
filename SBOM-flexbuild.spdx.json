@@ -1,0 +1,35 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2025-12-05T03:31:47Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.26"
+  },
+  "name": "flexbuild-v25.12",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/6a44ffd4-0188-4aa7-9ea6-ed72c2bdd7c4",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-6a44ffd4-0188-4aa7-9ea6-ed72c2bdd7c4",
+      "name": "flexbuild",
+      "versionInfo": "v25.12",
+      "licenseConcluded": "(BSD-3-Clause)",
+      "licenseDeclared": "(BSD-3-Clause)",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: flexbuild",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-6a44ffd4-0188-4aa7-9ea6-ed72c2bdd7c4"
+    }
+  ]
+}

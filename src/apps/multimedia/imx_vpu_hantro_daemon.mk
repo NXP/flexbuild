@@ -13,28 +13,23 @@
 SOCLIST = IMX8MM IMX8MQ IMX8MP
 
 imx_vpu_hantro_daemon: imx_vpu_hantro imx_vpu_hantro_vc
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 if [ ! -d $(MMDIR)/imx_vpu_hantro_daemon ]; then \
-	     cd $(MMDIR) && wget -q $(repo_vpu_hantro_daemon_tar_url) -O imx_vpu_hantro_daemon.tar.gz $(LOG_MUTE) && \
-	     tar xf imx_vpu_hantro_daemon.tar.gz && rm -rf imx_vpu_hantro_daemon.tar.gz && \
-	     mv imx-vpu-hantro-daemon-* imx_vpu_hantro_daemon; \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libhantro.so ]; then \
-	     bld imx_vpu_hantro -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/hantro_VC8000E_enc/ewl.h ]; then \
-	     bld imx_vpu_hantro_vc -r $(DISTROTYPE):$(DISTROVARIANT) -p $(SOCFAMILY); \
-	 fi && \
-	 $(call fbprint_b,"imx_vpu_hantro_daemon") && \
-	 cd $(MMDIR)/imx_vpu_hantro_daemon && \
-	 sed -e 's|HANTRO_VC8000E_LIB_DIR =.*|HANTRO_VC8000E_LIB_DIR = $(DESTDIR)/usr/lib|' \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	$(call dl_by_wget,vpu_hantro_daemon_tar,imx_vpu_hantro_daemon.tar.gz) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_vpu_hantro_daemon ]; then \
+		mkdir -p "$(MMDIR)"/imx_vpu_hantro_daemon; \
+		tar xf $(FBDIR)/dl/imx_vpu_hantro_daemon.tar.gz --strip-components=1 --wildcards -C $(MMDIR)/imx_vpu_hantro_daemon; \
+	fi && \
+	$(call fbprint_b,"imx_vpu_hantro_daemon") && \
+	cd $(MMDIR)/imx_vpu_hantro_daemon && \
+	sed -e 's|HANTRO_VC8000E_LIB_DIR =.*|HANTRO_VC8000E_LIB_DIR = $(DESTDIR)/usr/lib|' \
 	     -e 's|HANTRO_G1G2_LIB_DIR =.*|HANTRO_G1G2_LIB_DIR = $(DESTDIR)/usr/lib|' \
 	     -e 's|HANTRO_H1_LIB_DIR =.*|HANTRO_H1_LIB_DIR = $(DESTDIR)/usr/lib|' \
 	     -e 's|CTRLSW_HDRPATH =.*|CTRLSW_HDRPATH = $(DESTDIR)/usr/include|' -i Makefile && \
-	 for socplat in $(SOCLIST); do \
+	for socplat in $(SOCLIST); do \
 	     $(MAKE) clean && \
 	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat $(LOG_MUTE) && \
 	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat install $(LOG_MUTE) && \
 	     mv $(DESTDIR)/usr/bin/vsidaemon $(DESTDIR)/usr/bin/vsidaemon-$$socplat; \
-	 done && \
-	 $(call fbprint_d,"imx_vpu_hantro_daemon")
+	done && \
+	$(call fbprint_d,"imx_vpu_hantro_daemon")

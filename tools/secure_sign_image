@@ -10,7 +10,7 @@
 secure_sign_image() {
     # $1: <machine>,  $2: <boottype>
     [ ! -f $FBDIR/configs/board/$1.conf ] && echo $FBDIR/configs/board/$1.conf not exist! && exit
-    [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst
+    [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst -m $1
     [ $MACHINE = ls1012afrwy ] && secfile=IMG7 || secfile=IMG4
     if ! grep -q ${secfile}_FILE_${2}_sec $FBDIR/configs/board/$1.conf; then exit; fi
     . $FBDIR/configs/board/$1.conf
@@ -19,27 +19,27 @@ secure_sign_image() {
     [ "$IMA_EVM" = y -a ! -f $FBOUTDIR/$bootscript_enforce ] && bld distroscr -t -m $1
     [ "$ENCAP" = y -a ! -f $FBOUTDIR/$bootscript_dec ] && bld distroscr -e -m $1
 
-    [ ! -f $kernel_img ] && echo $kernel_img not exist, generating it ... && \
+    [ ! -f $kernel_img ] && echo $kernel_img not exist, generating it && \
     bld linux -p $SOCFAMILY -a $DESTARCH
 
     [ ! -f $tiny_itb ] && bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY
 
-    fbprint_n "Signing $2boot images for $1 ..."
-    [ "$ENCAP" = y ] && cp $FBOUTDIR/$bootscript_dec $PKGDIR/apps/security/cst/bootscript_dec && echo "Copying bootscript_decap"
+    fbprint_n "Signing $2boot images for $1 "
+    [ "$ENCAP" = y ] && cp $FBOUTDIR/$bootscript_dec $PKGDIR/apps/security/cst/bootscript_dec && log_mute echo "Copying bootscript_decap"
 
     if [ "$IMA_EVM" = y ]; then
 	[ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
 	bld rfs -r buildroot:imaevm -a $DESTARCH
-	cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $PKGDIR/apps/security/cst/initramfs.img && echo "Copying initramfs.img"
-	cp -f $FBOUTDIR/$bootscript_enforce $PKGDIR/apps/security/cst/bootscript_enforce && echo "Copying bootscript_enforce"
+	cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $PKGDIR/apps/security/cst/initramfs.img && log_mute echo "Copying initramfs.img"
+	cp -f $FBOUTDIR/$bootscript_enforce $PKGDIR/apps/security/cst/bootscript_enforce && log_mute echo "Copying bootscript_enforce"
     fi
 
     cd $PKGDIR/apps/security/cst && \
     rm -f bootscript uImage.dtb uImage.bin kernel.itb secboot_hdrs*.bin hdr*.out && \
-    cp -f $FBOUTDIR/$distro_bootscript bootscript && echo "Copying bootscript" && \
-    cp -f $FBOUTDIR/$device_tree uImage.dtb && echo "Copying dtb" && \
-    cp -f $tiny_itb kernel.itb && echo "Copying linux tiny itb" && \
-    cp -f $kernel_img uImage.bin && echo "Copying kernel" && cd -
+    cp -f $FBOUTDIR/$distro_bootscript bootscript && log_mute echo "Copying bootscript" && \
+    cp -f $FBOUTDIR/$device_tree uImage.dtb && log_mute echo "Copying dtb" && \
+    cp -f $tiny_itb kernel.itb && log_mute echo "Copying linux tiny itb" && \
+    cp -f $kernel_img uImage.bin && log_mute echo "Copying kernel" && cd "$FBDIR"
 
     rcwimg_sec=`eval echo '${'"rcw_""$2"'_sec}'`
     rcwimg_nonsec=`eval echo '${'"rcw_""$2"'}'`
@@ -60,12 +60,12 @@ secure_sign_image() {
 	fi
     fi
 
-    [ -f $pfe_fw ] || bld pfe_bin
-    [ ${1:0:7} = ls1012a ] && cp $pfe_fw $PKGDIR/apps/security/cst/pfe.itb && echo "Copying PFE"
+    [ -f $pfe_fw ] || bld pfe_bin -m $1
+    [ ${1:0:7} = ls1012a ] && cp $pfe_fw $PKGDIR/apps/security/cst/pfe.itb && log_mute echo "Copying PFE"
 
     if [ ${1:0:7} = ls1088a -o ${1:0:7} = ls2088a -o ${1:0:5} = lx216 ]; then
-	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin
-	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils
+	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin -m $1
+	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils -m $1
 	cp -f $FBOUTDIR/$COMPOSITE_IMG11_FILE $PKGDIR/apps/security/cst/mc.itb
 	cp -f $FBOUTDIR/$COMPOSITE_IMG12_FILE $PKGDIR/apps/security/cst/dpl.dtb
 	cp -f $FBOUTDIR/$COMPOSITE_IMG13_FILE $PKGDIR/apps/security/cst/dpc.dtb
@@ -75,13 +75,13 @@ secure_sign_image() {
     if [ $2 = nand -a -n "$nand_script" ]; then
 	. $nand_script
     elif [ $2 = sd -o $2 = emmc ] && [ -n "$sd_script" ]; then
-	. $sd_script
+	log_mute . $sd_script
     elif [ $2 = nor -a -n "$nor_script" ]; then
-	. $nor_script
+	log_mute . $nor_script
     elif [ $2 = qspi -a -n "$qspi_script" ]; then
-	. $qspi_script
+	log_mute . $qspi_script
     elif [ $2 = xspi -a -n "$xspi_script" ]; then
-	. $xspi_script
+	log_mute . $xspi_script
     fi
 
     if [ ${1:0:7} = ls1028a ]; then

@@ -5,13 +5,11 @@
 # section: iMX multimedia
 # description: NXP Audio Front End (AFE) for incorporating Voice Assistants
 
-nxp_afe:
-ifeq ($(CONFIG_NXP_AFE),y)
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,nxp_afe,apps/multimedia) && \
-	 if  [ ! -f $(DESTDIR)/usr/lib/pkgconfig/alsa.pc ]; then \
-	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
+#nxp_afe:
+nxp_afe: alsa_lib
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,nxp_afe,apps/multimedia) && \
+	 $(call patch_apply,nxp_afe,apps/multimedia) && \
 	 [ -f $(DESTDIR)/unit_tests/nxp-afe ] && exit || \
 	 $(call fbprint_b,"nxp_afe") && \
 	 cd $(MMDIR)/nxp_afe && \
@@ -33,4 +31,3 @@ ifeq ($(CONFIG_NXP_AFE),y)
 	 install -m 0755 deploy_afe/UAC_VCOM_composite.sh  $(DESTDIR)/unit_tests/nxp-afe && \
 	 \
 	 $(call fbprint_d,"imx_afe")
-endif

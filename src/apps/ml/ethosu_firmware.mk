@@ -7,9 +7,10 @@
 # COMPATIBLE_MACHINE: imx93
 
 ethosu_firmware:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $${MACHINE:0:5} != imx93  ] && exit || \
+	 $(call download_repo,ethosu_firmware,apps/ml) && \
+	 $(call patch_apply,ethosu_firmware,apps/ml) && \
 	 $(call fbprint_b,"ethosu_firmware") && \
-	 $(call repo-mngr,fetch,ethosu_firmware,apps/ml) && \
 	 cd $(MLDIR)/ethosu_firmware && \
-	 cp -f ethosu_firmware $(DESTDIR)/usr/lib/ && \
+	 cp -f ethosu_firmware $(DESTDIR)/lib/firmware && \
 	 $(call fbprint_d,"ethosu_firmware")

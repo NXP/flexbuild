@@ -22,18 +22,19 @@ endif
 
 
 imx_dsp_codec_ext:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"imx_dsp_codec_ext") && \
-	 cd $(MMDIR) && \
-	 if [ ! -d imx_dsp_codec_ext ]; then \
-	     wget -q $(repo_imx_dsp_codec_ext_bin_url) -O imx_dsp_codec_ext.bin $(LOG_MUTE) && \
-	     chmod +x imx_dsp_codec_ext.bin && ./imx_dsp_codec_ext.bin --auto-accept $(LOG_MUTE) && \
-	     mv imx-dsp-codec-ext* imx_dsp_codec_ext && rm -f imx_dsp_codec_ext.bin; \
-	 fi && \
-	 cd imx_dsp_codec_ext && \
-	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
+	@[ $${MACHINE:0:4} != imx8  ] && exit || \
+	$(call dl_by_wget,imx_dsp_codec_ext_bin,imx_dsp_codec_ext.bin) && \
+	cd $(MMDIR) && \
+	if [ ! -d "$(MMDIR)"/imx_dsp_codec_ext ]; then \
+		chmod +x $(FBDIR)/dl/imx_dsp_codec_ext.bin; \
+		$(FBDIR)/dl/imx_dsp_codec_ext.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-dsp-codec-ext* imx_dsp_codec_ext; \
+	fi && \
+	$(call fbprint_b,"imx_dsp_codec_ext") && \
+	cd imx_dsp_codec_ext && \
+	./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	   $(EXTRA_CONF) \
 	   --prefix=/usr $(LOG_MUTE) && \
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
-	 $(MAKE) install $(LOG_MUTE) && \
-	 $(call fbprint_d,"imx_dsp_codec_ext")
+	$(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	$(MAKE) install $(LOG_MUTE) && \
+	$(call fbprint_d,"imx_dsp_codec_ext")

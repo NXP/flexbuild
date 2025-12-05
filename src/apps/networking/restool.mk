@@ -6,7 +6,9 @@
 
 restool:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,restool,apps/networking) && \
+	 $(call download_repo,restool,apps/networking) && \
+	 $(call patch_apply,restool,apps/networking) && \
+	 $(call fbprint_b,"restool") && \
 	 cd $(NETDIR)/restool && \
 	 $(MAKE) clean && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \

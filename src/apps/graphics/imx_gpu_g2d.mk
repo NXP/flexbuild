@@ -5,20 +5,18 @@
 
 # GPU G2D library and apps for i.MX with 2D GPU
 
-# COMPATIBLE_MACHINE: imx8mm
+# GC520L                            -> imx-gpu-g2d : 8mm, 8mp, 8ulp
 
 imx_gpu_g2d:
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call fbprint_b,"imx_gpu_g2d") && \
-	 cd $(GRAPHICSDIR) && \
-	 if [ ! -d $(GRAPHICSDIR)/imx_gpu_g2d ]; then \
-	     wget -q $(repo_imx_gpu_g2d_bin_url) -O imx_gpu_g2d.bin $(LOG_MUTE) && \
-	     chmod +x imx_gpu_g2d.bin && ./imx_gpu_g2d.bin --auto-accept $(LOG_MUTE) && \
-	     mv imx-gpu-g2d-* imx_gpu_g2d && rm -f imx_gpu_g2d.bin; \
-	 fi && \
-	 cd imx_gpu_g2d && \
-	 cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/ && \
-	 cp -Pf g2d/usr/lib/libg2d* $(DESTDIR)/usr/lib/ && \
-	 cp g2d/usr/lib/mx8mm/libg2d-viv.so.2.2.0 $(DESTDIR)/usr/lib/libg2d-viv-mx8mm.so.2.2.0 && \
-	 $(call fbprint_d,"imx_gpu_g2d")
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:6} != ls1028  ] && exit || \
+	$(call dl_by_wget,imx_gpu_g2d_bin,imx_gpu_g2d.bin) && \
+	cd $(GRAPHICSDIR) && \
+	if [ ! -d "$(GRAPHICSDIR)"/imx_gpu_g2d ]; then \
+		chmod +x $(FBDIR)/dl/imx_gpu_g2d.bin; \
+		$(FBDIR)/dl/imx_gpu_g2d.bin --auto-accept --force $(LOG_MUTE); \
+		mv imx-gpu-g2d-* imx_gpu_g2d; \
+	fi && \
+	$(call fbprint_b,"imx_gpu_g2d") && \
+	cd imx_gpu_g2d && \
+	cp -af g2d/usr "$(DESTDIR)/" && \
+	$(call fbprint_d,"imx_gpu_g2d")

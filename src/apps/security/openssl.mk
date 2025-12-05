@@ -6,16 +6,13 @@
 
 
 openssl:
-	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,openssl,apps/security) && \
+	 @$(call download_repo,openssl,apps/security,submod) && \
+	 $(call patch_apply,openssl,apps/security) && \
 	 if [ ! -d $(DESTDIR)/usr/local/include/crypto ]; then \
-	     bld cryptodev_linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld cryptodev_linux -m $(MACHINE); \
 	 fi && \
 	 $(call fbprint_b,"OpenSSL") && \
 	 cd $(SECDIR)/openssl && \
-	 if [ -d $(FBDIR)/patch/openssl ] && [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/openssl/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 ./Configure enable-devcryptoeng linux-aarch64 shared \
 		     -I$(DESTDIR)/usr/include -I$(PKGDIR)/linux/cryptodev_linux \
 		     --prefix=/usr \

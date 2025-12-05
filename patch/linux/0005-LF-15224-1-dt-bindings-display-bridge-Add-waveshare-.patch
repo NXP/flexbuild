@@ -1,0 +1,127 @@
+From 4dd0160173fb013cc2a7c3c38a4e16a964698769 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 3 Jun 2025 16:57:04 +0900
+Subject: [PATCH 05/56] LF-15224-1 dt-bindings: display: bridge: Add waveshare
+ DSI2DPI unit support
+
+Add dt-binding documentation for waveshare DSI2DPI unit
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ .../display/bridge/waveshare,dsi2dpi.yaml     | 103 ++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/display/bridge/waveshare,dsi2dpi.yaml
+
+diff --git a/Documentation/devicetree/bindings/display/bridge/waveshare,dsi2dpi.yaml b/Documentation/devicetree/bindings/display/bridge/waveshare,dsi2dpi.yaml
+new file mode 100644
+index 000000000000..678922ebe138
+--- /dev/null
++++ b/Documentation/devicetree/bindings/display/bridge/waveshare,dsi2dpi.yaml
+@@ -0,0 +1,103 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/display/bridge/waveshare,dsi2dpi.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Waveshare MIPI-DSI to DPI Converter bridge
++
++maintainers:
++  - Joseph Guo <qijian.guo@nxp.com>
++
++description:
++  Waveshare bridge board is part of Waveshare panel which converts DSI to DPI.
++
++properties:
++  compatible:
++    const: waveshare,dsi2dpi
++
++  reg:
++    maxItems: 1
++    description: base I2C address of the device
++
++  power-supply: true
++
++  ports:
++    $ref: /schemas/graph.yaml#/properties/ports
++
++    properties:
++      port@0:
++        $ref: /schemas/graph.yaml#/$defs/port-base
++        unevaluatedProperties: false
++        description:
++          Video port for MIPI DSI input
++
++        properties:
++          endpoint:
++            $ref: /schemas/media/video-interfaces.yaml#
++            unevaluatedProperties: false
++
++            properties:
++              data-lanes:
++                description: array of physical DSI data lane indexes.
++                items:
++                  - const: 1
++                  - const: 2
++
++            required:
++              - data-lanes
++
++      port@1:
++        $ref: /schemas/graph.yaml#/properties/port
++        description:
++          Video port for MIPI DPI output panel.
++
++    required:
++      - port@0
++      - port@1
++
++required:
++  - compatible
++  - reg
++  - ports
++  - power-supply
++
++additionalProperties: false
++
++examples:
++  - |
++
++    i2c0 {
++      #address-cells = <1>;
++      #size-cells = <0>;
++
++      bridge@45 {
++        compatible = "waveshare,dsi2dpi";
++        reg = <0x45>;
++        power-supply = <&reg_3p3v>;
++
++        ports {
++          #address-cells = <1>;
++          #size-cells = <0>;
++
++          port@0 {
++            reg = <0>;
++
++            waveshare_from_dsim: endpoint {
++              data-lanes = <1 2>;
++              remote-endpoint = <&dsim_to_waveshare>;
++            };
++          };
++
++          port@1 {
++            reg = <1>;
++
++            waveshare_to_panel: endpoint {
++              remote-endpoint = <&panel_to_waveshare>;
++            };
++          };
++        };
++      };
++    };
++
++...
+-- 
+2.34.1
+

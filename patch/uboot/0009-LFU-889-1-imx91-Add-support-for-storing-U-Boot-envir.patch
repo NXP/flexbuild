@@ -1,0 +1,38 @@
+From c7c3017f46bcf5cfde2b26b1b2c5705812117107 Mon Sep 17 00:00:00 2001
+From: Yanan Yang <yanan.yang@nxp.com>
+Date: Wed, 2 Jul 2025 12:52:45 +0900
+Subject: [PATCH 09/24] LFU-889-1: imx91: Add support for storing U-Boot
+ environment in UBI on SPI-NAND
+
+Add support for storing U-Boot environment in UBI on SPI-NAND
+
+Signed-off-by: Yanan Yang <yanan.yang@nxp.com>
+Reviewed-by: Ye Li <ye.li@nxp.com>
+---
+ arch/arm/mach-imx/imx9/soc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-imx/imx9/soc.c b/arch/arm/mach-imx/imx9/soc.c
+index 30ad5d4dc22..9be9f99c197 100644
+--- a/arch/arm/mach-imx/imx9/soc.c
++++ b/arch/arm/mach-imx/imx9/soc.c
+@@ -948,13 +948,15 @@ enum env_location env_get_location(enum env_operation op, int prio)
+ 		if (CONFIG_IS_ENABLED(ENV_IS_IN_SPI_FLASH))
+ 			return ENVL_SPI_FLASH;
+ 		return ENVL_NOWHERE;
++	case FLEXSPI_NAND_BOOT:
++		if (CONFIG_IS_ENABLED(ENV_IS_IN_UBI))
++			return ENVL_UBI;
+ 	case SD1_BOOT:
+ 	case SD2_BOOT:
+ 	case SD3_BOOT:
+ 	case MMC1_BOOT:
+ 	case MMC2_BOOT:
+ 	case MMC3_BOOT:
+-	case FLEXSPI_NAND_BOOT:
+ 		if (CONFIG_IS_ENABLED(ENV_IS_IN_MMC))
+ 			return ENVL_MMC;
+ 		else if (CONFIG_IS_ENABLED(ENV_IS_IN_EXT4))
+-- 
+2.34.1
+

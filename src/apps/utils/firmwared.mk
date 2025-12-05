@@ -12,9 +12,10 @@
 
 
 firmwared:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,firmwared,apps/utils) && \
+	 $(call patch_apply,firmwared,apps/utils) && \
 	 $(call fbprint_b,"firmwared") && \
-	 $(call repo-mngr,fetch,firmwared,apps/utils) && \
 	 cd $(UTILSDIR)/firmwared && \
 	 export CROSS=$(CROSS_COMPILE) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)  \

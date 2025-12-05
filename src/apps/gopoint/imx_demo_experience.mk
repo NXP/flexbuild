@@ -5,27 +5,20 @@
 # NXP Demo Experience Launcher
 # GoPoint on i.MX Application Processors
 
-# https://github.com/nxp-imx-support/nxp-demo-experience
-
 # Depend:
 # qt6-base-dev qt6-wayland qt6-declarative-dev
 # qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window qml6-module-qtquick-templates
 # qml6-module-qtquick-layouts qml6-module-qtqml-workerscript qml6-module-qt5compat-graphicaleffects
 
 imx_demo_experience:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,imx_demo_experience,apps/gopoint) && \
+	 $(call patch_apply,imx_demo_experience,apps/gopoint) && \
 	 $(call fbprint_b,"imx_demo_experience") && \
-	 $(call repo-mngr,fetch,imx_demo_experience,apps/gopoint) && \
 	 export INSTALL_ROOT=$(DESTDIR) && \
-	 export QT_SELECT=qt6 && \
-	 if qtchooser -install qt6 /usr/bin/qmake6 | grep 'already exists'; then \
-	     echo qtchooser: qt6 already exists; \
-	 fi && \
+	 which qmake6 >/dev/null || { echo "Error: qmake6 not found"; exit 127; } && \
 	 cd $(GPDIR)/imx_demo_experience && \
-	 if [ -d $(FBDIR)/patch/imx_demo_experience ] && [ ! -f .patchdone ]; then \
-		 git am $(FBDIR)/patch/imx_demo_experience/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
-	 qmake -makefile -o Makefile demoexperience.pro -spec linux-aarch64-gnu-g++ $(LOG_MUTE) && \
+	 qmake6 -makefile -o Makefile demoexperience.pro -spec linux-aarch64-gnu-g++ $(LOG_MUTE) && \
 	 sed -e "s|aarch64-linux-gnu-g++|aarch64-linux-gnu-g++ --sysroot=$(RFSDIR)|g" \
 	     -e "s|/usr/lib/x86_64-linux-gnu|$(RFSDIR)/usr/lib/aarch64-linux-gnu|g" \
 	     -e "s|/usr/include/x86_64-linux-gnu|$(RFSDIR)/usr/include/aarch64-linux-gnu|g" \

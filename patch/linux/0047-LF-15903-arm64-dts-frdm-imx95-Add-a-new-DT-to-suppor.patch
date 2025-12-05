@@ -1,0 +1,184 @@
+From 7cb01c06ee5d0fed1a9d6efb6969a01e7f06e20d Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Thu, 26 Jun 2025 11:50:48 +0800
+Subject: [PATCH 47/56] LF-15903: arm64: dts: frdm-imx95: Add a new DT to
+ support 8MIC-REVE
+
+Add a new DT to support 8MIC-REVE board on FRDM-IMX95 platform.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+Reviewed-by: Shengjiu Wang <shengjiu.wang@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   1 +
+ .../freescale/imx95-15x15-frdm-8mic-reve.dts  | 147 ++++++++++++++++++
+ 2 files changed, 148 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-15x15-frdm-8mic-reve.dts
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index cd6b626ad8a5..74d2e1c97ee8 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -945,6 +945,7 @@ imx95-15x15-frdm-dual-os08a20-isp-dtbs := imx95-15x15-frdm.dtb \
+ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-dual-os08a20-isp.dtb
+ 
+ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-aud-hat.dtb
++dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-8mic-reve.dtb
+ 
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-8mic-reve.dts b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-8mic-reve.dts
+new file mode 100644
+index 000000000000..a273905926f9
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-8mic-reve.dts
+@@ -0,0 +1,147 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++#include "imx95-15x15-frdm.dts"
++
++/ {
++	mic_leds {
++		compatible = "gpio-leds";
++		mic0 {
++			label = "mic0";
++			gpios = <&pca9555 5 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic1 {
++			label = "mic1";
++			gpios = <&pca9555 7 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic2 {
++			label = "mic2";
++			gpios = <&pca9555 6 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic3 {
++			label = "mic3";
++			gpios = <&pca9555 2 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic4 {
++			label = "mic4";
++			gpios = <&pca9555 1 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic5 {
++			label = "mic5";
++			gpios = <&pca9555 0 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic6 {
++			label = "mic6";
++			gpios = <&pca9555 4 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++		mic7 {
++			label = "mic7";
++			gpios = <&pca9555 3 GPIO_ACTIVE_LOW>;
++			default-state = "off";
++		};
++	};
++
++	sw_keys {
++		compatible = "gpio-keys";
++
++		sw4: volume_down {
++			label = "Volume Down";
++			gpios = <&pca9555 15 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_VOLUMEDOWN>;
++			interrupt-parent = <&pca9555>;
++			interrupts = <15 IRQ_TYPE_LEVEL_LOW>;
++		};
++
++		sw3: volume_up {
++			label = "Volume Up";
++			gpios = <&pca9555 14 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_VOLUMEUP>;
++			interrupt-parent = <&pca9555>;
++			interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
++		};
++
++		sw2: volume_mute {
++			label = "Volume Mute";
++			gpios = <&pca9555 13 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_MUTE>;
++			interrupt-parent = <&pca9555>;
++			interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
++		};
++
++		sw1: key_act {
++			label = "Key Act";
++			gpios = <&pca9555 12 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_F9>;
++			interrupt-parent = <&pca9555>;
++			interrupts = <12 IRQ_TYPE_LEVEL_LOW>;
++		};
++	};
++};
++
++&micfil {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_pdm2>;
++	status = "okay";
++};
++
++&lpi2c6 {
++	clock-frequency = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_lpi2c6>;
++	status = "okay";
++
++	pca9555: gpio@21 {
++		compatible = "nxp,pca9555";
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_pushbutton_irq>;
++		reg = <0x21>;
++		gpio-controller;
++		#gpio-cells = <2>;
++		interrupt-controller;
++		#interrupt-cells = <2>;
++		interrupt-parent = <&gpio2>;
++		interrupts = <17 IRQ_TYPE_LEVEL_LOW>;
++		vcc-supply = <&reg_ext_3v3>;
++		status = "okay";
++	};
++};
++
++&scmi_iomuxc {
++	pinctrl_swpdm_mute_irq: swpdm_mute_grp {
++		fsl,pins = <
++			IMX95_PAD_GPIO_IO04__GPIO2_IO_BIT4			0x31e
++		>;
++	};
++
++	pinctrl_pushbutton_irq: pushbutton_grp {
++		fsl,pins = <
++			IMX95_PAD_GPIO_IO17__GPIO2_IO_BIT17			0x31e
++		>;
++	};
++
++	pinctrl_pdm2: pdm2grp {
++		fsl,pins = <
++			IMX95_PAD_GPIO_IO21__AONMIX_TOP_PDM_CLK			0x31e
++			IMX95_PAD_GPIO_IO20__AONMIX_TOP_PDM_BIT_STREAM_BIT0	0x31e
++			IMX95_PAD_GPIO_IO26__AONMIX_TOP_PDM_BIT_STREAM_BIT1	0x31e
++			IMX95_PAD_GPIO_IO16__AONMIX_TOP_PDM_BIT_STREAM_BIT2	0x31e
++			IMX95_PAD_GPIO_IO19__AONMIX_TOP_PDM_BIT_STREAM_BIT3	0x31e
++		>;
++	};
++
++	pinctrl_lpi2c6: lpi2c6grp {
++		fsl,pins = <
++			IMX95_PAD_GPIO_IO02__LPI2C6_SDA			0x40000b9e
++			IMX95_PAD_GPIO_IO03__LPI2C6_SCL			0x40000b9e
++		>;
++	};
++};
+-- 
+2.34.1
+

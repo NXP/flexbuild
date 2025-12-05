@@ -1,0 +1,50 @@
+From a4ba3e73b2ff6fe17a89d178935b423aaec99469 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 20 May 2025 18:16:06 +0900
+Subject: [PATCH 12/56] MLK-26282: media: imx8: media-dev: wait v4l2subdev
+ register
+
+When sensors driver didn't finish v4l2subdev register
+before media-dev load, the imx8-media-dev will unregister the ISI channel.
+Add check if the sensor driver has finished probe.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Guoniu Zhou <guoniu.zhou@nxp.com>
+---
+ drivers/staging/media/imx/imx8-media-dev.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/staging/media/imx/imx8-media-dev.c b/drivers/staging/media/imx/imx8-media-dev.c
+index 035df5d2e4b4..47f5d0bdc1fb 100644
+--- a/drivers/staging/media/imx/imx8-media-dev.c
++++ b/drivers/staging/media/imx/imx8-media-dev.c
+@@ -128,6 +128,10 @@ struct mxc_md {
+ 	struct v4l2_async_notifier subdev_notifier;
+ };
+ 
++static int debug;
++module_param(debug, int, 0644);
++MODULE_PARM_DESC(debug, "Debug level (0-2)");
++
+ static inline struct mxc_md *notifier_to_mxc_md(struct v4l2_async_notifier *n)
+ {
+ 	return container_of(n, struct mxc_md, subdev_notifier);
+@@ -1052,10 +1056,11 @@ static int register_sensor_entities(struct mxc_md *mxc_md)
+ 		 * Need to wait sensor driver probed for the first time
+ 		 */
+ 		client = of_find_i2c_device_by_node(rem);
+-		if (!client) {
+-			v4l2_info(&mxc_md->v4l2_dev,
+-				  "Can't find i2c client device for %s\n",
+-				  of_node_full_name(rem));
++		if (!client->dev.driver || !device_is_bound(&client->dev)) {
++			v4l2_dbg(1, debug, &mxc_md->v4l2_dev,
++				 "Can't find i2c client device for %s\n",
++				 of_node_full_name(rem));
++
+ 			return -EPROBE_DEFER;
+ 		}
+ 
+-- 
+2.34.1
+

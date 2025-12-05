@@ -7,10 +7,11 @@
 
 
 imx_pxp_g2d:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,imx_pxp_g2d,apps/graphics) && \
+	@[ $${MACHINE:0:5} != imx93 -a $${MACHINE:0:5} != imx91 ] && exit || \
+	 $(call download_repo,imx_pxp_g2d,apps/graphics) && \
+	 $(call patch_apply,imx_pxp_g2d,apps/graphics) && \
 	 if [ ! -f $(DESTDIR)/usr/include/linux/pxp_device.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 $(call fbprint_b,"imx_pxp_g2d") && \

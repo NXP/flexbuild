@@ -4,10 +4,9 @@
 
 
 perf:
-	@$(call repo-mngr,fetch,$(KERNEL_TREE),linux) && \
+	@$(call download_repo,linux,linux) && \
 	 cd $(PKGDIR)/linux && \
-	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && \
+	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \
 	 $(call fbprint_b,"kernel tools/perf") && \
 	 mkdir -p $$opdir && \
 	 if [ ! -f $$opdir/.config ]; then \

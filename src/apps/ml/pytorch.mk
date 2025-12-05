@@ -8,14 +8,15 @@
 
 PV = "2.0.0"
 PYV = "cp311"
-PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.11/site-packages"
+PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
 
 
 pytorch:
 ifeq ($(CONFIG_PYTORCH),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
+	@[ $(DESTARCH) != arm64  ] && exit || \
+	 $(call download_repo,pytorch,apps/ml) && \
+	 $(call patch_apply,pytorch,apps/ml) && \
 	 $(call fbprint_b,"pytorch") && \
-	 $(call repo-mngr,fetch,pytorch,apps/ml) && \
 	 cd $(MLDIR)/pytorch && \
 	 install -d $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) && \
 	 install -d $(DESTDIR)/usr/bin/pytorch/examples && \

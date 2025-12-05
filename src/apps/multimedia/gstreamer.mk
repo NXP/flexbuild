@@ -14,22 +14,15 @@
 
 
 gstreamer:
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,gstreamer,apps/multimedia) && \
-	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,gstreamer,apps/multimedia) && \
+	 $(call patch_apply,gstreamer,apps/multimedia) && \
 	 cd $(MMDIR)/gstreamer && \
-	 if [ ! -f .patchdone ]; then \
-	     git am $(FBDIR)/patch/gstreamer/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
 	 $(call fbprint_b,"gstreamer") && \
 	 export HAVE_PTP_HELPER_CAPABILITIES=0 && \
 	 if ! grep -q libexecdir= meson.build; then \
 	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
-	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build && \
-	     sed -i 's/1\.1/0.61/' meson.build; \
+	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build; \
 	 fi && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \

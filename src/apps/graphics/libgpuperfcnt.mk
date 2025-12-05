@@ -8,13 +8,14 @@
 
 
 libgpuperfcnt:
-	@[ $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call fbprint_b,"libgpuperfcnt") && \
-	 cd $(GRAPHICSDIR) && \
-	 if [ ! -d libgpuperfcnt ]; then \
-	     wget -q $(repo_libgpuperfcnt_bin_url) -O libgpuperfcnt.bin $(LOG_MUTE) && \
-	     chmod +x libgpuperfcnt.bin && ./libgpuperfcnt.bin --auto-accept $(LOG_MUTE) && \
-	     mv libgpuperfcnt-* libgpuperfcnt && rm -f libgpuperfcnt.bin; \
-	 fi && \
-	 cp -Prf libgpuperfcnt/usr $(DESTDIR) && \
-	 $(call fbprint_d,"libgpuperfcnt")
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
+	$(call dl_by_wget,libgpuperfcnt_bin,libgpuperfcnt.bin) && \
+	cd $(GRAPHICSDIR) && \
+	if [ ! -d "$(GRAPHICSDIR)"/libgpuperfcnt ]; then \
+		chmod +x $(FBDIR)/dl/libgpuperfcnt.bin; \
+		$(FBDIR)/dl/libgpuperfcnt.bin --auto-accept --force $(LOG_MUTE); \
+		mv libgpuperfcnt-* libgpuperfcnt; \
+	fi && \
+	$(call fbprint_b,"libgpuperfcnt") && \
+	cp -Prf libgpuperfcnt/usr $(DESTDIR) && \
+	$(call fbprint_d,"libgpuperfcnt")

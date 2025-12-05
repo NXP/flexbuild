@@ -1,0 +1,413 @@
+From 940fdfd0bb28ab1f5afeb08a4c494d3272470cf5 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Tue, 16 Sep 2025 17:57:40 -0700
+Subject: [PATCH 1/2] Add imx8mpfrdm , imx93frdm and imx95frdm boards support
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ demos.json | 88 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 44 insertions(+), 44 deletions(-)
+
+diff --git a/demos.json b/demos.json
+index 235ce4a..dd3b65a 100644
+--- a/demos.json
++++ b/demos.json
+@@ -4,7 +4,7 @@
+              "name": "Image Classification",
+              "id": "obj_class_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/classification/image_classification.py",
+-             "compatible": "imx8mp, imx93, imx8mm, imx8qmmek, imx95",
++             "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm, imx8mm, imx8qmmek, imx95, imx95frdm",
+              "screenshot": "image_classification.jpg",
+              "icon": "ml-icon.svg",
+              "description": "Image classification example using NNStreamer. Image classification is an ML task that attempts to comprehend an entire image as a whole. The goal is to classify the image by assigning it to a specific label. Typically, it refers to images in which only one object appears and is analyzed. An internet connection may be required."
+@@ -12,7 +12,7 @@
+              "name": "Object Detection",
+              "id": "obj_detect_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/object_detection/object_detection.py",
+-             "compatible": "imx8mp, imx93, imx8mm, imx8qmmek, imx95",
++             "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm, imx8mm, imx8qmmek, imx95, imx95frdm",
+              "screenshot": "ml_detect.jpg",
+              "icon": "ml-icon.svg",
+              "description": "Object detection example using NNStreamer. Object detection is the ML task that detects instances of objects of a certain class within an image. A bounding box and a class label are found for each detected object. An internet connection may be required."
+@@ -20,7 +20,7 @@
+             "name": "Face Detection",
+             "id": "face_detect_nn",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/face_detection/face_detection.py",
+-            "compatible": "imx8mp, imx93, imx95",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm, imx95, imx95frdm",
+             "screenshot": "",
+             "icon": "ml-icon.svg",
+             "description": "Face detection example using NNStreamer. Face detection is the ML task that detects instances of faces within an image. A bounding box is found for each detected face. An internet connection may be required."
+@@ -28,7 +28,7 @@
+             "name": "Classification/Detection",
+             "id": "class_detect_nn",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/classification_detection/classification_detection.py",
+-            "compatible": "imx8mp, imx93, imx95",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "screenshot": "",
+             "icon": "ml-icon.svg",
+             "description": "Classification and Detection example using NNStreamer. A bounding box is found for each detected object and text for overall classification. An internet connection may be required."
+@@ -36,7 +36,7 @@
+             "name": "Pose/Face",
+             "id": "class_detect_nn",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/pose_face/pose_face.py",
+-            "compatible": "imx8mp, imx93",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "screenshot": "",
+             "icon": "ml-icon.svg",
+             "description": "Pose and Face example using NNStreamer. This will detect the position and orientation of a person or object and face. A bounding box is found for each detected object and text for overall classification. An internet connection may be required."
+@@ -44,7 +44,7 @@
+             "name": "Dual Classification",
+             "id": "dual_class_nn",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/dual_classification/dual_classification.py",
+-            "compatible": "imx8mp, imx93, imx95",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "screenshot": "",
+             "icon": "ml-icon.svg",
+             "description": "Dual Classification example using NNStreamer. Text for overall classification is shown for two cameras. An internet connection may be required."
+@@ -52,7 +52,7 @@
+             "name": "Emotion Detection",
+             "id": "emote_detect_nn",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/emotion_detection/emotion_detection.py",
+-            "compatible": "imx8mp, imx93, imx95",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm, imx95, imx95frdm",
+             "screenshot": "",
+             "icon": "ml-icon.svg",
+             "description": "Emotion example using NNStreamer. A bounding box is found for each detected face and it will detect the current emotion. An internet connection may be required."
+@@ -60,7 +60,7 @@
+              "name": "Pose Estimation",
+              "id": "pose_detect_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/pose_estimation/pose_estimation.py",
+-             "compatible": "imx8mp, imx8mm, imx8qmmek, imx93, imx95",
++             "compatible": "imx8mp, imx8mpfrdm, imx8mm, imx8qmmek, imx93, imx93frdm, imx95, imx95frdm",
+              "screenshot": "pose-estimation.jpg",
+              "icon": "ml-icon.svg",
+              "description": "Pose estimation example using NNStreamer. The goal of pose estimation is to detect the position and orientation of a person or object. In human pose estimation, this is usually done with specific keypoints such as hands, head, legs, etc. An internet connection may be required."
+@@ -68,7 +68,7 @@
+             "name": "Semantic Segmantation",
+             "id": "emote_detect_nn",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/nnstreamer/semantic_segmentation/semantic_segmentation.py",
+-            "compatible": "imx8mp, imx93, imx95",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm, imx95, imx95frdm",
+             "screenshot": "",
+             "icon": "ml-icon.svg",
+             "description": "Emotion example using NNStreamer. A bounding box is found for each detected face and it will detect the current emotion. An internet connection may be required."
+@@ -76,7 +76,7 @@
+              "name": "ML Gateway",
+              "id": "ml_gate_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/ml_gateway/ml_gateway.py",
+-             "compatible": "imx8mp, imx8mm, imx93",
++             "compatible": "imx8mp, imx8mpfrdm, imx8mm, imx93, imx93frdm",
+              "screenshot": "ml_gateway.jpg",
+              "icon": "ml-icon.svg",
+              "description": "ML Gateway easily configures the i.MX 8M Plus and i.MX 93 EVKs as machine learning accelerator servers and allows resource-constrained MPU systems (clients) without NPUs to connect and run ML inference. This is currently enabled for i.MX 8M Mini on the client side."
+@@ -84,7 +84,7 @@
+              "name": "Selfie Segmenter",
+              "id": "selfie_nn",
+              "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/selfie_segmenter/selfie_segmenter.py",
+-             "compatible": "imx8mp, imx93",
++             "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+              "screenshot": "selfie_segmenter.jpg",
+              "icon": "ml-icon.svg",
+              "description": "Selfie Segmenter showcases the ML capabilities of i.MX 8M Plus and i.MX 93 by using the NPU to accelerate an instance segmentation model. This model lets you segment the portrait of a person and can be used to replace or modify the background of an image. An internet connection is required."
+@@ -92,7 +92,7 @@
+               "name": "i.MX Smart Fitness",
+               "id": "imx-smart-fitness",
+               "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py",
+-              "compatible": "imx8mp, imx93",
++              "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+               "screenshot": "imx-smart-fitness.jpg",
+               "icon": "ml-icon.svg",
+               "description": "i.MX Smart Fitness showcases the i.MX' Machine Learning capabilities by using an NPU to accelerate two Deep Learning vision-based models. Together, these models detect a person present in the scene and predict 33 3D-keypoints to generate a complete body landmark, known as pose estimation. From the pose estimation, a K-NN pose classifier classifies two different body poses: 'Squat-Down' and 'Squat-Up'. The application tracks the 'squats' fitness exercise and the repetition counter is set to 12 repetitions in an infinite loop."
+@@ -100,7 +100,7 @@
+         "TFLite":[{
+             "name": "ML Benchmark",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/ml_benchmark/ml_benchmark.py",
+-            "compatible": "imx8mp, imx93, imx95",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm, imx95, imx95frdm",
+             "screenshot": "ml_benchmark.jpg",
+             "icon": "speedometer.svg",
+             "description": "This tool allows to easily compare the performance of TensorFlow Lite models running on CPU (Cortex-A) and NPU. The tool works on i.MX 93 and i.MX 8M Plus."
+@@ -109,7 +109,7 @@
+             "name": "Face Recognition",
+             "id": "face_recog",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/face_recognition.py",
+-            "compatible": "imx8mp",
++            "compatible": "imx8mp, imx8mpfrdm",
+             "screenshot": "face_recognition.jpg",
+             "icon": "ml-icon.svg",
+             "description": "An OpenCV application example of how to use machine learning to recognize faces. The user can save multiple profiles and the application will recognize the identity of each person by their names. An internet connection is required."
+@@ -117,7 +117,7 @@
+             "name": "DMS",
+             "id": "dms",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/dms/launcher.py",
+-            "compatible": "imx8mp, imx93",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "screenshot": "dms.jpg",
+             "icon": "ml-icon.svg",
+             "description": "An example over how to implement a Driver Monitoring System (DMS) using the NPU. An internet connection is required."
+@@ -125,7 +125,7 @@
+             "name": "i.MX Gesture Recognition",
+             "id": "imx-gesture-recognition",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/imx_gesture_recognition/imx_gesture_recognition.py",
+-            "compatible": "imx8mp, imx93",
++            "compatible": "imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "screenshot": "imx-gesture-recognition.jpg",
+             "icon": "ml-icon.svg",
+             "description": "i.MX Gesture Recognition showcases the Machine Learning (ML) capabilities of the i.MX SoCs (i.MX 93 and i.MX 8M Plus) using the available Neural Processing Unit (NPU) to accelerate two Deep Learning vision-based models. Together, these models detect up to two hands present in the scene and predict 21 3D-keypoints that are used to recognize hand signs and finger gestures."
+@@ -134,7 +134,7 @@
+             "name": "LP Baby Cry Detection",
+             "id": "lp_baby_cry",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/low_power_ml/lp_baby_cry_detection.py",
+-            "compatible": "imx93",
++            "compatible": "imx93, imx93frdm",
+             "screenshot": "LP-baby-cry-detection.jpg",
+             "icon": "ml-icon.svg",
+             "description": "Note: To run this example, append 'clk_ignore_unused' in u-boot 'mmcargs' env, before booting linux. An application example showing how to implement baby crying and glass breaking detection in Cortex-M33 core when Linux is in suspend mode. When the application is started, Linux enters suspend mode, and users must enter the timeout value in Cortex-M33 console. Then Cortex-M33 records one second audio input from MIC array on the i.MX 93 EVK board, and try to identify whether there is baby crying or glass breaking sound in the audio by running ML model inference. If baby crying or glass breaking sound is detected, it will wake up Cortex-A55 core and send the result to Linux through rpmsg-tty. If baby crying or glass breaking sound is not detected, it will suspend Cortex-M33 core for the configured timeout and wake up Cortex-M33 core to record one second audio again, and run the same process in an infinite loop until a baby crying or glass breaking sound is detected. An internet connection is required."
+@@ -142,7 +142,7 @@
+             "name": "LP KWS Detection",
+             "id": "lp_kws",
+             "executable": "python3 /opt/gopoint-apps/scripts/machine_learning/low_power_ml/lp_kws_detection.py",
+-            "compatible": "imx93",
++            "compatible": "imx93, imx93frdm",
+             "screenshot": "LP-kws-detection.jpg",
+             "icon": "ml-icon.svg",
+             "description": "Note: To run this example, append 'clk_ignore_unused' in u-boot 'mmcargs' env, before booting linux. An application example showing how to implement key word detection in Cortex-M33 core when Linux is in suspend mode. When the application is started, Linux enters suspend mode. Cortex-M33 will record one second audio input from MIC array on the i.MX 93 EVK board, and try to identify whether there is key word UP in the audio by running ML model inference. If key word is detected, it will wake up Cortex-A55 core and stop. If no key word is detected, it will record one second audio again, and run the same process in an infinite loop until a key word is detected. An internet connection is required."
+@@ -157,7 +157,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "gst_test_src_screenshot.jpg",
+-            "compatible": "imx7ulp, imx8ulp, imx8qxpc0mek, imx8qmmek, imx8mq, imx8mm, imx8mn, imx8mp, imx93",
++            "compatible": "imx7ulp, imx8ulp, imx8qxpc0mek, imx8qmmek, imx8mq, imx8mm, imx8mn, imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "description": "This is a simple demo utility that allows users to play back video captured on a camera or a test source."
+         },{
+             "name": "Camera using VPU",
+@@ -166,7 +166,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "camera-vpu.jpg",
+-            "compatible": "imx8mp",
++            "compatible": "imx8mp, imx8mpfrdm",
+             "description": "This is a GStreamer pipeline able to create a camera preview example using VPU to encode and decode the image."
+         },{
+             "name": "Video To Texture Demo",
+@@ -175,7 +175,7 @@
+             "source": "",
+             "icon": "photo-video-solid.svg",
+             "screenshot": "video_to_texture.png",
+-            "compatible": "imx95, imx8qmmek",
++            "compatible": "imx8qmmek",
+             "description": "Demonstrates Video to texturing functionality of gstreamer within a QT video player application"
+         },{
+             "name": "2Way Video Streaming",
+@@ -184,7 +184,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "two-way-video-streaming.jpg",
+-            "compatible": "imx8mp, imx8mm",
++            "compatible": "imx8mp, imx8mpfrdm, imx8mm",
+             "description": "Allows user to implement a two way video streaming demo that displays video encode and decode capabilities between i.MX devices in local network."
+         },{
+             "name": "Multi Cameras Preview",
+@@ -193,7 +193,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "multi_cameras.jpg",
+-            "compatible": "imx8mp",
++            "compatible": "imx8mp, imx8mpfrdm",
+             "description": "This is a GStreamer pipeline able to create a camera preview example using a Basler/OS08A20 camera and an OV5640 camera simultaneously."
+         }],
+         "ISP":[{
+@@ -203,7 +203,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "isp_demo.png",
+-            "compatible": "imx8mp",
++            "compatible": "imx8mp, imx8mpfrdm",
+             "description": "This program opens a GStreamer pipeline and allows the user to change various parameters of the ISP in real time. This example application works with Basler and OS08A20 cameras."
+         },{
+             "name": "Video Dump",
+@@ -212,7 +212,7 @@
+             "source": "",
+             "icon": "multimedia-icon.svg",
+             "screenshot": "video-dump.jpg",
+-            "compatible": "imx8mp",
++            "compatible": "imx8mp, imx8mpfrdm",
+             "description": "This program allows users to dump the raw frame data from a camera onto a connected drive. This demo will only work with a compatible Basler camera."
+         }],
+         "Audio":[{
+@@ -242,7 +242,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "voice-control.jpg",
+-            "compatible": "imx8mp, imx8mm",
++            "compatible": "imx8mp, imx8mpfrdm, imx8mm",
+             "description": "See NXP's Voice Technology in action! Use your voice to open and close various applications. This requires 8-MIC Array Board (8MIC-RPI-MX8) installed on the i.MX hardware (Visit NXP.com for help). Please note that this will override '/etc/asound.conf' file. It will be restored if this application is gracefully terminated."
+         },
+         {
+@@ -252,7 +252,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "multimedia-player.jpg",
+-            "compatible": "imx8mm, imx8mp, imx93",
++            "compatible": "imx8mm, imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "description": "This is an application for controlling an audio player using the Bluetooth communication protocol by the use of voice commands. WakeWord supported:'HEY NXP'. Voice commands supported : PLAY MUSIC, PAUSE, PREVIOUS SONG, NEXT SONG, VOLUME UP, VOLUME DOWN, MUTE, STOP, STOP PLAYER. This application requires 8-MIC Array Board (8MIC-RPI-MX8) installed on the i.MX hardware (Visit NXP.com for help)."
+         },
+         {
+@@ -262,7 +262,7 @@
+             "source": "",
+             "icon": "voice-control.svg",
+             "screenshot": "smart-kitchen-screenshot.jpg",
+-            "compatible": "imx8mm, imx8mp, imx93",
++            "compatible": "imx8mm, imx8mp, imx8mpfrdm, imx93, imx93frdm",
+             "description": "This application simulates a smart kitchen controlled by voice commands using NXP's Voice Intelligent Technology (VIT). How to use: First say a wakeword to select a kitchen's item (hood, oven or aircon) and then say one of the item's available commands (e.g. \"Hey hood, light on\"). WakeWords supported are HEY HOOD, HEY OVEN, HEY AIRCON. Global Commands are ENTER, EXIT, RUN DEMO, STOP DEMO. Hood commands are FAN OFF, FAN ON, FAN LOW, FAN HIGH, LIGHT OFF, LIGHT ON. Aircon commands are DRY MODE, COOL MODE, FAN MODE SWING OFF, SWING ON, FAN LOW, FAN HIGH. Oven commands are CLOSE DOOR, OPEN DOOR. The item's functions can also be activated by clicking on the item's controls using a mouse or touchscreen."
+         },
+         {
+@@ -272,7 +272,7 @@
+              "source": "",
+              "icon": "ebike-vit-icon.svg",
+              "screenshot": "ebike-vit-screenshot.jpg",
+-             "compatible": "imx8mm, imx8mp, imx93",
++             "compatible": "imx8mm, imx8mp, imx8mpfrdm, imx93, imx93frdm",
+              "description": "This application simulates a ebike controlled by voice commands using NXP's Voice Intelligent Technology (VIT). First say a wakeword to wake up ebike and then say one of the available commands.The supported wake words are HEY NXP, HEY E-Bike. Global Commands are NEXT PAGE, LAST PAGE, RUN DEMO, STOP DEMO. The page can also be switched by clicking on the UI using a mouse or touchscreen."
+ 	}]
+     }]
+@@ -285,7 +285,7 @@
+             "source": "",
+             "icon": "tsn.svg",
+             "screenshot": "tsn.jpg",
+-            "compatible": "imx8mm, imx8mp",
++            "compatible": "imx8mm, imx8mp, imx8mpfrdm",
+             "description": "Enhancements to Traffic Scheduling: Time-Aware Shaper. It separates communication on the Ethernet network into configurable length, repeating time cycles, thereby contributing to the delivery of time-critical traffic. Each network node's egress ports have per-queue traffic windows which may be opened/closed at specified times.The talker-to-listener path across the network may be dedicated to this priority traffic alone, at real-time (T), causing the talker's traffic to be delivered reliably and deterministically across the network."
+         }]
+     }]
+@@ -298,7 +298,7 @@
+             "source": "",
+             "icon": "ele-demo-icon.svg",
+             "screenshot": "ele-demo-screenshot.jpg",
+-            "compatible": "imx93",
++            "compatible": "imx93, imx93frdm",
+             "description": "The EdgeLock® Secure Enclave (ELE) is an independent security domain that provides security services, which include key management, random number generation, data storage, execution of cryptographic services, etc.This application is developed to make some of the ELE functionalities visible."
+         }]
+     }]
+@@ -324,7 +324,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "tiger_2d.jpg",
+-            "compatible": "imx7ulp, imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8ulp",
++            "compatible": "imx7ulp, imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx8ulp",
+             "description": "Vivante Tiger G2D, this demo shows a vector image being rotated and scaled using OpenVG."
+         }],
+         "GLES2":[{
+@@ -334,7 +334,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "vivante_vv_laucher.jpg",
+-            "compatible": "imx7ulp, imx8qxpc0mek, imx8qmmek, imx8mp, imx8ulp",
++            "compatible": "imx7ulp, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx8ulp",
+             "description": "Vivante launcher demo."
+         },
+         {
+@@ -364,7 +364,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "bloom.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "An example of how to create a bloom effect. The idea is not to create the most accurate bloom, but something that is fairly fast to render. Instead of increasing the kernal size to get a good blur we do a fairly fast approximation by downscaling the original image to multiple smaller render-targets and then blurring these using a relative small kernel and then finally rescaling the result to the original size."
+         },
+         {
+@@ -384,7 +384,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "blur.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "Uses the two pass linear technique and further reduces the bandwidth requirement by downscaling the 'source image' to 1/4 its size (1/2w x 1/2h) before applying the blur and and then upscaling the blurred image to provide the final image. This works well for large kernel sizes and relatively high sigma's but the downscaling produces visible artifacts with low sigma's."
+         },
+         {
+@@ -404,7 +404,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "eightlayerblend.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "Creates a simple parallax scrolling effect by blending eight 32 bit per pixel 1080p layers on top of each other. This is not the most optimal way to do it as it uses eight passes. But it does provide a good example of the worst case bandwidth use for the operation. The demo was created to compare GLES to the G2D eight blend blit functionality."
+         },
+         {
+@@ -424,7 +424,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "fractalshader.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "Can render both the julia and mandelbrot set using a fragment shader. This demo was used to demonstrates GPU shader performance by using up roughly 515 instructions to render each fragment while generating the julia set. It uses no textures, has no overdraw and has a minimal bandwidth requirement."
+         },
+         {
+@@ -454,7 +454,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "linebuilder101.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "A simple example of dynamic line rendering using the LineBuilder helper class. The line builder has 'Add' methods for most FslBase.Math classes like BoundingBox, BoundingSphere, BoundingFrustrum, Ray, etc."
+         },
+         {
+@@ -474,7 +474,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "modelloaderbasics.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "Demonstrates how to use the FslSceneImporter and Assimp to load a scene and render it using OpenGLES2. The model is rendered using a simple per pixel directional light shader."
+         },
+         {
+@@ -494,7 +494,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "s03_transform.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "Renders a animated vertex colored triangle. This shows how to modify the model matrix to rotate a triangle and how to utilize demoTime.DeltaTime to do frame rate independent animation."
+         },
+         {
+@@ -514,7 +514,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "s04_projection.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "This example shows how to: - Build a perspective projection matrix - Render two simple 3d models using frame rate independent animation."
+         },
+         {
+@@ -534,7 +534,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "s06_texturing.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "This example shows how to use the Texture class to use a texture in a cube. It also shows you how to use the ContentManager service to load a 'png' file from the Content directory into a bitmap utility class which is then used to create an OpenGL ES texture."
+         },
+         {
+@@ -554,7 +554,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "s07_environmentmapping.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "This sample shows how to use a cubemap texture to simulate a reflective material. It also shows you how to use the ContentManager service to load a 'dds' file from the Content directory into a Texture utility class which is then used to create an OpenGL ES cubemap texture."
+         },
+         {
+@@ -574,7 +574,7 @@
+             "source": "",
+             "icon": "graphics-icon.svg",
+             "screenshot": "s08_environmentmappingrefraction.jpg",
+-            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx95",
++            "compatible": "imx8mq, imx8mm, imx8mn, imx8qxpc0mek, imx8qmmek, imx8mp, imx8mpfrdm, imx95, imx95frdm",
+             "description": "This sample is a variation from the previous sample, again, a cubemap texture is used, but this time instead of simulating a reflective material a refractive material is simulated. It also shows you how to use the ContentManager service to load a 'dds' file from the Content directory into a Texture utility class which is then used to create an OpenGL ES cubemap texture."
+         },
+         {
+-- 
+2.34.1
+

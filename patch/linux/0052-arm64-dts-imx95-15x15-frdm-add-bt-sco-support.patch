@@ -1,0 +1,91 @@
+From 7511487e1255051b0b8fc349a5b7cf2ebd077af9 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Mon, 8 Sep 2025 16:46:08 +0900
+Subject: [PATCH 52/56] arm64: dts: imx95-15x15-frdm: add bt-sco support
+
+Add bt audio support for FRDM-IMX95 platform.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+---
+ .../boot/dts/freescale/imx95-15x15-frdm.dts   | 51 +++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
+index 6e8a87e5b4ae..1fd16c870262 100644
+--- a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
+@@ -279,6 +279,30 @@ sound-mqs {
+ 		links = <&sai1_port1>;
+ 		label = "mqs-audio";
+ 	};
++
++	bt_sco_codec: bt_sco_codec {
++		#sound-dai-cells = <1>;
++		compatible = "linux,bt-sco";
++	};
++
++	sound-bt-sco {
++		compatible = "simple-audio-card";
++		simple-audio-card,name = "bt-sco-audio";
++		simple-audio-card,format = "dsp_a";
++		simple-audio-card,bitclock-inversion;
++		simple-audio-card,frame-master = <&btcpu>;
++		simple-audio-card,bitclock-master = <&btcpu>;
++
++		btcpu: simple-audio-card,cpu {
++			sound-dai = <&sai5>;
++			dai-tdm-slot-num = <2>;
++			dai-tdm-slot-width = <16>;
++		};
++
++		simple-audio-card,codec {
++			sound-dai = <&bt_sco_codec 1>;
++		};
++	};
+ };
+ 
+ &adc1 {
+@@ -908,6 +932,15 @@ IMX95_PAD_XSPI1_DATA3__GPIO5_IO_BIT3			0x31e
+ 		>;
+ 	};
+ 
++	pinctrl_sai5: sai5grp {
++		fsl,pins = <
++			IMX95_PAD_XSPI1_DATA7__SAI5_RX_DATA_BIT0    		0x31e
++			IMX95_PAD_XSPI1_DATA6__SAI5_TX_BCLK      		0x31e
++			IMX95_PAD_XSPI1_DATA5__SAI5_TX_SYNC     		0x31e
++			IMX95_PAD_XSPI1_DATA4__SAI5_TX_DATA_BIT0    		0x31e
++		>;
++	};
++
+ 	pinctrl_usdhc1: usdhc1grp {
+ 		fsl,pins = <
+ 			IMX95_PAD_SD1_CLK__USDHC1_CLK				0x158e
+@@ -1110,6 +1143,24 @@ sai1_endpoint1: endpoint {
+ 	};
+ };
+ 
++&sai5 {
++	#sound-dai-cells = <0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_sai5>;
++	assigned-clocks = <&scmi_clk IMX95_CLK_AUDIOPLL1_VCO>,
++			  <&scmi_clk IMX95_CLK_AUDIOPLL2_VCO>,
++			  <&scmi_clk IMX95_CLK_AUDIOPLL1>,
++			  <&scmi_clk IMX95_CLK_AUDIOPLL2>,
++			  <&scmi_clk IMX95_CLK_SAI5>;
++	assigned-clock-parents = <0>, <0>, <0>, <0>,
++				 <&scmi_clk IMX95_CLK_AUDIOPLL1>;
++	assigned-clock-rates = <3932160000>,
++			       <3612672000>, <393216000>,
++			       <361267200>, <12288000>;
++	fsl,sai-mclk-direction-output;
++	status = "okay";
++};
++
+ &mqs1 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_mqs1>;
+-- 
+2.34.1
+

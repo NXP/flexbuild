@@ -1,0 +1,142 @@
+From 6f05a24ab2a20a09f952810267114a2badd8fc63 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Thu, 17 Apr 2025 17:11:31 +0900
+Subject: [PATCH 10/56] LF-15226 arm64: dts: imx8mp-frdm: add dtb to support
+ waveshare 7inch panel
+
+Add waveshare 7inch panel support for FRDM-iMX8MP
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   3 +
+ .../imx8mp-frdm-waveshare-7inch-c-panel.dtso  | 103 ++++++++++++++++++
+ 2 files changed, 106 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mp-frdm-waveshare-7inch-c-panel.dtso
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 76b8306206e3..b3d507fc2fde 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -260,6 +260,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-frdm.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mp-frdm-boe-wuxga-lvds0-panel.dtb imx8mp-frdm-boe-wuxga-lvds1-panel.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mp-frdm-os08a20.dtb imx8mp-frdm-os08a20-dual.dtb
+ 
++imx8mp-frdm-waveshare-7inch-c-panel-dtbs := imx8mp-frdm.dtb imx8mp-frdm-waveshare-7inch-c-panel.dtbo
++dtb-${CONFIG_ARCH_MXC} += imx8mp-frdm-waveshare-7inch-c-panel.dtb
++
+ dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk.dtb imx8mq-evk-rpmsg.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mq-evk.dtb imx8mq-evk-rpmsg.dtb imx8mq-evk-pcie1-m2.dtb imx8mq-evk-usd-wifi.dtb \
+ 			  imx8mq-evk-usdhc2-m2.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-frdm-waveshare-7inch-c-panel.dtso b/arch/arm64/boot/dts/freescale/imx8mp-frdm-waveshare-7inch-c-panel.dtso
+new file mode 100644
+index 000000000000..e678c45bf11f
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mp-frdm-waveshare-7inch-c-panel.dtso
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++/dts-v1/;
++/plugin/;
++
++&{/} {
++	panel {
++		compatible = "waveshare,7.0inch-c-panel", "panel-dpi";
++		power-supply = <&reg_vdd_5p0v>;
++
++		port {
++			panel_to_waveshare: endpoint {
++				remote-endpoint = <&waveshare_to_panel>;
++			};
++		};
++
++		panel-timing {
++			clock-frequency = <50000000>;
++			hactive = <1024>;
++			vactive = <600>;
++			hfront-porch = <100>;
++			hback-porch = <100>;
++			hsync-len = <100>;
++			vback-porch = <10>;
++			vfront-porch = <10>;
++			vsync-len = <10>;
++
++			hsync-active = <0>;
++			vsync-active = <0>;
++			de-active = <1>;
++			pixelclk-active = <1>;
++		};
++	};
++};
++
++&i2c3 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	bridge@45 {
++		compatible = "waveshare,dsi2dpi";
++		reg = <0x45>;
++		power-supply = <&reg_vdd_5p0v>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++
++				waveshare_from_dsim: endpoint {
++					data-lanes = <1 2>;
++					remote-endpoint = <&dsim_to_waveshare>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++
++				waveshare_to_panel: endpoint {
++					remote-endpoint = <&panel_to_waveshare>;
++				};
++			};
++		};
++	};
++
++	touchscreen@14 {
++		compatible = "goodix,gt911";
++		reg = <0x14>;
++		touchscreen-size-x = <800>;
++		touchscreen-size-y = <480>;
++	};
++};
++
++&lcdif1 {
++	status = "okay";
++};
++
++&media_blk_ctrl {
++	/* currently it is not possible to let IMX8MP_VIDEO_PLL1
++	 * configure automatically, so we need to set it manually
++	 */
++	assigned-clock-rates = <500000000>, <200000000>, <0>, <0>, <400000000>;
++};
++
++&mipi_dsi {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	port@1 {
++		reg = <1>;
++
++		dsim_to_waveshare: endpoint {
++			remote-endpoint = <&waveshare_from_dsim>;
++			attach-bridge;
++		};
++	};
++};
+-- 
+2.34.1
+

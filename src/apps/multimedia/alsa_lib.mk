@@ -8,9 +8,9 @@
 
 
 alsa_lib:
-	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a -o \
-	   $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
-	 $(call repo-mngr,fetch,alsa_lib,apps/multimedia) && \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,alsa_lib,apps/multimedia) && \
+	 $(call patch_apply,alsa_lib,apps/multimedia) && \
 	 $(call fbprint_b,"alsa_lib") && \
 	 cd $(MMDIR)/alsa_lib && \
 	 sed -i 's|=Versions|=$(srcdir)/Versions|g' src/topology/Makefile.am && \

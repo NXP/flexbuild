@@ -1,0 +1,129 @@
+From 0ae687bd86c5021d8f8c7edac966792652c4ab0f Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Wed, 25 Jun 2025 11:26:34 +0800
+Subject: [PATCH 39/56] LF-15824: arm64: dts: imx95-15x15-frdm: add IT6263 LVDS
+ to HDMI support
+
+Add HDMI display support on FRDM-IMX95 board using IT6263.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ .../boot/dts/freescale/imx95-15x15-frdm.dts   | 72 +++++++++++++++++++
+ 1 file changed, 72 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
+index 2d2fed5d9f1d..2c7080404d08 100644
+--- a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
+@@ -35,6 +35,18 @@ chosen {
+ 		#size-cells = <2>;
+ 	};
+ 
++	hdmi-connector {
++		compatible = "hdmi-connector";
++		label = "hdmi";
++		type = "a";
++
++		port {
++			hdmi_connector_in: endpoint {
++				remote-endpoint = <&it6263_out>;
++			};
++		};
++	};
++
+ 	memory@80000000 {
+ 		device_type = "memory";
+ 		reg = <0x0 0x80000000 0 0x80000000>;
+@@ -262,6 +274,10 @@ &adc1 {
+ 	status = "okay";
+ };
+ 
++&display_pixel_link {
++	status = "okay";
++};
++
+ &displaymix_irqsteer {
+ 	status = "okay";
+ };
+@@ -284,6 +300,27 @@ &flexcan5 {
+ 	status = "okay";
+ };
+ 
++&ldb {
++	assigned-clocks = <&scmi_clk IMX95_CLK_LDBPLL_VCO>,
++			  <&scmi_clk IMX95_CLK_LDBPLL>;
++	assigned-clock-rates = <4158000000>, <1039500000>;
++	status = "okay";
++
++	channel@1 {
++		status = "okay";
++
++		port@1 {
++			lvds1_out: endpoint {
++				remote-endpoint = <&it6263_in>;
++			};
++		};
++	};
++};
++
++&ldb1_phy {
++	status = "okay";
++};
++
+ &lpi2c2 {
+ 	clock-frequency = <400000>;
+ 	pinctrl-names = "default";
+@@ -411,6 +448,33 @@ led_backlight1: led@1 {
+ 			function-enumerator = <1>;
+ 		};
+ 	};
++
++	bridge@4c {
++		compatible = "ite,it6263";
++		reg = <0x4c>;
++		reset-gpios = <&pcal6524 23 GPIO_ACTIVE_LOW>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++
++				it6263_in: endpoint {
++					remote-endpoint = <&lvds1_out>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++
++				it6263_out: endpoint {
++					remote-endpoint = <&hdmi_connector_in>;
++				};
++			};
++		};
++	};
+ };
+ 
+ &lpspi3 {
+@@ -449,6 +513,14 @@ &mu7 {
+ 	status = "okay";
+ };
+ 
++&pixel_interleaver {
++	status = "okay";
++
++	channel@1 {
++		status = "okay";
++	};
++};
++
+ &usdhc1 {
+ 	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+ 	pinctrl-0 = <&pinctrl_usdhc1>;
+-- 
+2.34.1
+

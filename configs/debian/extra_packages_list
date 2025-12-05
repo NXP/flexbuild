@@ -8,26 +8,27 @@
 
 
 # host dependent packages list
-host_dependent_packages=" \
-    git u-boot-tools device-tree-compiler ccache autoconf automake cmake \
-    binfmtc binfmt-support qemu-system-common qemu-user qemu-user-static \
-    meson lzop qemu-system-arm debian-archive-keyring swig locales \
-    crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
-    crossbuild-essential-armhf gcc-arm-linux-gnueabihf cpp-arm-linux-gnueabihf \
-    g++-arm-linux-gnueabihf dh-autoreconf libssl-dev openssl flex bc rsync  \
-    bison qemu-utils libncurses5-dev gawk scons libpcap-dev curl gettext    \
-    parted sshfs libicu-dev libtclap-dev rpm2cpio xutils-dev libwayland-bin \
-    libtool diffstat pkg-config texinfo chrpath python3 python3-dev python3-pip \
-    python3-wheel python3-h5py libhdf5-serial-dev cython3 qtchooser qt6-base-dev \
-    python3-numpy libgflags-dev ninja-build python3-pyelftools python3-yaml \
-    python3-jsonschema python3-cryptography libzstd-dev libtinyxml2-dev g++ \
-    libgnutls28-dev pandoc xtrans-dev libusb-1.0-0-dev libzip-dev libbz2-dev \
-    texlive-font-utils libglib2.0-dev autoconf-archive valac libcanberra-dev \
-    zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin \
-    protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome \
-    rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-    libdbus-glib-1-dev qt6-tools-dev \
-"
+host_dependent_packages=(
+    git u-boot-tools device-tree-compiler ccache autoconf automake cmake
+    binfmtc binfmt-support qemu-system-common qemu-user qemu-user-static
+    meson lzop qemu-system-arm debian-archive-keyring swig locales
+    crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+    dh-autoreconf libssl-dev openssl flex bc rsync
+    bison qemu-utils gawk scons libpcap-dev curl gettext
+    parted sshfs libicu-dev libtclap-dev rpm2cpio xutils-dev libwayland-bin
+    libtool diffstat pkg-config texinfo chrpath python3 python3-dev python3-pip
+    python3-wheel python3-h5py cython3 qt6-base-dev
+    python3-numpy libgflags-dev ninja-build python3-pyelftools python3-yaml
+    python3-jsonschema python3-cryptography libzstd-dev libtinyxml2-dev g++
+    libgnutls28-dev pandoc xtrans-dev libusb-1.0-0-dev libzip-dev libbz2-dev
+    texlive-font-utils libglib2.0-dev autoconf-archive valac libcanberra-dev
+    zstd fdisk libgdk-pixbuf2.0-bin gtk-doc-tools liborc-0.4-dev-bin
+    protobuf-compiler python3-installer python3-pybind11 python3-pycryptodome
+    rename qt6-declarative-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+    libdbus-glib-1-dev qt6-tools-dev mmdebstrap hwdata qt6-base-dev-tools qtchooser
+    efitools itstool python3-jinja2 python3-ply python3-yaml python3-requests
+    python3-tqdm
+)
 
 
 
@@ -35,31 +36,56 @@ host_dependent_packages=" \
 # packages/components from source code against Debian rootfs libraries/headers
 # during build-time for NXP iMX & Layerscape MPU platforms.
 
+base_pkgs=(
+	wpasupplicant bridge-utils tcpdump mtd-utils pciutils
+	hdparm psmisc libssl-dev usbutils sysstat lsb-release kexec-tools
+	iptables libhugetlbfs0 strongswan libcharon-extra-plugins dmidecode
+	flex rdate initramfs-tools fbset mmc-utils i2c-tools
+	lm-sensors rt-tests linuxptp mosquitto xterm bluez pipewire pipewire-audio
+	pipewire-pulse wireplumber locales libspa-0.2-bluetooth net-tools
+)
 
-extra_server_devel_packages=" \
-    libxml2-dev libtinyxml2-9 libssl-dev libsbc-dev libsndfile1-dev libwebp-dev \
-    dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses5-dev libelf-dev \
-    libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev libinput-dev libpixman-1-dev \
-    libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.3-dev libsystemd-dev \
-    libxcb-composite0-dev libxcursor-dev libxcb-cursor-dev libseat-dev seatd libtinfo-dev \
-    libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev \
-    uuid-dev libpython3.11-dev python3-pip python3-pybind11 python3-numpy python3-pillow \
-    python3-flatbuffers python3-decorator python3-numpy python3-attr python3-psutil \
-    python3-lxml libflatbuffers-dev libcpuinfo-dev libwaffle-dev libpciaccess-dev \
-    liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev \
-    libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd \
-"
 
-extra_desktop_devel_packages=" \
-    libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev \
-    libbsd-dev libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev \
-    libwayland-bin libasound2-dev gstreamer1.0-libav libgstrtspserver-1.0-0 libgudev-1.0-dev \
-    libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev libgnome-desktop-3-dev \
-    libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev \
-    libx264-dev libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev \
-    libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev libassimp-dev \
-    libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev libtheora-dev \
-    libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging \
-    python3-venv libgtest-dev libboost-system1.74-dev libboost-thread1.74-dev libdbus-glib-1-dev \
-    qt6-tools-dev libqt6svg6 libqt6svg6-dev libfmt-dev libdevil-dev nfs-common \
-"
+ls_pkgs=(
+    efitools libxml2-dev libtinyxml2-dev libssl-dev libsbc-dev libsndfile1-dev libwebp-dev
+    dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses-dev libelf-dev
+    libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev libinput-dev libpixman-1-dev
+    libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.4-dev libsystemd-dev
+    libxcb-composite0-dev libxcursor-dev libxcb-cursor-dev libseat-dev seatd
+    libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev
+    uuid-dev libpython3.13-dev python3-pip python3-pybind11 python3-pil
+    python3-flatbuffers python3-decorator python3-numpy python3-attr python3-psutil
+    python3-lxml libwaffle-dev libpciaccess-dev clinfo libcogl-pango-dev
+    liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libvorbis-dev
+    libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd
+)
+
+
+
+imx_pkgs=(
+	libinput-tools libqt6core6t64 qt6-base-dev qt6-wayland qt6-declarative-dev
+	qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window
+	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript
+	qml6-module-qt5compat-graphicaleffects glmark2-es2-wayland wayland-utils
+	v4l-utils mesa-utils alsa-utils qt6-svg-plugins network-manager
+    libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev
+    libbsd-dev libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev
+    libwayland-bin libasound2-dev gstreamer1.0-libav libgstrtspserver-1.0-0 libgudev-1.0-dev
+    libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev
+    libx264-dev libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev
+    libpulse-dev libspeex-dev x264 libtag1-dev libvulkan-dev libglm-dev libassimp-dev
+    libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev libtheora-dev
+    libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging
+    python3-venv libgtest-dev libdbus-glib-1-dev libprotobuf-dev libevent-dev
+    qt6-tools-dev libqt6svg6 qt6-svg-dev libfmt-dev libdevil-dev nfs-common
+    python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-gstreamer-1.0
+    iw python-gi-dev qtwayland5
+)
+
+
+gnome_pkgs=(
+	libgnome-desktop-3-dev chromium dmz-cursor-theme gnome-core
+	libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
+    gnome-sound-recorder rhythmbox
+)
+

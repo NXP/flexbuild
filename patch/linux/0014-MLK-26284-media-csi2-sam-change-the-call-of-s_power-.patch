@@ -1,0 +1,35 @@
+From 4f6a9b435768091c0a871e4592fa88655c618f70 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 20 May 2025 18:22:10 +0900
+Subject: [PATCH 14/56] MLK-26284: media: csi2-sam: change the call of s_power
+ to optional
+
+When using sensors driver without s_power in core_ops, will fail when
+trying to do STREAM_ON.
+Change the call of s_power to adapt these sensors.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Guoniu Zhou <guoniu.zhou@nxp.com>
+---
+ drivers/staging/media/imx/imx8-mipi-csi2-sam.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+index db87f22c0899..f08d8c9f0a7b 100644
+--- a/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
++++ b/drivers/staging/media/imx/imx8-mipi-csi2-sam.c
+@@ -1094,7 +1094,10 @@ static int mipi_csis_s_power(struct v4l2_subdev *mipi_sd, int on)
+ 		return -EINVAL;
+ 	}
+ 
+-	return v4l2_subdev_call(sen_sd, core, s_power, on);
++	if (sen_sd->ops->core->s_power)
++		return v4l2_subdev_call(sen_sd, core, s_power, on);
++	else
++		return 0;
+ }
+ 
+ static int mipi_csis_s_stream(struct v4l2_subdev *mipi_sd, int enable)
+-- 
+2.34.1
+

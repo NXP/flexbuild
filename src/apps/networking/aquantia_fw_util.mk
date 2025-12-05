@@ -6,7 +6,9 @@
 
 aquantia_fw_util:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call repo-mngr,fetch,aquantia_fw_util,apps/networking) && \
+	 $(call download_repo,aquantia_fw_util,apps/networking) && \
+	 $(call patch_apply,aquantia_fw_util,apps/networking) && \
+	 $(call fbprint_b,"aquantia_fw_util") && \
 	 cd $(NETDIR)/aquantia_fw_util && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 cp -f aq-firmware-tool $(DESTDIR)/usr/local/bin && \

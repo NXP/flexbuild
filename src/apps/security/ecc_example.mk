@@ -10,9 +10,10 @@
 
 
 ecc_example:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,ecc_example,apps/security) && \
+	 $(call patch_apply,ecc_example,apps/security) && \
 	 $(call fbprint_b,"ecc_example") && \
-	 $(call repo-mngr,fetch,ecc_example,apps/security) && \
 	 cd $(SECDIR)/ecc_example && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) $(DESTDIR)/usr/bin && \

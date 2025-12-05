@@ -7,13 +7,12 @@
 
 
 gputop: libgpuperfcnt
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,gputop,apps/graphics) && \
-	 if [ ! -f $(DESTDIR)/usr/include/gpuperfcnt/gpuperfcnt.h ]; then \
-	     bld libgpuperfcnt -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
+	@[ $${MACHINE:0:4} != imx8 ] && exit || \
+	 $(call download_repo,gputop,apps/graphics) && \
+	 $(call patch_apply,gputop,apps/graphics) && \
 	 $(call fbprint_b,"gputop") && \
 	 cd $(GRAPHICSDIR)/gputop && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cd build_$(DISTROTYPE)_$(ARCH) && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \

@@ -1,0 +1,32 @@
+From 1cd64ceede2768a0e86f1c2a45fef00f454010c5 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Wed, 4 Jun 2025 15:35:32 +0900
+Subject: [PATCH 06/56] LF-15224-2 dt-bindings: display: panel: Add waveshare
+ DPI panel support
+
+Add dt-binding documentation for waveshare DPI panel
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ .../devicetree/bindings/display/panel/panel-simple.yaml       | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+index b89e39790579..16465fe33339 100644
+--- a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
++++ b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+@@ -301,6 +301,10 @@ properties:
+       - vivax,tpc9150-panel
+         # VXT 800x480 color TFT LCD panel
+       - vxt,vl050-8048nt-c01
++        # Waveshare 13.3" FHD (1920x1080) LCD panel
++      - waveshare,13.3inch-panel
++        # Waveshare 7.0" WSVGA (1024x600) LCD panel
++      - waveshare,7.0inch-c-panel
+         # Winstar Display Corporation 3.5" QVGA (320x240) TFT LCD panel
+       - winstar,wf35ltiacd
+         # Yes Optoelectronics YTC700TLAG-05-201C 7" TFT LCD panel
+-- 
+2.34.1
+

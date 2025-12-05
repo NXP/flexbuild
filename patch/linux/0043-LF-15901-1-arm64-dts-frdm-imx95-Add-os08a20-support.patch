@@ -1,0 +1,145 @@
+From 90039801c91116c61e0e08a8617153dc3eec6b39 Mon Sep 17 00:00:00 2001
+From: Lei Xu <lei.xu@nxp.com>
+Date: Wed, 25 Jun 2025 16:49:35 +0800
+Subject: [PATCH 43/56] LF-15901-1: arm64: dts: frdm-imx95: Add os08a20 support
+
+Add device tree overlay file to support Omnivision os08a20 sensor
+for FRDM-IMX95 platform.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+Reviewed-by: Mirela Rabulea <mirela.rabulea@nxp.com>
+Reviewed-by: Robby Cai <robby.cai@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   5 +
+ .../freescale/imx95-15x15-frdm-os08a20.dtso   | 103 ++++++++++++++++++
+ 2 files changed, 108 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-15x15-frdm-os08a20.dtso
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index ee06730db52e..f73dd697d57a 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -928,6 +928,11 @@ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-waveshare-7inch-c-panel.dtb
+ imx95-15x15-frdm-ap1302-dtbs := imx95-15x15-frdm.dtb imx95-15x15-frdm-ap1302.dtbo
+ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-ap1302.dtb
+ 
++imx95-15x15-frdm-os08a20-isp-dtbs := imx95-15x15-frdm.dtb \
++				     imx95-15x15-frdm-os08a20.dtbo \
++				     imx95-19x19-evk-neoisp.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-os08a20-isp.dtb
++
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g399a-rdb3.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-os08a20.dtso b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-os08a20.dtso
+new file mode 100644
+index 000000000000..d1bfcf6c385c
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-os08a20.dtso
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/gpio/gpio.h>
++
++&lpi2c4 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	os08a20: os08a20_mipi@36 {
++		compatible = "ovti,os08a20";
++		reg = <0x36>;
++		reset-gpios = <&pcal6524 19 GPIO_ACTIVE_LOW>;
++		orientation = <2>;
++		rotation = <0>;
++		status = "okay";
++
++		port {
++			os08a20_mipi_0_ep: endpoint {
++				remote-endpoint = <&mipi_csi0_ep>;
++				data-lanes = <1 2 3 4>;
++				clock-lanes = <0>;
++			};
++		};
++	};
++};
++
++&dphy_rx {
++	status = "okay";
++};
++
++&mipi_csi0 {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++			mipi_csi0_ep: endpoint {
++				remote-endpoint = <&os08a20_mipi_0_ep>;
++				data-lanes = <1 2 3 4>;
++				clock-lanes = <0>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++				mipi_csi0_out: endpoint {
++				remote-endpoint = <&formatter_0_in>;
++			};
++		};
++	};
++};
++
++&csi_pixel_formatter_0 {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++
++			formatter_0_in: endpoint {
++				remote-endpoint = <&mipi_csi0_out>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++
++			formatter_0_out: endpoint {
++				remote-endpoint = <&isi_in_2>;
++			};
++		};
++	};
++};
++
++&isi {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@2 {
++			reg = <2>;
++
++			isi_in_2: endpoint {
++				remote-endpoint = <&formatter_0_out>;
++			};
++		};
++	};
++};
+-- 
+2.34.1
+

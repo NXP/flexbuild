@@ -1,0 +1,26 @@
+From ed0ad637ec2dd7d7b4e57d11dcf68a2a2f49560f Mon Sep 17 00:00:00 2001
+From: nxa22691 <andy.tang@nxp.com>
+Date: Tue, 8 Jul 2025 17:33:32 +0900
+Subject: [PATCH] Update the wayland-scanner can't find issue
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ protocol/meson.build | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/protocol/meson.build b/protocol/meson.build
+index 938b116d..3984fc87 100644
+--- a/protocol/meson.build
++++ b/protocol/meson.build
+@@ -1,5 +1,6 @@
+-dep_scanner = dependency('wayland-scanner', native: true)
+-prog_scanner = find_program(dep_scanner.get_variable(pkgconfig: 'wayland_scanner'))
++prog_scanner = find_program('wayland-scanner', native: true)
++dep_scanner = prog_scanner
++
+ 
+ dep_wp = dependency('wayland-protocols', version: '>= 1.33',
+ 	fallback: ['wayland-protocols', 'wayland_protocols'])
+-- 
+2.34.1
+

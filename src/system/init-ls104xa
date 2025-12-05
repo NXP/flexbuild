@@ -4,7 +4,7 @@
 #
 
 soc="`cat /proc/device-tree/model |cut -d' ' -f1,2`"
-echo "Configuring for $soc..."
+echo "Configuring for $soc"
 fmc_path=/etc/fmc/config/private
 if [ "LS1043A RDB" = "$soc" ];then
     config=`ls $fmc_path/ls1043ardb/*/config.xml`

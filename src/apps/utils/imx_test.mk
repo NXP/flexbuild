@@ -8,16 +8,11 @@
 PLATFORM = IMX8
 
 imx_test: libdrm alsa_lib
-	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != IMX -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,imx_test,apps/utils) && \
-	 if [ ! -f $(DESTDIR)/usr/include/linux/mxc_asrc.h ]; then \
-	     bld linux-headers -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/xf86drm.h ]; then \
-	     bld libdrm -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
-	 if [ ! -f $(DESTDIR)/usr/include/alsa/asoundlib.h ]; then \
-	     bld alsa_lib -r $(DISTROTYPE):$(DISTROVARIANT); \
+	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,imx_test,apps/utils) && \
+	 $(call patch_apply,imx_test,apps/utils) && \
+	 if [ ! -d $(DESTDIR)/usr/include/linux ]; then \
+	     bld linux-headers -m $(MACHINE); \
 	 fi && \
 	 sudo cp -rf $(DESTDIR)/usr/include/alsa $(RFSDIR)/usr/include && \
 	 $(call fbprint_b,"imx_test") && \

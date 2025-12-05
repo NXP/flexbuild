@@ -1,0 +1,69 @@
+From 24d2ff29e77c25d4e44a1f5391151c2d06f968d4 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 21 Oct 2025 19:25:16 +0900
+Subject: [PATCH 19/24] LFU-936: frdm-imx95: Pull up regulator according to
+ board version
+
+FRDM-IMX95 updated from RevB to RevC and the EXT_PWR control pin has
+been changed from on-chip gpio to io expander.
+This patch will read the board version of the board and decided which
+pin should be pulled up at the boot up time.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Ye Li <ye.li@nxp.com>
+---
+ board/freescale/imx95_frdm/imx95_frdm.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/board/freescale/imx95_frdm/imx95_frdm.c b/board/freescale/imx95_frdm/imx95_frdm.c
+index 37be02c1409..0e380ee394f 100644
+--- a/board/freescale/imx95_frdm/imx95_frdm.c
++++ b/board/freescale/imx95_frdm/imx95_frdm.c
+@@ -24,6 +24,7 @@
+ #include <dm/uclass-internal.h>
+ 
+ extern int board_fix_fdt_fuse(void *fdt);
++static int get_board_version(int *rev, int *data);
+ 
+ int board_early_init_f(void)
+ {
+@@ -93,6 +94,8 @@ void tca_mux_select(enum typec_cc_polarity pol)
+ static void setup_typec(void)
+ {
+ 	int ret;
++	unsigned int rev[2];
++	unsigned int data[2];
+ 
+ 	tca_base = USB1_BASE_ADDR + 0xfc000;
+ 
+@@ -106,10 +109,23 @@ static void setup_typec(void)
+ 		printf("Power supply on USB PD\n");
+ 
+ 		/* Enable EXT PWR */
+-		ret = dm_gpio_lookup_name("GPIO5_9", &ext_pwr_desc);
+-		if (ret) {
+-			printf("%s lookup GPIO5_9 failed ret = %d\n", __func__, ret);
+-			return;
++		ret = get_board_version(rev, data);
++		if (ret == 0) {
++			if (rev[0] < 1) {
++				ret = dm_gpio_lookup_name("GPIO5_9", &ext_pwr_desc);
++				if (ret) {
++					printf("%s lookup GPIO5_9 failed ret = %d\n",
++					       __func__, ret);
++					return;
++				}
++			} else {
++				ret = dm_gpio_lookup_name("gpio@22_12", &ext_pwr_desc);
++				if (ret) {
++					printf("%s lookup gpio@22_12 failed ret = %d\n",
++					       __func__, ret);
++					return;
++				}
++			}
+ 		}
+ 
+ 		ret = dm_gpio_request(&ext_pwr_desc, "ext_pwr_en");
+-- 
+2.34.1
+

@@ -1,0 +1,46 @@
+From 4d8c10277eaeddced525b431040d8e6e9c4590d8 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Thu, 18 Sep 2025 15:51:01 +0900
+Subject: [PATCH 58/58] LF-16283: arm64: dts: imx95-15x15-frdm: Change
+ waveshare 7inch panel I2C assignment
+
+The waveshare panel uses dupont line to connect its I2C interfrace
+to i2c6 which is on the FRDM-IMX95 40-pin EXPI header.
+
+At the begnning, the i2c4 is unavailable for dupont line connection.
+Hardware requests to change the I2C connection from i2c6 to i2c4.
+Since i2c6 is located on the 40-pin EXPI header, which is
+commonly used by accessories such as the aud-hat.
+
+To enable connection of additional accessories without conflict,
+using i2c4 which is not on the 40-pin EXPI header and remains
+available as new I2C interface.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ .../freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+index a52d1644eefb..0be540eec955 100644
+--- a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+@@ -47,13 +47,9 @@ &dpu {
+ 	assigned-clock-rates = <0>, <3000000000>, <500000000>;
+ };
+ 
+-&lpi2c6 {
++&lpi2c4 {
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+-	clock-frequency = <100000>;
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_lpi2c6>;
+-	status = "okay";
+ 
+ 	touchscreen@14 {
+ 		compatible = "goodix,gt911";
+-- 
+2.34.1
+

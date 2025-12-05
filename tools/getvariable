@@ -7,10 +7,6 @@
 
 BIN_FW="fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin uefi_bin mc_bin mc_utils ddr_phy_bin dp_fw_cadence"
 
-LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | cut -d= -f2 | sed -e '/qds/d' | xargs echo`
-
-IMX_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=imx' | cut -d= -f2 | xargs echo`
-
 BSP_REPO_LIST=`find $FBDIR/src/bsp -name '*.mk' | xargs basename -s .mk | tr '\n' ' '`
 
 BSP_REPO_LIST="$BSP_REPO_LIST $BIN_FW"
@@ -34,7 +30,10 @@ GOPOINT_REPO_LIST=`ls $FBDIR/src/apps/gopoint/*.mk | xargs basename -s .mk | tr 
 ROBOTICS_REPO_LIST=`ls $FBDIR/src/apps/robotics/*.mk | xargs basename -s .mk | tr '\n' ' '`
 
 APPS_REPO_LIST=""
-[ $SOCFAMILY = LS ] && PKG_GROUPS_NETWORKING=y
+PKG_GROUPS_GRAPHICS=y
+PKG_GROUPS_MULTIMEDIA=y
+[ "$PKG_GROUPS_GOPOINT" = "y" ]&& PKG_GROUPS_ML=y
+
 [ "$PKG_GROUPS_GRAPHICS" = y -o "$GROUPS_GRAPHICS" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $GRAPHICS_REPO_LIST"
 [ "$PKG_GROUPS_MULTIMEDIA" = y -o "$GROUPS_MULTIMEDIA" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $MULTIMEDIA_REPO_LIST"
 [ "$PKG_GROUPS_NETWORKING" = y -o "$GROUPS_NETWORKING" = y ] && APPS_REPO_LIST="$APPS_REPO_LIST $NETWORKING_REPO_LIST"

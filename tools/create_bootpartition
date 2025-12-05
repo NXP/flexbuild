@@ -4,15 +4,11 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-
-
 generate_bootpartition_tarball() {
     # check kernel image
-    [ -f $KERNEL_PATH/Makefile ] || bld repo-fetch linux
-    curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2`
-    [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$curbrch/include/config/kernel.release ] && \
-    echo Building the dependent $kernel_img ... && \
-    bld linux -p $SOCFAMILY -a $DESTARCH
+    [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release ] && \
+        echo Building the dependent $kernel_img && \
+        bld linux -p $SOCFAMILY -a $DESTARCH
 
     [ ! -d $PKGDIR/linux/cryptodev_linux ] && bld linux-modules -p $SOCFAMILY -a $DESTARCH
 
@@ -22,98 +18,79 @@ generate_bootpartition_tarball() {
 
     [ $SOCFAMILY = IMX ] && socseries=im
     [ $SOCFAMILY = LS  ] && socseries=l
-    [ -f  $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz ] && \
-    cp -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz $bootpartdir
+    [ -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz ] && \
+        cp -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz $bootpartdir
 
-    fbprint_n "Installing kernel and dtb ..."
+    fbprint_n "Installing kernel and dtb "
     [ -f $tiny_itb ] && cp -f $tiny_itb $bootpartdir
     [ -f $base_itb ] && cp -f $base_itb $bootpartdir
-    kernelrelease=$(cat $KERNEL_OUTPUT_PATH/$curbrch/include/config/kernel.release)
+    kernelrelease=$(cat $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release)
     [ $DESTARCH = arm64 ] && kernelimg=Image* || kernelimg=zImage*
     cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/{*.dtb,$kernelimg,config-$kernelrelease} $bootpartdir
     if [ $DESTARCH = arm64 ]; then
-	cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/vmlinuz-$kernelrelease $bootpartdir
+        cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/vmlinuz-$kernelrelease $bootpartdir
     elif [ $DESTARCH = arm32 ]; then
-	cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/uImage* $bootpartdir
+        cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/uImage* $bootpartdir
     fi
 
     # install kernel modules
-    fbprint_n "Installing kernel modules ..."
-    cp -rf $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules $bootpartdir
-    modversion=$(ls $KERNEL_OUTPUT_PATH/$curbrch/tmp/lib/modules|xargs echo|cut -d' ' -f1)
+    fbprint_n "Installing kernel modules "
+    cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules $bootpartdir
+    modversion=$(ls $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules|xargs echo|cut -d' ' -f1)
     rm -f $bootpartdir/modules/$modversion/{build,source}
 
-    # install /lib/firmware
-    mkdir -p $bootpartdir/firmware
-    if [ $SOCFAMILY = IMX ]; then
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/sof-gcc ] &&  bld sof_zephyr -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/dsp ] && bld imx_dsp -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $FBOUTDIR/bsp/imx_firmware/lib/firmware/imx/easrc ] && bld imx_firmware -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo ] && bld mcore_demo -a $DESTARCH -p $SOCFAMILY
-	[ ! -d $DESTDIR/usr/lib/ethosu_firmware ] && bld ethosu_firmware -a $DESTARCH -p $SOCFAMILY
-
-	cp -Prf $FBOUTDIR/bsp/imx_firmware/lib/firmware/* $bootpartdir/firmware
-	cp -Prf $FBOUTDIR/bsp/imx_mcore_demos/imx93-m33-demo/imx93-*m33*.elf $DESTDIR/usr/lib/ethosu_firmware $bootpartdir/firmware
-     fi
-
     # install distro boot script
-    fbprint_n "Installing distro boot script ..."
+    fbprint_n "Installing distro boot script "
     if [ $DESTARCH = arm64 -a $SOCFAMILY = LS ]; then
-	socseries=l; scrmask="-v ls1021atwr"
+        socseries=l; scrmask="-v ls1021atwr"
     elif [ $DESTARCH = arm32 -a $SOCFAMILY = LS ]; then
-	socseries=l; scrmask=ls1021atwr
+        socseries=l; scrmask=ls1021atwr
     elif [ $DESTARCH = arm64 -a $SOCFAMILY = IMX ]; then
-	socseries=imx*; scrmask='imx8|imx9'
+        socseries=imx*; scrmask='imx8|imx9'
     elif [ $DESTARCH = arm32 -a $SOCFAMILY = IMX ]; then
-	socseries=imx*; scrmask='imx6|imx7'
+        socseries=imx*; scrmask='imx6|imx7'
     fi
 
-    bld distroscr -a $DESTARCH -p $SOCFAMILY
+    if [ "$MACHINE" = all ]; then
+        bld distroscrall -a $DESTARCH -p $SOCFAMILY
+    else
+        bld distroscr -m $MACHINE
+    fi
 
     ls $FBOUTDIR/bsp/u-boot/$socseries*/*boot.scr | grep -E $scrmask | xargs -I {} cp {} $bootpartdir
 
-    # check UEFI
-    if [ "$CONFIG_UEFI_BIN" = y -a $SOCFAMILY = LS -a $DESTARCH = arm64 ]; then
-	generate_uefi_grub_cfg
-	mkdir -p $bootpartdir/grub
-	find  $FBOUTDIR/bsp/uefi/ -name "*grub.cfg" | xargs -I {} cp {} $bootpartdir/grub
-	[ -f $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI ] || bld uefi_bin
-	cp $FBOUTDIR/bsp/uefi/grub/BOOTAA64.EFI $bootpartdir/grub
-    fi
-
     # secure boot headers
     if [ $SOCFAMILY = LS -a "$SECURE" = y ]; then
-	[ -n "$BOOTTYPE" ] && boottype=$BOOTTYPE
-	for brd in $machinelist; do
-	    [ ! -f $FBOUTDIR/firmware/secboot_hdrs/${MACHINE:0:10}/hdr_dtb.out ] && \
-	    bld signimg -m $brd -a $DESTARCH
-	done
-	cp -rf $FBOUTDIR/bsp/secboot_hdrs $bootpartdir
-	ls $FBOUTDIR/bsp/secboot_hdrs/*/*bs.out | grep $scrmask | xargs -I {} cp {} $bootpartdir
+        [ -n "$BOOTTYPE" ] && boottype=$BOOTTYPE
+        for brd in $machinelist; do
+            [ ! -f $FBOUTDIR/firmware/secboot_hdrs/${MACHINE:0:10}/hdr_dtb.out ] && \
+                bld signimg -m $brd -a $DESTARCH
+        done
+        cp -rf $FBOUTDIR/bsp/secboot_hdrs $bootpartdir
+        ls $FBOUTDIR/bsp/secboot_hdrs/*/*bs.out | grep $scrmask | xargs -I {} cp {} $bootpartdir
     fi
 
     # check IMA/EVM
     if [ "$IMA_EVM" = y -a $SOCFAMILY = LS ]; then
-	[ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
-	bld rfs -r buildroot:imaevm -a $DESTARCH
+        [ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
+            bld rfs -r buildroot:imaevm -a $DESTARCH
 
-	cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $bootpartdir/initramfs.img
-	for brd in $LS_MACHINE_LIST; do
-	    [ -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr ] && \
-	    cp -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr $bootpartdir
-	done
+        cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $bootpartdir/initramfs.img
+        for brd in $LS_MACHINE_LIST; do
+            [ -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr ] && \
+                cp -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr $bootpartdir
+        done
     fi
 
     # install kernel tools/perf
-    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf
+    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf -m $MACHINE
     [ -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && mkdir -p $bootpartdir/tools && \
-    cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf $bootpartdir/tools
+        cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf $bootpartdir/tools
 
     majorver=`grep "^VERSION =" $KERNEL_PATH/Makefile | cut -d' ' -f3`
     patchlevel=`grep "^PATCHLEVEL =" $KERNEL_PATH/Makefile | cut -d' ' -f3`
     sublevel=`grep "^SUBLEVEL =" $KERNEL_PATH/Makefile | cut -d' ' -f3`
     kernelver=$majorver.$patchlevel.$sublevel
-    [ -f $PKGDIR/apps/security/cst/srk_hash.txt -a $SOCFAMILY = LS ] && cp -f $PKGDIR/apps/security/cst/srk* $bootpartdir
     boottarball=${bootpartname}_lts_${kernelver}${imaevmopt}_`date +%Y%m%d%H%M`
     echo $boottarball > $bootpartdir/buildinfo
     cd $bootpartdir && tar --zstd -cf ../$boottarball.tar.zst *

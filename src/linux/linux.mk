@@ -6,18 +6,10 @@
 
 
 linux:
-	@$(call repo-mngr,fetch,linux,linux) && \
+	$(call download_repo,linux,linux) && \
+	$(call patch_apply,linux,linux) && \
 	cd $(KERNEL_PATH) && \
-	curbrch=`git branch | grep ^* | cut -d' ' -f2` && \
-	if echo $$curbrch | grep -qE '\(HEAD'; then \
-	    $(call fbprint_w,"Please set proper tag/branch name in kernel repo $(KERNEL_PATH)") && exit 1; \
-	fi && \
-	if [ -d $(FBDIR)/patch/linux ] && [ ! -f .patchdone ]; then \
-		git am $(FBDIR)/patch/linux/*.patch $(LOG_MUTE); \
-		git am "$(FBDIR)"/patch/linux/rt/*.patch $(LOG_MUTE); \
-		touch .patchdone; \
-	fi && \
-	$(call fbprint_b,"$(KERNEL_TREE) with $$curbrch") && \
+	$(call fbprint_b,"$(KERNEL_TREE) with $(KERNEL_BRANCH)") && \
 	$(call fbprint_n,"Compiler = `$(CROSS_COMPILE)gcc --version | head -1`") && \
 	if [ $(DESTARCH) = arm64 -a $(SOCFAMILY) = IMX ]; then \
 	    locarch=arm64; dtbstr=freescale/imx*.dtb; \
@@ -28,7 +20,7 @@ linux:
 	elif [ $(DESTARCH) = arm32 -a $(SOCFAMILY) = IMX ]; then \
 	    locarch=arm; dtbstr=imx*.dtb; \
 	fi && \
-	opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir/tmp && \
+	opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && mkdir -p $$opdir/tmp && \
 	if [ "$(BUILDARG)" = "custom" ]; then \
 	    $(MAKE) menuconfig -C $(KERNEL_PATH) O=$$opdir && \
 	    $(call fbprint_d,"Custom kernel config: $$opdir/.config") && \
@@ -60,7 +52,7 @@ linux:
 	$(MAKE) -j$(JOBS)  modules_install INSTALL_MOD_PATH=$$opdir/tmp -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	ls $$opdir/arch/$$locarch/boot/dts/$$dtbstr | xargs -I {} cp {} $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY) && \
 	ls -l $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY) $(LOG_MUTE) && \
-	$(call fbprint_d,"$(KERNEL_TREE) $$curbrch in $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY)")
+	$(call fbprint_d,"$(KERNEL_TREE) $(KERNEL_BRANCH) in $(FBOUTDIR)/linux/$(KERNEL_TREE)/$(DESTARCH)/$(SOCFAMILY)")
 
 
 
@@ -71,10 +63,9 @@ linux-modules: cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt
 
 
 linux-headers:
-	@$(call repo-mngr,fetch,linux,linux) && \
+	@$(call download_repo,linux,linux) && \
 	 cd $(PKGDIR)/linux && \
-	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir/tmp && \
+	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && mkdir -p $$opdir/tmp && \
 	 mkdir -p $(DESTDIR)/usr && \
 	 $(MAKE) -j$(JOBS) headers_install INSTALL_HDR_PATH=$(DESTDIR)/usr -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	 $(call fbprint_d,"linux-headers")
@@ -82,6 +73,6 @@ linux-headers:
 
 
 linux-deb: linux
-	opdir=$(KERNEL_OUTPUT_PATH)/`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
+	opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \
 	$(MAKE) -j$(JOBS) bindeb-pkg -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
 	$(call fbprint_d,"linux-deb")

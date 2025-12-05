@@ -1,0 +1,30 @@
+From b956302f57ac60a408b0390e61ba022f6d9b4460 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 29 Jul 2025 12:29:01 +0900
+Subject: [PATCH 55/56] LF-15945-3: arm64: dts: imx91-11x11-frdm: correct
+ compatible name
+
+Correct FRDM-IMX91 board compatible name to frdm-imx91
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx91-11x11-frdm.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm.dts b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm.dts
+index 5cd57a0511ec..55e79f49197b 100644
+--- a/arch/arm64/boot/dts/freescale/imx91-11x11-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx91-11x11-frdm.dts
+@@ -14,7 +14,7 @@ &ele_fw2 {
+ 
+ / {
+ 	model = "FRDM-IMX91";
+-	compatible = "fsl,imx91-11x11-frdm", "fsl,imx91";
++	compatible = "fsl,frdm-imx91", "fsl,imx91";
+ 
+ 	chosen {
+ 		stdout-path = &lpuart1;
+-- 
+2.34.1
+

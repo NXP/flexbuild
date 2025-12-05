@@ -1,0 +1,31 @@
+From 3e376d829a54314ad0c6dce7dbc1a1079272106b Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Mon, 16 Jun 2025 11:27:46 +0900
+Subject: [PATCH 36/56] LF-15644: arm64: dts: imx91-11x11-frdm: add DT to
+ support Tianma TM050RDH03 panel
+
+Add Tianma TM050RDH03 panel support on FRDM-IMX91 board.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 59d2f5e48af7..e75559699f10 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -564,6 +564,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-frdm.dtb \
+ imx91-11x11-frdm-tianma-wvga-panel-dtbs := imx91-11x11-frdm.dtb imx91-11x11-frdm-tianma-wvga-panel.dtbo
+ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-frdm-tianma-wvga-panel.dtb
+ 
++imx91-11x11-frdm-tianma-wvga-panel-dtbs := imx91-11x11-frdm.dtb imx91-11x11-frdm-tianma-wvga-panel.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-frdm-tianma-wvga-panel.dtb
++
+ dtb-$(CONFIG_ARCH_MXC) += imx93-9x9-qsb.dtb \
+ 			  imx93-9x9-qsb-can1.dtb \
+ 			  imx93-9x9-qsb-flexspi-m2.dtb \
+-- 
+2.34.1
+

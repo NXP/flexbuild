@@ -1,0 +1,170 @@
+From 756bf4df932958e175ff44e2972844271899b06e Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Wed, 25 Jun 2025 16:20:19 +0800
+Subject: [PATCH 41/56] LF-15825: arm64: dts: imx95-15x15-frdm: add dtb to
+ support waveshare 7inch panel
+
+Add waveshare 7inch panel support for FRDM-IMX95 platform.
+
+Signed-off-by: Lei Xu <lei.xu@nxp.com>
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+Reviewed-by: Bough Chen <haibo.chen@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   3 +
+ ...95-15x15-frdm-waveshare-7inch-c-panel.dtso | 129 ++++++++++++++++++
+ 2 files changed, 132 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 123c1640fcf1..d4581fe9f357 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -922,6 +922,9 @@ dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-verdin-root.dtb imx95-19x19-verdin-inmate.
+ 
+ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm.dtb imx95-15x15-frdm-boe-wxga-lvds-panel.dtb
+ 
++imx95-15x15-frdm-waveshare-7inch-c-panel-dtbs := imx95-15x15-frdm.dtb imx95-15x15-frdm-waveshare-7inch-c-panel.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-waveshare-7inch-c-panel.dtb
++
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g399a-rdb3.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+new file mode 100644
+index 000000000000..a52d1644eefb
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+@@ -0,0 +1,129 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++#include "imx95-clock.h"
++#include "imx95-pinfunc.h"
++
++/dts-v1/;
++/plugin/;
++
++&{/} {
++	panel {
++		compatible = "waveshare,7.0inch-c-panel", "panel-dpi";
++		power-supply = <&reg_5p0v>;
++
++		port {
++			panel_to_waveshare: endpoint {
++				remote-endpoint = <&waveshare_to_panel>;
++			};
++		};
++
++		panel-timing {
++			clock-frequency = <50000000>;
++			hactive = <1024>;
++			vactive = <600>;
++			hfront-porch = <100>;
++			hback-porch = <100>;
++			hsync-len = <100>;
++			vback-porch = <10>;
++			vfront-porch = <10>;
++			vsync-len = <10>;
++
++			hsync-active = <0>;
++			vsync-active = <0>;
++			de-active = <1>;
++			pixelclk-active = <1>;
++		};
++	};
++};
++
++&dpu {
++	assigned-clocks = <&scmi_clk IMX95_CLK_DISP1PIX>,
++			  <&scmi_clk IMX95_CLK_VIDEOPLL1_VCO>,
++			  <&scmi_clk IMX95_CLK_VIDEOPLL1>;
++	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
++	assigned-clock-rates = <0>, <3000000000>, <500000000>;
++};
++
++&lpi2c6 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	clock-frequency = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_lpi2c6>;
++	status = "okay";
++
++	touchscreen@14 {
++		compatible = "goodix,gt911";
++		reg = <0x14>;
++		touchscreen-size-x = <800>;
++		touchscreen-size-y = <480>;
++	};
++
++	bridge@45 {
++		compatible = "waveshare,dsi2dpi";
++		reg = <0x45>;
++		power-supply = <&reg_5p0v>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++
++				waveshare_from_dsi: endpoint {
++					data-lanes = <1 2>;
++					remote-endpoint = <&dsi_to_waveshare>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++
++				waveshare_to_panel: endpoint {
++					remote-endpoint = <&panel_to_waveshare>;
++				};
++			};
++		};
++	};
++};
++
++&mipi_dsi {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@1 {
++			reg = <1>;
++
++			dsi_to_waveshare: endpoint {
++				remote-endpoint = <&waveshare_from_dsi>;
++			};
++		};
++	};
++};
++
++&pixel_interleaver {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	channel@0 {
++		reg = <0>;
++		status = "okay";
++	};
++};
++
++&scmi_iomuxc {
++	pinctrl_lpi2c6: lpi2c6grp {
++		fsl,pins = <
++			IMX95_PAD_GPIO_IO02__LPI2C6_SDA			0x40000b9e
++			IMX95_PAD_GPIO_IO03__LPI2C6_SCL			0x40000b9e
++		>;
++	};
++};
+-- 
+2.34.1
+

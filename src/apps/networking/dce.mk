@@ -8,8 +8,9 @@
 
 dce:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
+	 $(call download_repo,dce,apps/networking,submod) && \
+	 $(call patch_apply,dce,apps/networking) && \
 	 $(call fbprint_b,"dce") && \
-	 $(call repo-mngr,fetch,dce,apps/networking) && \
 	 cd $(NETDIR)/dce && \
 	 sed -i 's/DESTDIR)\/sbin/DESTDIR)\/usr\/bin/' Makefile && \
 	 sed -i 's/-Wwrite-strings -Wno-error/-Wwrite-strings -fcommon -Wno-error/' lib/qbman_userspace/Makefile && \

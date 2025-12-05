@@ -6,10 +6,11 @@
 
 optee_client:
 ifeq ($(CONFIG_OPTEE),y)
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call repo-mngr,fetch,optee_client,apps/security) && \
+	@[ $(DESTARCH) != arm64  ] && exit || \
+	 $(call download_repo,optee_client,apps/security) && \
+	 $(call patch_apply,optee_client,apps/security) && \
 	 if [ ! -d $(RFSDIR)/usr/lib ]; then \
-	     bld rfs -r $(DISTROTYPE):$(DISTROVARIANT) -a $(DESTARCH); \
+	     bld rfs -m $(MACHINE); \
 	 fi && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \

@@ -6,9 +6,17 @@
 # SDK BSP Components
 
 SHELL=/bin/bash
+.SHELLFLAGS := $(SHFLAGS)
+
 include $(FBDIR)/configs/$(CONFIGLIST)
-include $(FBDIR)/include/repo.mk
-include $(FBDIR)/include/repo_update.inc
-include *.mk
+include $(FBDIR)/include/utils.mk
+include $(FBDIR)/include/download_repo.mk
+include $(FBDIR)/include/patch_apply.mk
+include $(FBDIR)/configs/.repo_pool
+
+BSP_MK_FILES := $(wildcard $(FBDIR)/src/bsp/*.mk)
+include $(BSP_MK_FILES)
+
+BSP_TARGETS := $(basename $(notdir $(BSP_MK_FILES)))
 
 BSPDIR = $(PKGDIR)/bsp

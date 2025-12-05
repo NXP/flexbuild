@@ -1,0 +1,26 @@
+From 00557f7a906bdae13219912a18620f0d9ec252cf Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Tue, 22 Jul 2025 02:50:02 -0700
+Subject: [PATCH] fix the compiling issue
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ libcheese/cheese-flash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcheese/cheese-flash.c b/libcheese/cheese-flash.c
+index 59959dbd..0d2a0c8a 100644
+--- a/libcheese/cheese-flash.c
++++ b/libcheese/cheese-flash.c
+@@ -132,7 +132,7 @@ cheese_flash_set_property (GObject      *object,
+       GObject *parent;
+       parent = g_value_get_object (value);
+       if (object != NULL)
+-        priv->parent = g_object_ref (parent);
++        priv->parent = GTK_WIDGET( g_object_ref (parent));
+       else
+         priv->parent = NULL;
+     }
+-- 
+2.34.1
+

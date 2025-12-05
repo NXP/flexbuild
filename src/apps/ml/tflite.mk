@@ -6,28 +6,47 @@
 # Version: 2.16.2
 
 # DEPEND: protobuf-compiler + libprotobuf-dev + libprotoc-dev for protoc on host
-# libpython3.11-dev python3-pybind11 on target
+# libpython3.13-dev python3-pybind11 on target
 
 # run ./benchmark_model --external_delegate_path=<patch_to_libvx_delegate.so> --graph=<tflite_model.tflite>
 
-model-mobv1 = https://storage.googleapis.com/download.tensorflow.org/models/mobilenet_v1_2018_08_02/mobilenet_v1_1.0_224_quant.tgz
 
-TFLITE_VERSION = tensorflow-lite-2.16.2
+TFLITE_VERSION = tensorflow-lite-2.18.0
 
-tflite:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = tiny -o $(DISTROVARIANT) = base ] && exit || \
-	 $(call fbprint_b,"tensorflow-lite") && \
-	 $(call repo-mngr,fetch,tflite,apps/ml) && \
+tflite: flatbuffers
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,tflite,apps/ml) && \
+	 $(call patch_apply,tflite,apps/ml) && \
 	 cd $(MLDIR)/tflite && \
-	 [ ! -f mobilenet.tgz ] && wget -q $(model-mobv1) -O mobilenet.tgz $(LOG_MUTE) && tar xf mobilenet.tgz || true && \
+	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then \
+		$(call dl_by_wget,model-mobv1,mobilenet.tgz); \
+	 fi && \
+	 if ! ls mobilenet_v1* >/dev/null 2>&1; then \
+		 tar xf $(FBDIR)/dl/mobilenet.tgz; \
+	 fi && \
+	 $(call fbprint_b,"tensorflow-lite") && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
+	 export CMAKE_TLS_VERIFY=0 && \
+	 if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
+		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
+		cd build_$(DISTROTYPE)_$(ARCH);  \
+		rm -rf CMakeCache.txt Makefile cmake_install.cmake compile_commands.json \
+			CMakeFiles bin lib/*.so* lib/*.a \
+			example_proto_generated examples/*.o \
+			tools/*.o tmp/* ; \
+		find . -type d -name "CMakeFiles" -exec rm -rf {} + ; \
+		cd ..; \
+	 fi && \
 	 cmake  -S tensorflow/lite \
 		-B build_$(DISTROTYPE)_$(ARCH) \
+		-DFETCHCONTENT_BASE_DIR="$(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/_deps" \
+		-DCMAKE_POLICY_DEFAULT_CMP0169=OLD \
+		-DCMAKE_POLICY_DEFAULT_CMP0177=OLD \
 		-DCMAKE_BUILD_TYPE=release \
 		-DCMAKE_SYSTEM_NAME=Linux \
 		-DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+		-DTFLITE_ENABLE_FLATBUFFERS=ON \
 		-DTFLITE_HOST_TOOLS_DIR=/usr/bin \
 		-DFETCHCONTENT_FULLY_DISCONNECTED=OFF \
 		-DTFLITE_EVAL_TOOLS=on \
@@ -49,7 +68,7 @@ tflite:
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/public && \
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/platform && \
 	 install -d $(DESTDIR)/usr/include/tsl/platform && \
-	 install -d $(DESTDIR)/usr/lib/python3.11/site-packages && \
+	 install -d $(DESTDIR)/usr/lib/python3/dist-packages && \
 	 cd $(MLDIR)/tflite/tensorflow/lite && \
 	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite && \
 	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public && \
@@ -73,7 +92,7 @@ tflite:
 	 $(call fbprint_n,"install mobilenet tflite file python example and pip package") && \
 	 cp $(MLDIR)/tflite/mobilenet_*.tflite $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
 	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples && \
-	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3.11/site-packages \
-		--no-cache-dir --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE) && \
+	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3/dist-packages \
+		--no-cache-dir --upgrade --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE) && \
 	 #rm -rf $(DESTDIR)/usr/include/tensorflow/lite/{interpreter.h,util.h} && \
 	 $(call fbprint_d,"tflite")

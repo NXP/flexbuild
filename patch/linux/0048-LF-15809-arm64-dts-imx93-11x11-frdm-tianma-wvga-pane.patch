@@ -1,0 +1,35 @@
+From 519fb29a7ab17c61a04cbbee696fc6774131b17a Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Thu, 10 Jul 2025 15:20:40 +0900
+Subject: [PATCH 48/56] LF-15809: arm64: dts:
+ imx93-11x11-frdm-tianma-wvga-panel: Fix pinmux conflict
+
+Delete unused sai3 node.
+Disable tpm3 and tpm4 node to avoid pinmux conflict.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Liu Ying <victor.liu@nxp.com>
+---
+ .../dts/freescale/imx93-11x11-frdm-tianma-wvga-panel.dtso   | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-tianma-wvga-panel.dtso b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-tianma-wvga-panel.dtso
+index 3dde9fe3bebc..0fa25a47de86 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-tianma-wvga-panel.dtso
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm-tianma-wvga-panel.dtso
+@@ -174,7 +174,11 @@ display_out: endpoint {
+ };
+ 
+ /* pin conflicts */
+-&sai3 {
++&tpm3 {
++	status = "disabled";
++};
++
++&tpm4 {
+ 	status = "disabled";
+ };
+ 
+-- 
+2.34.1
+

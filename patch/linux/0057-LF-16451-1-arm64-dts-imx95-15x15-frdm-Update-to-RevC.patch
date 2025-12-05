@@ -1,0 +1,97 @@
+From e7c8d8413e2d54e78950e8a4eb830d3f99f4508c Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Wed, 22 Oct 2025 11:55:15 +0900
+Subject: [PATCH 57/58] LF-16451-1: arm64: dts: imx95-15x15-frdm: Update to
+ RevC board
+
+FRDM-IMX95 board updated from RevB to RevC.
+This patch is to meet the hardware change.
+
+Regulator exp_5v, exp_3v3, m2_mkey_pwr, m2_ekey_pwr control pin
+has been changed.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+Acked-by: Jason Liu <jason.hui.liu@nxp.com>
+---
+ .../boot/dts/freescale/imx95-15x15-frdm.dts   | 38 ++++---------------
+ 1 file changed, 8 insertions(+), 30 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
+index 1fd16c870262..8069658d9d33 100644
+--- a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm.dts
+@@ -132,30 +132,14 @@ reg_can_stby: regulator-can-stby {
+ 		enable-active-low;
+ 	};
+ 
+-	reg_ext_pwr_en: regulator-1p8v {
+-		compatible = "regulator-fixed";
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_reg_ext_pwr>;
+-		regulator-name = "ext_pwr_en";
+-		gpio = <&gpio5 9 GPIO_ACTIVE_HIGH>;
+-		enable-active-high;
+-		regulator-always-on;
+-	};
+-
+-	reg_ext_1v8: regulator-ext-1v8 {
+-		compatible = "regulator-fixed";
+-		regulator-max-microvolt = <1800000>;
+-		regulator-min-microvolt = <1800000>;
+-		regulator-name = "VCCEXT_1V8";
+-		vin-supply = <&reg_ext_pwr_en>;
+-	};
+-
+ 	reg_ext_3v3: regulator-ext-3v3 {
+ 		compatible = "regulator-fixed";
+ 		regulator-max-microvolt = <3300000>;
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-name = "VCCEXT_3V3";
+-		vin-supply = <&reg_ext_pwr_en>;
++		gpio = <&pcal6524 13 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
+ 	};
+ 
+ 	reg_ext_5v: regulator-ext-5v {
+@@ -163,15 +147,9 @@ reg_ext_5v: regulator-ext-5v {
+ 		regulator-max-microvolt = <5000000>;
+ 		regulator-min-microvolt = <5000000>;
+ 		regulator-name = "VCCEXT_5V";
+-		vin-supply = <&reg_ext_pwr_en>;
+-	};
+-
+-	reg_ext_12v: regulator-ext-12v {
+-		compatible = "regulator-fixed";
+-		regulator-name = "VCCEXT_12V";
+-		regulator-min-microvolt = <12000000>;
+-		regulator-max-microvolt = <12000000>;
+-		vin-supply = <&reg_ext_pwr_en>;
++		gpio = <&pcal6524 12 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++		regulator-always-on;
+ 	};
+ 
+ 	reg_usdhc2_vmmc: regulator-usdhc2 {
+@@ -231,7 +209,7 @@ reg_m2_ekey_pwr: regulator-m2-pwr {
+ 		regulator-name = "M.2-power-ekey";
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+-		gpio = <&gpio5 11 GPIO_ACTIVE_HIGH>;
++		gpio = <&pcal6524 16 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 	};
+ 
+@@ -242,7 +220,7 @@ reg_m2_mkey_pwr: regulator-m2-mkey-pwr {
+ 		regulator-name = "M.2-power-mkey";
+ 		regulator-min-microvolt = <3300000>;
+ 		regulator-max-microvolt = <3300000>;
+-		gpio = <&gpio5 10 GPIO_ACTIVE_HIGH>;
++		gpio = <&pcal6524 14 GPIO_ACTIVE_HIGH>;
+ 		enable-active-high;
+ 		regulator-always-on;
+ 	};
+-- 
+2.34.1
+

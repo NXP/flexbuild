@@ -1,122 +1,131 @@
 #!/bin/bash
-#
-# Copyright 2024 NXP
-#
-# SPDX-License-Identifier: BSD-3-Clause
-#
-# Shengzhou Liu <shengzhou.liu@nxp.com>
-#
-# Install NXP-specific packages and extra deb packages for Debian on i.MX and Layerscape platforms.
+set -euo pipefail
+IFS=$'\n\t'
 
-set -e
+DISTRVER=lsdk2512
 
-DEFAULT_DL_URL=https://www.nxp.com/lgfiles/sdk/lsdk2506
+LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb "
+IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95evk imx95frdm"
+DEFAULT_DL_URL="https://www.nxp.com/lgfiles/sdk/$DISTRVER"
 
-NXPAPPSPKG=nxp_apps_arm64_debian_$1.tar.zst
+show_one_line() {
+    "$@" 2>&1 | while IFS= read -r line; do
+        printf "\033[1A\033[2K\r%s\n" "$line"
+    done
+}
 
-source /usr/bin/board_id.sh
-board_id=$(get_board_id)
+check_board_valid() {
+    if [ -z "${MACHINE:-}" ] || [ "$MACHINE" = "all" ]; then
+        echo -e "Error: can't detect the board name, please check if DTB is used correctly.\n"
+        exit 1
+    fi
+    if ! echo "$LS_MACHINE_LIST $IMX_MACHINE_LIST" | grep -qw "$MACHINE"; then
+        echo "Error: Invalid board: '$MACHINE'."
+        echo "LS_MACHINE_LIST: $LS_MACHINE_LIST"
+        echo "IMX_MACHINE_LIST: $IMX_MACHINE_LIST"
+        exit 1
+    fi
+}
 
-if [ "$1" != server -a "$1" != desktop ]; then
-cat <<EOF
-  run 'debian-post-install-pkg server' to install extra packages for Debian server (without GUI desktop)
-  run 'debian-post-install-pkg desktop' to install extra packages for Debian desktop
-EOF
-  exit
-fi
+check_network() {
+    if ! ping -c 2 deb.debian.org &>/dev/null; then
+        echo "ERROR: Unable to access deb.debian.org. Check network connectivity."
+        exit 1
+    fi
 
+    if [ -n "${http_proxy:-}" ] && ! grep -iq 'acquire::http::proxy' /etc/apt/apt.conf 2>/dev/null; then
+        echo "ERROR: HTTP proxy is set in environment but not configured in /etc/apt/apt.conf"
+        exit 1
+    fi
+}
 
-pkglist_server="base-files dnsutils ntpdate bridge-utils tcpdump mtd-utils pciutils hdparm psmisc libssl-dev usbutils
-	sysstat lsb-release kexec-tools iptables libhugetlbfs0 strongswan libcharon-extra-plugins
-	dmidecode flex rdate initramfs-tools fbset mmc-utils usbutils i2c-tools lm-sensors rt-tests
-	linuxptp mosquitto xterm bluez pipewire pipewire-audio pipewire-pulse wireplumber libspa-0.2-bluetooth"
+apt_install_with_retry() {
+    local packages=("$@")
+    local max_retries=3
+    local success=false
 
+    for ((attempt=1; attempt<=max_retries; attempt++)); do
+        echo "Installing packages (attempt $attempt)"
+        if show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y "${packages[@]}"; then
+            success=true
+            break
+        else
+            echo "Warning: Attempt $attempt failed, retrying in 5 seconds"
+            sleep 5
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get clean &>/dev/null
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get update --fix-missing &>/dev/null
+            show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get --fix-broken install &>/dev/null
+        fi
+    done
 
-pkglist_desktop="gnome chromium libinput-tools libqt6core6 qt6-base-dev qt6-wayland
-	qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls qml6-module-qtquick-window
-	qml6-module-qtquick-templates qml6-module-qtquick-layouts qml6-module-qtqml-workerscript
-	qml6-module-qt5compat-graphicaleffects glmark2-es2-wayland wayland-utils libgles2-mesa clinfo
-	v4l-utils mesa-utils alsa-utils dmz-cursor-theme"
+    if ! $success; then
+        echo "ERROR: Failed to install packages after $max_retries attempts."
+        exit 1
+    fi
+}
 
+download_and_install_deb() {
+    local url="$1"
+    local deb="$2"
+    rm -f "$deb"
 
-pkglist_server_dev="libxml2-dev libtinyxml2-9 libjsoncpp-dev libssl-dev libsbc-dev libsndfile1-dev libwebp-dev
-	libnuma-dev libpcap-dev libtclap-dev libncurses5-dev libelf-dev libnl-genl-3-dev libreadline-dev libffi-dev
-	libudev-dev libinput-dev libpixman-1-dev libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.3-dev
-	libsystemd-dev libxcb-composite0-dev libxcursor-dev libxcb-cursor-dev libseat-dev seatd libtinfo-dev
-	libusb-1.0-0-dev libexif-dev libxv-dev libtheora-dev libcjson-dev libmnl-dev uuid-dev libpython3.11-dev
-	python3-pip python3-pybind11 python3-numpy python3-pillow python3-flatbuffers python3-decorator python3-numpy
-	python3-attr python3-psutil python3-lxml libflatbuffers-dev libcpuinfo-dev libwaffle-dev libpciaccess-dev
-    liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libcogl-pango-dev libvorbis-dev libjpeg62-turbo-dev
-    dh-autoreconf rsync dbus-user-session hostapd "
+    echo -e "\nDownloading $deb"
+    if ! wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress "$url/$deb"; then
+        echo "ERROR: Download $deb failed. Please try again."
+        exit 1
+    fi
 
+    echo "Installing $deb"
+    show_one_line sudo dpkg -i --force-overwrite "$deb"
+    rm -f "$deb"
+}
 
-pkglist_desktop_dev="libcjson-dev libxshmfence-dev x11proto-dev libxfont-dev libxkbfile-dev libxv-dev libbsd-dev
-	libxcb-dri3-dev libxcb-present-dev libepoxy-dev libdbus-1-dev libwayland-bin libasound2-dev gstreamer1.0-libav
-	libgstrtspserver-1.0-0 libgudev-1.0-dev libclutter-1.0-dev libclutter-gst-3.0-dev libclutter-gtk-1.0-dev
-	libgnome-desktop-3-dev libcanberra-dev libcanberra-gtk3-dev libv4l-dev libmpg123-dev libmpeg2-4-dev libx264-dev
-	libflac-dev libsoup-3.0-dev libxcvt-dev libbz2-dev libmp3lame-dev libpulse-dev libspeex-dev x264 libtag1-dev
-	libvulkan-dev libglm-dev libassimp-dev libxkbcommon-x11-dev libusb-1.0-0-dev librsvg2-dev libcurl4-openssl-dev
-    libtheora-dev libxv-dev libx11-xcb-dev libjson-glib-dev python3-opencv python3-packaging python3-venv
-    libgtest-dev libboost-system1.74-dev libboost-thread1.74-dev libdbus-glib-1-dev qt6-tools-dev libqt6svg6
-    libqt6svg6-dev libfmt-dev libdevil-dev nfs-common "
+main() {
+    source /usr/bin/board_id.sh
+    local board_id
+    board_id=$(get_board_id)
 
+    MACHINE="$board_id"
+    check_board_valid
 
-if ! `ping deb.debian.org -c 2 1>/dev/null 2>&1`; then
-  echo ERROR: unable to access deb.debian.org !
-  echo Please check your network to ensure the access to external Internet.
-  exit
-fi
+    if [[ -n "${1:-}" && ! "$1" =~ ^http ]]; then
+        echo "Usage: debian-post-install-pkg [url]"
+        exit 0
+    fi
 
-if [ -n "$http_proxy" ]; then
-  if ! grep -i -q 'acquire::http::proxy' /etc/apt/apt.conf 2>/dev/null; then
-	echo Please set HTTP proxy in /etc/apt/apt.conf
-	exit
-  fi
-fi
+    source /etc/extra_packages_list || true
+    check_network
 
-[ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
+    [ -f "/etc/ts.conf" ] && mv /etc/ts.conf /etc/ts.conf.bak
 
-echo -e "\e[0;32mPreparing to install packages ...\e[0m"
-sudo apt-get update -y 1>/dev/null
+    echo "Updating package list"
+    show_one_line sudo apt-get update -y
 
-[ "$1" = server ] && pkglist_desktop="" && pkglist_desktop_dev=""
+    case "$board_id" in
+        imx95*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx95evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
+        imx8*)  NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx8mpevk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
+        imx93*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}");;
+        imx91*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx91evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}");;
+        l*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_ls1028ardb.deb; PKGS=("${ls_pkgs[@]}");;
+    esac
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q apt-utils $pkglist_server $pkglist_server_dev $pkglist_desktop $pkglist_desktop_dev
+    apt_install_with_retry apt-utils "${base_pkgs[@]}" "${PKGS[@]}"
 
-if [[ "$board_id" == imx93* && "$1" == "desktop" ]]; then
-    sudo rm -f /usr/lib/aarch64-linux-gnu/{libGLESv2.so,libEGL.so,libgbm.so,libcogl.so,libgstallocators-1.0.so,libvulkan.so}
-fi
+    local pkglink="${1:-$DEFAULT_DL_URL}"
+    download_and_install_deb "$pkglink" "$NXPAPPSPKG"
 
-echo -e "\e[0;32mInstalling Debian packages successfully.\e[0m"
+    echo "Cleaning up"
+    sudo apt-get clean
+    sudo apt-get autoclean
+    sudo apt-get autoremove -y
 
-[ -n "$2" ] && pkglink=$2 || pkglink=$DEFAULT_DL_URL
+    [ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
 
-echo -e "\e[0;32mDownloading and installing NXP-specific packages ...\e[0m"
-rm -rf /tmp/dl
-mkdir -p /tmp/dl
-rm -rf ${NXPAPPSPKG}*
-wget $pkglink/$NXPAPPSPKG -q --show-progress || { echo "Downloading ${NXPAPPSPKG} failed "; exit 1; }
-sudo tar -I zstd -xf $NXPAPPSPKG -C /tmp/dl
-rsync -a --exclude='/lib/' /tmp/dl/ /
-[ -d /tmp/dl/lib/ ] && rsync -a /tmp/dl/lib/ /usr/lib/
-rm -rf ${NXPAPPSPKG}*
+    echo "Configuring system"
+    /usr/bin/distroplatcfg
 
-echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
+    echo "System is ready. Please reboot now."
+}
 
-if [[ "$1" == "desktop" ]]; then
-	sudo DEBIAN_FRONTEND=noninteractive apt-get reinstall -y $pkglist_desktop 1>/dev/null
-fi
+main "$@"
 
-sudo apt-get clean
-sudo apt-get autoclean
-sudo apt-get autoremove -y
-
-[ -f "/etc/ts.conf.bak" ] && mv /etc/ts.conf.bak /etc/ts.conf
-sed -i "s/Debian base/Debian $1/" /etc/issue
-
-echo -e "\e[0;32mInstalling NXP-specific packages for Debian $1 successfully.\e[0m"
-
-echo -e "\e[0;32m\nStart to configure the system ...\e[0m"
-/usr/bin/distroplatcfg
-
-echo -e "\nSystem is ready, please reboot the system now."

@@ -1,0 +1,110 @@
+From 365c65f564c1e16adb113cfa7293f954d5f69723 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Mon, 27 Oct 2025 12:15:29 +0900
+Subject: [PATCH 21/24] LFU-938: frdm-imx95: Runtime Update dtb according to
+ board version
+
+FRDM-IMX95 currently have two version board. VerB and VerC.
+This patch use ADC to read the board version and update dtb according
+to the board version to make one dtb can work on both version boards.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Ye Li <ye.li@nxp.com>
+---
+ board/freescale/imx95_frdm/imx95_frdm.c | 72 +++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
+
+diff --git a/board/freescale/imx95_frdm/imx95_frdm.c b/board/freescale/imx95_frdm/imx95_frdm.c
+index 20a2f0cf95f..87da87a8290 100644
+--- a/board/freescale/imx95_frdm/imx95_frdm.c
++++ b/board/freescale/imx95_frdm/imx95_frdm.c
+@@ -437,14 +437,86 @@ int board_late_init(void)
+ }
+ 
+ #ifdef CONFIG_OF_BOARD_SETUP
++int board_fix_fdt_version(void *blob)
++{
++	int ret, nodeoffset;
++	int gpio5_offset;
++	u32 gpio5_phandle;
++	u32 gpio_phandle_data[3];
++
++	static const struct {
++		const char *path;
++		int gpio_pin;  // -1 means delete the node
++	} configs[] = {
++		{"/regulator-ext-3v3", -1},    // Delete node
++		{"/regulator-ext-5v", 9},      // GPIO pin 9
++		{"/regulator-m2-pwr", 11},     // GPIO pin 11
++		{"/regulator-m2-mkey-pwr", 10}, // GPIO pin 10
++	};
++
++	gpio5_offset = fdt_path_offset(blob, "/soc/gpio@43850000");
++	if (gpio5_offset < 0) {
++		printf("Failed to find gpio5 node\n");
++		return gpio5_offset;
++	}
++
++	gpio5_phandle = fdt_get_phandle(blob, gpio5_offset);
++	if (!gpio5_phandle) {
++		printf("Failed to get gpio5 phandle\n");
++		return gpio5_phandle;
++	}
++
++	for (int i = 0; i < ARRAY_SIZE(configs); i++) {
++		printf("Modify node: %s\n", configs[i].path);
++		nodeoffset = fdt_path_offset(blob, configs[i].path);
++		if (nodeoffset < 0)
++			return nodeoffset;
++
++		if (configs[i].gpio_pin < 0) {
++			/* Delete node */
++			ret = fdt_del_node(blob, nodeoffset);
++			if (ret < 0) {
++				printf("Unable to delete node %s, err=%s\n",
++				       configs[i].path, fdt_strerror(ret));
++			} else {
++				printf("Delete node %s\n", configs[i].path);
++			}
++		} else {
++			/* Set GPIO property */
++			gpio_phandle_data[0] = cpu_to_fdt32(gpio5_phandle);
++			gpio_phandle_data[1] = cpu_to_fdt32(configs[i].gpio_pin);
++			gpio_phandle_data[2] = cpu_to_fdt32(1);
++
++			ret = fdt_setprop(blob, nodeoffset, "gpio", gpio_phandle_data,
++					  sizeof(gpio_phandle_data));
++			if (ret < 0) {
++				printf("Failed to set gpio property for %s: %s\n",
++				       configs[i].path, fdt_strerror(ret));
++				return ret;
++			}
++		}
++	}
++
++	return 0;
++}
+ int ft_board_setup(void *blob, struct bd_info *bd)
+ {
++	unsigned int rev[2];
++	unsigned int data[2];
+ 	char *p, *b, *s;
+ 	char *token = NULL;
+ 	int i, ret = 0;
+ 	u64 base[CONFIG_NR_DRAM_BANKS] = {0};
+ 	u64 size[CONFIG_NR_DRAM_BANKS] = {0};
+ 
++	ret = get_board_version(rev, data);
++	if (ret == 0) {
++		if (rev[0] < 1) {
++			/* For RevA and RevB, potentially remove or modify nodes */
++			board_fix_fdt_version(blob);
++		}
++	}
++
+ 	p = env_get("jh_root_mem");
+ 	if (!p)
+ 		return 0;
+-- 
+2.34.1
+

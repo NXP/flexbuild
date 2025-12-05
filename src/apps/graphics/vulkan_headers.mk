@@ -5,15 +5,14 @@
 # https://www.khronos.org/vulkan
 # Vulkan Header files and API registry
 
-repo_vulkan_headers_url=https://github.com/KhronosGroup/Vulkan-Headers.git
-repo_vulkan_headers_commit=2bb0a23104ceffd9a2
-
 
 vulkan_headers:
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
+	 $(call download_repo,vulkan_headers,apps/graphics) && \
+	 $(call patch_apply,vulkan_headers,apps/graphics) && \
 	 $(call fbprint_b,"vulkan_headers") && \
-	 $(call repo-mngr,fetch,vulkan_headers,apps/graphics) && \
 	 cd $(GRAPHICSDIR)/vulkan_headers && \
+	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
 	 cmake -S . -B build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \

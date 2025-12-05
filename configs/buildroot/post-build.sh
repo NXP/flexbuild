@@ -18,12 +18,12 @@ if [ $DESTARCH = arm64 ]; then
 	releasestamp="Built at: `date +'%Y-%m-%d %H:%M:%S'`" && \
 	echo $releasestamp > $DESTDIR/etc/buildinfo
     fi
-    echo merge apps components from $DESTDIR to ${TARGET_DIR} ...
+    echo merge apps components from $DESTDIR to ${TARGET_DIR}
     cp -rf $DESTDIR/* ${TARGET_DIR}/
 fi
 
 # setup kernel lib modules
-curbrch=`cd $KERNEL_PATH && git branch | grep ^* | cut -d' ' -f2 && cd $FBDIR`
+curbrch="${repo_linux_ver:-$DEFAULT_REPO_TAG}"
 libmodules=$FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/output/$curbrch/tmp/lib/modules
 modulename=$(echo `ls -t $libmodules` | cut -d' ' -f1)
 modulespath=$libmodules/$modulename

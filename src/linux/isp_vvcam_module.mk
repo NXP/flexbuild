@@ -10,14 +10,13 @@
 
 isp_vvcam_module:
 	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call repo-mngr,fetch,isp_vvcam_module,linux) && \
-	 $(call repo-mngr,fetch,$(KERNEL_TREE),linux) && \
+	 $(call download_repo,isp_vvcam_module,linux) && \
+	 $(call download_repo,linux,linux) && \
 	 \
 	 if [ ! -d $(FBOUTDIR)/linux/kernel/$(DESTARCH)/$(SOCFAMILY) ]; then \
-	     bld linux -a $(DESTARCH) -p $(SOCFAMILY); \
+	     bld linux -m $(MACHINE); \
 	 fi && \
-	 curbrch=`cd $(KERNEL_PATH) && git branch | grep ^* | cut -d' ' -f2` && \
-	 opdir=$(KERNEL_OUTPUT_PATH)/$$curbrch && mkdir -p $$opdir && \
+	 opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && mkdir -p $$opdir && \
 	 \
 	 cd $(PKGDIR)/linux/isp_vvcam_module/vvcam/v4l2 && \
 	 $(call fbprint_b,"isp_vvcam_module") && \

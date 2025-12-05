@@ -8,7 +8,8 @@
 qbman_userspace:
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call fbprint_b,"qbman_userspace") && \
-	 $(call repo-mngr,fetch,qbman_userspace,apps/networking) && \
+	 $(call download_repo,qbman_userspace,apps/networking) && \
+	 $(call patch_apply,qbman_userspace,apps/networking) && \
 	 cd $(NETDIR)/qbman_userspace && \
 	 export PREFIX=/usr && \
 	 export ARCH=aarch64 && \

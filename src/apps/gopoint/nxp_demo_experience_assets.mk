@@ -10,9 +10,10 @@
 
 nxp_demo_experience_assets:
 ifeq ($(CONFIG_NXP_DEMO_EXPERIENCE_ASSETS),y)
-	@[ $(DISTROVARIANT) != desktop -o $(SOCFAMILY) != IMX ] && exit || \
+	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call fbprint_b,"nxp_demo_experience_assets") && \
-	 $(call repo-mngr,fetch,nxp_demo_experience_assets,apps/gopoint) && \
+	 $(call download_repo,nxp_demo_experience_assets,apps/gopoint) && \
+	 $(call patch_apply,nxp_demo_experience_assets,apps/gopoint) && \
 	 \
 	 $(call fbprint_d,"nxp_demo_experience_assets")
 endif

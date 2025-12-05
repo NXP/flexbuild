@@ -8,29 +8,35 @@
 
 # clutter-1.0 depends on cogl-1.0
 
-cogl: gpu_viv
-	@[ $(DESTARCH) != arm64 -o $(DISTROVARIANT) != desktop ] && exit || \
-	 $(call repo-mngr,fetch,cogl,apps/graphics) && \
-	 cd $(GRAPHICSDIR)/cogl && \
-	 if [ ! -f $(DESTDIR)/usr/lib/libGLESv2.so ]; then \
-	     bld gpu_viv -r $(DISTROTYPE):$(DISTROVARIANT); \
-	 fi && \
+ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
+  DEP_COGL = mali_imx
+  DEP_COGL_LDFLAGS = -lmali -lEGL -lGLESv2 -lgbm
+else
+  DEP_COGL = gpu_viv
+  DEP_COGL_LDFLAGS = -lGAL -lVSC -lGLESv2 -lgbm_viv
+endif
+
+#cogl:
+cogl: $(DEP_COGL)
+	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:5} != imx95 ] && exit || \
+	 $(call download_repo,cogl,apps/graphics,submod) && \
+	 $(call patch_apply,cogl,apps/graphics) && \
 	 $(call fbprint_b,"cogl") && \
-	 if [ ! -f .patchdone ]; then \
-	    git am $(FBDIR)/patch/cogl/*.patch $(LOG_MUTE) && touch .patchdone; \
-	 fi && \
+	 cd $(GRAPHICSDIR)/cogl && \
 	 export CROSS=$(CROSS_COMPILE) && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)  \
-		 -march=armv8-a+crc+crypto -mbranch-protection=standard -O2 \
-		 -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat \
-		 -Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized" && \
-	 export CFLAGS="-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" && \
-	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
-	 sudo cp $(DESTDIR)/usr/lib/{libVSC.so,libgbm_viv.so,libGLESv2.so*} $(RFSDIR)/usr/lib && \
+	 export CC="$(CROSS_COMPILE)gcc" && \
+	 export CFLAGS="--sysroot=$(RFSDIR) \
+		-march=armv8-a+crc+crypto -mbranch-protection=standard -O2 \
+		-fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat \
+		-Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized \
+		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" && \
+	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)" && \
 	 \
+	 [ -f Makefile ] && $(MAKE) distclean &>/dev/null || true && \
 	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
+		--build=x86_64-linux-gnu \
 		--prefix=/usr \
 		--disable-silent-rules \
 		--disable-dependency-tracking \

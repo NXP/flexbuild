@@ -1,0 +1,30 @@
+From e54d1bd1d5d798bca332842fcda45cf2dad7918a Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Tue, 29 Jul 2025 12:28:09 +0900
+Subject: [PATCH 53/56] LF-15945-1: arm64: dts: imx93-11x11-frdm: correct
+ compatible name
+
+Correct FRDM-IMX93 board compatible name to frdm-imx93
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts
+index 35625c7aa1b0..f24b7c74d294 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts
++++ b/arch/arm64/boot/dts/freescale/imx93-11x11-frdm.dts
+@@ -14,7 +14,7 @@ &ele_fw2 {
+ 
+ / {
+ 	model = "NXP FRDM-IMX93";
+-	compatible = "fsl,imx93-11x11-frdm", "fsl,imx93";
++	compatible = "fsl,frdm-imx93", "fsl,imx93";
+ 
+ 	chosen {
+ 		stdout-path = &lpuart1;
+-- 
+2.34.1
+

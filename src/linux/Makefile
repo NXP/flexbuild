@@ -8,13 +8,15 @@
 
 SHELL=/bin/bash
 include $(FBDIR)/configs/$(CONFIGLIST)
-include $(FBDIR)/include/repo.mk
-include $(FBDIR)/include/repo_update.inc
+include $(FBDIR)/include/utils.mk
+include $(FBDIR)/include/download_repo.mk
+include $(FBDIR)/include/patch_apply.mk
+include $(FBDIR)/configs/.repo_pool
 
-include linux.mk
-include perf.mk
-include cryptodev_linux.mk
-include lttng_modules.mk
-include mdio_proxy_module.mk
-include isp_vvcam_module.mk
-include nxp_wlan_bt.mk
+
+# Find and include all .mk files in this directory
+LINUX_MK_FILES := $(wildcard $(FBDIR)/src/linux/*.mk)
+include $(LINUX_MK_FILES)
+
+# All Linux targets in this directory (derived from .mk files)
+LINUX_TARGETS := $(basename $(notdir $(LINUX_MK_FILES)))

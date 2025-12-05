@@ -5,9 +5,9 @@
 
 
 crconf:
-	@[ $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	 @$(call download_repo,crconf,apps/security) && \
+	 $(call patch_apply,crconf,apps/security) && \
 	 $(call fbprint_b,"crconf") && \
-	 $(call repo-mngr,fetch,crconf,apps/security) && \
 	 sed -i -e 's/CC =/CC ?=/' -e 's/DESTDIR=/DESTDIR?=/' $(SECDIR)/crconf/Makefile && \
 	 cd $(SECDIR)/crconf && \
 	 export CC=$(CROSS_COMPILE)gcc && \

@@ -16,9 +16,10 @@ APPLET_AUTH    ?= "None"
 
 
 openssl_provider_se05x:
-	@[ $(SOCFAMILY) != IMX -o $(DISTROVARIANT) = base -o $(DISTROVARIANT) = tiny ] && exit || \
+	@[ $(SOCFAMILY) != IMX  ] && exit || \
+	 $(call download_repo,openssl_provider_se05x,apps/security,submod) && \
+	 $(call patch_apply,openssl_provider_se05x,apps/security) && \
 	 $(call fbprint_b,"openssl_provider_se05x") && \
-	 $(call repo-mngr,fetch,openssl_provider_se05x,apps/security) && \
 	 cd $(SECDIR)/openssl_provider_se05x && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \

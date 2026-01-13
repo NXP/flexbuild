@@ -6,25 +6,46 @@
 
 
 clean_bsp_components() {
-	echo "[INFO] Clean the BSP "
     rm -rf $FBOUTDIR/bsp
-    rm -rf $PKGDIR/bsp/*
-	rm -f $FBDIR/logs/.lsfwdone
-	echo "[INFO] Done."
+    rm -rf $PKGDIR/bsp/atf/build
+
+    [ -d $PKGDIR/bsp/rcw ] && \
+    $MAKE clean -C $PKGDIR/bsp/rcw 2>/dev/null
+
+    [ -d $PKGDIR/bsp/mc_utils/config ] &&
+    $MAKE clean -C $PKGDIR/bsp/mc_utils/config
 }
 
 
 clean_linux_components() {
-	echo "[INFO] Clean the linux "
     rm -rf $FBOUTDIR/linux
-	rm -rf $PKGDIR/linux/*
-	echo "[INFO] Done."
 }
 
 
 clean_apps_components() {
-	echo "[INFO] Clean the apps "
+    # staging build directory
     rm -rf $DESTDIR
-	rm -rf $PKGDIR/apps/*
-	echo "[INFO] Done."
+
+    [ -d $PKGDIR/apps/networking/vpp/build-root ] && \
+    $MAKE distclean -C $PKGDIR/apps/networking/vpp/build-root
+
+    [ -d $PKGDIR/apps/networking/fmc/source ] && \
+    $MAKE clean -C $PKGDIR/apps/networking/fmc/source
+
+    [ -d $PKGDIR/apps/security/optee_os ] && \
+    $MAKE clean -C $PKGDIR/apps/security/optee_os ARCH=arm
+
+    [ -d $PKGDIR/apps/security/optee_client ] && \
+    rm -rf $PKGDIR/apps/security/optee_client/out
+
+    [ -d $PKGDIR/apps/security/keyctl_caam ] && \
+    $MAKE clean -C $PKGDIR/apps/security/keyctl_caam
+
+    [ -d $PKGDIR/apps/security/libpkcs11 ] && \
+    $MAKE clean -C $PKGDIR/apps/security/libpkcs11
+
+    rm -rf $PKGDIR/apps/security/optee_test/out
+
+    find $PKGDIR/apps -name build_${DISTROTYPE}_$ARCH | xargs rm -rf
+    rm -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}
 }

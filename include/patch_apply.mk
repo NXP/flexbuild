@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 
 #
@@ -18,11 +18,16 @@ define patch_apply
 		fi && \
 		\
 		echo "[INFO] Applying patches "; \
+		cd $$targetdir; \
 		for i in $$(ls "$$patchdir"/$$patchpattern 2>/dev/null); do \
 			[ -d "$$i" ] && echo "Ignoring subdirectory '$$i' " $(LOG_MUTE) && continue; \
 			echo '' $(LOG_MUTE); \
 			echo "Applying $$i  " $(LOG_MUTE); \
-			patch -f -p1 -d $$targetdir < "$$i" $(LOG_MUTE); \
+			if [ -d "$$targetdir/.git" ]; then \
+				git am "$$i" $(LOG_MUTE); \
+			else \
+				patch -f -p1 -d $$targetdir < "$$i" $(LOG_MUTE); \
+			fi; \
 		done && \
 		touch $$targetdir/.patchdone && \
 		echo "[INFO] Applying patches  DONE " $(LOG_MUTE); \

@@ -846,10 +846,8 @@ done
 
 [ -z "$CFGLISTYML" ] && CFGLISTYML=sdk.yml
 
-python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/repo.yml $FBDIR/configs/.repo_pool
 python3 $FBDIR/tools/parse_yaml.py $FBDIR/configs/$CFGLISTYML $FBDIR/configs/.sdk.cfg
-#. $FBDIR/tools/parse_yaml $FBDIR/configs/$CFGLISTYML > $FBDIR/configs/.sdk.cfg
-chmod 666 $FBDIR/configs/.sdk.cfg $FBDIR/configs/.repo_pool
+chmod 666 $FBDIR/configs/.sdk.cfg
 CONFIGLIST=.sdk.cfg
 export CONFIGLIST CFGLISTYML
 
@@ -965,6 +963,17 @@ fi
 
 [ $DESTARCH = arm32 -a $DISTROVARIANT = desktop ] && log_mute echo $DISTROTYPE desktop supports only arm64 && exit
 
+linux_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${SOCFAMILY}_${DESTARCH}.itb
+tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb
+base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
+initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.cpio.gz
+
+[ $DISTROVARIANT != base -a "$MACHINE" != all -a $DISTROTYPE != poky ] && sudo mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
+mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
+mkdir -p $PKGDIR/linux $FBDIR/logs
+mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}
+mkdir -p $KERNEL_OUTPUT_PATH
+
 if [ "$1" = docker ]; then
     if ! which docker 1>/dev/null 2>&1; then
         fbprint_e "Ensure docker is installed properly on the host machine!"; exit
@@ -983,17 +992,6 @@ elif [ "$1" = push ]; then
     host_push_image_to_target $2 $3; exit
 fi
 
-
-linux_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${SOCFAMILY}_${DESTARCH}.itb
-tiny_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb
-base_itb=$FBOUTDIR/images/${DISTRIB_VERSION}_debian_base_${SOCFAMILY}_${DESTARCH}.itb
-initrdimg=$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_${DISTROTYPE}_${DISTROVARIANT}_${DESTARCH}.cpio.gz
-
-[ $DISTROVARIANT != base -a "$MACHINE" != all -a $DISTROTYPE != poky ] && sudo mkdir -p $DESTDIR/{etc,opt} $DESTDIR/usr/{lib,bin,include} $DESTDIR/usr/local/{lib,bin,include}
-mkdir -p $FBOUTDIR/{bsp,linux,rfs,images}
-mkdir -p $PKGDIR/linux $FBDIR/logs
-mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}
-mkdir -p $KERNEL_OUTPUT_PATH
 
 [ -z "$JOBS" ] && JOBS=$(nproc)
 

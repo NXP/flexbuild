@@ -19,7 +19,7 @@ tflite: flatbuffers
 	 $(call patch_apply,tflite,apps/ml) && \
 	 cd $(MLDIR)/tflite && \
 	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then \
-		$(call dl_by_wget,model-mobv1,mobilenet.tgz); \
+		$(call dl_by_wget,model_mobv1,mobilenet.tgz); \
 	 fi && \
 	 if ! ls mobilenet_v1* >/dev/null 2>&1; then \
 		 tar xf $(FBDIR)/dl/mobilenet.tgz; \

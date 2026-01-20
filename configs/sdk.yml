@@ -12,6 +12,9 @@ DEFAULT_REPO_TAG: "lf-6.12.20-2.0.0"
 DEBIAN_CODENAME: "trixie"
 DEBIAN_VERSION:  "13"
 
+# y if git information is needed
+CONFIG_KEEP_GIT: n
+
 # enable/disable custom packagegroups
 # This feature is intended for advanced users.
 # Improper configuration may lead to build failures
@@ -79,6 +82,7 @@ repo:
 
   ddr_phy_bin:
     url:  https://github.com/nxp-qoriq/ddr-phy-binary.git
+    ver:  1dd5f83
 
   qe_ucode:
     url:  https://github.com/nxp-qoriq/qoriq-qe-ucode.git

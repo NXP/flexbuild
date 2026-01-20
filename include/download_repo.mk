@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 
 #
@@ -80,12 +80,16 @@ define download_repo
 	if [ -s "$${_PKG_FILE}" ]; then \
 		echo "[INFO] Package exists: $(1)_$${_VER} " $(LOG_MUTE); \
 	else \
-		case "$(3)" in \
-			submod|git) \
-				$(call rawgit,$(1),$${_URL},$${_VER},$(3)) || { echo git clone failed; exit 1; } ;; \
-			*) \
-				$(call dl_from_github,$(1),$${_URL},$${_VER}) || { echo Download failed; exit 1; } ;; \
-		esac; \
+		if [ "$(CONFIG_KEEP_GIT)" = "y" ]; then \
+			$(call rawgit,$(1),$${_URL},$${_VER},git) || { echo "Global git clone failed"; exit 1; }; \
+		else \
+			case "$(3)" in \
+				submod|git) \
+					$(call rawgit,$(1),$${_URL},$${_VER},$(3)) || { echo git clone failed; exit 1; } ;; \
+				*) \
+					$(call dl_from_github,$(1),$${_URL},$${_VER}) || { echo Download failed; exit 1; } ;; \
+			esac; \
+		fi; \
 	fi && \
 	\
 	if [ -d "$${_TARGET_DIR}" ]; then \

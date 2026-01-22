@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2017-2025 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -974,25 +974,6 @@ mkdir -p $PKGDIR/linux $FBDIR/logs
 mkdir -p $PKGDIR/apps/{multimedia,graphics,networking,security,utils,ml}
 mkdir -p $KERNEL_OUTPUT_PATH
 
-if [ "$1" = docker ]; then
-    if ! which docker 1>/dev/null 2>&1; then
-        fbprint_e "Ensure docker is installed properly on the host machine!"; exit
-    fi
-    if ! docker ps  1>/dev/null 2>&1; then
-        fbprint_e "Ensure you can run 'docker ps' if you are in a docker group"; exit
-    fi
-    [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && check_binfmt_qemu
-    [ ! -b /dev/loop0 ] && sudo losetup -f
-    flexbuild_launch_docker; exit
-elif [ "$1" = connect ]; then
-    host_connect_target $2 $3; exit
-elif [ "$1" = disconnect ]; then
-    host_disconnect_target $2; exit
-elif [ "$1" = push ]; then
-    host_push_image_to_target $2 $3; exit
-fi
-
-
 [ -z "$JOBS" ] && JOBS=$(nproc)
 
 if [ ! $(echo $JOBS | grep '^[0-9]\{1,2\}$' | grep '^[1-9]') ]; then
@@ -1042,6 +1023,25 @@ if [ ! -f $FBDIR/logs/.checkproxydone ]; then
     fi
     check_proxy && touch $FBDIR/logs/.checkproxydone
 fi
+
+if [ "$1" = docker ]; then
+    if ! which docker 1>/dev/null 2>&1; then
+        fbprint_e "Ensure docker is installed properly on the host machine!"; exit
+    fi
+    if ! docker ps  1>/dev/null 2>&1; then
+        fbprint_e "Ensure you can run 'docker ps' if you are in a docker group"; exit
+    fi
+    [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && check_binfmt_qemu
+    [ ! -b /dev/loop0 ] && sudo losetup -f
+    flexbuild_launch_docker; exit
+elif [ "$1" = connect ]; then
+    host_connect_target $2 $3; exit
+elif [ "$1" = disconnect ]; then
+    host_disconnect_target $2; exit
+elif [ "$1" = push ]; then
+    host_push_image_to_target $2 $3; exit
+fi
+
 
 if [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && [ $DISTROTYPE != buildroot ]; then
     if [ `hostname` = fbdebian -a ! -f $FBDIR/logs/.deppkgdonefbdeb ] || [ `hostname` != fbdebian -a ! -f $FBDIR/logs/.deppkgdone ]; then

@@ -1,0 +1,27 @@
+From eb8f07322e5472af26f5b43bf4b0b724cc602a8c Mon Sep 17 00:00:00 2001
+From: Ohtokani Pinzon <ohtokani.pinzon@nxp.com>
+Date: Fri, 9 Jun 2023 12:52:21 -0700
+Subject: [PATCH] Added custom_tick_get function
+GoPoint Patch
+
+Upstream-Status: Pending
+Signed-off-by: Miguel Alonso <miguelangel.alonso@nxp.com>
+---
+ src/custom/custom.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/custom/custom.c b/src/custom/custom.c
+index 22c7c62..380d227 100644
+--- a/src/custom/custom.c
++++ b/src/custom/custom.c
+@@ -12,6 +12,7 @@
+  *      INCLUDES
+  *********************/
+ #include <stdio.h>
++#include <unistd.h>
+ #include "lvgl.h"
+ #include "custom.h"
+
+--
+2.34.1
+

@@ -1,0 +1,150 @@
+From 954756d44f1346c09a98e99adbe03713e13ac046 Mon Sep 17 00:00:00 2001
+From: Miguel Alonso <miguelangel.alonso@nxp.com>
+Date: Thu, 23 Jan 2025 12:42:32 -0800
+Subject: [PATCH] Update lv_anim_set_exec_cb with correct function type
+GoPoint Patch
+
+Upstream-Status: Pending
+Signed-off-by: Miguel Alonso <miguelangel.alonso@nxp.com>
+---
+ Makefile           | 16 +++-------------
+ src/generated/ui.h |  2 ++
+ src/ui_ext.c       |  4 ++--
+ src/ui_ext.h       |  1 +
+ src/ui_home.c      |  6 +++---
+ 5 files changed, 11 insertions(+), 18 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 9245db5..c6f4063 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,28 +8,22 @@
+ CC ?= gcc
+ LVGL_DIR_NAME = lvgl
+ LVGL_DIR = ${shell pwd}
+-CPPFLAGS = -I$(LVGL_DIR)/ -I$(INC_DIR_SRC)/ -I$(INC_DIR_GENERATED)/ -g3 -ggdb -O0
+-CFLAGS = -O0 -g3 -ggdb -I$(LVGL_DIR)/ -I$(INC_DIR_SRC)/ -I$(INC_DIR_GENERATED)/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare
++CPPFLAGS = -I$(LVGL_DIR)/ -I$(INC_DIR_SRC)/ -I$(INC_DIR_GENERATED)/ -I${INC_DIR_LVGL}/ -g3 -ggdb -O0
++CFLAGS = -O0 -g3 -ggdb -I$(LVGL_DIR)/ -I$(INC_DIR_SRC)/ -I$(INC_DIR_GENERATED)/ -I${INC_DIR_LVGL}/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare
+ LDFLAGS = -lm -lwayland-client -lxkbcommon -lwayland-cursor -lrt -Llv_drivers/wayland/protocols/libdf-wayland-xdg-application-stable-latest
+ 
+-#BIN = $(BIN_DIR)/demo
+ BIN_DIR = ./bin
+ OBJ_DIR = ./obj
+ INC_DIR_SRC = ./src
+ INC_DIR_GENERATED = ./src/generated
++INC_DIR_LVGL = ./lvgl
+ 
+ BIN = smart-kitchen-gui
+ 
+-#Collect the files to compile
+-#MAINSRC = ./main.c
+-
+ include $(LVGL_DIR)/lvgl/lvgl.mk
+ include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
+-
+ include $(LVGL_DIR)/src/src.mk
+ 
+-#CSRCS +=$(LVGL_DIR)/src/*.c
+-
+ OBJEXT ?= .o
+ 
+ AOBJS = $(ASRCS:.S=$(OBJEXT))
+@@ -40,16 +34,12 @@ MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
+ SRCS = $(ASRCS) $(CSRCS) $(MAINSRC)
+ OBJS = $(AOBJS) $(COBJS)
+ 
+-## MAINOBJ -> OBJFILES
+-
+ .PHONY: all
+ all: default
+ 
+ %.o: %.c
+ 	@$(CC)  $(CFLAGS) -c $< -o $@
+ 	@echo "CC $<"
+-#@mkdir obj_files
+-#@mv $(OBJS) ./obj_files/
+ 
+ command-interface.o: src/command-interface.cpp 
+ 	$(CXX) $(CPPFLAGS) -c -g $< -o $@
+diff --git a/src/generated/ui.h b/src/generated/ui.h
+index b0101d1..464b476 100644
+--- a/src/generated/ui.h
++++ b/src/generated/ui.h
+@@ -22,6 +22,8 @@ extern "C" {
+ #include "lvgl.h"
+ #endif
+ 
++#include <stdio.h>
++
+ extern lv_obj_t * ui_Home;
+ extern lv_obj_t * ui_Panel_Settings;
+ extern lv_obj_t * ui_Panel_Menu;
+diff --git a/src/ui_ext.c b/src/ui_ext.c
+index 77f149c..59bfb44 100644
+--- a/src/ui_ext.c
++++ b/src/ui_ext.c
+@@ -392,7 +392,7 @@ void _ui_smog1_anim(lv_obj_t * obj, bool fast)
+     lv_anim_init(&PropertyAnimation_0);
+     lv_anim_set_time(&PropertyAnimation_0, fast ? 5000 : 15000);
+     lv_anim_set_var(&PropertyAnimation_0, obj);
+-    lv_anim_set_exec_cb(&PropertyAnimation_0, lv_obj_set_y);
++    lv_anim_set_exec_cb(&PropertyAnimation_0, (lv_anim_exec_xcb_t)lv_obj_set_y);
+     lv_anim_set_values(&PropertyAnimation_0, 0, -328);
+     lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
+ 
+@@ -412,7 +412,7 @@ void _ui_smog2_anim(lv_obj_t * obj, bool fast)
+     lv_anim_init(&PropertyAnimation_0);
+     lv_anim_set_time(&PropertyAnimation_0, fast ? 9000 : 27000);
+     lv_anim_set_var(&PropertyAnimation_0, obj);
+-    lv_anim_set_exec_cb(&PropertyAnimation_0, lv_obj_set_y);
++    lv_anim_set_exec_cb(&PropertyAnimation_0, (lv_anim_exec_xcb_t)lv_obj_set_y);
+     lv_anim_set_values(&PropertyAnimation_0, 0, -468);
+     lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
+ 
+diff --git a/src/ui_ext.h b/src/ui_ext.h
+index 8d94821..146c7e8 100644
+--- a/src/ui_ext.h
++++ b/src/ui_ext.h
+@@ -19,6 +19,7 @@ extern "C" {
+  *      INCLUDES
+  *********************/
+ #include "generated/ui.h"
++#include <stdio.h>
+ 
+ /*********************
+  *      DEFINES
+diff --git a/src/ui_home.c b/src/ui_home.c
+index 8239871..730b017 100644
+--- a/src/ui_home.c
++++ b/src/ui_home.c
+@@ -231,7 +231,7 @@ uint32_t ui_home_anim_out(void)
+ 	lv_anim_init(&a);
+ 	lv_anim_set_var(&a, ui_Panel_Menu);
+ 	lv_anim_set_values(&a, lv_obj_get_x( ui_Panel_Menu), 0);
+-	lv_anim_set_exec_cb(&a, lv_obj_set_x);
++	lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+ 	lv_anim_set_time(&a, DARK_PANEL_ANIM_TIME / 2);
+ 	lv_anim_start(&a);
+ 
+@@ -253,7 +253,7 @@ uint32_t ui_home_anim_out(void)
+ 	lv_anim_set_var(&a, ui_Group_Nxp_Logo);
+ 	lv_anim_start(&a);
+ 
+-	lv_anim_set_exec_cb(&a, lv_obj_set_height);
++	lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_height);
+ 	lv_anim_set_values(&a, 120, 0);
+ 	lv_anim_set_exec_cb(&a, _ui_max_height_anim_cb);
+ 	lv_anim_set_var(&a, ui_Group_Info);
+@@ -351,7 +351,7 @@ static void ui_home_menu_btn_click_event_cb(lv_event_t * e)
+ 	lv_anim_set_var(&a, ui_Panel_Menu);
+ 	if(x < 0) lv_anim_set_values(&a, -SETTINGS_MENU_WIDTH,  0);
+ 	else lv_anim_set_values(&a, 0, -SETTINGS_MENU_WIDTH);
+-	lv_anim_set_exec_cb(&a, lv_obj_set_x);
++	lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+ 	lv_anim_set_time(&a, DARK_PANEL_ANIM_TIME / 2);
+ 	lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+ 	lv_anim_start(&a);
+-- 
+2.34.1
+

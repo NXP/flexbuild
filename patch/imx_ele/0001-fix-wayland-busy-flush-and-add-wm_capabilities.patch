@@ -1,0 +1,70 @@
+From e56d63ced54cd1344b5347f578a48e2deb25f490 Mon Sep 17 00:00:00 2001
+From: Jinghui <jinghui.liu@nxp.com>
+Date: Wed, 24 Jan 2024 16:13:11 +0900
+Subject: [PATCH] fix wayland busy flush and add wm_capabilities
+GoPoint Patch
+
+Upstream-Status: Pending
+---
+ wayland/wayland.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/wayland/wayland.c b/wayland/wayland.c
+index 11ed05c..83d50ba 100644
+--- a/wayland/wayland.c
++++ b/wayland/wayland.c
+@@ -220,6 +220,7 @@ struct window
+ #if LV_WAYLAND_XDG_SHELL
+     struct xdg_surface *xdg_surface;
+     struct xdg_toplevel *xdg_toplevel;
++    uint32_t wm_capabilities;
+ #endif
+ 
+     struct buffer_allocator allocator;
+@@ -1144,10 +1145,23 @@ static void xdg_toplevel_handle_configure_bounds(void *data, struct xdg_toplevel
+      */
+ }
+ 
++static void xdg_toplevel_handle_wm_capabilities(void *data, struct xdg_toplevel *xdg_toplevel,
++                                                struct wl_array *capabilities)
++{
++    uint32_t *cap;
++    struct window *window = (struct window *)data;
++
++    wl_array_for_each(cap, capabilities) {
++        window->wm_capabilities |= (1 << (*cap));
++        /* TODO: Disable appropriate graphics/capabilities as appropriate */
++    }
++}
++
+ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
+     .configure = xdg_toplevel_handle_configure,
+     .close = xdg_toplevel_handle_close,
+-    .configure_bounds = xdg_toplevel_handle_configure_bounds
++    .configure_bounds = xdg_toplevel_handle_configure_bounds,
++    .wm_capabilities = xdg_toplevel_handle_wm_capabilities
+ };
+ 
+ static void xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base, uint32_t serial)
+@@ -1950,12 +1964,12 @@ static void _lv_wayland_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv
+         lv_disp_flush_ready(disp_drv);
+         return;
+     }
+-    else if (buffer->busy)
+-    {
+-        LV_LOG_WARN("skip flush since wayland backing buffer is busy");
+-        lv_disp_flush_ready(disp_drv);
+-        return;
+-    }
++    // else if (buffer->busy)
++    // {
++    //     LV_LOG_WARN("skip flush since wayland backing buffer is busy");
++    //     lv_disp_flush_ready(disp_drv);
++    //     return;
++    // }
+ 
+     int32_t x;
+     int32_t y;
+-- 
+2.25.1
+

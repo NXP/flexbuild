@@ -1,0 +1,61 @@
+From eb8f07322e5472af26f5b43bf4b0b724cc602a8c Mon Sep 17 00:00:00 2001
+From: Ohtokani Pinzon <ohtokani.pinzon@nxp.com>
+Date: Fri, 9 Jun 2023 12:52:21 -0700
+Subject: [PATCH] Added custom_tick_get function
+GoPoint Patch
+
+Upstream-Status: Pending
+Signed-off-by: Ohtokani Pinzon <ohtokani.pinzon@nxp.com>
+---
+ src/hal/lv_hal_tick.c | 19 +++++++++++++++++++
+ src/hal/lv_hal_tick.h |  1 +
+ 2 files changed, 20 insertions(+)
+
+diff --git a/src/hal/lv_hal_tick.c b/src/hal/lv_hal_tick.c
+index c12a5942e..c11d567d9 100644
+--- a/src/hal/lv_hal_tick.c
++++ b/src/hal/lv_hal_tick.c
+@@ -8,9 +8,28 @@
+  *********************/
+ #include "lv_hal_tick.h"
+ #include <stddef.h>
++#include <sys/time.h>
+ 
+ #if LV_TICK_CUSTOM == 1
+     #include LV_TICK_CUSTOM_INCLUDE
++
++	uint32_t custom_tick_get(void)
++	{
++	    static uint64_t start_ms = 0;
++	    if(start_ms == 0) {
++			struct timeval tv_start;
++	        gettimeofday(&tv_start, NULL);
++	        start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
++	    }
++	
++	    struct timeval tv_now;
++	    gettimeofday(&tv_now, NULL);
++	    uint64_t now_ms;
++	    now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
++	
++	    uint32_t time_ms = now_ms - start_ms;
++	    return time_ms;
++	}
+ #endif
+ 
+ /*********************
+diff --git a/src/hal/lv_hal_tick.h b/src/hal/lv_hal_tick.h
+index 949f56b83..d941f2382 100644
+--- a/src/hal/lv_hal_tick.h
++++ b/src/hal/lv_hal_tick.h
+@@ -50,6 +50,7 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period);
+  * @return the elapsed milliseconds
+  */
+ uint32_t lv_tick_get(void);
++uint32_t custom_tick_get(void);
+ 
+ /**
+  * Get the elapsed milliseconds since a previous time stamp
+-- 
+2.25.1
+

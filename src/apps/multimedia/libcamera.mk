@@ -41,7 +41,7 @@ libcamera: gstreamer gst_plugins_base $(DEP_LIBCAM)
 	 meson setup build \
 		--prefix=/usr --buildtype=release \
 		--cross-file meson.cross \
-		-Dpipelines=auto \
+		-Dpipelines=imx8-isi,mali-c55,simple,uvcvideo,nxp/neo \
 		-Dv4l2=enabled \
 		-Dcam=enabled \
 		-Dlc-compliance=disabled \

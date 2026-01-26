@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-DISTRVER=lsdk2512
+DISTRVER=lsdk2606
 
 LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb "
 IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95evk imx95frdm"

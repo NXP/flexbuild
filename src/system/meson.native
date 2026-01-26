@@ -1,0 +1,18 @@
+# src/system/meson.native
+[binaries]
+c = 'gcc'
+cpp = 'g++'
+ar = 'ar'
+cython = 'cython3'
+nm = 'nm'
+strip = 'strip'
+readelf = 'readelf'
+objcopy = 'objcopy'
+pkg-config = '@STAGING_DIR@/src/system/pkg-config-native'
+
+
+[built-in options]
+c_args = []
+c_link_args = []
+cpp_args = []
+cpp_link_args = []

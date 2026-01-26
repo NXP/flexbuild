@@ -26,8 +26,8 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge
 		--cross-file meson.cross \
 		--prefix=/usr --buildtype=release \
 		--strip \
-		-Dc_args="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
-		-Dcpp_args="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include \
+		-Dc_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/local/include -I$(RFSDIR)/usr/include -Wno-declaration-after-statement" \
+		-Dcpp_args="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/local/include -I$(RFSDIR)/usr/include \
 				-I$(RFSDIR)/usr/lib/aarch64-linux-gnu/python3-numpy/numpy/_core/include \
 				-I$(MLDIR)/tvm/3rdparty/dmlc-core/include \
 			    -I$(MLDIR)/tflite/build_debian_arm64/abseil-cpp -I$(MLDIR)/tflite \

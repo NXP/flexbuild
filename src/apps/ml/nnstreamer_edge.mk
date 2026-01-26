@@ -27,7 +27,7 @@ nnstreamer_edge:
 	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
 	 mkdir -p $(RFSDIR)/usr/local/include/nnstreamer && \
-	 mv $(DESTDIR)/usr/local/include/nnstreamer/nnstreamer-edge.h $(DESTDIR)/usr/include && \
+	 mv $(DESTDIR)/usr/local/include/nnstreamer/*.h $(DESTDIR)/usr/include && \
 	 mv $(DESTDIR)/pkgconfig/nnstreamer-edge.pc $(DESTDIR)/usr/lib/pkgconfig/ && \
 	 rm -rf $(DESTDIR)/pkgconfig && \
 	 $(call fbprint_d,"nnstreamer_edge")

@@ -1,0 +1,7 @@
+#!/bin/bash
+# src/system/pkg-config-native
+export PKG_CONFIG_PATH="/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig/"
+export PKG_CONFIG_LIBDIR="/usr/lib:/usr/lib/x86_64-linux-gnu/"
+unset PKG_CONFIG_SYSROOT_DIR
+
+/usr/bin/pkg-config "$@"

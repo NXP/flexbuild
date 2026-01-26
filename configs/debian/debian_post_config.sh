@@ -109,7 +109,7 @@ printf "Build: $(date --rfc-3339 seconds)\n" >> /etc/buildinfo
 EOF
 
 printf "%s %s (optimized with NXP-specific hardware acceleration)\n" \
-  "${DISTRIB_NAME:-Debian}" "${DISTRIB_VERSION:-lsdk2512}" >> "$ROOTDIR"/etc/issue
+  "${DISTRIB_NAME:-Debian}" "${DISTRIB_VERSION:-lsdk2606}" >> "$ROOTDIR"/etc/issue
 # ---- Board-specific customization on host ----
 # echo "[POST_ROOTFS] Board-specific configuration"
 

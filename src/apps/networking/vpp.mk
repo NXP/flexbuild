@@ -9,6 +9,7 @@
 # depends on libmnl-dev for libmnl/libmnl.h
 # Need git information to compile, so must use git clone
 
+ifeq ($(CONFIG_VPP),y)
 #vpp:
 vpp: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
@@ -49,3 +50,4 @@ vpp: dpdk
 		mv $(RFSDIR)/usr/include/mbedtls/ssl.h.bak $(RFSDIR)/usr/include/mbedtls/ssl.h; \
 	 fi && \
 	 $(call fbprint_d,"vpp")
+endif

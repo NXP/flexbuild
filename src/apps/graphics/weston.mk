@@ -29,7 +29,6 @@ weston: $(DEP_WESTON) libdrm wayland wayland_protocols
 	 $(call patch_apply,weston,apps/graphics) && \
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/share/pkgconfig && \
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) && \
-	 export PKG_CONFIG_PATH="" && \
 	 export LD_LIBRARY_PATH=$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib && \
 	 $(call fbprint_b,"weston") && \
 	 cd $(GRAPHICSDIR)/weston && \
@@ -37,11 +36,12 @@ weston: $(DEP_WESTON) libdrm wayland wayland_protocols
 	 cp -rf $(DESTDIR)/usr/include/libdrm/drm_fourcc.h $(RFSDIR)/usr/include/libdrm/ && \
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
+	 sed 's%@STAGING_DIR@%$(FBDIR)%g' $(FBDIR)/src/system/meson.native > meson.native && \
 	 PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBDIR)" \
 	 PKG_CONFIG_SYSROOT_DIR="$(PKG_CONFIG_SYSROOT_DIR)" \
-	 PKG_CONFIG_PATH="$(PKG_CONFIG_PATH)" \
 	 PYTHONNOUSERSITE=y meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file=meson.cross \
+		--native-file=meson.native \
 		--prefix=/usr --libdir=lib \
 		--default-library=shared \
 		--buildtype=release \

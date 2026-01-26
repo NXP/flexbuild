@@ -1,12 +1,12 @@
 # NXP Debian Linux SDK Distribution configuration for iMX and Layerscape MPU platforms
 
 DISTRIB_NAME:    "NXP Debian Linux SDK"
-DISTRIB_VERSION: "lsdk2512"
+DISTRIB_VERSION: "lsdk2606"
 RELEASE_TYPE:    "external"
 
 
 # default repo tag which can be overrided by specified tag
-DEFAULT_REPO_TAG: "lf-6.12.20-2.0.0"
+DEFAULT_REPO_TAG: "lf-6.12.49-2.2.0"
 
 # default Debian version for target userland
 DEBIAN_CODENAME: "trixie"
@@ -117,8 +117,7 @@ repo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-sc-firmware-1.18.0-654907b.bin
 
   firmware_imx_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.28-994fa14.bin
-    md5:  2e4037eb1971d4be2e22b31cdf5bf50a
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.30-3fa84fd.bin
     # /lib/firmware for ddr,hdmi,dp,vpu,easrc,epdc,xcvr,xuvi
 
   imx_firmware:
@@ -127,7 +126,7 @@ repo:
 
 #  i.MX 91, i.MX 93, i.MX 95, and i.MX 8ULP ELE Firmware
   fw_ele_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-ele-imx-2.0.2-89161a8.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-ele-imx-2.0.4-93492e0.bin
 
 # i.MX 8ULP uPower firmware
   fw_upower_bin:
@@ -135,28 +134,28 @@ repo:
 
 # mcore demo
   imx8mm_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mm-m4-demo-25.03.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mm-m4-demo-25.09.00.bin
 
   imx8mp_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mp-m7-demo-25.03.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mp-m7-demo-25.09.00.bin
 
   imx8mq_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mq-m4-demo-25.03.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mq-m4-demo-25.09.00.bin
 
   imx8mn_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mn-m7-demo-25.03.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8mn-m7-demo-25.09.00.bin
 
   imx8qm_mdemo:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8qm-m4-demo-2.9.0.bin
 
   imx8ulp_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8ulp-m33-demo-25.03.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx8ulp-m33-demo-25.12.00.bin
 
   imx93_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx93-m33-demo-25.06.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx93-m33-demo-25.12.00.bin
 
   imx95_mdemo:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx95-m7-demo-25.06.00.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx95-m7-demo-25.12.00.bin
 
 
 
@@ -197,7 +196,7 @@ repo:
 
   tsntool:
     url:  https://github.com/nxp-qoriq/tsntool.git
-    ver:  Real-Time-Edge-v3.2-202507
+    ver:  Real-Time-Edge-v3.3-202512
 
   dpdk:
     url:  https://github.com/nxp-qoriq/dpdk.git
@@ -281,11 +280,11 @@ repo:
 
   ecc_example:
     url:  https://github.com/nxp/plug-and-trust.git
-    tag:  v04.07.00
+    tag:  v04.07.01
 
   openssl_provider_se05x:
     url:  https://github.com/NXPPlugNTrust/se05x-openssl-provider.git
-    tag:  v01.00.02
+    ver:  12999e8
 
   imx_secure_enclave:
     url:  https://github.com/nxp-imx/imx-secure-enclave.git
@@ -308,7 +307,7 @@ repo:
     url:  https://github.com/nxp-imx/libdrm-imx.git
 
   gpu_viv_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2512/imx-gpu-viv-6.4.11.p3.2-aarch64-6.12.20.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2606/imx-gpu-viv-6.4.11.p4.2-aarch64-6.12.49.bin
 
   gputop:
     url:  https://github.com/nxp-imx/imx-gputop.git
@@ -317,23 +316,22 @@ repo:
     url:  https://github.com/nxp-imx/apitrace-imx.git
 
   libgpuperfcnt_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2512/libgpuperfcnt-6.4.11.p3.2-aarch64-6.12.20.bin
-#
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2606/libgpuperfcnt-6.4.11.p4.2-aarch64-6.12.49.bin
+
 #  i.MX Graphics G2D libraries for i.MX 8
   imx_gpu_g2d_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p3.2-aarch64-3c5e429.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-gpu-g2d-6.4.11.p4.2-aarch64-846e12e.bin
 
 # i.MX G2D library for i.MX 8 Auto SoC with DPU blitter engine
   imx_dpu_g2d_bin_v1:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v1-2.4.0.0-9e8bbf1.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v1-2.5.0.0-07e4d19.bin
 
 # i.MX G2D library for i.MX 9 SoC with DPU blitter engine
   imx_dpu_g2d_bin_v2:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v2-2.4.0.0-9e8bbf1.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dpu-g2d-v2-2.5.0.0-07e4d19.bin
 
   mali_imx_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2512/mali-imx-r54.0-aarch64-6.12.20.bin
-    md5:  7ebc277f1fb66774bf4ff9ec2cc20e38
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2606/mali-imx-r54p1.0-aarch64-6.12.49.bin
 
   imx_pxp_g2d:
     url:  https://github.com/nxp-imx/imx-g2d-pxp.git
@@ -351,7 +349,7 @@ repo:
 
   vulkan_headers:
     url: https://github.com/KhronosGroup/Vulkan-Headers.git
-    ver: vulkan-sdk-1.3.275.0
+    ver: vulkan-sdk-1.4.309.0
 
   vkmark:
     url: https://github.com/vkmark/vkmark.git
@@ -363,15 +361,16 @@ repo:
 # --------------------------------------------------------------------------------------
 # i.MX VPU Hantro libraries for i.MX 8M Quad, 8M Mini, and 8M Plus
   vpu_hantro_bin:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.37.0-deec65e.bin
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-1.39.0-ea804d0.bin
 
 # i.MX VPU Hantro VC8000E Encoder libraries for i.MX 8M plus
   vpu_hantro_vc_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2512/imx-vpu-hantro-vc-1.10.2-aarch64-6.12.20.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2606/imx-vpu-hantro-vc-1.11.0-aarch64-6.12.49.bin
+
 
 # i.MX VPU Hantro deamon binary for i.MX 8M Quad, 8M Mini, and 8M Plus
   vpu_hantro_daemon_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.6.0-cc9a838.tar.gz
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-vpu-hantro-daemon-1.8.0-6d3ec73.tar.gz
 
 #
 #  basler_camera_bin:
@@ -379,7 +378,7 @@ repo:
 
 # i.MX 8M Plus ISP SDK
   imx_isp_bin:
-    url:  https://www.nxp.com/lgfiles/sdk/lsdk2512/isp-imx-4.2.2.25.2-aarch64-6.12.20.bin
+    url:  https://www.nxp.com/lgfiles/sdk/lsdk2606/isp-imx-4.2.2.25.4-aarch64-6.12.49.bin
 
   gstreamer:
     url:  https://github.com/nxp-imx/gstreamer.git
@@ -416,8 +415,7 @@ repo:
 
 #  SOF firmware architecture is based on Zephyr RTOS
   sof_zephyr_tar:
-    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-zephyr-2.13.0-3d67d3f.tar.gz
-    md5:  2a6d226d36bbecf8fcb455dc037c44ee
+    url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/sof-zephyr-2.15.0-f9c56ae.tar.gz
 
 # i.MX optimized Audio and Video core codec libraries
   imx_codec_bin:
@@ -426,7 +424,6 @@ repo:
 # DSP firmware
   imx_dsp_bin:
     url:  https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-dsp-2.1.10-ea4fe3f.bin
-    md5:  5400a078994256004a37be2ed7d187d4
 
 # DSP AACPlus decoder
   imx_dsp_codec_ext_bin:
@@ -438,7 +435,7 @@ repo:
 
 # i.MX optimized core parser
   imx_parser_bin:
-    url: https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.10.0-e8a7ec7.bin
+    url: https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/imx-parser-4.10.2-ed69753.bin
 
 # NXP PDM to PCM Software Decimation SIMD Library
   imx_sw_pdm_bin:
@@ -469,7 +466,6 @@ repo:
 
   wireless_regdb_tar:
     url: https://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2025.02.20.tar.xz
-    md5: 7454c55208ca51bae6461ca7932559ab
 
 #  buildroot:
 #    url:  https://github.com/buildroot/buildroot.git
@@ -515,11 +511,11 @@ repo:
 
   nnstreamer:
     url: https://github.com/nnstreamer/nnstreamer.git
-    ver: 8070609
+    ver: 9cf11e0
 
   nnstreamer_edge:
     url: https://github.com/nnstreamer/nnstreamer-edge.git
-    ver: 2bf50d5
+    ver: e73acb7
 
   nnshark:
     url: https://github.com/nxp-imx/nnshark.git
@@ -552,7 +548,7 @@ repo:
 
   imx_nnstreamer_examples:
     url: https://github.com/nxp-imx/nxp-nnstreamer-examples.git
-    ver: b8dafc1
+    ver: 062ebd1
 
   imx_demos_list:
     url: https://github.com/nxp-imx-support/nxp-demo-experience-demos-list.git

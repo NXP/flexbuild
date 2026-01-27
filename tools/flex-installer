@@ -11,14 +11,14 @@
 
 set -e
 
-FIVERSION=2512
+FIVERSION=2606
 DEFAULT_PARTITION_NUMBER=4
 DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
 DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=8192
 DEFAULT_RAW_PARTITION_SIZE_MB=256
-DEFAULT_LINUX_VERSION=6.12.20
-DEFAULT_DISTRO_SVR_URL=https://www.nxp.com/lgfiles/sdk/lsdk2512
+DEFAULT_LINUX_VERSION=6.12.49
+DEFAULT_DISTRO_SVR_URL=https://www.nxp.com/lgfiles/sdk/lsdk2606
 
 
 usage ()
@@ -76,7 +76,7 @@ EOF
 }
 
 ls_machine_list='ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
-imx_machine_list='imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm '
+imx_machine_list='imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95-15x15-frdm imx95-15x15-evk imx95-19x19-frdm-pro imx95-19x19-evk '
 
 search_dev() {
     devlist=`ls /dev/sd?`

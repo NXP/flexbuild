@@ -9,8 +9,8 @@
 # depends on libmnl-dev for libmnl/libmnl.h
 # Need git information to compile, so must use git clone
 
+vpp:
 ifeq ($(CONFIG_VPP),y)
-#vpp:
 vpp: dpdk
 	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
 	 $(call download_repo,vpp,apps/networking,git) && \

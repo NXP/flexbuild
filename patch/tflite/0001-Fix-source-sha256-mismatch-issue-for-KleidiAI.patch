@@ -1,6 +1,6 @@
-From 27eaf2a3f785a24f664de11b3f54434f0140de69 Mon Sep 17 00:00:00 2001
-From: Andy Tang <andy.tang@nxp.com>
-Date: Tue, 20 Jan 2026 09:00:19 +0800
+From 39c246b247cc8f975a8522cb6612fc22f34656ed Mon Sep 17 00:00:00 2001
+From: Feng Guo <feng.guo@nxp.com>
+Date: Mon, 19 Jan 2026 17:23:23 +0800
 Subject: [PATCH] Fix source sha256 mismatch issue for KleidiAI
 
 Signed-off-by: Feng Guo <feng.guo@nxp.com>
@@ -12,13 +12,13 @@ Signed-off-by: Feng Guo <feng.guo@nxp.com>
  create mode 100644 tensorflow/lite/cmake/DownloadKleidiAI.cmake
 
 diff --git a/tensorflow/lite/CMakeLists.txt b/tensorflow/lite/CMakeLists.txt
-index 94febb0c7d5..47ed5f9c3cc 100644
+index 0c5ecb32ea9..e9eec5968aa 100644
 --- a/tensorflow/lite/CMakeLists.txt
 +++ b/tensorflow/lite/CMakeLists.txt
-@@ -190,6 +190,15 @@ include_directories(
- )
- # Download necessary dependencies.
- if(TFLITE_ENABLE_XNNPACK)
+@@ -222,6 +222,15 @@ if(TFLITE_ENABLE_XNNPACK)
+       WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/FP16-download")
+     SET(FP16_SOURCE_DIR "${CMAKE_BINARY_DIR}/FP16-source" CACHE STRING "FP16 source directory")
+   ENDIF()
 +  IF(NOT DEFINED KLEIDIAI_SOURCE_DIR)
 +    MESSAGE(STATUS "Downloading kleidiai to ${CMAKE_BINARY_DIR}/kleidiai-source (define FP16_SOURCE_DIR to avoid it)")
 +    CONFIGURE_FILE(cmake/DownloadKleidiAI.cmake "${CMAKE_BINARY_DIR}/kleidiai-download/CMakeLists.txt")
@@ -28,12 +28,12 @@ index 94febb0c7d5..47ed5f9c3cc 100644
 +      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/kleidiai-download")
 +    SET(KLEIDIAI_SOURCE_DIR "${CMAKE_BINARY_DIR}/kleidiai-source" CACHE STRING "kleidiai source directory")
 +  ENDIF()
-   # pthreadpool is used by XNNPACK.
-   if(SYSTEM_PTHREADPOOL)
-     find_library(PTHREADPOOL_LIB pthreadpool REQUIRED)
+ endif()
+ set(TF_TARGET_PRIVATE_OPTIONS "")
+ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
 diff --git a/tensorflow/lite/cmake/DownloadKleidiAI.cmake b/tensorflow/lite/cmake/DownloadKleidiAI.cmake
 new file mode 100644
-index 00000000000..bb640613cb4
+index 00000000000..58b9459027a
 --- /dev/null
 +++ b/tensorflow/lite/cmake/DownloadKleidiAI.cmake
 @@ -0,0 +1,32 @@
@@ -58,8 +58,8 @@ index 00000000000..bb640613cb4
 +# LINT.IfChange
 +INCLUDE(ExternalProject)
 +ExternalProject_Add(kleidiai
-+  URL https://gitlab.arm.com/kleidi/kleidiai/-/archive/cddf991af5de49fd34949fa39690e4e906e04074/kleidiai-cddf991af5de49fd34949fa39690e4e906e04074.zip
-+  URL_HASH SHA256=5d4fe6b12ab999b40b26fc2760b3f1e2d134029acd9546541e118494fe11fb03
++  URL https://gitlab.arm.com/kleidi/kleidiai/-/archive/847ebd19d0192528659b0a0fa2c6057eed674c6a/kleidiai-847ebd19d0192528659b0a0fa2c6057eed674c6a.zip
++  URL_HASH SHA256=3564707756473a165ddb3cf670187a4eeb2189c71c5ef01e865567cab071daac
 +  SOURCE_DIR "${CMAKE_BINARY_DIR}/kleidiai-source"
 +  BINARY_DIR "${CMAKE_BINARY_DIR}/kleidiai"
 +  CONFIGURE_COMMAND ""
@@ -70,17 +70,17 @@ index 00000000000..bb640613cb4
 +)
 +# LINT.ThenChange(../MODULE.bazel:kleidiai)
 diff --git a/tensorflow/workspace2.bzl b/tensorflow/workspace2.bzl
-index 7a7ecae031e..9facc2c6f04 100644
+index 5d75ffd4a6d..d787ecbf50f 100644
 --- a/tensorflow/workspace2.bzl
 +++ b/tensorflow/workspace2.bzl
-@@ -162,7 +162,7 @@ def _tf_repositories():
+@@ -163,7 +163,7 @@ def _tf_repositories():
      # XNNPack dependency.
      tf_http_archive(
          name = "KleidiAI",
--        sha256 = "88233e427be6579560073267575f00f3b5fc370a31a43bbdd87a1810bd4bf1b6",
-+        sha256 = "5d4fe6b12ab999b40b26fc2760b3f1e2d134029acd9546541e118494fe11fb03",
-         strip_prefix = "kleidiai-cddf991af5de49fd34949fa39690e4e906e04074",
-         urls = tf_mirror_urls("https://gitlab.arm.com/kleidi/kleidiai/-/archive/cddf991af5de49fd34949fa39690e4e906e04074/kleidiai-cddf991af5de49fd34949fa39690e4e906e04074.zip"),
+-        sha256 = "f3ea4fce53f3b31076958dbff229f0048dae15bf454929673c78292a56279d52",
++        sha256 = "3564707756473a165ddb3cf670187a4eeb2189c71c5ef01e865567cab071daac",
+         strip_prefix = "kleidiai-847ebd19d0192528659b0a0fa2c6057eed674c6a",
+         urls = tf_mirror_urls("https://gitlab.arm.com/kleidi/kleidiai/-/archive/847ebd19d0192528659b0a0fa2c6057eed674c6a/kleidiai-847ebd19d0192528659b0a0fa2c6057eed674c6a.zip"),
      )
 -- 
 2.43.0

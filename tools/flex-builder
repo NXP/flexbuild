@@ -9,7 +9,7 @@
 
 [ -n "$FBDEBUG" ] && set -xe || set -e
 [ -n "$MKDEBUG" ] && SHFLAGS="-ex -o pipefail -c" || SHFLAGS="-c "
-FB_VERSION=2512
+FB_VERSION=2606
 
 usage () {
 cat <<EOF
@@ -767,7 +767,7 @@ DESTARCH=arm64
 #LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | cut -d= -f2 | sed -e '/qds/d' | xargs echo`
 LS_MACHINE_LIST="ls1043ardb ls1046ardb ls1028ardb lx2160ardb"
 #IMX_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=imx' | cut -d= -f2 | xargs echo`
-IMX_MACHINE_LIST="imx8mpfrdm imx8mpevk imx8mmevk imx8qmmek imx91frdm imx91evk imx91sfrdm imx93evk imx93frdm imx95frdm imx95evk"
+IMX_MACHINE_LIST="imx8mpfrdm imx8mpevk imx8mmevk imx8qmmek imx91frdm imx91evk imx91sfrdm imx93evk imx93frdm imx95-15x15-frdm imx95-15x15-evk imx95-19x19-frdm-pro imx95-19x19-evk "
 
 
 ARGS=$(getopt -a -o m:j:a:b:c:f:r:i:p:k:B:T:soetvhF \

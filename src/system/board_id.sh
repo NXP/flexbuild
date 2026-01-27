@@ -29,8 +29,10 @@ get_board_id() {
         *"FRDM-IMX91S")           board_id="imx91sfrdm" ;;
 	    *"i.MX93 11X11 EVK"*)     board_id="imx93evk" ;;
 	    *"FRDM-IMX93"*)           board_id="imx93frdm" ;;
-	    *"i.MX95"*)               board_id="imx95evk" ;;
-	    *"FRDM-IMX95")            board_id="imx95frdm" ;;
+	    *"i.MX95 19x19"*)         board_id="imx95-19x19-evk" ;;
+	    *"i.MX95 15X15"*)         board_id="imx95-15x15-evk" ;;
+	    *"FRDM-IMX95-PRO"*)       board_id="imx95-19x19-frdm-pro" ;;
+	    *"FRDM-IMX95")            board_id="imx95-15x15-frdm" ;;
 	    
 	    # FSL QorIQ series
 	    *"LS1012A FRWY"*)         board_id="ls1012afrwy" ;;

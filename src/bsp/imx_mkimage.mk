@@ -348,7 +348,7 @@ define imx_mkimage_target
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
             ;; \
-        imx95evk) \
+        imx95-15x15-evk) \
 			SOC_FAMILY=iMX95; \
 			$(call dl_fw_ele); \
 			bld mcore_demo -m $(MACHINE); \
@@ -374,7 +374,7 @@ define imx_mkimage_target
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
             ;; \
-        imx95frdm) \
+        imx95-15x15-frdm) \
 			SOC_FAMILY=iMX95; \
 			$(call dl_fw_ele); \
 			bld mcore_demo -m $(MACHINE); \

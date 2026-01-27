@@ -5,7 +5,7 @@ IFS=$'\n\t'
 DISTRVER=lsdk2606
 
 LS_MACHINE_LIST="ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb "
-IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95evk imx95frdm"
+IMX_MACHINE_LIST="imx8mpfrdm imx93evk imx93frdm imx8mqevk imx91sfrdm imx8mnevk imx8qxpmek imx8mpevk imx8qmmek imx8mmevk imx91frdm imx8ulpevk imx91evk imx95-15x15-frdm imx95-15x15-evk imx95-19x19-frdm-pro imx95-19x19-evk"
 DEFAULT_DL_URL="https://www.nxp.com/lgfiles/sdk/$DISTRVER"
 
 show_one_line() {

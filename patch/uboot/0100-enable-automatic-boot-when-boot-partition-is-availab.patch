@@ -1,0 +1,40 @@
+From 2082e14e27a23ff56b559d5b53c5cd4c48e47d90 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Tue, 27 Jan 2026 19:49:27 -0800
+Subject: [PATCH] enable automatic boot when boot partition is available
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ configs/imx95_15x15_frdm_defconfig     | 2 +-
+ configs/imx95_19x19_frdm_pro_defconfig | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/imx95_15x15_frdm_defconfig b/configs/imx95_15x15_frdm_defconfig
+index ce8cbde68e8..6b016af0c15 100644
+--- a/configs/imx95_15x15_frdm_defconfig
++++ b/configs/imx95_15x15_frdm_defconfig
+@@ -37,7 +37,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_OF_SYSTEM_SETUP=y
+-CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx95-15x15-frdm.dtb"
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
+diff --git a/configs/imx95_19x19_frdm_pro_defconfig b/configs/imx95_19x19_frdm_pro_defconfig
+index ff0282ef1d7..8ba33a0af93 100644
+--- a/configs/imx95_19x19_frdm_pro_defconfig
++++ b/configs/imx95_19x19_frdm_pro_defconfig
+@@ -37,7 +37,7 @@ CONFIG_REMAKE_ELF=y
+ CONFIG_FIT=y
+ CONFIG_FIT_VERBOSE=y
+ CONFIG_OF_SYSTEM_SETUP=y
+-CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_BOOTCOMMAND="bootflow scan -lb; run bsp_bootcmd"
+ CONFIG_DEFAULT_FDT_FILE="imx95-19x19-frdm-pro.dtb"
+ CONFIG_SYS_CBSIZE=2048
+ CONFIG_SYS_PBSIZE=2074
+-- 
+2.43.0
+

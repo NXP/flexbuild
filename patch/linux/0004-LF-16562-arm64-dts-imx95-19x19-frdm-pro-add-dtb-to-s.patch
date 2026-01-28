@@ -1,0 +1,298 @@
+From 95f9961827e8e562a7290917fa3331eb39624eed Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 26 Jan 2026 23:38:48 -0800
+Subject: [PATCH 4/5] LF-16562: arm64: dts: imx95-19x19-frdm-pro: add dtb to
+ support waveshare 7inch panel
+
+Since FRDM-IMX95 and FRDM-IMX95-pro have similar design on DSI display.
+Move the common code from imx95-15x15-frdm-waveshare-7-inch-c-panel.dtso
+to common dtsi.
+Both boards use the common dtsi code to support the waveshare 7 inch panel.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Acked-by: Liu Ying <victor.liu@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   3 +
+ ...95-15x15-frdm-waveshare-7inch-c-panel.dtso | 110 +-----------------
+ ...9x19-frdm-pro-waveshare-7inch-c-panel.dtso |  17 +++
+ ...5-frdm-waveshare-7inch-c-panel-common.dtsi | 105 +++++++++++++++++
+ 4 files changed, 126 insertions(+), 109 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-waveshare-7inch-c-panel.dtso
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-frdm-waveshare-7inch-c-panel-common.dtsi
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index b459f5d07b30..6c0002f95b43 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -965,6 +965,9 @@ imx95-19x19-frdm-pro-dual-os08a20-isp-dtbs := imx95-19x19-frdm-pro.dtb \
+ 					      imx95-19x19-frdm-pro-os08a20-combo.dtbo
+ dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-frdm-pro-dual-os08a20-isp.dtb
+ 
++imx95-19x19-frdm-pro-waveshare-7inch-c-panel-dtbs := imx95-19x19-frdm-pro.dtb \
++						     imx95-19x19-frdm-pro-waveshare-7inch-c-panel.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-frdm-pro-waveshare-7inch-c-panel.dtb
+ 
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+index 0be540eec955..f4e042e749b0 100644
+--- a/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
++++ b/arch/arm64/boot/dts/freescale/imx95-15x15-frdm-waveshare-7inch-c-panel.dtso
+@@ -3,106 +3,7 @@
+  * Copyright 2025 NXP
+  */
+ 
+-#include "imx95-clock.h"
+-#include "imx95-pinfunc.h"
+-
+-/dts-v1/;
+-/plugin/;
+-
+-&{/} {
+-	panel {
+-		compatible = "waveshare,7.0inch-c-panel", "panel-dpi";
+-		power-supply = <&reg_5p0v>;
+-
+-		port {
+-			panel_to_waveshare: endpoint {
+-				remote-endpoint = <&waveshare_to_panel>;
+-			};
+-		};
+-
+-		panel-timing {
+-			clock-frequency = <50000000>;
+-			hactive = <1024>;
+-			vactive = <600>;
+-			hfront-porch = <100>;
+-			hback-porch = <100>;
+-			hsync-len = <100>;
+-			vback-porch = <10>;
+-			vfront-porch = <10>;
+-			vsync-len = <10>;
+-
+-			hsync-active = <0>;
+-			vsync-active = <0>;
+-			de-active = <1>;
+-			pixelclk-active = <1>;
+-		};
+-	};
+-};
+-
+-&dpu {
+-	assigned-clocks = <&scmi_clk IMX95_CLK_DISP1PIX>,
+-			  <&scmi_clk IMX95_CLK_VIDEOPLL1_VCO>,
+-			  <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+-	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+-	assigned-clock-rates = <0>, <3000000000>, <500000000>;
+-};
+-
+-&lpi2c4 {
+-	#address-cells = <1>;
+-	#size-cells = <0>;
+-
+-	touchscreen@14 {
+-		compatible = "goodix,gt911";
+-		reg = <0x14>;
+-		touchscreen-size-x = <800>;
+-		touchscreen-size-y = <480>;
+-	};
+-
+-	bridge@45 {
+-		compatible = "waveshare,dsi2dpi";
+-		reg = <0x45>;
+-		power-supply = <&reg_5p0v>;
+-
+-		ports {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-
+-			port@0 {
+-				reg = <0>;
+-
+-				waveshare_from_dsi: endpoint {
+-					data-lanes = <1 2>;
+-					remote-endpoint = <&dsi_to_waveshare>;
+-				};
+-			};
+-
+-			port@1 {
+-				reg = <1>;
+-
+-				waveshare_to_panel: endpoint {
+-					remote-endpoint = <&panel_to_waveshare>;
+-				};
+-			};
+-		};
+-	};
+-};
+-
+-&mipi_dsi {
+-	status = "okay";
+-
+-	ports {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		port@1 {
+-			reg = <1>;
+-
+-			dsi_to_waveshare: endpoint {
+-				remote-endpoint = <&waveshare_from_dsi>;
+-			};
+-		};
+-	};
+-};
++#include "imx95-frdm-waveshare-7inch-c-panel-common.dtsi"
+ 
+ &pixel_interleaver {
+ 	#address-cells = <1>;
+@@ -114,12 +15,3 @@ channel@0 {
+ 		status = "okay";
+ 	};
+ };
+-
+-&scmi_iomuxc {
+-	pinctrl_lpi2c6: lpi2c6grp {
+-		fsl,pins = <
+-			IMX95_PAD_GPIO_IO02__LPI2C6_SDA			0x40000b9e
+-			IMX95_PAD_GPIO_IO03__LPI2C6_SCL			0x40000b9e
+-		>;
+-	};
+-};
+diff --git a/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-waveshare-7inch-c-panel.dtso b/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-waveshare-7inch-c-panel.dtso
+new file mode 100644
+index 000000000000..4914a0f2b728
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-waveshare-7inch-c-panel.dtso
+@@ -0,0 +1,17 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++#include "imx95-frdm-waveshare-7inch-c-panel-common.dtsi"
++
++&pixel_interleaver {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	channel@1 {
++		reg = <1>;
++		status = "okay";
++	};
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx95-frdm-waveshare-7inch-c-panel-common.dtsi b/arch/arm64/boot/dts/freescale/imx95-frdm-waveshare-7inch-c-panel-common.dtsi
+new file mode 100644
+index 000000000000..f10780c3bc05
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-frdm-waveshare-7inch-c-panel-common.dtsi
+@@ -0,0 +1,105 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++#include "imx95-clock.h"
++#include "imx95-pinfunc.h"
++
++/dts-v1/;
++/plugin/;
++
++&{/} {
++	panel {
++		compatible = "waveshare,7.0inch-c-panel", "panel-dpi";
++		power-supply = <&reg_5p0v>;
++
++		port {
++			panel_to_waveshare: endpoint {
++				remote-endpoint = <&waveshare_to_panel>;
++			};
++		};
++
++		panel-timing {
++			clock-frequency = <50000000>;
++			hactive = <1024>;
++			vactive = <600>;
++			hfront-porch = <100>;
++			hback-porch = <100>;
++			hsync-len = <100>;
++			vback-porch = <10>;
++			vfront-porch = <10>;
++			vsync-len = <10>;
++
++			hsync-active = <0>;
++			vsync-active = <0>;
++			de-active = <1>;
++			pixelclk-active = <1>;
++		};
++	};
++};
++
++&dpu {
++	assigned-clocks = <&scmi_clk IMX95_CLK_DISP1PIX>,
++			  <&scmi_clk IMX95_CLK_VIDEOPLL1_VCO>,
++			  <&scmi_clk IMX95_CLK_VIDEOPLL1>;
++	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
++	assigned-clock-rates = <0>, <3000000000>, <500000000>;
++};
++
++&lpi2c4 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	touchscreen@14 {
++		compatible = "goodix,gt911";
++		reg = <0x14>;
++		touchscreen-size-x = <800>;
++		touchscreen-size-y = <480>;
++	};
++
++	bridge@45 {
++		compatible = "waveshare,dsi2dpi";
++		reg = <0x45>;
++		power-supply = <&reg_5p0v>;
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++
++				waveshare_from_dsi: endpoint {
++					data-lanes = <1 2>;
++					remote-endpoint = <&dsi_to_waveshare>;
++				};
++			};
++
++			port@1 {
++				reg = <1>;
++
++				waveshare_to_panel: endpoint {
++					remote-endpoint = <&panel_to_waveshare>;
++				};
++			};
++		};
++	};
++};
++
++&mipi_dsi {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@1 {
++			reg = <1>;
++
++			dsi_to_waveshare: endpoint {
++				remote-endpoint = <&waveshare_from_dsi>;
++			};
++		};
++	};
++};
+-- 
+2.43.0
+

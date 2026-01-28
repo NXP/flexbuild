@@ -348,22 +348,18 @@ define imx_mkimage_target
 			cd $(BSPDIR)/imx_mkimage; \
             $(MAKE) SOC=iMX93 flash_singleboot $(LOG_MUTE) ; \
             ;; \
-        imx95-15x15-evk) \
+        imx95-15x15*) \
 			SOC_FAMILY=iMX95; \
 			$(call dl_fw_ele); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
-			cp -f $$opdir/arch/arm/dts/imx95-15x15-evk.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
 			cp $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
 				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \
 			cp -f $(BSPDIR)/atf/build/imx95/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
 			cp -f $(BSPDIR)/imx_sm/build/mx95evk/m33_image.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
 			cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
-			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
-				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
-				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
-				$$opdir/u-boot-nodtb.bin; \
+			cp -f $$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
 				if [ ! -f "$$bl32" ]; then \
 					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
@@ -374,22 +370,18 @@ define imx_mkimage_target
 			cd $(BSPDIR)/imx_mkimage; \
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
             ;; \
-        imx95-15x15-frdm) \
+        imx95-19x19*) \
 			SOC_FAMILY=iMX95; \
 			$(call dl_fw_ele); \
 			bld mcore_demo -m $(MACHINE); \
 			cp -f $(UTILSDIR)/firmware_imx/firmware/ddr/synopsys/*.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
-			cp -f $$opdir/arch/arm/dts/imx95-15x15-frdm.dtb $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			cp $(BSPDIR)/fw_ele/mx95b0-ahab-container.img $(BSPDIR)/imx_mkimage/iMX95; \
 			cp $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin \
 				$(BSPDIR)/imx_mkimage/iMX95/m7_image.bin; \
 			cp -f $(BSPDIR)/atf/build/imx95/release/bl31.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
 			cp -f $(BSPDIR)/imx_sm/build/mx95evk/m33_image.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
-			cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
-			cp -t $(BSPDIR)/imx_mkimage/$$SOC_FAMILY \
-				$(UTILSDIR)/firmware_imx/firmware/hdmi/cadence/signed*_imx8m.bin \
-				$$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin \
-				$$opdir/u-boot-nodtb.bin; \
+			cp -f $(BSPDIR)/imx_oei/build/mx95lp5/ddr/oei-m33-ddr.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY/; \
+			cp -f $$opdir/spl/u-boot-spl.bin $$opdir/u-boot.bin $(BSPDIR)/imx_mkimage/$$SOC_FAMILY; \
 			if [ "$(CONFIG_OPTEE)" = "y" ]; then \
 				if [ ! -f "$$bl32" ]; then \
 					echo "$$bl32 does not exist, OPTEE was disabled automatically."; \
@@ -398,7 +390,7 @@ define imx_mkimage_target
 				fi; \
 			fi;  \
 			cd $(BSPDIR)/imx_mkimage; \
-			$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
+			$(MAKE) SOC=iMX95 REV=B0 OEI=YES flash_all $(LOG_MUTE); \
             ;; \
     esac && \
     cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$(MACHINE)/flash.bin;

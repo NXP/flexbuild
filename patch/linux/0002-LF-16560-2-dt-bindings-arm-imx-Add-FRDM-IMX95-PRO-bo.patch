@@ -1,0 +1,29 @@
+From 443bf78882aac07b41aa6aebd840fe5ee48b92a4 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 26 Jan 2026 23:27:57 -0800
+Subject: [PATCH 2/5] LF-16560-2: dt-bindings: arm: imx Add FRDM-IMX95-PRO
+ board
+
+Add DT compatible string for FRDM-IMX95-PRO
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Peng Fan <peng.fan@nxp.com>
+---
+ Documentation/devicetree/bindings/arm/fsl.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/arm/fsl.yaml b/Documentation/devicetree/bindings/arm/fsl.yaml
+index f4945878d5b5..59ddd8059c60 100644
+--- a/Documentation/devicetree/bindings/arm/fsl.yaml
++++ b/Documentation/devicetree/bindings/arm/fsl.yaml
+@@ -1330,6 +1330,7 @@ properties:
+         items:
+           - enum:
+               - fsl,frdm-imx95            # FRDM-IMX95 Board
++              - fsl,frdm-imx95-pro        # FRDM-IMX95-PRO Board
+               - fsl,imx95-15x15-evk       # i.MX95 15x15 EVK Board
+               - fsl,imx95-19x19-evk       # i.MX95 19x19 EVK Board
+           - const: fsl,imx95
+-- 
+2.43.0
+

@@ -322,7 +322,8 @@ pack_distro_rfs() {
 
     tarname=${rname}_`date +%Y%m%d%H%M`.tar.zst
     fbprint_n "Generating $tarname"
-    cd $RFSDIR && sudo tar --exclude=proc --exclude=sys --exclude=dev --exclude=run --zstd -C "$RFSDIR" -cf $FBOUTDIR/images/$tarname *
+    cd $RFSDIR && sudo tar --exclude=proc --exclude=sys --exclude=dev --exclude=run -C "$RFSDIR" -cf - * | \
+        pzstd -o "$FBOUTDIR/images/$tarname"
     cd $FBOUTDIR/images && ln -sf $tarname $FBOUTDIR/images/${rname}.tar.zst && cd $FBDIR
     log_mute ls -lh $FBOUTDIR/images/${rname}*
     fbprint_d $FBOUTDIR/images/$tarname

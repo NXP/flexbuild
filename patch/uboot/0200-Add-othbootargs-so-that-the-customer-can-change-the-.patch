@@ -1,0 +1,26 @@
+From 6f231a271b2c9b6a7747af145ba444a026405070 Mon Sep 17 00:00:00 2001
+From: nxa22691 <andy.tang@nxp.com>
+Date: Wed, 19 Feb 2025 16:06:26 +0900
+Subject: [PATCH 7/7] Add othbootargs so that the customer can change the
+ resolution
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ include/configs/ls1028ardb.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/configs/ls1028ardb.h b/include/configs/ls1028ardb.h
+index e18695ebd9f..ec577cf0c48 100644
+--- a/include/configs/ls1028ardb.h
++++ b/include/configs/ls1028ardb.h
+@@ -77,6 +77,7 @@
+ 	"kernel_size_sd=0x14000\0"		\
+ 	"kernelhdr_addr_sd=0x3000\0"		\
+ 	"kernelhdr_size_sd=0x20\0"		\
++	"othbootargs=video=1920x1080-32@60 cma=640M\0"	\
+ 	"console=ttyS0,115200\0"                \
+ 	BOOTENV					\
+ 	"boot_scripts=ls1028ardb_boot.scr\0"    \
+-- 
+2.34.1
+

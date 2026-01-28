@@ -1,0 +1,533 @@
+From 3056536e5834539448b059197003725855883c91 Mon Sep 17 00:00:00 2001
+From: Joseph Guo <qijian.guo@nxp.com>
+Date: Thu, 6 Nov 2025 18:07:19 +0900
+Subject: [PATCH 1/3] LFU-944-1: frdm-imx95-pro: Add FRDM-IMX95-PRO board
+ support
+
+Add board level code and defconfig for FRDM-IMX95-PRO board.
+
+Signed-off-by: Tom.zheng <haidong.zheng@nxp.com>
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Ye Li <ye.li@nxp.com>
+---
+ arch/arm/mach-imx/imx9/Kconfig            |  12 ++
+ board/freescale/imx95_frdm/Kconfig        |   2 +-
+ board/freescale/imx95_frdm/imx95_frdm.c   | 119 ++++++++++-
+ board/freescale/imx95_frdm/imx95_frdm.env |   5 +
+ configs/imx95_19x19_frdm_pro_defconfig    | 232 ++++++++++++++++++++++
+ include/configs/imx95_frdm.h              |   5 +-
+ 6 files changed, 365 insertions(+), 10 deletions(-)
+ create mode 100644 configs/imx95_19x19_frdm_pro_defconfig
+
+diff --git a/arch/arm/mach-imx/imx9/Kconfig b/arch/arm/mach-imx/imx9/Kconfig
+index 608bfac935e..c713ecd1ba3 100644
+--- a/arch/arm/mach-imx/imx9/Kconfig
++++ b/arch/arm/mach-imx/imx9/Kconfig
+@@ -219,6 +219,18 @@ config TARGET_IMX95_15X15_FRDM
+ 	select IMX_SM_LMM
+ 	select IMX_SM_CPU
+ 
++config TARGET_IMX95_19X19_FRDM_PRO
++	bool "imx95_19x19_frdm_pro"
++	select IMX95
++	imply BOOTSTD_BOOTCOMMAND
++	imply BOOTSTD_FULL
++	select CMD_REMOTEPROC
++	select REMOTEPROC_IMX
++	select REGMAP
++	select SYSCON
++	select IMX_SM_LMM
++	select IMX_SM_CPU
++
+ config TARGET_IMX943_EVK
+ 	bool "imx943_evk"
+ 	select IMX94
+diff --git a/board/freescale/imx95_frdm/Kconfig b/board/freescale/imx95_frdm/Kconfig
+index 0dd10dd46cb..d698051a476 100644
+--- a/board/freescale/imx95_frdm/Kconfig
++++ b/board/freescale/imx95_frdm/Kconfig
+@@ -1,4 +1,4 @@
+-if TARGET_IMX95_15X15_FRDM
++if TARGET_IMX95_15X15_FRDM || TARGET_IMX95_19X19_FRDM_PRO
+ 
+ config SYS_BOARD
+ 	default "imx95_frdm"
+diff --git a/board/freescale/imx95_frdm/imx95_frdm.c b/board/freescale/imx95_frdm/imx95_frdm.c
+index e37ed88354f..64b98f373df 100644
+--- a/board/freescale/imx95_frdm/imx95_frdm.c
++++ b/board/freescale/imx95_frdm/imx95_frdm.c
+@@ -94,12 +94,20 @@ void tca_mux_select(enum typec_cc_polarity pol)
+ static void setup_typec(void)
+ {
+ 	int ret;
+-	unsigned int rev[2];
+-	unsigned int data[2];
+ 
+ 	tca_base = USB1_BASE_ADDR + 0xfc000;
+-
++#ifdef CONFIG_TARGET_IMX95_19X19_FRDM_PRO
++	struct gpio_desc dcdc2_5v_desc;
++	struct gpio_desc dcdc_3_3v_desc;
++	struct gpio_desc ext_12v_desc;
++	struct gpio_desc ext_5v_desc;
++	struct gpio_desc ext_3_3v_desc;
++	struct gpio_desc ext_1_8v_desc;
++#else
+ 	struct gpio_desc ext_pwr_desc;
++	unsigned int rev[2];
++	unsigned int data[2];
++#endif
+ 
+ 	ret = tcpc_init(&portpd, portpd_config, NULL);
+ 	if (ret) {
+@@ -107,7 +115,91 @@ static void setup_typec(void)
+ 		       __func__, ret);
+ 	} else if (tcpc_pd_sink_check_charging(&portpd)) {
+ 		printf("Power supply on USB PD\n");
++#ifdef CONFIG_TARGET_IMX95_19X19_FRDM_PRO
++		/* Enable dcdc2_5v */
++		ret = dm_gpio_lookup_name("gpio@22_1", &dcdc2_5v_desc);
++		if (ret) {
++			printf("%s lookup gpio@22_1 failed ret = %d\n", __func__, ret);
++			return;
++		}
++		ret = dm_gpio_request(&dcdc2_5v_desc, "dcdc2_5v_en");
++		if (ret) {
++			printf("%s request dcdc2_5v_en failed ret = %d\n", __func__, ret);
++			return;
++		}
++		/* Enable DCDC2_5V regulator */
++		dm_gpio_set_dir_flags(&dcdc2_5v_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++
++		/* Enable dcdc_3_3v */
++		ret = dm_gpio_lookup_name("gpio@22_18", &dcdc_3_3v_desc);
++		if (ret) {
++			printf("%s lookup gpio@22_18 failed ret = %d\n", __func__, ret);
++			return;
++		}
++		ret = dm_gpio_request(&dcdc_3_3v_desc, "dcdc_3_3v_en");
++		if (ret) {
++			printf("%s request dcdc_3_3v_en failed ret = %d\n", __func__, ret);
++			return;
++		}
++		/* Enable DCDC_3_3V regulator */
++		dm_gpio_set_dir_flags(&dcdc_3_3v_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++
++		/* Enable EXT 12V */
++		ret = dm_gpio_lookup_name("gpio@22_17", &ext_12v_desc);
++		if (ret) {
++			printf("%s lookup gpio@22_17 failed ret = %d\n", __func__, ret);
++			return;
++		}
++		ret = dm_gpio_request(&ext_12v_desc, "ext_12v_en");
++		if (ret) {
++			printf("%s request ext_12v_en failed ret = %d\n", __func__, ret);
++			return;
++		}
++		/* Enable Ext 12V regulator */
++		dm_gpio_set_dir_flags(&ext_12v_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++
++		/* Enable EXT 5V */
++		ret = dm_gpio_lookup_name("gpio@22_5", &ext_5v_desc);
++		if (ret) {
++			printf("%s lookup gpio@22_5 failed ret = %d\n", __func__, ret);
++			return;
++		}
++		ret = dm_gpio_request(&ext_5v_desc, "ext_5v_en");
++		if (ret) {
++			printf("%s request ext_5v_en failed ret = %d\n", __func__, ret);
++			return;
++		}
++		/* Enable Ext 5V regulator */
++		dm_gpio_set_dir_flags(&ext_5v_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++
++		/* Enable EXT 3.3V */
++		ret = dm_gpio_lookup_name("gpio@22_6", &ext_3_3v_desc);
++		if (ret) {
++			printf("%s lookup gpio@22_6 failed ret = %d\n", __func__, ret);
++			return;
++		}
++		ret = dm_gpio_request(&ext_3_3v_desc, "ext_3_3v_en");
++		if (ret) {
++			printf("%s request ext_3_3v_en failed ret = %d\n", __func__, ret);
++			return;
++		}
++		/* Enable Ext 3.3V regulator */
++		dm_gpio_set_dir_flags(&ext_3_3v_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
+ 
++		/* Enable EXT 1.8V */
++		ret = dm_gpio_lookup_name("gpio@22_10", &ext_1_8v_desc);
++		if (ret) {
++			printf("%s lookup gpio@22_10 failed ret = %d\n", __func__, ret);
++			return;
++		}
++		ret = dm_gpio_request(&ext_1_8v_desc, "ext_1_8v_en");
++		if (ret) {
++			printf("%s request ext_1_8v_en failed ret = %d\n", __func__, ret);
++			return;
++		}
++		/* Enable Ext 1.8V regulator */
++		dm_gpio_set_dir_flags(&ext_1_8v_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++#else
+ 		/* Enable EXT PWR */
+ 		ret = get_board_version(rev, data);
+ 		if (ret == 0) {
+@@ -136,6 +228,7 @@ static void setup_typec(void)
+ 
+ 		/* Enable EXT PWR */
+ 		dm_gpio_set_dir_flags(&ext_pwr_desc, GPIOD_IS_OUT | GPIOD_IS_OUT_ACTIVE);
++#endif
+ 	}
+ 
+ 	ret = tcpc_init(&port, port_config, &tca_mux_select);
+@@ -321,13 +414,18 @@ void netc_init(void)
+ 		printf("SCMI_POWWER_STATE_SET Failed for NETC MIX\n");
+ 		return;
+ 	}
+-
++#ifdef CONFIG_TARGET_IMX95_19X19_FRDM_PRO
++	netc_phy_rst("gpio@20_1", "ENET1_RST_B");
++	netc_phy_rst("gpio@20_2", "ENET2_RST_B");
++#else
+ 	netc_phy_rst("gpio@22_0", "ENET1_RST_B");
+ 	netc_phy_rst("gpio@22_1", "ENET2_RST_B");
++#endif
+ 
+ 	pci_init();
+ }
+ 
++#ifdef CONFIG_TARGET_IMX95_15X15_FRDM
+ void lvds_backlight_on(void)
+ {
+ 	struct udevice *dev;
+@@ -347,6 +445,7 @@ void lvds_backlight_on(void)
+ 	reg = 5;
+ 	dm_i2c_write(dev, 0x8, &reg, 1);
+ }
++#endif
+ 
+ static int get_board_version(int *rev, int *data)
+ {
+@@ -417,8 +516,9 @@ int board_init(void)
+ 	netc_init();
+ 
+ 	power_on_m7("mx95evkrpmsg");
+-
++#ifdef CONFIG_TARGET_IMX95_15X15_FRDM
+ 	lvds_backlight_on();
++#endif
+ 
+ 	return 0;
+ }
+@@ -437,6 +537,7 @@ int board_late_init(void)
+ }
+ 
+ #ifdef CONFIG_OF_BOARD_SETUP
++#ifdef CONFIG_TARGET_IMX95_15X15_FRDM
+ int board_fix_fdt_version(void *blob)
+ {
+ 	int ret, nodeoffset;
+@@ -499,15 +600,17 @@ int board_fix_fdt_version(void *blob)
+ 
+ 	return 0;
+ }
++#endif
+ int ft_board_setup(void *blob, struct bd_info *bd)
+ {
+-	unsigned int rev[2];
+-	unsigned int data[2];
+ 	char *p, *b, *s;
+ 	char *token = NULL;
+ 	int i, ret = 0;
+ 	u64 base[CONFIG_NR_DRAM_BANKS] = {0};
+ 	u64 size[CONFIG_NR_DRAM_BANKS] = {0};
++#ifdef CONFIG_TARGET_IMX95_15X15_FRDM
++	unsigned int rev[2];
++	unsigned int data[2];
+ 
+ 	ret = get_board_version(rev, data);
+ 	if (ret == 0) {
+@@ -516,7 +619,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
+ 			board_fix_fdt_version(blob);
+ 		}
+ 	}
+-
++#endif
+ 	p = env_get("jh_root_mem");
+ 	if (!p)
+ 		return 0;
+diff --git a/board/freescale/imx95_frdm/imx95_frdm.env b/board/freescale/imx95_frdm/imx95_frdm.env
+index 104d0256a5e..d906fe30b69 100644
+--- a/board/freescale/imx95_frdm/imx95_frdm.env
++++ b/board/freescale/imx95_frdm/imx95_frdm.env
+@@ -17,7 +17,12 @@ sec_boot=yes
+ sec_boot=no
+ #endif
+ 
++#ifdef CONFIG_TARGET_IMX95_15X15_FRDM
+ jh_root_dtb=imx95-15x15-frdm-root.dtb
++#else
++jh_root_dtb=imx95-19x19-frdm-pro-root.dtb
++#endif
++
+ jh_mmcboot=setenv fdtfile ${jh_root_dtb};
+ 	setenv jh_clk kvm.enable_virt_at_load=false cpuidle.off=1 clk_ignore_unused kvm-arm.mode=nvhe;
+ 	setenv jh_root_mem 0x58000000@0x90000000,0xc0000000@0x180000000;
+diff --git a/configs/imx95_19x19_frdm_pro_defconfig b/configs/imx95_19x19_frdm_pro_defconfig
+new file mode 100644
+index 00000000000..ff0282ef1d7
+--- /dev/null
++++ b/configs/imx95_19x19_frdm_pro_defconfig
+@@ -0,0 +1,232 @@
++CONFIG_ARM=y
++CONFIG_ARCH_IMX9=y
++CONFIG_TEXT_BASE=0x90200000
++CONFIG_SYS_MALLOC_LEN=0x2000000
++CONFIG_SYS_MALLOC_F_LEN=0x10000
++CONFIG_SPL_GPIO=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_NR_DRAM_BANKS=3
++CONFIG_ENV_SOURCE_FILE="imx95_frdm"
++CONFIG_SF_DEFAULT_SPEED=40000000
++CONFIG_ENV_SIZE=0x4000
++CONFIG_ENV_OFFSET=0x700000
++CONFIG_ENV_SECT_SIZE=0x10000
++CONFIG_IMX_CONFIG="arch/arm/mach-imx/imx9/scmi/imximage.cfg"
++CONFIG_DM_GPIO=y
++CONFIG_DEFAULT_DEVICE_TREE="imx95-19x19-frdm-pro"
++CONFIG_USB_TCPC=y
++CONFIG_TARGET_IMX95_19X19_FRDM_PRO=y
++CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_SYS_MONITOR_LEN=524288
++CONFIG_SPL_MMC=y
++CONFIG_SPL_SERIAL=y
++CONFIG_SPL_DRIVERS_MISC=y
++CONFIG_SPL_STACK=0x204d6000
++CONFIG_SPL_TEXT_BASE=0x20480000
++CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
++CONFIG_SPL_BSS_START_ADDR=0x204d6000
++CONFIG_SPL_BSS_MAX_SIZE=0x2000
++CONFIG_SYS_LOAD_ADDR=0x90400000
++CONFIG_SPL=y
++CONFIG_SPL_RECOVER_DATA_SECTION=y
++CONFIG_PCI=y
++CONFIG_SYS_MEMTEST_START=0x90000000
++CONFIG_SYS_MEMTEST_END=0xA0000000
++CONFIG_REMAKE_ELF=y
++CONFIG_FIT=y
++CONFIG_FIT_VERBOSE=y
++CONFIG_OF_SYSTEM_SETUP=y
++CONFIG_BOOTCOMMAND="bootflow scan -l; run bsp_bootcmd"
++CONFIG_DEFAULT_FDT_FILE="imx95-19x19-frdm-pro.dtb"
++CONFIG_SYS_CBSIZE=2048
++CONFIG_SYS_PBSIZE=2074
++CONFIG_ARCH_MISC_INIT=y
++CONFIG_BOARD_EARLY_INIT_F=y
++CONFIG_BOARD_LATE_INIT=y
++CONFIG_SPL_MAX_SIZE=0x30000
++CONFIG_SPL_BOARD_INIT=y
++CONFIG_SPL_LOAD_IMX_CONTAINER=y
++CONFIG_IMX_CONTAINER_CFG="arch/arm/mach-imx/imx9/scmi/container.cfg"
++# CONFIG_SPL_SHARES_INIT_SP_ADDR is not set
++CONFIG_SPL_SYS_MALLOC=y
++CONFIG_SPL_HAS_CUSTOM_MALLOC_START=y
++CONFIG_SPL_CUSTOM_SYS_MALLOC_ADDR=0x93200000
++CONFIG_SPL_SYS_MALLOC_SIZE=0x80000
++CONFIG_SPL_SYS_MMCSD_RAW_MODE=y
++CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x1040
++CONFIG_SPL_I2C=y
++CONFIG_SPL_DM_MAILBOX=y
++CONFIG_SPL_DM_SEQ_ALIAS=y
++CONFIG_SPL_POWER=y
++CONFIG_SPL_POWER_DOMAIN=y
++CONFIG_SPL_USB_GADGET=y
++CONFIG_SPL_USB_SDP_SUPPORT=y
++CONFIG_SDP_LOADADDR=0x90400000
++
++CONFIG_SPL_WATCHDOG=y
++CONFIG_SYS_PROMPT="u-boot=> "
++CONFIG_CMD_ERASEENV=y
++CONFIG_CMD_NVEDIT_EFI=y
++CONFIG_CMD_CRC32=y
++CONFIG_CRC32_VERIFY=y
++CONFIG_CMD_MEMTEST=y
++CONFIG_CMD_CLK=y
++CONFIG_CMD_DFU=y
++CONFIG_CMD_FUSE=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_GPT=y
++CONFIG_CMD_I2C=y
++CONFIG_CMD_MMC=y
++CONFIG_CMD_PCI=y
++CONFIG_CMD_PART=y
++CONFIG_CMD_POWEROFF=y
++CONFIG_CMD_USB=y
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_MII=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_SNTP=y
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EFIDEBUG=y
++CONFIG_CMD_RTC=y
++CONFIG_CMD_TIME=y
++CONFIG_CMD_GETTIME=y
++CONFIG_CMD_TIMER=y
++CONFIG_CMD_REGULATOR=y
++CONFIG_CMD_HASH=y
++CONFIG_CMD_EXT2=y
++CONFIG_CMD_EXT4=y
++CONFIG_CMD_EXT4_WRITE=y
++CONFIG_CMD_FAT=y
++CONFIG_CMD_FS_GENERIC=y
++CONFIG_CMD_USB_SDP=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++CONFIG_OF_BOARD_FIXUP=y
++CONFIG_OF_CONTROL=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_NOWHERE=y
++CONFIG_ENV_IS_IN_MMC=y
++CONFIG_SYS_RELOC_GD_ENV_ADDR=y
++CONFIG_SYS_MMC_ENV_DEV=1
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_USE_ETHPRIME=y
++CONFIG_ETHPRIME="eth0"
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_SYS_RX_ETH_BUFFER=8
++CONFIG_SPL_DM=y
++CONFIG_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_ADC=y
++CONFIG_ADC_IMX93=y
++CONFIG_SPL_OF_TRANSLATE=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_SPL_CLK_CCF=y
++CONFIG_CLK_CCF=y
++CONFIG_CLK_SCMI=y
++CONFIG_SPL_CLK_SCMI=y
++CONFIG_DFU_MMC=y
++CONFIG_DFU_RAM=y
++CONFIG_SPL_FIRMWARE=y
++# CONFIG_SCMI_AGENT_SMCCC is not set
++CONFIG_IMX_RGPIO2P=y
++
++CONFIG_CMD_FASTBOOT=y
++CONFIG_USB_FUNCTION_FASTBOOT=y
++CONFIG_FASTBOOT_UUU_SUPPORT=y
++CONFIG_FASTBOOT=y
++CONFIG_FASTBOOT_BUF_ADDR=0x92800000
++CONFIG_FASTBOOT_BUF_SIZE=0x20000000
++CONFIG_FASTBOOT_FLASH=y
++CONFIG_EFI_PARTITION=y
++CONFIG_FASTBOOT_USB_DEV=0
++CONFIG_USB_PORT_AUTO=y
++
++CONFIG_DM_PCA953X=y
++CONFIG_ADP5585_GPIO=y
++CONFIG_DM_I2C=y
++CONFIG_SYS_I2C_IMX_LPI2C=y
++CONFIG_IMX_MU_MBOX=y
++CONFIG_SUPPORT_EMMC_BOOT=y
++CONFIG_MMC_IO_VOLTAGE=y
++CONFIG_MMC_UHS_SUPPORT=y
++CONFIG_MMC_HS400_ES_SUPPORT=y
++CONFIG_MMC_HS400_SUPPORT=y
++CONFIG_FSL_USDHC=y
++CONFIG_MTD=y
++CONFIG_DM_SPI_FLASH=y
++CONFIG_SPI_FLASH_WINBOND=y
++CONFIG_PHYLIB=y
++CONFIG_PHYLIB_10G=y
++CONFIG_PHY_AQUANTIA=y
++CONFIG_PHY_REALTEK=y
++CONFIG_DM_MDIO=y
++CONFIG_MII=y
++CONFIG_PHY_MOTORCOMM=y
++CONFIG_FSL_ENETC=y
++CONFIG_PCIE_ECAM_GENERIC=y
++CONFIG_PHY=y
++CONFIG_PHY_IMX8MQ_USB=y
++CONFIG_PINCTRL=y
++CONFIG_SPL_PINCTRL=y
++CONFIG_PINCTRL_IMX_SCMI=y
++CONFIG_POWER_DOMAIN=y
++CONFIG_SCMI_POWER_DOMAIN=y
++CONFIG_DM_REGULATOR=y
++CONFIG_SPL_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_SPL_DM_REGULATOR_FIXED=y
++CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_DM_RTC=y
++CONFIG_DM_SERIAL=y
++CONFIG_FSL_LPUART=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_NXP_FSPI=y
++CONFIG_USB=y
++CONFIG_DM_USB=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_DWC3=y
++CONFIG_USB_DWC3=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_MAX_CONTROLLER_COUNT=2
++CONFIG_USB_STORAGE=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_MANUFACTURER="FSL"
++CONFIG_USB_GADGET_VENDOR_NUM=0x1fc9
++CONFIG_USB_GADGET_PRODUCT_NUM=0x0152
++CONFIG_USB_HOST_ETHER=y
++CONFIG_USB_ETHER_ASIX=y
++CONFIG_USB_ETHER_RTL8152=y
++CONFIG_ULP_WATCHDOG=y
++CONFIG_LZO=y
++CONFIG_BZIP2=y
++CONFIG_OF_BOARD_SETUP=y
++
++CONFIG_IMX_SNPS_DDR_PHY_QB_GEN=y
++CONFIG_SAVED_QB_STATE_BASE=0x4aaf0000
++
++CONFIG_DM_THERMAL=y
++CONFIG_SCMI_THERMAL=y
++CONFIG_SPL_THERMAL=y
++
++CONFIG_VIDEO_IMX95_DPU=y
++CONFIG_VIDEO_IMX95_DW_DSI=y
++CONFIG_VIDEO_IMX95_PIXEL_LINK=y
++CONFIG_VIDEO_IMX95_PIXEL_INTERLEAVER=y
++CONFIG_VIDEO=y
++CONFIG_BMP_16BPP=y
++CONFIG_BMP_24BPP=y
++CONFIG_BMP_32BPP=y
++CONFIG_VIDEO_LOGO=y
++CONFIG_VIDEO_LCD_RAYDIUM_RM692C9=y
++CONFIG_VIDEO_ADV7535=y
++CONFIG_SYS_WHITE_ON_BLACK=y
++CONFIG_SPLASH_SCREEN=y
++CONFIG_SPLASH_SCREEN_ALIGN=y
++CONFIG_CMD_BMP=y
++CONFIG_DISPLAY=y
++CONFIG_MIPI_DPHY_HELPERS=y
++
++CONFIG_BOOTDEV_ETH=n
+diff --git a/include/configs/imx95_frdm.h b/include/configs/imx95_frdm.h
+index 358619302ab..920937f023b 100644
+--- a/include/configs/imx95_frdm.h
++++ b/include/configs/imx95_frdm.h
+@@ -17,8 +17,11 @@
+ #define PHYS_SDRAM			0x90000000
+ 
+ #define PHYS_SDRAM_SIZE			0x70000000 /* 2GB - 256MB DDR */
++#ifdef CONFIG_TARGET_IMX95_19X19_FRDM_PRO
++#define PHYS_SDRAM_2_SIZE		0x380000000UL /* 14GB */
++#else
+ #define PHYS_SDRAM_2_SIZE		0x180000000UL /* 6GB */
+-
++#endif
+ #define CFG_SYS_SECURE_SDRAM_BASE	0x8A000000
+ #define CFG_SYS_SECURE_SDRAM_SIZE	0x06000000
+ 
+-- 
+2.43.0
+

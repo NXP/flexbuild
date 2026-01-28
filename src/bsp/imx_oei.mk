@@ -10,6 +10,12 @@
 # the processor returns to ROM execution.
 
 
+ifeq ($(filter imx95-15x15%,$(MACHINE)),$(MACHINE))
+	IMX_OEI_BOARD = mx95lp4x-15
+else
+	IMX_OEI_BOARD = mx95lp5
+endif
+
 imx_oei:
 	[[ ! "$(MACHINE)" == *"imx95"* ]] && exit 0 || \
 	$(call download_repo,imx_oei,bsp) && \
@@ -17,6 +23,6 @@ imx_oei:
 	$(call fbprint_b,"imx_oei") && \
 	cd $(BSPDIR)/imx_oei && \
 	export PATH=/usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin:$(PATH) && \
-	$(MAKE) board=mx95lp4x-15 oei=ddr clean $(LOG_MUTE) && \
-	$(MAKE) board=mx95lp4x-15 oei=ddr DEBUG=1 OEI_CROSS_COMPILE=arm-none-eabi- r=B0 $(LOG_MUTE) && \
+	$(MAKE) board=$(IMX_OEI_BOARD) oei=ddr clean $(LOG_MUTE); \
+	$(MAKE) board=$(IMX_OEI_BOARD) oei=ddr DEBUG=1 OEI_CROSS_COMPILE=arm-none-eabi- r=B0 $(LOG_MUTE); \
 	$(call fbprint_d,"imx_oei")

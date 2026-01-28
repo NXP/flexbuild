@@ -1,0 +1,18 @@
+From af5b76adf419ff58bf4ad99fda8d74408ca61203 Mon Sep 17 00:00:00 2001
+From: Chuck Cannon <chuck.cannon@nxp.com>
+Date: Mon, 10 Nov 2025 08:48:57 -0600
+Subject: [PATCH] SM-321: Rename FRDM board.
+
+Signed-off-by: Chuck Cannon <chuck.cannon@nxp.com>
+---
+ configs/other/{mx95frdm-mr.cfg => mx95frdm-pro.cfg} | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename configs/other/{mx95frdm-mr.cfg => mx95frdm-pro.cfg} (100%)
+
+diff --git a/configs/other/mx95frdm-mr.cfg b/configs/other/mx95frdm-pro.cfg
+similarity index 100%
+rename from configs/other/mx95frdm-mr.cfg
+rename to configs/other/mx95frdm-pro.cfg
+-- 
+2.43.0
+

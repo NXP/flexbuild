@@ -1,0 +1,288 @@
+From a22eecf006f108a3b44221f17f612d9ba8fd439e Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 26 Jan 2026 23:30:05 -0800
+Subject: [PATCH 3/5] LF-16561: arm64: dts: imx95-19x19-frdm-pro: Add os08a20
+ support
+
+Add device tree overlay file to support Omnivision os08a20
+sensor for FRDM-IMX95-PRO platform.
+
+Signed-off-by: Joseph Guo <qijian.guo@nxp.com>
+Reviewed-by: Robby Cai <robby.cai@nxp.com>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |  13 ++
+ .../imx95-19x19-frdm-pro-os08a20-combo.dtso   | 123 ++++++++++++++++++
+ .../imx95-19x19-frdm-pro-os08a20.dtso         | 107 +++++++++++++++
+ 3 files changed, 243 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20-combo.dtso
+ create mode 100644 arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20.dtso
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 141d6d9e741e..b459f5d07b30 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -952,6 +952,19 @@ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-aud-hat.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx95-15x15-frdm-8mic-reve.dtb
+ 
+ dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-frdm-pro.dtb
++imx95-19x19-frdm-pro-os08a20-isp-dtbs := imx95-19x19-frdm-pro.dtb \
++					 imx95-19x19-frdm-pro-os08a20.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-frdm-pro-os08a20-isp.dtb
++
++imx95-19x19-frdm-pro-os08a20-combo-isp-dtbs := imx95-19x19-frdm-pro.dtb \
++					       imx95-19x19-frdm-pro-os08a20-combo.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-frdm-pro-os08a20-combo-isp.dtb
++
++imx95-19x19-frdm-pro-dual-os08a20-isp-dtbs := imx95-19x19-frdm-pro.dtb \
++					      imx95-19x19-frdm-pro-os08a20.dtbo \
++					      imx95-19x19-frdm-pro-os08a20-combo.dtbo
++dtb-$(CONFIG_ARCH_MXC) += imx95-19x19-frdm-pro-dual-os08a20-isp.dtb
++
+ 
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+ dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20-combo.dtso b/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20-combo.dtso
+new file mode 100644
+index 000000000000..cdbe10cebd59
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20-combo.dtso
+@@ -0,0 +1,123 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/gpio/gpio.h>
++
++&lpi2c2 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	os08a20: os08a20_mipi@36 {
++		compatible = "ovti,os08a20";
++		reg = <0x36>;
++		clocks = <&dummy>;
++		reset-gpios = <&i2c3_gpio_expander_20 15 GPIO_ACTIVE_LOW>;
++		avdd-supply = <&reg_dummy>;
++		dovdd-supply = <&reg_dummy>;
++		dvdd-supply = <&reg_dummy>;
++		orientation = <2>;
++		rotation = <0>;
++		status = "okay";
++
++		port {
++			os08a20_mipi_1_ep: endpoint {
++				remote-endpoint = <&mipi_csi1_ep>;
++				data-lanes = <1 2 3 4>;
++				clock-lanes = <0>;
++			};
++		};
++	};
++};
++
++&display_stream_csr {
++	status = "disabled";
++};
++
++&display_master_csr {
++	status = "disabled";
++};
++
++&mipi_tx_phy_csr {
++	status = "disabled";
++};
++
++&mipi_dsi_intf {
++	status = "okay";
++};
++
++&combo_rx {
++	status = "okay";
++};
++
++&mipi_csi1 {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++			mipi_csi1_ep: endpoint {
++				remote-endpoint = <&os08a20_mipi_1_ep>;
++				data-lanes = <1 2 3 4>;
++				clock-lanes = <0>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++				mipi_csi1_out: endpoint {
++				remote-endpoint = <&formatter_1_in>;
++			};
++		};
++	};
++};
++
++&csi_pixel_formatter_1 {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++
++			formatter_1_in: endpoint {
++				remote-endpoint = <&mipi_csi1_out>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++
++			formatter_1_out: endpoint {
++				remote-endpoint = <&isi_in_3>;
++			};
++		};
++	};
++};
++
++&isi {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@3 {
++			reg = <3>;
++
++			isi_in_3: endpoint {
++				remote-endpoint = <&formatter_1_out>;
++			};
++		};
++	};
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20.dtso b/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20.dtso
+new file mode 100644
+index 000000000000..442b66291027
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx95-19x19-frdm-pro-os08a20.dtso
+@@ -0,0 +1,107 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright 2025 NXP
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include <dt-bindings/gpio/gpio.h>
++
++&lpi2c3 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	os08a20: os08a20_mipi@36 {
++		compatible = "ovti,os08a20";
++		reg = <0x36>;
++		clocks = <&dummy>;
++		reset-gpios = <&i2c3_gpio_expander_20 10 GPIO_ACTIVE_LOW>;
++		avdd-supply = <&reg_dummy>;
++		dovdd-supply = <&reg_dummy>;
++		dvdd-supply = <&reg_dummy>;
++		orientation = <2>;
++		rotation = <0>;
++		status = "okay";
++
++		port {
++			os08a20_mipi_0_ep: endpoint {
++				remote-endpoint = <&mipi_csi0_ep>;
++				data-lanes = <1 2 3 4>;
++				clock-lanes = <0>;
++			};
++		};
++	};
++};
++
++&dphy_rx {
++	status = "okay";
++};
++
++&mipi_csi0 {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++			mipi_csi0_ep: endpoint {
++				remote-endpoint = <&os08a20_mipi_0_ep>;
++				data-lanes = <1 2 3 4>;
++				clock-lanes = <0>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++				mipi_csi0_out: endpoint {
++				remote-endpoint = <&formatter_0_in>;
++			};
++		};
++	};
++};
++
++&csi_pixel_formatter_0 {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@0 {
++			reg = <0>;
++
++			formatter_0_in: endpoint {
++				remote-endpoint = <&mipi_csi0_out>;
++			};
++		};
++
++		port@1 {
++			reg = <1>;
++
++			formatter_0_out: endpoint {
++				remote-endpoint = <&isi_in_2>;
++			};
++		};
++	};
++};
++
++&isi {
++	status = "okay";
++
++	ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		port@2 {
++			reg = <2>;
++
++			isi_in_2: endpoint {
++				remote-endpoint = <&formatter_0_out>;
++			};
++		};
++	};
++};
+-- 
+2.43.0
+

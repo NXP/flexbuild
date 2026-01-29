@@ -342,11 +342,11 @@ repo:
     url:  https://github.com/nxp-imx/g2d-samples.git
 
   cogl:
-    url:  https://gitlab.gnome.org/GNOME/cogl.git
+    url:  https://gitlab.gnome.org/Archive/cogl.git
     tag:  1.22.8
 
   clutter_gst:
-    url:  https://gitlab.gnome.org/GNOME/clutter-gst.git
+    url:  https://gitlab.gnome.org/Archive/clutter-gst.git
     tag:  3.0.27
 
   vulkan_headers:
@@ -448,7 +448,7 @@ repo:
     url: https://github.com/nxp/imx-vpuwrap.git
 
   cheese:
-    url: https://gitlab.gnome.org/GNOME/cheese.git
+    url: https://gitlab.gnome.org/Archive/cheese.git
     tag: 43.0
 
   libcamera:

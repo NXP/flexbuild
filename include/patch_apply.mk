@@ -26,7 +26,7 @@ define patch_apply
 			if [ -d "$$targetdir/.git" ]; then \
 				git am "$$i" $(LOG_MUTE); \
 			else \
-				patch -f -p1 -d $$targetdir < "$$i" $(LOG_MUTE); \
+				patch -f -p1 -d $$targetdir < "$$i" $(LOG_MUTE) || exit 1; \
 			fi; \
 		done && \
 		touch $$targetdir/.patchdone && \

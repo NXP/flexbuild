@@ -593,3 +593,7 @@ repo:
   imx_video2texture:
     url: https://github.com/nxp-imx-support/imx-video-to-texture.git
     ver: ee77a45
+
+  imx_camera_rotation:
+    url: https://github.com/nxp-imx-support/imx-camera-rotation.git
+    ver: e8d7f8b

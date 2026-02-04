@@ -11,8 +11,8 @@
 #
 
 
-tflite_ethosu_delegate: tflite ethosu_driver_stack
 #tflite_ethosu_delegate:
+tflite_ethosu_delegate: tflite ethosu_driver_stack
 	@[ $${MACHINE:0:5} != imx93  ] && exit || \
 	$(call download_repo,tflite_ethosu_delegate,apps/ml) && \
 	$(call patch_apply,tflite_ethosu_delegate,apps/ml) && \
@@ -21,6 +21,8 @@ tflite_ethosu_delegate: tflite ethosu_driver_stack
 	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
 	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include" && \
+	export CMAKE_TLS_VERIFY=0 && \
+	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
 		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
 		cd build_$(DISTROTYPE)_$(ARCH); \
@@ -53,4 +55,5 @@ tflite_ethosu_delegate: tflite ethosu_driver_stack
 	$(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) ethosu_delegate $(LOG_MUTE) && \
 	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so && \
 	install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so $(DESTDIR)/usr/lib && \
+	rm -f /lib/ld-linux-aarch64.so.1 && \
 	$(call fbprint_d,"tflite_ethosu_delegate")

@@ -72,7 +72,14 @@ linux-headers:
 
 
 
+#linux-deb:
 linux-deb: linux
+	@$(call fbprint_b,linux debian packages) && \
 	opdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) && \
+	mkdebian_file=$(PKGDIR)/linux/linux/scripts/package/mkdebian && \
+	if [ -f $$mkdebian_file ]; then \
+		sed -i '/^ libssl-dev:native,/ s/, libssl-dev.*/,/' $$mkdebian_file; \
+	fi && \
 	$(MAKE) -j$(JOBS) bindeb-pkg -C $(KERNEL_PATH) O=$$opdir $(LOG_MUTE) && \
-	$(call fbprint_d,"linux-deb")
+	cp -f $(KERNEL_OUTPUT_PATH)/*.deb $(FBOUTDIR)/images/ && \
+	$(call fbprint_d,"linux-deb in: $(FBOUTDIR)/images")

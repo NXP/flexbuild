@@ -393,5 +393,5 @@ define imx_mkimage_target
 			$(MAKE) SOC=iMX95 REV=B0 OEI=YES flash_all $(LOG_MUTE); \
             ;; \
     esac && \
-    cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/bsp/imx-mkimage/$(MACHINE)/flash.bin;
+    cp $$SOC_FAMILY/flash.bin $(FBOUTDIR)/images/"$(MACHINE)"-sd-flash.bin;
 endef

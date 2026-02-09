@@ -32,7 +32,7 @@ log "Sourcing board_id.sh"
 source /usr/bin/board_id.sh
 board_id=$(get_board_id)
 
-: ${board_id:?}
+: "${board_id:=localhost}"
 
 log "Detected board: $board_id"
 
@@ -52,6 +52,8 @@ case "${board_id}" in
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
+        safe_run systemctl disable gdm --now
+        safe_run systemctl enable weston
         ;;
     imx8mp*)
         safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
@@ -72,6 +74,8 @@ case "${board_id}" in
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
+        safe_run systemctl disable gdm --now
+        safe_run systemctl enable weston
         ;;
     imx8qm*)
         safe_run sed -i "s/.*pam_nologin.*/auth    requisite       pam_nologin.so nullok/" /etc/pam.d/gdm-password
@@ -90,6 +94,8 @@ case "${board_id}" in
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
+        safe_run systemctl disable gdm --now
+        safe_run systemctl enable weston
         ;;
     imx91*)
         safe_run rm -rf /etc/systemd/system/display-manager.service
@@ -119,6 +125,8 @@ case "${board_id}" in
         sed -i 's|^Exec=.*|Exec=/usr/lib/chromium/chromium --ozone-platform=wayland --password-store=basic %U|' \
             /usr/share/applications/chromium.desktop
         /usr/bin/update-desktop-database
+        safe_run systemctl disable gdm --now
+        safe_run systemctl enable weston
         ;;
     ls1028a*)
         safe_run ln -sf weston.ini.ls1028 /etc/xdg/weston/weston.ini

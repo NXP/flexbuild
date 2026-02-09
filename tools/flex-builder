@@ -406,21 +406,29 @@ check_binfmt_qemu() {
 
 
 flexbuild_launch_docker() {
-    dnum=$(echo $FBDIR | md5sum | cut -b 1-6)
-    containername=${username}_fbdebian_${DEBIAN_VERSION}_${dnum}
-    if ! docker ps -a | grep -q $containername; then
-        if ! docker ps -a | grep -q ' fbdebian_${DEBIAN_VERSION}'; then
-            make -C $FBDIR/docker/debian
-        fi && \
-        docker run -t -i -h fbdebian --name="$containername" --privileged=true --net=host \
-               -v $HOME:$HOME -v $FBDIR:$FBDIR -v /lib/modules:/lib/modules -v /dev:/dev \
-               -v /etc/localtime:/etc/localtime:ro \
-               -w $FBDIR fbdebian:${DEBIAN_VERSION} /bin/bash
-    elif docker ps -a | grep $containername | grep -q Exited; then
-        docker start $containername
-        docker attach $containername
+    dnum=$(printf '%s' "$FBDIR" | md5sum | cut -c1-6)
+    containername="${username}_fbdebian_${DEBIAN_VERSION}_${dnum}"
+
+    # check if container exists and get its status (running / exited / not found)
+    status=$(docker container inspect -f '{{.State.Status}}' "$containername" 2>/dev/null || true)
+
+    if [ -z "$status" ]; then
+        # ensure image exists
+        if ! docker image inspect "fbdebian:${DEBIAN_VERSION}" >/dev/null 2>&1; then
+            make -C "$FBDIR/docker/debian" || {
+                echo "ERROR: failed to build fbdebian:${DEBIAN_VERSION}" >&2
+                return 1
+            }
+        fi
+
+        docker run -it --hostname fbdebian --name="$containername" --privileged --net=host \
+            -v "$HOME":"$HOME" -v "$FBDIR":"$FBDIR" -v /lib/modules:/lib/modules -v /dev:/dev \
+            -v /etc/localtime:/etc/localtime:ro -w "$FBDIR" "fbdebian:${DEBIAN_VERSION}" /bin/bash
+    elif [ "$status" = "exited" ]; then
+        docker start -ai "$containername"
     else
-        docker attach $containername
+        # running -> open an interactive shell in a new session, or attach if you prefer
+        docker exec -it "$containername" /bin/bash
     fi
 }
 

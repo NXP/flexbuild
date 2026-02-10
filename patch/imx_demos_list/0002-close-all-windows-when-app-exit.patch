@@ -1,0 +1,427 @@
+From 23671dbae112f9a800e546cbcb1f7d765fd776e2 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Mon, 9 Feb 2026 23:29:06 -0800
+Subject: [PATCH 2/2] close all windows when app exit
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ .../imx_gesture_recognition/imx_gesture_recognition.py      | 6 +++++-
+ .../machine_learning/imx_smart_fitness/imx_smart_fitness.py | 4 ++++
+ .../nnstreamer/classification/image_classification.py       | 4 ++++
+ .../classification_detection/classification_detection.py    | 4 ++++
+ .../nnstreamer/detection/object_detection.py                | 4 ++++
+ .../nnstreamer/dual_classification/dual_classification.py   | 4 ++++
+ .../nnstreamer/emotion_detection/emotion_detection.py       | 4 ++++
+ .../nnstreamer/face_detection/face_detection.py             | 4 ++++
+ .../nnstreamer/object_detection/object_detection.py         | 4 ++++
+ scripts/machine_learning/nnstreamer/pose/pose_estimation.py | 4 ++++
+ .../nnstreamer/pose_estimation/pose_estimation.py           | 4 ++++
+ scripts/machine_learning/nnstreamer/pose_face/pose_face.py  | 4 ++++
+ .../semantic_segmentation/semantic_segmentation.py          | 4 ++++
+ .../gstreamer/multi_cameras/imx8mp_camera_demo.py           | 2 +-
+ 14 files changed, 54 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/machine_learning/imx_gesture_recognition/imx_gesture_recognition.py b/scripts/machine_learning/imx_gesture_recognition/imx_gesture_recognition.py
+index e9f4131..0954048 100644
+--- a/scripts/machine_learning/imx_gesture_recognition/imx_gesture_recognition.py
++++ b/scripts/machine_learning/imx_gesture_recognition/imx_gesture_recognition.py
+@@ -14,6 +14,7 @@ import subprocess
+ import threading
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -124,6 +125,8 @@ class ImxGestureRecognition:
+         """Closes GTK+3 GUI and kills main process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -320,6 +323,7 @@ class ImxGestureRecognition:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         _, error = self.output_process.communicate()
+@@ -340,4 +344,4 @@ class ImxGestureRecognition:
+ 
+ if __name__ == "__main__":
+     main = ImxGestureRecognition()
+-    gtk.main()
+\ No newline at end of file
++    gtk.main()
+diff --git a/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py b/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
+index 57610b7..3b2344d 100644
+--- a/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
++++ b/scripts/machine_learning/imx_smart_fitness/imx_smart_fitness.py
+@@ -14,6 +14,7 @@ import subprocess
+ import threading
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -114,6 +115,8 @@ class ImxSmartFitness:
+         """Closes GTK+3 GUI and kills imx_smart_fitness process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -306,6 +309,7 @@ class ImxSmartFitness:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         _, error = self.output_process.communicate()
+diff --git a/scripts/machine_learning/nnstreamer/classification/image_classification.py b/scripts/machine_learning/nnstreamer/classification/image_classification.py
+index 1dd67ad..8a4e688 100644
+--- a/scripts/machine_learning/nnstreamer/classification/image_classification.py
++++ b/scripts/machine_learning/nnstreamer/classification/image_classification.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -152,6 +153,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -444,6 +447,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+             env=env
+         )
+ 
+diff --git a/scripts/machine_learning/nnstreamer/classification_detection/classification_detection.py b/scripts/machine_learning/nnstreamer/classification_detection/classification_detection.py
+index f8b66a9..09a39b8 100644
+--- a/scripts/machine_learning/nnstreamer/classification_detection/classification_detection.py
++++ b/scripts/machine_learning/nnstreamer/classification_detection/classification_detection.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -169,6 +170,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -653,6 +656,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+             env=env
+         )
+ 
+diff --git a/scripts/machine_learning/nnstreamer/detection/object_detection.py b/scripts/machine_learning/nnstreamer/detection/object_detection.py
+index 6079883..2398831 100644
+--- a/scripts/machine_learning/nnstreamer/detection/object_detection.py
++++ b/scripts/machine_learning/nnstreamer/detection/object_detection.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -149,6 +150,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -425,6 +428,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         return True
+diff --git a/scripts/machine_learning/nnstreamer/dual_classification/dual_classification.py b/scripts/machine_learning/nnstreamer/dual_classification/dual_classification.py
+index 03db23c..20003af 100644
+--- a/scripts/machine_learning/nnstreamer/dual_classification/dual_classification.py
++++ b/scripts/machine_learning/nnstreamer/dual_classification/dual_classification.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -153,6 +154,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -433,6 +436,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         return True
+diff --git a/scripts/machine_learning/nnstreamer/emotion_detection/emotion_detection.py b/scripts/machine_learning/nnstreamer/emotion_detection/emotion_detection.py
+index e03d9f1..7c0343e 100644
+--- a/scripts/machine_learning/nnstreamer/emotion_detection/emotion_detection.py
++++ b/scripts/machine_learning/nnstreamer/emotion_detection/emotion_detection.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -160,6 +161,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -469,6 +472,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+             env=env
+         )
+ 
+diff --git a/scripts/machine_learning/nnstreamer/face_detection/face_detection.py b/scripts/machine_learning/nnstreamer/face_detection/face_detection.py
+index f48a9fb..d1859b1 100644
+--- a/scripts/machine_learning/nnstreamer/face_detection/face_detection.py
++++ b/scripts/machine_learning/nnstreamer/face_detection/face_detection.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -153,6 +154,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -410,6 +413,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+             env=env
+         )
+ 
+diff --git a/scripts/machine_learning/nnstreamer/object_detection/object_detection.py b/scripts/machine_learning/nnstreamer/object_detection/object_detection.py
+index 68a2b43..faaa16e 100644
+--- a/scripts/machine_learning/nnstreamer/object_detection/object_detection.py
++++ b/scripts/machine_learning/nnstreamer/object_detection/object_detection.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -157,6 +158,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -489,6 +492,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+             env=env
+         )
+ 
+diff --git a/scripts/machine_learning/nnstreamer/pose/pose_estimation.py b/scripts/machine_learning/nnstreamer/pose/pose_estimation.py
+index f5ce1ff..7677f24 100644
+--- a/scripts/machine_learning/nnstreamer/pose/pose_estimation.py
++++ b/scripts/machine_learning/nnstreamer/pose/pose_estimation.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -142,6 +143,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -386,6 +389,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         return True
+diff --git a/scripts/machine_learning/nnstreamer/pose_estimation/pose_estimation.py b/scripts/machine_learning/nnstreamer/pose_estimation/pose_estimation.py
+index 5fda982..0942c62 100644
+--- a/scripts/machine_learning/nnstreamer/pose_estimation/pose_estimation.py
++++ b/scripts/machine_learning/nnstreamer/pose_estimation/pose_estimation.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -147,6 +148,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -410,6 +413,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+             env=env
+         )
+ 
+diff --git a/scripts/machine_learning/nnstreamer/pose_face/pose_face.py b/scripts/machine_learning/nnstreamer/pose_face/pose_face.py
+index 2c29dde..40cd727 100644
+--- a/scripts/machine_learning/nnstreamer/pose_face/pose_face.py
++++ b/scripts/machine_learning/nnstreamer/pose_face/pose_face.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -161,6 +162,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -471,6 +474,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         return True
+diff --git a/scripts/machine_learning/nnstreamer/semantic_segmentation/semantic_segmentation.py b/scripts/machine_learning/nnstreamer/semantic_segmentation/semantic_segmentation.py
+index bbd30aa..c317a60 100644
+--- a/scripts/machine_learning/nnstreamer/semantic_segmentation/semantic_segmentation.py
++++ b/scripts/machine_learning/nnstreamer/semantic_segmentation/semantic_segmentation.py
+@@ -15,6 +15,7 @@ import glob
+ import subprocess
+ import time
+ import gi
++import signal
+ 
+ # Check for correct Gtk version
+ gi.require_version("Gtk", "3.0")
+@@ -138,6 +139,8 @@ class NNStreamerLauncher:
+         """Closes GTK+3 GUI and kills NNStreamer process"""
+         if self.output_process:
+             self.output_process.kill()
++        if self.output_process:
++            os.killpg(os.getpgid(self.output_process.pid), signal.SIGTERM)
+         gtk.main_quit()
+ 
+     def about_button_activate(self, widget):
+@@ -384,6 +387,7 @@ class NNStreamerLauncher:
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             encoding="utf-8",
++            preexec_fn=os.setsid,
+         )
+ 
+         return True
+diff --git a/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py b/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py
+index c69824d..fbc2f0b 100644
+--- a/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py
++++ b/scripts/multimedia/gstreamer/multi_cameras/imx8mp_camera_demo.py
+@@ -10,11 +10,11 @@ from subprocess import Popen
+ import sys
+ import gi
+ 
+-from gi.repository import Gst, Gtk
+ 
+ gi.require_version("Gst", "1.0")
+ gi.require_version("Gtk", "3.0")
+ 
++from gi.repository import Gst, Gtk
+ 
+ CAM_PIPELINE = "gst-launch-1.0 v4l2src device={} ! waylandsink"
+ 
+-- 
+2.43.0
+

@@ -732,7 +732,15 @@ sudo mkdir -p $bootpartition $rootpartition $backuppartition $efipartition
 
 [ -n "$bootimg" ] && bootimg_n=$bootimg || bootimg_n=boot_${portfolio}_${tgtarch}_lts_${DEFAULT_LINUX_VERSION}.tar.zst
 [ -n "$rootfsimg" ] && rootfsimg_n=$rootfsimg || rootfsimg_n=rootfs_${distroversion}_debian_base_${tgtarch}.tar.zst
-[ -n "$firmware" ] && firmware_n=$firmware || firmware_n=firmware_${machine}_sdboot.img
+if [ -n "$firmware" ]; then
+	firmware_n=$firmware
+else
+	if [[ " ${ls_machine_list} " =~ " ${machine} " ]]; then
+		firmware_n=firmware_"${machine}"_sdboot.img
+	else
+		firmware_n="${machine}"-sd-flash.bin
+	fi
+fi
 
 if [ -z "$firmware" -a "$machine" = imx8qxpmek ]; then
     firmware_n=firmware_${machine}_sdboot_c0.img

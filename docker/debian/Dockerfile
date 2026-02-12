@@ -11,7 +11,10 @@ ENV http_proxy=${http_proxy} \
     HTTPS_PROXY=${https_proxy} \
     NO_PROXY=${no_proxy} \
     DEBIAN_FRONTEND=noninteractive \
-    DEBCONF_NONINTERACTIVE_SEEN=true
+    DEBCONF_NONINTERACTIVE_SEEN=true \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    TERM=xterm-256color
 
 
 RUN set -eux; \
@@ -26,7 +29,13 @@ RUN set -eux; \
       echo "Acquire::https::Timeout \"20\";"; \
     } > /etc/apt/apt.conf.d/01proxy && \
     echo 'PS1="[\u@\h \W]\$ "' >> /root/.bashrc && \
-    echo "syntax on" > /root/.vimrc
+    echo "syntax on" > /root/.vimrc && \
+    echo '' >> /etc/bash.bashrc && \
+    echo '# Fix terminal for menuconfig' >> /etc/bash.bashrc && \
+    echo 'if [ -t 0 ]; then' >> /etc/bash.bashrc && \
+    echo '    stty erase ^H 2>/dev/null || true' >> /etc/bash.bashrc && \
+    echo '    stty -brkint ixany -imaxbel iutf8 2>/dev/null || true' >> /etc/bash.bashrc && \
+    echo 'fi' >> /etc/bash.bashrc
 
 RUN set -eux; \
     apt-get update && \
@@ -38,7 +47,8 @@ RUN set -eux; \
       gawk gettext zip unzip xz-utils zstd ruby efitools \
       crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu \
       device-tree-compiler u-boot-tools bc flex bison lzop && \
-    localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 && \
+    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen en_US.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
 
@@ -55,7 +65,7 @@ RUN set -eux; \
       libgnutls28-dev libcanberra-dev \
       python3 python3-dev python3-pip python3-wheel python3-pybind11 \
       python3-yaml python3-pyelftools python3-requests python3-tqdm \
-      python3-jinja2 python3-ply python3-numpy \
+      python3-jinja2 python3-ply python3-numpy python3-kconfiglib \
       protobuf-compiler libgdk-pixbuf-2.0-dev libxml2-utils libprotobuf-dev \
       gtk-doc-tools pandoc && \
     rm -rf /var/lib/apt/lists/*

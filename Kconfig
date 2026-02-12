@@ -1,0 +1,185 @@
+# Flexbuild Main Configuration
+
+mainmenu "Flexbuild Configuration LSDK System"
+
+
+# ============================================================================
+# Target Configuration Categories
+# ============================================================================
+config FLEXBUILD_VERSION
+	string
+	help
+	  Flexbuild version string
+
+config ARM
+	bool
+	help
+	  Define the arm32 architecture
+
+config ARM64
+	bool
+	help
+	  Define the arm64 architecture
+
+choice
+	prompt "Target Platform Family"
+	default PLATFORM_IMX
+	help
+	  Select the target platform family
+
+config PLATFORM_IMX
+	bool "NXP i.MX Platform"
+	help
+	  Build for NXP i.MX family processors
+
+config PLATFORM_LS
+	bool "NXP LayerScape Platform"
+	help
+	  Build for NXP LayerScape family processors
+
+endchoice
+
+
+
+# ============================================================================
+# SubTarget Configuration Categories
+# ============================================================================
+choice
+	prompt "Subtarget platform Family"
+	default SOC_IMX93EVK if PLATFORM_IMX
+	default SOC_LX2160ARDB if PLATFORM_LS
+	help
+	  Select the subtarget platform family
+
+# Source board configurations
+source "configs/board/Kconfig.imx"
+source "configs/board/Kconfig.ls"
+
+endchoice
+
+
+# Helper symbols (outside choice block to avoid circular dependency)
+config SOC_IMX8
+	bool
+	default y if SOC_IMX8MPEVK || SOC_IMX8MPFRDM || SOC_IMX8MMEVK || SOC_IMX8QMMEK
+
+config SOC_IMX8M
+	bool
+	default y if SOC_IMX8MPEVK || SOC_IMX8MPFRDM || SOC_IMX8MMEVK
+
+config SOC_IMX91
+	bool
+	default y if SOC_IMX91SFRDM || SOC_IMX91FRDM || SOC_IMX91EVK
+
+config SOC_IMX93
+	bool
+	default y if SOC_IMX93FRDM || SOC_IMX93EVK
+
+config SOC_IMX95-15x15
+	bool
+	default y if SOC_IMX95-15x15-FRDM || SOC_IMX95-15x15-EVK
+
+config SOC_IMX95-19x19
+	bool
+	default y if SOC_IMX95-19x19-FRDM-pro || SOC_IMX95-19x19-EVK
+
+config SOC_IMX95
+	bool
+	default y if SOC_IMX95-15x15 || SOC_IMX95-19x19
+
+# ============================================================================
+# Build Configuration Categories
+# ============================================================================
+menu "Build Configuration"
+
+config JOBS
+	int "Parallel build jobs"
+	range 0 24
+	default 0
+	help
+	  Number of parallel make jobs to run.
+	  Default is 0, which means use the number of CPU cores as parallel jobs.
+	  Adjust based on your CPU cores and system resources.
+
+config BUILD_VERBOSE
+	bool "Verbose build output"
+	default n
+	help
+	  Show detailed compilation commands during build
+
+config KEEP_GIT
+	bool "Use git clone to download source code"
+	default n
+	help
+	  If enabled, use git clone to download source code repositories.
+	  If disabled, use direct download (tarball/archive) method instead.
+	  Git clone method keeps the full git history and allows for easier
+	  development and contribution.
+	  Using download method can speed up the build time by avoiding
+	  full git history retrieval.
+
+config OPTEE
+	bool "Enable OPTEE feature"
+	default n
+	help
+	  Use Open Portable Trusted Execution Environment(OPTEE)
+	  designed to run secure code alongside a normal operating system
+
+config SECURE_BOOT
+	bool "Enable secure boot feature"
+	default n
+	depends on PLATFORM_LS
+	help
+	  Enable security feature that ensures only trusted software is
+	  loaded during the device's startup process.
+
+config LINUX_KERNEL_CONFIG
+	string "Custom linux kernel configuration"
+	default "defconfig lsdk.config" if PLATFORM_LS
+	default "imx_v8_defconfig" if PLATFORM_IMX
+	help
+	  Specify custom Linux kernel configuration file(s) to replace the default.
+	  The configuration file(s) must be located in configs/linux/ directory.
+	  For LayerScape platform, default is: defconfig lsdk.config
+	  For i.MX platform, default is: imx_v8_defconfig
+
+config CUSTOM_SDK_CONFIG
+	string "Custom SDK configuration file"
+	default "sdk.yml"
+	help
+	  Specify a custom SDK configuration file to replace the default.
+	  The configuration file(s) must be located in configs/ directory.
+	  The default SDK configuration file is: sdk.yml.
+
+config FUSE_PROVISIONING
+	bool "Enable fuse provisioning"
+	default n
+	depends on PLATFORM_LS
+	help
+	  Provides non-volatile secure storage in form of on-chip fuse memory which some
+	  information can be programmed into fuse memory via Security Fuse Processor (SFP)
+	  designed to run secure code alongside a normal operating system
+
+endmenu # Build Configuration
+
+
+# ============================================================================
+# Application Categories
+# ============================================================================
+menu "NXP Component Selection"
+
+source "src/apps/Kconfig"
+
+endmenu # Component Selection
+
+
+# ============================================================================
+# Rootfs Categories
+# ============================================================================
+#menu "Root Filesystem"
+#
+#config DISTRO_VERSION
+#	string "Distribution version"
+#	default "trixie"
+#
+#endmenu # Root Filesystem

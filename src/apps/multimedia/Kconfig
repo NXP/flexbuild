@@ -1,0 +1,238 @@
+# ============================================================================
+# Multimedia Configuration
+# ============================================================================
+
+
+config APP_MULTIMEDIA
+	bool "Multimedia applications"
+	default y
+	depends on PLATFORM_IMX
+	help
+	  Build multimedia applications (GStreamer, ALSA, codecs, etc.)
+
+if APP_MULTIMEDIA && PLATFORM_IMX
+
+config MM_ALSA_LIB
+	bool "ALSA library"
+	default y
+	help
+	  Advanced Linux Sound Architecture library
+
+config MM_ALSA_STATE
+	bool "ALSA state management"
+	default y
+	select MM_ALSA_LIB
+	help
+	  ALSA state management utilities
+
+#config MM_BASLER_CAMERA
+#	bool
+#	#bool "Basler camera support"
+#	default n
+#	help
+#	  Basler industrial camera support
+
+config MM_CHEESE
+	bool "Cheese webcam application"
+	default n
+	depends on SOC_IMX8 || SOC_IMX95
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BAD
+	select GFX_CLUTTER_GST
+	help
+	  GNOME webcam application
+
+config MM_GSTREAMER
+	bool "GStreamer multimedia framework"
+	default y
+	help
+	  GStreamer multimedia framework core
+
+config MM_GST_PLUGINS_BASE
+	bool "GStreamer base plugins"
+	default y
+	select MM_GSTREAMER
+	select MM_ALSA_LIB
+	select GFX_WAYLAND_PROTOCOLS
+	select GFX_LIBDRM
+	select GFX_GPU_VIV if SOC_IMX8
+	select GFX_IMX_GPU_G2D if SOC_IMX8
+	select GFX_MALI_IMX if SOC_IMX95
+	select GFX_IMX_DPU_G2D if SOC_IMX95
+	help
+	  GStreamer base plugins set
+
+config MM_GST_PLUGINS_GOOD
+	bool "GStreamer good plugins"
+	default y
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BASE
+	select GFX_LIBDRM
+	help
+	  GStreamer good quality plugins with good license
+
+config MM_GST_PLUGINS_BAD
+	bool "GStreamer bad plugins"
+	default y
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BASE
+	help
+	  GStreamer plugins with potential quality or licensing issues
+
+config MM_GST_PLUGINS_UGLY
+	bool
+	#bool "GStreamer ugly plugins"
+	default n
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BASE
+	help
+	  GStreamer plugins with licensing issues
+
+config MM_GST_PYTHON
+	bool "GStreamer Python bindings"
+	default y
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BASE
+	help
+	  Python bindings for GStreamer
+
+config MM_IMX_ALSA_PLUGIN
+	bool "i.MX ALSA plugins"
+	default y
+	select MM_ALSA_LIB
+	select MM_IMX_SW_PDM
+	help
+	  i.MX specific ALSA plugins
+
+config MM_IMX_CODEC
+	bool "i.MX codec libraries"
+	default n
+	help
+	  i.MX hardware codec support libraries
+
+config MM_IMX_DSPC_ASRC
+	bool "i.MX DSPC ASRC"
+	default y
+	select MM_IMX_DSP if SOC_IMX8
+	help
+	  i.MX DSP-based Asynchronous Sample Rate Converter
+
+config MM_IMX_DSP_CODEC_EXT
+	bool "i.MX DSP codec extensions"
+	default y
+	depends on SOC_IMX8
+	select MM_IMX_DSP if SOC_IMX8
+	help
+	  i.MX DSP codec extensions
+
+config MM_IMX_DSP
+	bool "i.MX DSP support"
+	default y
+	depends on SOC_IMX8
+	help
+	  i.MX DSP audio processing support
+
+config MM_IMX_GST_PLUGIN
+	bool "i.MX GStreamer plugins"
+	default y
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BAD
+	select MM_IMX_CODEC
+	select MM_IMX_PARSER
+	select MM_IMX_VPUWRAP if SOC_IMX8
+	select MM_IMX_LIB
+	select GFX_LIBDRM
+	select MM_IMX_VPU_HANTRO_VC if SOC_IMX8
+	select GFX_IMX_GPU_G2D if SOC_IMX8
+	select GFX_IMX_PXP_G2D if SOC_IMX91 || SOC_IMX93
+	select GFX_IMX_DPU_G2D if SOC_IMX95
+	help
+	  i.MX hardware accelerated GStreamer plugins
+
+config MM_IMX_ISP
+	bool "i.MX ISP support"
+	default y
+	depends on SOC_IMX8
+	select GFX_GPU_VIV if SOC_IMX8
+	select GFX_IMX_GPU_G2D if SOC_IMX8
+	select GFX_LIBDRM
+	help
+	  i.MX Image Signal Processor support
+
+config MM_IMX_LIB
+	bool "i.MX multimedia libraries"
+	default y
+	help
+	  i.MX multimedia support libraries
+
+config MM_IMX_PARSER
+	bool "i.MX parser libraries"
+	default y
+	help
+	  i.MX multimedia parser libraries
+
+config MM_IMX_SW_PDM
+	bool "i.MX software PDM"
+	default y
+	help
+	  i.MX software PDM microphone support
+
+config MM_IMX_VPU_HANTRO_DAEMON
+	bool "i.MX VPU Hantro daemon"
+	default y
+	depends on SOC_IMX8
+	select MM_IMX_VPU_HANTRO
+	select MM_IMX_VPU_HANTRO_VC
+	help
+	  i.MX VPU Hantro hardware daemon
+
+config MM_IMX_VPU_HANTRO
+	bool "i.MX VPU Hantro driver"
+	default n
+	depends on SOC_IMX8
+	help
+	  i.MX VPU Hantro hardware video processing unit driver
+
+config MM_IMX_VPU_HANTRO_VC
+	bool "i.MX VPU Hantro VC8000E"
+	default n
+	depends on SOC_IMX8
+	help
+	  i.MX VPU Hantro VC8000E encoder support
+
+config MM_IMX_VPUWRAP
+	bool "i.MX VPU wrapper"
+	default y
+	depends on SOC_IMX8
+	select MM_IMX_VPU_HANTRO
+	select MM_IMX_VPU_HANTRO_VC
+	help
+	  i.MX VPU wrapper library
+
+config MM_LIBCAMERA
+	bool "libcamera framework"
+	default y
+	depends on SOC_IMX95 || SOC_IMX8
+	select MM_GSTREAMER
+	select MM_GST_PLUGINS_BASE
+	select GFX_GPU_VIV if SOC_IMX8
+	select GFX_MALI_IMX if SOC_IMX95
+	help
+	  Modern camera support library for Linux
+
+config MM_NEO_IPA_UGUZZI
+	bool "Neo IPA Uguzzi"
+	default y
+	depends on SOC_IMX95
+	select MM_LIBCAMERA
+	help
+	  Neo Image Processing Algorithms for Uguzzi
+
+config MM_SOF_ZEPHYR
+	bool "Sound Open Firmware with Zephyr"
+	default n
+	help
+	  Sound Open Firmware running on Zephyr RTOS
+
+
+endif # APP_MULTIMEDIA && PLATFORM_IMX

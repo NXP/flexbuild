@@ -1,0 +1,122 @@
+# ============================================================================
+# GoPoint Demo Configuration
+# ============================================================================
+
+config APP_GOPOINT
+	bool "GoPoint demo applications"
+	default n
+	depends on PLATFORM_IMX
+	help
+	  Build GoPoint demo applications
+
+if APP_GOPOINT && PLATFORM_IMX
+
+config GP_GTEC_DEMO_FRAMEWORK
+	bool "Gtec demo framework"
+	default n
+	depends on SOC_IMX8 || SOC_IMX95
+	select GFX_GPU_VIV if SOC_IMX8
+	select GFX_MALI_IMX if SOC_IMX95
+	help
+	  Gtec demo framework for creating graphical demos
+
+config GP_IMX_DEMO_EXPERIENCE
+	bool "i.MX Demo Experience application"
+	default n
+	help
+	  i.MX Demo Experience showcase application
+
+config GP_IMX_DEMOS_LIST
+	bool "i.MX demos list manager"
+	default n
+	select GP_IMX_DEMO_EXPERIENCE
+	help
+	  Demo list manager for i.MX platforms
+
+config GP_IMX_EBIKE_VIT
+	bool "i.MX E-bike VIT demo"
+	default n
+	#select GP_NXP_AFE
+	#select GP_IMX_VOICEUI
+	help
+	  E-bike demo with Voice Intelligence Technology
+
+config GP_IMX_ELE
+	bool "i.MX EdgeLock Enclave demo"
+	default n
+	depends on SOC_IMX93
+	select SEC_IMX_SECURE_ENCLAVE
+	help
+	  i.MX EdgeLock Enclave demonstration
+
+config GP_IMX_NNSTREAMER_EXAMPLES
+	bool "i.MX NNStreamer examples"
+	default n
+	select ML_NNSTREAMER
+	help
+	  NNStreamer examples for i.MX platforms
+
+config GP_IMX_SMART_FITNESS
+	bool "i.MX Smart Fitness demo"
+	default n
+	depends on SOC_IMX93 || SOC_IMX8
+	select ML_TFLITE
+	select ML_NNSTREAMER
+	help
+	  Smart fitness tracking demonstration
+
+config GP_IMX_SMART_KITCHEN
+	bool "i.MX Smart Kitchen demo"
+	default n
+	#select GP_IMX_VOICEUI
+	help
+	  Smart kitchen assistant demonstration
+
+config GP_IMX_CAMERA_ROTATION
+	bool "i.MX Camera Rotation"
+	default n
+	help
+	  Camera frame rotation support
+
+#config GP_IMX_VIDEO2TEXTURE
+#	bool
+#	#bool "i.MX Video to Texture demo"
+#	default n
+#	select MM_GSTREAMER
+#	select MM_GST_PLUGINS_GOOD
+#	help
+#	  Video to texture rendering demonstration
+
+#config GP_IMX_VOICEPLAYER
+#	bool
+#	#bool "i.MX Voice Player"
+#	default n
+#	select GP_IMX_VOICEUI
+#	select MM_ALSA_LIB
+#	help
+#	  Voice-controlled audio player
+
+#config GP_IMX_VOICEUI
+#	bool
+#	#bool "i.MX Voice UI framework"
+#	default n
+#	#select GP_NXP_AFE
+#	#select MM_ALSA_LIB
+#	help
+#	  Voice user interface framework
+
+config GP_NXP_AFE
+	bool "NXP Audio Front End"
+	default n
+	select MM_ALSA_LIB
+	help
+	  NXP Audio Front End for voice processing
+
+#config GP_NXP_DEMO_EXPERIENCE_ASSETS
+#	bool
+#	#bool "NXP Demo Experience assets"
+#	default n
+#	help
+#	  Media assets for NXP Demo Experience
+
+endif # APP_GOPOINT && PLATFORM_IMX

@@ -1,0 +1,56 @@
+# ============================================================================
+# Utility Configuration
+# ============================================================================
+
+config APP_UTILS
+	bool "Firmware, mcore demos and others"
+	default y
+	help
+	  Build Firmware, mcore demos and wireless firmware etc.
+
+if APP_UTILS
+
+
+if PLATFORM_IMX
+
+config UTILS_FIRMWARED
+	bool "Firmware daemon"
+	default y
+	help
+	  Firmware loading daemon for system devices
+
+config UTILS_IMX_FIRMWARE
+	bool "i.MX system firmware"
+	default y
+	help
+	  System firmware for i.MX platforms (DDR, HDMI, etc.)
+
+config UTILS_IMX_TEST
+	bool "i.MX test utilities"
+	default n
+	depends on SOC_IMX8
+	help
+	  Test utilities and unit tests for i.MX platforms
+
+config UTILS_MCORE_DEMO
+	bool "M-core demo applications"
+	default y
+	help
+	  Demo applications for i.MX M-core (Cortex-M) processors
+
+config UTILS_WIRELESS_REGDB
+	bool "Wireless regulatory database"
+	default y
+	help
+	  Wireless regulatory database for WiFi compliance
+
+endif # PLATFORM_IMX
+
+config UTILS_FIRMWARE_IMX
+	bool "i.MX firmware package"
+	default y if PLATFORM_IMX
+	depends on PLATFORM_IMX || SOC_LS1028ARDB
+	help
+	  Firmware binaries for i.MX platforms (VPU, SDMA, etc.)
+
+endif # APP_UTILS

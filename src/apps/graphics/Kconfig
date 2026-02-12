@@ -1,0 +1,160 @@
+# ============================================================================
+# Graphics Configuration
+# ============================================================================
+
+config APP_GRAPHICS
+	bool "Graphics applications"
+	default y
+	help
+	  Build graphics applications (Wayland, Weston, GPU drivers, etc.)
+
+if APP_GRAPHICS
+
+if PLATFORM_IMX
+
+config GFX_CLUTTER_GST
+	bool "Clutter-GST integration library"
+	default n
+	depends on SOC_IMX8 || SOC_IMX95
+	select MM_GST_PLUGINS_BAD
+	select GFX_COGL
+	select GFX_LIBDRM
+	help
+	  GStreamer integration library for Clutter
+
+config GFX_COGL
+	bool "Cogl 3D graphics API"
+	default n
+	depends on SOC_IMX8 || SOC_IMX95
+	select GFX_GPU_VIV if SOC_IMX8
+	select GFX_MALI_IMX if SOC_IMX95
+	help
+	  Modern 3D graphics API for Clutter
+
+config GFX_GPUTOP
+	bool "gputop GPU profiling tool"
+	default n
+	depends on SOC_IMX8
+	select GFX_LIBGPUPERFCNT
+	help
+	  GPU profiling tool for Intel graphics
+
+config GFX_IMX_DPU_G2D
+	bool "i.MX DPU G2D support"
+	default y
+	depends on SOC_IMX95
+	select GFX_LIBDRM
+	help
+	  i.MX Display Processing Unit 2D graphics acceleration
+
+config GFX_IMX_G2D_SAMPLES
+	bool "i.MX G2D sample applications"
+	default n
+	select GFX_IMX_GPU_G2D if SOC_IMX8
+	select GFX_GPU_VIV if SOC_IMX8
+	select GFX_IMX_PXP_G2D if SOC_IMX91 || SOC_IMX93
+	select GFX_IMX_DPU_G2D if SOC_IMX95
+	select GFX_MALI_IMX if SOC_IMX95
+	help
+	  Sample applications for i.MX G2D API
+
+config GFX_IMX_PXP_G2D
+	bool "i.MX PXP G2D support"
+	default y
+	depends on SOC_IMX91 || SOC_IMX93
+	select GFX_LIBDRM
+	help
+	  i.MX Pixel Pipeline 2D graphics acceleration
+
+config GFX_LIBGPUPERFCNT
+	bool "GPU performance counter library"
+	default n
+	depends on SOC_IMX8
+	select GFX_GPU_VIV
+	help
+	  Library for accessing GPU performance counters
+
+config GFX_MALI_IMX
+	bool "Mali GPU driver for i.MX"
+	default y
+	depends on SOC_IMX95
+	select GFX_LIBDRM
+	help
+	  ARM Mali GPU driver for i.MX platforms
+
+config GFX_VKMARK
+	bool
+	#bool "vkmark Vulkan benchmark"
+	default n
+	select GFX_VULKAN_HEADERS
+	select GFX_LIBDRM
+	help
+	  Vulkan benchmark suite
+
+config GFX_VULKAN_HEADERS
+	bool "Vulkan API headers"
+	default n
+	help
+	  Vulkan graphics and compute API headers
+
+config GFX_APITRACE
+	bool
+	#bool "apitrace graphics debugging tool"
+	default n
+	help
+	  Tools for tracing OpenGL, Direct3D, and other graphics APIs
+
+endif # PLATFORM_IMX
+
+config GFX_GPU_VIV
+	bool "Vivante GPU driver"
+	default y
+	depends on SOC_IMX8 || SOC_LS1028ARDB
+	select GFX_LIBDRM
+	help
+	  Vivante GPU driver for i.MX platforms
+
+config GFX_IMX_GPU_G2D
+	bool "i.MX GPU 2D acceleration"
+	default y if PLATFORM_IMX
+	depends on SOC_IMX8 || SOC_LS1028ARDB
+	select GFX_GPU_VIV
+	help
+	  i.MX GPU-based 2D graphics acceleration library
+
+config GFX_LIBDRM
+	bool "libdrm - Direct Rendering Manager library"
+	default y
+	depends on SOC_LS1028ARDB || PLATFORM_IMX
+	help
+	  Userspace library for accessing the Direct Rendering Manager
+
+config GFX_WAYLAND
+	bool
+	#bool "Wayland display server protocol"
+	default n
+	help
+	  Wayland compositor infrastructure
+
+config GFX_WAYLAND_PROTOCOLS
+	bool "Wayland protocols"
+	default y
+	depends on SOC_LS1028ARDB || PLATFORM_IMX
+	help
+	  Wayland protocol specifications
+
+config GFX_WESTON
+	bool "Weston reference compositor"
+	default y
+	depends on SOC_LS1028ARDB || PLATFORM_IMX
+	select GFX_MALI_IMX if SOC_IMX95
+	select GFX_IMX_DPU_G2D if SOC_IMX95
+	select GFX_IMX_PXP_G2D if SOC_IMX91 || SOC_IMX93
+	select GFX_GPU_VIV if SOC_IMX8 || SOC_LS1028ARDB
+	select GFX_IMX_GPU_G2D if SOC_IMX8 || SOC_LS1028ARDB
+	select GFX_WAYLAND_PROTOCOLS
+	select GFX_LIBDRM
+	help
+	  Reference implementation of a Wayland compositor
+
+endif # APP_GRAPHICS

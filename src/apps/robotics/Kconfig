@@ -1,0 +1,92 @@
+# ============================================================================
+# Robotics Configuration
+# ============================================================================
+
+# config APP_ROBOTICS
+# 	bool
+# 	#bool "The Robot Operating System (ROS2)"
+# 	default n
+# 	help
+# 	  Build ROS2
+
+# if APP_ROBOTICS
+
+
+# config ROBOTICS_ROS
+# 	bool "ROS - Robot Operating System"
+# 	default y
+# 	help
+# 	  Robot Operating System framework
+
+# if ROBOTICS_ROS
+
+# choice
+# 	prompt "ROS version"
+# 	default ROBOTICS_ROS2_HUMBLE
+# 	help
+# 	  Select the ROS version to build
+
+# config ROBOTICS_ROS2_HUMBLE
+# 	bool "ROS 2 Humble Hawksbill (LTS)"
+# 	help
+# 	  ROS 2 Humble Hawksbill - Long Term Support release (2022-2027)
+
+# config ROBOTICS_ROS2_IRON
+# 	bool "ROS 2 Iron Irwini"
+# 	help
+# 	  ROS 2 Iron Irwini release (2023)
+
+# config ROBOTICS_ROS2_ROLLING
+# 	bool "ROS 2 Rolling Ridley"
+# 	help
+# 	  ROS 2 Rolling Ridley - Development branch
+
+# config ROBOTICS_ROS1_NOETIC
+# 	bool "ROS 1 Noetic Ninjemys (LTS)"
+# 	help
+# 	  ROS 1 Noetic Ninjemys - Final ROS 1 LTS release (2020-2025)
+
+# endchoice
+
+# config ROBOTICS_ROS_BASE
+# 	bool "ROS base packages only"
+# 	default n
+# 	help
+# 	  Build only ROS base packages without desktop tools
+
+# config ROBOTICS_ROS_DESKTOP
+# 	bool "ROS desktop packages"
+# 	default y
+# 	depends on !ROBOTICS_ROS_BASE
+# 	help
+# 	  Include ROS desktop visualization and development tools
+
+# config ROBOTICS_ROS_PERCEPTION
+# 	bool "ROS perception packages"
+# 	default n
+# 	help
+# 	  Include ROS perception packages (vision, point clouds, etc.)
+
+# config ROBOTICS_ROS_NAVIGATION
+# 	bool "ROS navigation stack"
+# 	default n
+# 	help
+# 	  Include ROS navigation and SLAM packages
+
+# config ROBOTICS_ROS_MOVEIT
+# 	bool "MoveIt motion planning"
+# 	default n
+# 	depends on ROBOTICS_ROS2_HUMBLE || ROBOTICS_ROS2_IRON || ROBOTICS_ROS1_NOETIC
+# 	help
+# 	  MoveIt motion planning framework for robotic arms
+
+# config ROBOTICS_ROS_GAZEBO
+# 	bool "Gazebo simulator integration"
+# 	default n
+# 	help
+# 	  Gazebo robot simulator integration with ROS
+
+# endif # ROBOTICS_ROS
+
+
+# endif # APP_ROBOTICS

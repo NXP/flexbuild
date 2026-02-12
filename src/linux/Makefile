@@ -1,16 +1,11 @@
 #
-# Copyright 2017-2023 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 #
 # SDK linux kernel and modules components
 
-SHELL=/bin/bash
-include $(FBDIR)/configs/$(CONFIGLIST)
-include $(FBDIR)/include/utils.mk
-include $(FBDIR)/include/download_repo.mk
-include $(FBDIR)/include/patch_apply.mk
 
 
 # Find and include all .mk files in this directory

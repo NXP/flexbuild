@@ -9,6 +9,7 @@ tools/bld
 dl
 tmp
 .bash*
+.config*
 *.tgz
 *.tar.zst
 *.log

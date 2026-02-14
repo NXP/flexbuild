@@ -3,63 +3,81 @@
 if PLATFORM_IMX
 
 config SOC_IMX8MPEVK
-	bool "imx8mpevk board"
+	bool "i.MX 8M Plus EVK Board"
 	select ARCH_ARM64
 	help
 	  imx8mpevk board
 
 config SOC_IMX8MPFRDM
-	bool "imx8mpfrdm board"
+	bool "FRDM-IMX8MPLUS Board"
 	select ARCH_ARM64
 	help
 	  imx8mpfrdm board
 
 config SOC_IMX8MMEVK
-	bool "imx8mmevk board"
+	bool "i.MX 8M Mini EVK Board"
 	select ARCH_ARM64
 	help
 	  imx8mmevk board
 
+config SOC_IMX8QMMEK
+	bool "i.MX 8QuadMax MEK Board"
+	select ARCH_ARM64
+	help
+	  imx8qmmek board
+
 config SOC_IMX91EVK
-	bool "imx91evk board"
+	bool "i.MX 91 EVK board (11x11 A1 silicon)"
 	select ARCH_ARM64
 	help
 	  imx91evk board
 
 config SOC_IMX91FRDM
-	bool "imx91frdm board"
+	bool "FRDM-IMX91 board (11x11 A1 silicon)"
 	select ARCH_ARM64
 	help
 	  imx91frdm board
 
 config SOC_IMX91SFRDM
-	bool "imx91sfrdm board"
+	bool "FRDM-IMX91S board (11x11 A1 silicon)"
 	select ARCH_ARM64
 	help
 	  imx91sfrdm board
 
 config SOC_IMX93EVK
-	bool "imx93evk board"
+	bool "i.MX 93 EVK board (11x11 A2 silicon)"
 	select ARCH_ARM64
 	help
 	  imx93evk board
 
 config SOC_IMX93FRDM
-	bool "imx93frdm board"
+	bool "FRDM-IMX93 Board (11x11 A2 silicon)"
 	select ARCH_ARM64
 	help
 	  imx93frdm board
 
-config SOC_IMX95EVK
-	bool "imx95evk board"
+config SOC_IMX95-15x15-EVK
+	bool "i.MX 95 15x15 EVK Board (B0 silicon revision)"
 	select ARCH_ARM64
 	help
-	  imx95evk board
+	  imx95-15x15-evk board
 
-config SOC_IMX95FRDM
-	bool "imx95frdm board"
+config SOC_IMX95-15x15-FRDM
+	bool "FRDM-IMX95 board (15x15 B0 silicon revision)"
 	select ARCH_ARM64
 	help
-	  imx95frdm board
+	  imx95-15x15-frdm board
+
+config SOC_IMX95-19x19-EVK
+	bool "i.MX 95 19x19 EVK Board (B0 silicon revision)"
+	select ARCH_ARM64
+	help
+	  imx95-19x19-evk board
+
+config SOC_IMX95-19x19-FRDM-PRO
+	bool "FRDM-PRO-IMX95 board (19x19 B0 silicon revision)"
+	select ARCH_ARM64
+	help
+	  imx95-19x19-frdm-pro board
 
 endif # PLATFORM_IMX

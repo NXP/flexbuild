@@ -45,10 +45,6 @@ endif
 export PATH := $(FBDIR):$(FBDIR)/tools:$(PATH)
 export GIT_SSL_NO_VERIFY := 1
 
-#ifeq ($(shell [ ! -L tools/bld ] && echo "true"),true)
-#  $(shell ln -sf flex-builder tools/bld)
-#endif
-
 # Load configuration
 -include $(FBDIR)/.config
 
@@ -103,7 +99,7 @@ export DESTDIR := $(FBOUTDIR)/apps/apps_debian_$(MACHINE)
 export RFSDIR := $(FBOUTDIR)/rfs/rootfs_${DISTRIB_VERSION}_debian_$(MACHINE)
 export KERNEL_TREE := linux
 export MAKE := make
-export MAKEFLAGS += -j$(JOBS) -s --no-print-directory
+export MAKEFLAGS += -j$(JOBS) --no-print-directory
 export KERNEL_PATH := $(PKGDIR)/linux/$(KERNEL_TREE)
 export KERNEL_OUTPUT_PATH := $(FBOUTDIR)/linux/linux/arm64/$(SOCFAMILY)/output
 export INSTALL_MOD_PATH := $(FBOUTDIR)/linux/kernel/arm64/$(SOCFAMILY)
@@ -113,10 +109,14 @@ export PKG_CONFIG_SYSROOT_DIR := $(RFSDIR)
 export LD_LIBRARY_PATH := $(DESTDIR)/usr/lib:$(RFSDIR)/usr/lib:$(RFSDIR)/usr/lib/aarch64-linux-gnu
 export PKG_CONFIG_PATH := $(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/share/pkgconfig
 export KERNEL_BRANCH := $(DEFAULT_REPO_TAG)
-export JOBS := $(CONFIG_JOBS)
 export FRAGMENT_CFG =
+export CFGLISTYML := sdk.yml
 export SHFLAGS = -c
 export GIT_SSL_NO_VERIFY=1
+export LOG_MUTE
+export MACHINE
+JOBS := $(CONFIG_JOBS)
+
 
 $(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
 $(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
@@ -125,16 +125,12 @@ $(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR
 $(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images} $(PKGDIR)/linux $(FBDIR)/{logs,dl})
 $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics} $(KERNEL_OUTPUT_PATH))
 
-$(shell python3 $(FBDIR)/tools/parse_yaml.py $(FBDIR)/configs/repo.yml $(FBDIR)/configs/.repo_pool)
-
+$(shell python3 $(FBDIR)/tools/parse_yaml.py $(FBDIR)/configs/sdk.yml $(FBDIR)/configs/.sdk.cfg)
 
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk
 include $(FBDIR)/include/patch_apply.mk
-include $(FBDIR)/configs/.repo_pool
-
-export LOG_MUTE
-export MACHINE
+include $(FBDIR)/configs/.sdk.cfg
 
 ifdef CONFIG_SECURE_BOOT
 	export CONFIG_SECURE_BOOT=y
@@ -151,11 +147,18 @@ all:
 	@time $(BLD) -m $(MACHINE)
 	@echo -e "$(GREEN)Build complete!$(NC)"
 
+
 # MENUCONFIG_STYLE can be: default, aquatic, monochrome
 .PHONY: menuconfig
-menuconfig: host-dep
-	@$(PYTHON) -m menuconfig
-	@$(MAKE) host-dep
+menuconfig:
+	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
+		echo "ERROR: must be run inside a Docker container!" >&2; \
+		echo "       Please run "make docker" first"; \
+		exit 1; \
+	fi && \
+	$(PYTHON) -m menuconfig && \
+	$(PYTHON) tools/kconfig_hooks.py && \
+	$(MAKE) host-dep
 
 
 # Help target
@@ -199,6 +202,7 @@ help:
 	@echo "  make clean-boot          - Clean boot partition images"
 	@echo "  make clean-rfs           - Clean root filesystem image"
 	@echo "  make distclean           - Clean everything"
+	@echo "  make clean-config        - Clean .config configuration file"
 	@echo ""
 	@echo "==================================================================="
 	@echo "Machine:              $(MACHINE)"
@@ -297,6 +301,9 @@ distclean:
 	@rm -rf $(PKGDIR)/*
 	@rm -rf $(FBDIR)/logs/* $(FBDIR)/logs/.*
 	@rm -rf $(FBDIR)/dl/*
+
+clean-config:
+	@rm -f $(FBDIR)/.config
 
 # ============================================================================
 # Helper targets

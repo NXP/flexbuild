@@ -133,19 +133,16 @@ config SECURE_BOOT
 	  Enable security feature that ensures only trusted software is
 	  loaded during the device's startup process.
 
-config LINUX_KERNEL_CONFIG
-	string "Custom linux kernel configuration"
-	default "defconfig lsdk.config" if PLATFORM_LS
-	default "imx_v8_defconfig" if PLATFORM_IMX
+config LINUX_EXTRA_CONFIG
+	string "Extra linux kernel configuration"
 	help
-	  Specify custom Linux kernel configuration file(s) to replace the default.
+	  Specify custom Linux kernel configuration file(s) to append to the default.
 	  The configuration file(s) must be located in configs/linux/ directory.
 	  For LayerScape platform, default is: defconfig lsdk.config
 	  For i.MX platform, default is: imx_v8_defconfig
 
 config CUSTOM_SDK_CONFIG
 	string "Custom SDK configuration file"
-	default "sdk.yml"
 	help
 	  Specify a custom SDK configuration file to replace the default.
 	  The configuration file(s) must be located in configs/ directory.

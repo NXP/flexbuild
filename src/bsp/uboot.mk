@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2024 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -9,7 +9,7 @@ include $(FBDIR)/src/bsp/imx_mkimage.mk
 
 
 uboot u-boot:
-	 $(call download_repo,uboot,bsp) && \
+	 $(call download_repo,uboot,bsp,git) && \
 	 $(call patch_apply,uboot,bsp) && \
      if [ "$(MACHINE)" = all ]; then \
         $(call fbprint_w,"Please specify '-m <machine>'") && exit 0; \

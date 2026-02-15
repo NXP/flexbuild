@@ -50,6 +50,7 @@ get_board_id() {
 	    *"LX2160ARDB"*)           board_id="lx2160ardb" ;;
 	    *"LX2160AQDS"*)           board_id="lx2160aqds" ;;
 	    *"LX2162AQDS"*)           board_id="lx2162aqds" ;;
+	    *"LA1224-RDB"*)           board_id="la1224rdb" ;;
 	    
 	    # Default processing rules (smart conversion)
 	    *)

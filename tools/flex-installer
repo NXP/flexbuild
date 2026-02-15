@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2017-2025 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -75,7 +75,7 @@ EOF
     exit
 }
 
-ls_machine_list='ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds '
+ls_machine_list='ls1012ardb ls1012afrwy ls1028ardb ls1043ardb ls1046ardb ls1046afrwy ls1088ardb ls2088ardb lx2160ardb lx2162aqds la1224rdb la1224rdb_revc '
 imx_machine_list='imx8mmevk imx8mnevk imx8mpevk imx8mpfrdm imx8mqevk imx8qmmek imx8qxpmek imx8ulpevk imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm '
 
 search_dev() {
@@ -325,7 +325,7 @@ flex_install_distro() {
                 prefix_to_keep="${machine:0:6}" ;;
             imx9*)
                 prefix_to_keep="${machine:0:5}" ;;
-            lx*|ls*)
+            lx*|ls*|la*)
                 prefix_to_keep="fsl-${machine:0:6}" ;;
             *)
                 echo "Unsupported machine type: $machine"

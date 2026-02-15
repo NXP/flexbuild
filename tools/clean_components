@@ -7,7 +7,11 @@
 
 clean_bsp_components() {
     rm -rf $FBOUTDIR/bsp
+    [ -d $PKGDIR/bsp/atf ] && \
+    $MAKE realclean -C $PKGDIR/bsp/atf
     rm -rf $PKGDIR/bsp/atf/build
+    rm -rf $PKGDIR/bsp/atf/srk.pri
+    rm -rf $PKGDIR/bsp/atf/srk.pub
 
     [ -d $PKGDIR/bsp/rcw ] && \
     $MAKE clean -C $PKGDIR/bsp/rcw 2>/dev/null
@@ -28,6 +32,10 @@ clean_apps_components() {
     # staging build directory
     rm -rf $DESTDIR
 
+    # networking
+    rm -rf $PKGDIR/apps/networking/dpdk/build_arm64*
+    rm -rf $PKGDIR/apps/networking/pktgen_dpdk/build_arm64*
+
     [ -d $PKGDIR/apps/networking/vpp/build-root ] && \
     $MAKE distclean -C $PKGDIR/apps/networking/vpp/build-root
 
@@ -47,6 +55,19 @@ clean_apps_components() {
     $MAKE clean -C $PKGDIR/apps/security/libpkcs11
 
     rm -rf $PKGDIR/apps/security/optee_test/out
+
+    [ -d $PKGDIR/apps/networking/hostsw_la12xx ] && \
+    export KERNEL_DIR=$FBOUTDIR/linux/linux/arm64/LS/output/$(KERNEL_BRANCH) && \
+    export COMMON_HEADERS_DIR=$PACKAGES_PATH/apps/networking/geul_common_headers && \
+    cd $PKGDIR/apps/networking/hostsw_la12xx &&\
+    $MAKE clean -C $PKGDIR/apps/networking/hostsw_la12xx && cd -
+
+    [ -d $PKGDIR/apps/networking/freertos_la12xx ] && \
+    cd $PKGDIR/apps/networking/freertos_la12xx/demos/E200_MPC57XXX_GEUL_GCC && \
+    ./clean.sh && cd -
+
+    [ -d $PKGDIR/apps/networking/geul_rf_util ] && \
+    rm -rf cd $PKGDIR/apps/networking/geul_rf_util/install
 
     find $PKGDIR/apps -name build_${DISTROTYPE}_$ARCH | xargs rm -rf
     rm -f $FBOUTDIR/apps/.app${DESTARCH}${DISTROTYPE}${DISTROVARIANT}${SOCFAMILY}

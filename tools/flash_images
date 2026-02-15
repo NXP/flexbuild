@@ -1,4 +1,4 @@
-# Copyright 2018-2021 NXP
+# Copyright 2018-2021,2026 NXP
 #
 # SPDX-License-Identifier:     BSD-3-Clause
 #
@@ -6,7 +6,7 @@
 #
 # Supported platforms:
 # LS1021ATWR, LS1012ARDB, LS1012AFRWY, LS1028ARDB, LS1043ARDB, LS1046ARDB, LS1046AFRWY
-# ls1088ardb, LS2088ARDB, LX2160ARDB, LX2162AQDS
+# ls1088ardb, LS2088ARDB, LX2160ARDB, LX2162AQDS, LA1224RDB, LA1224RDB_REVC
 #
 # mkimage -T script -C none -d flash_images.sh flash_images.scr
 # or
@@ -25,7 +25,7 @@
 #
 
 if test -z "$mc_version"; then
-    mc_version=mc_10.38.0
+    mc_version=mc_10.40.0
 fi
 
 if test -z "$board"; then
@@ -333,6 +333,38 @@ elif test $board = lx2162aqds; then
     efs="$filesize"
     erase_cmd="sf erase"
     write_cmd="sf write"
+elif test $board = lx2160aqds; then
+    if test -z "$bl2_img"; then
+        bl2_img=$image_path/bl2_flexspi_nor.pbl
+    fi
+    if test -z "$fip_img"; then
+        fip_img=$image_path/fip_uboot.bin
+    fi
+    if test -z "$ddr_img"; then
+	ddr_img=$image_path/fip_ddr_all.bin
+    fi
+    if test -z "$mcfw_img"; then
+	mcfw_img=$image_path/${mc_version}_lx2160a.itb
+    fi
+    if test -z "$mcdpc_img"; then
+        mcdpc_img=$image_path/dpc_warn.dtb
+    fi
+    if test -z "$mcdpl_img"; then
+        mcdpl_img=$image_path/dpl-2dpni.dtb
+    fi
+    if test -z "$phy_img"; then
+        phy_img=/flash_images/in112525-phy-ucode.txt
+    fi
+    if test -z "$dtb_img"; then
+        dtb_img=/fsl-lx2160a-qds.dtb
+    fi
+    if test -z "$flash_type"; then
+        flash_type=flexspi_nor
+    fi
+    pt_off_cmd="echo sf protect unlock"
+    efs="$filesize"
+    erase_cmd="sf erase"
+    write_cmd="sf write"
 fi
 
 if test -z "$linux_itb_img"; then
@@ -365,8 +397,8 @@ if test $board = ls1021atwr -o $board = ls1043ardb; then
 	echo Error: invalid $bank for bank!
 	exit
     fi
-elif test $board = ls1012ardb -o $board = ls1028ardb -o $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb -o $board = lx2160ardb -o $board = lx2162aqds; then
-    # SPI flash on LS1012ARDB, LS1046ARDB,  LS1046AFRWY, LS1088ARDB, LX2160ARDB, LX2162AQDS
+elif test $board = ls1012ardb -o $board = ls1028ardb -o $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb -o $board = lx2160ardb -o $board = lx2162aqds -o $board = lx2160aqds; then
+    # SPI flash on LS1012ARDB, LS1046ARDB,  LS1046AFRWY, LS1088ARDB, LX2160ARDB, LX2162AQDS, LX2160AQDS
     addr_bl2=0x0
     addr_fip=0x00100000
     addr_ddr=0x00800000
@@ -411,7 +443,7 @@ elif test $board = ls2088ardb; then
     fi
 fi
 
-if test $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb -o $board = lx2160ardb -o $board = lx2162aqds; then
+if test $board = ls1046ardb -o $board = ls1046afrwy -o $board = ls1088ardb -o $board = lx2160ardb -o $board = lx2162aqds -o $board = lx2160aqds; then
     if test $bank = other; then
 	echo Selecting other bank
 	sf probe 0:1
@@ -591,7 +623,7 @@ else
 fi
 
 # DDR PHY firmware
-if test $board = lx2160ardb -o $board = lx2162aqds; then
+if test $board = lx2160ardb -o $board = lx2162aqds -o $board = lx2160aqds; then
     if load $bd_type $bd_part $img_load_addr $ddr_img && $pt_off_cmd $addr_ddr $efs && $erase_cmd $addr_ddr +$filesize && $write_cmd $img_load_addr $addr_ddr $filesize; then
         echo Success: flashed $ddr_img to $addr_ddr
     else
@@ -643,7 +675,7 @@ elif test $board = ls1012ardb -o $board = ls1012afrwy; then
 fi
 
 # DPAA2 MC firmware
-if test $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds; then
+if test $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds -o $board = lx2160aqds; then
     if load $bd_type $bd_part $img_load_addr $mcfw_img && $pt_off_cmd $addr_mcfw $efs && $erase_cmd $addr_mcfw +$filesize && $write_cmd $img_load_addr $addr_mcfw $filesize; then
 	echo Success: flashed $mcfw_img to $addr_mcfw
     else
@@ -652,7 +684,7 @@ if test $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $bo
 fi
 
 # DPAA2 DPL firmware
-if test $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds; then
+if test $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds -o $board = lx2160aqds; then
     if load $bd_type $bd_part $img_load_addr $mcdpl_img && $pt_off_cmd $addr_mcdpl $efs && $erase_cmd $addr_mcdpl +$filesize && $write_cmd $img_load_addr $addr_mcdpl $filesize; then
 	echo Success: flashed $mcdpl_img to $addr_mcdpl
     else
@@ -692,6 +724,6 @@ echo Completed!
 
 if test $board = ls1043ardb -o $board = ls1046ardb -o $board = ls1046afrwy; then
     echo run "cpld reset altbank" to boot U-Boot from other bank.
-elif test $board = ls1028ardb -o $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds; then
+elif test $board = ls1028ardb -o $board = ls1088ardb -o $board = ls2088ardb -o $board = lx2160ardb -o $board = lx2162aqds -o $board = lx2160aqds; then
     echo run "qixis_reset altbank" to boot U-Boot from other bank.
 fi

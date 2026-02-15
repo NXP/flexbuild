@@ -85,7 +85,6 @@ pfe_bin:
 	 $(call fbprint_d,"pfe_bin")
 
 
-
 ddr_phy_bin:
 	@$(call download_repo,ddr_phy_bin,bsp) && \
 	 if [ ! -f $(FBOUTDIR)/bsp/ddr_phy_bin/fip_ddr.bin ]; then \

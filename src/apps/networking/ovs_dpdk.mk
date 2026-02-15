@@ -1,15 +1,23 @@
-# Copyright 2017-2024 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+CONFIG_APP_OVS_DPDK ?= n
 
-
-ovs_dpdk: dpdk
-	@[ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
-	 $(call download_repo,ovs_dpdk,apps/networking) && \
+ovs_dpdk:
+	@set -e; \
+	if [ "$(strip $(CONFIG_APP_OVS_DPDK))" != "y" ]; then \
+		echo "Skipping ovs_dpdk: CONFIG_APP_OVS_DPDK!='y' (current='$(strip $(CONFIG_APP_OVS_DPDK))')"; \
+		exit 0; \
+	fi && \
+	 [ $(SOCFAMILY) != LS -o $(DISTROVARIANT) != server ] && exit || \
+	 $(call download_repo,ovs_dpdk,apps/networking,git) && \
 	 $(call patch_apply,ovs_dpdk,apps/networking) && \
 	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
 	     bld rfs -m $(MACHINE); \
 	 fi && \
+	if [ ! -d $(DESTDIR)/usr/local/dpdk ]; then \
+	    bld dpdk -r $(DISTROTYPE):$(DISTROSCALE) -f $(CFGLISTYML); \
+	fi && \
 	 if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then \
 		sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/ && \
 		sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/; \

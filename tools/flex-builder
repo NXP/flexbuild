@@ -359,6 +359,11 @@ merge_apps() {
         fi
         sudo chroot $RFSDIR ldconfig
     fi
+
+    if [ $MACHINE = la1224rdb_revc ]; then
+	    sudo cp -f $FBDIR/configs/extra/si5518_fw_upgrade.sh $RFSDIR/etc/init.d/ && sudo chmod u+x $RFSDIR/etc/init.d/si5518_fw_upgrade.sh && \
+		    cd $RFSDIR/etc/rc5.d/ && sudo ln -sf /etc/init.d/si5518_fw_upgrade.sh S02si5518_fw_upgrade.sh
+    fi
     fbprint_d "merge apps to $RFSDIR"
 }
 
@@ -772,8 +777,8 @@ NC='\e[0m'
 
 [ $# -eq 0 ] && usage && exit
 DESTARCH=arm64
-#LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx' | cut -d= -f2 | sed -e '/qds/d' | xargs echo`
-LS_MACHINE_LIST="ls1043ardb ls1046ardb ls1028ardb lx2160ardb"
+#LS_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=ls|=lx=la' | cut -d= -f2 | sed -e '/qds/d' | xargs echo`
+LS_MACHINE_LIST="ls1043ardb ls1046ardb ls1028ardb lx2160ardb lx2160aqds la1224rdb la1224rdb_revc"
 #IMX_MACHINE_LIST=`grep -r 'machine=' $FBDIR/configs/board | grep -E '=imx' | cut -d= -f2 | xargs echo`
 IMX_MACHINE_LIST="imx8mpfrdm imx8mpevk imx8mmevk imx8qmmek imx91frdm imx91evk imx91sfrdm imx93evk imx93frdm imx95frdm imx95evk"
 
@@ -874,7 +879,7 @@ elif `echo $MACHINE | grep -qE 'imx8|imx9'`; then
     DESTARCH=arm64 && SOCFAMILY=IMX
 elif [ ${MACHINE:0:7} = ls1021a ]; then
     DESTARCH=arm32 && SOCFAMILY=LS
-elif `echo $MACHINE | grep -qE 'ls|lx'`; then
+elif `echo $MACHINE | grep -qE 'ls|lx|la'`; then
     DESTARCH=arm64 && SOCFAMILY=LS
 fi
 

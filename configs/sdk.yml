@@ -52,7 +52,30 @@ KERNEL_CONFIG:
 
 
 # DPAA2 MC firmware version
-MC_FW_VERSION:  "10.39.0"
+MC_FW_VERSION:  "10.40.0"
+
+#optional package section
+CONFIG_APP_OVS_DPDK: y
+CONFIG_APP_PKTGEN_DPDK: y
+CONFIG_APP_VPP: n
+CONFIG_APP_DPDK_NFP: y
+CONFIG_APP_HOSTSW_LA12XX: y
+CONFIG_APP_FREERTOS_LA12XX: y
+CONFIG_APP_GEUL_COMMON_HEADERS: y
+CONFIG_APP_FR1_FR2_TEST_TOOL: y
+CONFIG_APP_HOSTSW_LA931X: y
+CONFIG_APP_FREERTOS_LA931X: y
+CONFIG_APP_GEUL_RF_UTIL: n
+CONFIG_APP_LINUXPTP: n
+CONFIG_APP_GPSD: y
+CONFIG_APP_SLAB_DRIVER: n
+CONFIG_APP_VSPA_DU: n
+CONFIG_APP_VSPA_VDMA_DU: n
+CONFIG_APP_VSPA_FECA: n
+CONFIG_APP_VSPA_REF_APP: n
+CONFIG_APP_FH_ECPRI: n
+CONFIG_APP_REF_APP_UP: n
+CONFIG_APP_SW_UCI_POLOR_DEC: n
 
 # flexbuild repo list
 repo:
@@ -60,13 +83,16 @@ repo:
 # BSP component repositories
 # --------------------------------------------------------------------------------------
   atf:
-    url:  https://github.com/nxp-imx/imx-atf.git
+    url:  https://github.com/nxp-qoriq/atf.git
+    tag: la12xx-sdk4.0
 
   uboot:
-    url:  https://github.com/nxp-imx/uboot-imx.git
+    url:  https://github.com/nxp-qoriq/u-boot.git
+    tag: la12xx-sdk4.0
 
   rcw:
     url:  https://github.com/nxp-qoriq/rcw.git
+    tag: la12xx-sdk4.0
 
   mbedtls:
     url:  https://github.com/Mbed-TLS/mbedtls.git
@@ -74,15 +100,15 @@ repo:
 
   mc_utils:
     url:  https://github.com/nxp-qoriq/mc-utils.git
-    tag:  mc_release_10.39.0
+    tag:  mc_release_10.40.0
 
   mc_bin:
     url:  https://github.com/nxp-qoriq/qoriq-mc-binary.git
-    tag:  mc_release_10.39.0
+    tag:  mc_release_10.40.0
 
   ddr_phy_bin:
     url:  https://github.com/nxp-qoriq/ddr-phy-binary.git
-    ver:  1dd5f83
+    tag: la12xx-sdk3.2
 
   qe_ucode:
     url:  https://github.com/nxp-qoriq/qoriq-qe-ucode.git
@@ -164,7 +190,7 @@ repo:
 # --------------------------------------------------------------------------------------
   linux:
     url:  https://github.com/nxp-qoriq/linux.git
-    tag:  Real-Time-Edge-v3.3-202512
+    tag: la12xx-sdk4.0
 
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git
@@ -176,6 +202,7 @@ repo:
 
   mdio_proxy_module:
     url:  https://github.com/nxp-qoriq/mdio-proxy-module.git
+    tag:  la12xx-sdk4.0
 
   isp_vvcam_module:
     url:  https://github.com/nxp-imx/isp-vvcam.git
@@ -189,6 +216,7 @@ repo:
 # --------------------------------------------------------------------------------------
   restool:
     url:  https://github.com/nxp-qoriq/restool.git
+    tag: lf-6.12.49-2.2.0
 
   fmc:
     url:  https://github.com/nxp-qoriq/fmc.git
@@ -201,17 +229,31 @@ repo:
     ver:  Real-Time-Edge-v3.2-202507
 
   dpdk:
-    url:  https://github.com/nxp-qoriq/dpdk.git
+    url:  https://github.com/nxp/dpdk.git
+    tag: la12xx-sdk4.0
+
+  dpdk_extras:
+    url:  https://github.com/nxp-qoriq/dpdk-extras.git
+    tag: la12xx-sdk4.0
+
+  dpdk_nfp:
+    url:  https://github.com/nxp/dpdk-nfp.git
+    tag: la12xx-sdk4.0
 
   vpp:
     url:  https://github.com/nxp-qoriq/vpp.git
 
   ovs_dpdk:
     url:  https://github.com/nxp-qoriq/ovs-dpdk.git
+    tag: la12xx-sdk4.0
+
+  bsd:
+    url:  https://gitlab.freedesktop.org/libbsd/libbsd.git
+    tag:  0.12.0
 
   pktgen_dpdk:
     url:  https://github.com/pktgen/pktgen-dpdk.git
-    tag:  pktgen-23.06.1
+    tag:     pktgen-26.02.4
 
   mtcp_dpdk:
     url:  https://github.com/nxpmicro/mtcp.git
@@ -233,6 +275,10 @@ repo:
 
   aquantia_fw_util:
     url:  https://github.com/nxp-qoriq/aquantia-firmware-utility.git
+    tag:  la12xx-sdk4.0
+
+  aquantia_fw_src:
+    url:     https://github.com/NXP/qoriq-firmware-aquantia/raw/6dddb3e99655386702d420623a479011e0b0a9ad/AQR-G4_v5.4.6-AQR_NXP_Bonnyrigg_ID44428_VER1533.cld
 
   gpp_aioptool:
     url:  https://github.com/nxp-qoriq/gpp-aioptool.git
@@ -242,6 +288,86 @@ repo:
 
   eth_config:
     url:  https://github.com/nxp-qoriq/eth-config.git
+
+  freertos_la12xx:
+    url:  https://github.com/nxp-qoriq/freertos_la12xx.git
+    tag: la12xx-sdk4.0
+
+  hostsw_la12xx:
+    url: https://github.com/nxp-qoriq/hostsw_la12xx.git
+    tag: la12xx-sdk4.0
+
+  geul_common_headers:
+    url: https://github.com/nxp-qoriq/geul_common_headers.git
+    tag: la12xx-sdk4.0
+
+  fr1_fr2_test_tool:
+    url: https://github.com/nxp-qoriq/fr1_fr2_test_tool.git
+    tag: la12xx-sdk4.0
+
+  freertos_la931x:
+    url: https://github.com/nxp-qoriq/la93xx_freertos.git
+    tag: la12xx-sdk4.0
+
+  hostsw_la931x:
+    url: https://github.com/nxp-qoriq/la93xx_host_sw.git
+    tag: la12xx-sdk4.0
+
+  m4_gcc:
+     url: https://www.nxp.com/lgfiles/geul/Tools/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+
+  arm_ral:
+    url: https://git.gitlab.arm.com/networking/ral.git
+    tag: armral-26.01
+
+  rteval_src:
+    url: https://git.kernel.org/pub/scm/utils/rteval/rteval.git/snapshot/rteval-3.10.tar.gz
+
+  slab_driver:
+    url:
+    tag: la12xx-sdk4.0
+
+  ref_app_up:
+    url:
+    tag: RUP_v6.9.41
+
+  linuxptp:
+    url:
+    tag: la1224_bsp_2.3
+
+  geul_rf_util:
+    url:
+    tag: la12xx-sdk4.0
+
+  gpsd_src:
+    url: https://download-mirror.savannah.gnu.org/releases/gpsd/gpsd-3.27.tar.gz
+
+  vspa_du:
+    url:
+    tag: la1224_bsp_2.4_rc1
+
+  vspa_vdma_du:
+    url:
+    tag: la1224_bsp_1.9_vdma_rc2
+
+  vspa_feca:
+    url:
+    tag: la12xx-sdk3.0
+
+  vspa_ref_app:
+    url:
+    tag: L1_RefApp_v6.9.25
+
+  sw_uci_polar_dec:
+    url:
+    tag: v1.1-bsp1.3-rc2
+
+  gtest:
+    url: https://codeload.github.com/google/googletest/zip/refs/tags/release-1.7.0
+
+  fh_ecpri:
+    url:
+    tag: la12xx-sdk4.0
 
 
 # security component repositories

@@ -49,6 +49,7 @@ def download_file(url: str, output_path: str, retries: int = 3, timeout: int = 3
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
+    session.mount("ssh://", adapter)
 
     # If partial file exists, try to resume download
     resume_byte_pos = os.path.getsize(output_path) if os.path.exists(output_path) else 0

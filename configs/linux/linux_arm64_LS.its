@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2025 NXP
+ * Copyright 2017-2026 NXP
  *
  * Shengzhou Liu <Shengzhou.Liu@nxp.com>
  *
@@ -196,10 +196,39 @@
 			load = <0x90000000>;
 		};
 
+		la1224rdb-dtb {
+			description = "la1224rdb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-la1224-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
 
 		lx2162aqds-dtb {
 			description = "lx2162aqds-dtb";
 			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-lx2162a-qds.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		la1238rdb-dtb {
+			description = "la1238rdb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-la1238-rdb.dtb");
+			type = "flat_dt";
+			arch = "arm64";
+			os = "linux";
+			compression = "none";
+			load = <0x90000000>;
+		};
+
+		la1246rdb-dtb {
+			description = "la1246rdb-dtb";
+			data = /incbin/("../../build/linux/kernel/arm64/LS/fsl-la1246-rdb-sdk.dtb");
 			type = "flat_dt";
 			arch = "arm64";
 			os = "linux";
@@ -321,11 +350,32 @@
 			fdt = "lx2160aqds-dtb";
 		};
 
+		la1224rdb {
+			description = "config for la1224rdb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "la1224rdb-dtb";
+		};
+
 		lx2162aqds {
 			description = "config for lx2162aqds";
 			kernel = "kernel";
 			ramdisk = "initrd";
 			fdt = "lx2162aqds-dtb";
+		};
+
+		la1238rdb {
+			description = "config for la1238rdb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "la1238rdb-dtb";
+		};
+
+		la1246rdb {
+			description = "config for la1246rdb";
+			kernel = "kernel";
+			ramdisk = "initrd";
+			fdt = "la1246rdb-dtb";
 		};
 	};
 };

@@ -1,5 +1,5 @@
 #
-# Copyright 2018-2024 NXP
+# Copyright 2018-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -22,7 +22,8 @@ define atf_imx
 endef
 
 define atf_ls
-	[ $${MACHINE:0:6} = ls1012 -o $${MACHINE:0:5} = ls104 ] && \
+	 [ $${MACHINE} = la1224rdb_revc ] && platform=la1224rdb || platform=$(MACHINE) && \
+	 [ $${MACHINE:0:6} = ls1012 -o $${MACHINE:0:5} = ls104 ] && \
         chassistype=ls104x_1012 || chassistype=ls2088_1088; \
     if [ "$(SECURE)" = y ]; then \
         if [ $$chassistype = ls104x_1012 ]; then \
@@ -30,7 +31,7 @@ define atf_ls
         else \
             rcwbin=`grep ^rcw_$(BOOTTYPE)= $(FBDIR)/configs/board/$(MACHINE).conf | cut -d'"' -f2`; \
         fi; \
-        if [ $${MACHINE:0:5} = lx216 ] && [ ! -f $(PKGDIR)/bsp/atf/ddr4_pmu_train_dmem.bin ]; then \
+        if [ $${MACHINE:0:5} = lx216 -o $${MACHINE:0:5} = la122 ] && [ ! -f $(PKGDIR)/bsp/atf/ddr4_pmu_train_dmem.bin ]; then \
             bld ddr_phy_bin -m $(MACHINE); \
         fi && \
         if [ ! -d $(PKGDIR)/apps/security/mbedtls ]; then \
@@ -41,18 +42,18 @@ define atf_ls
             outputdir="arm-cot"; \
             mkdir -p $$outputdir build/$(MACHINE)/release; \
             [ -f $$outputdir/rot_key.pem ] && cp -f $$outputdir/*.pem build/$(MACHINE)/release/; \
-			bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/uboot_$(MACHINE)_tfa_SECURE_BOOT.bin; \
+			bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/uboot_$${platform}_tfa_SECURE_BOOT.bin; \
 			secext=_sec; \
         else \
             secureopt="TRUSTED_BOARD_BOOT=1 CST_DIR=$(PKGDIR)/apps/security/cst"; \
             outputdir="nxp-cot" && mkdir -p $$outputdir; \
-            bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/uboot_$(MACHINE)_tfa_SECURE_BOOT.bin; \
+            bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/uboot_$${platform}_tfa_SECURE_BOOT.bin; \
             secext=_sec; \
         fi; \
         [ ! -f $(PKGDIR)/apps/security/cst/srk.pub ] && bld cst -m $(MACHINE); \
         cp -f $(PKGDIR)/apps/security/cst/srk.* $(PKGDIR)/bsp/atf; \
     else \
-        bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/uboot_$(MACHINE)_tfa.bin; \
+        bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/uboot_$${platform}_tfa.bin; \
         rcwbin=`grep ^rcw_$(BOOTTYPE)= $(FBDIR)/configs/board/$(MACHINE).conf | cut -d'"' -f2`; \
     fi && \
     if [ -z "$$rcwbin" ]; then \
@@ -87,24 +88,25 @@ define atf_ls
         bootmode=$(BOOTTYPE); \
     fi && \
 	\
-	echo $(MAKE) -j$(JOBS) fip pbl PLAT=$(MACHINE) BOOT_MODE=$$bootmode RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt ${LOG_MUTE} && \
-	$(MAKE) -j$(JOBS) fip pbl PLAT=$(MACHINE) BOOT_MODE=$$bootmode RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) $(LOG_MUTE) && \
-	if [ $${MACHINE:0:5} = lx216 -a "$(SECURE)" = y ] && [ ! -f $$outputdir/ddr_fip_sec.bin ]; then \
-		$(MAKE) -j$(JOBS) fip_ddr PLAT=$(MACHINE) BOOT_MODE=$$bootmode $$secureopt $(bldstr) $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a $(LOG_MUTE); \
-		[ "$(COT)" = arm-cot -o "$(COT)" = arm-cot-with-verified-boot ] && cp -f build/$(MACHINE)/release/*.pem $$outputdir/; \
-		cp -f build/$(MACHINE)/release/ddr_fip_sec.bin $$outputdir/; \
+	echo $(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt ${LOG_MUTE} && \
+	$(MAKE) -j$(JOBS) fip pbl PLAT=$$platform BOOT_MODE=$$bootmode RCW=$$rcwbin BL33=$$bl33 $$bl32opt $$spdopt $$secureopt $$fuseopt $(bldstr) $(LOG_MUTE) && \
+	if [ $${MACHINE:0:5} = lx216 -o $${MACHINE:0:5} = la122 ] && [ "$(SECURE)" = y ] && [ ! -f $$outputdir/ddr_fip_sec.bin ]; then \
+		$(MAKE) -j$(JOBS) fip_ddr PLAT=$$platform BOOT_MODE=$$bootmode $$secureopt $(bldstr) $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a $(LOG_MUTE); \
+		[ "$(COT)" = arm-cot -o "$(COT)" = arm-cot-with-verified-boot ] && cp -f build/$$platform/release/*.pem $$outputdir/; \
+		cp -f build/$$platform/release/ddr_fip_sec.bin $$outputdir/; \
 	fi && \
-	[ $${MACHINE:0:5} = lx216 -a "$(SECURE)" = y -a -f $$outputdir/ddr_fip_sec.bin ] && \
+	[ $${MACHINE:0:5} = lx216 -o $${MACHINE:0:5} = la122 ] && [ "$(SECURE)" = y ] && [ -f $$outputdir/ddr_fip_sec.bin ] && \
 		cp -f $$outputdir/ddr_fip_sec.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fip_ddr_sec.bin; \
-	cp -f build/$(MACHINE)/release/bl2_$$bootmode*.pbl $(FBOUTDIR)/bsp/atf/$(MACHINE)/ && \
-	cp -f build/$(MACHINE)/release/fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fip_uboot$$secext.bin && \
+	cp -f build/$$platform/release/bl2_$$bootmode*.pbl $(FBOUTDIR)/bsp/atf/$(MACHINE)/ && \
+	cp -f build/$$platform/release/fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fip_uboot$$secext.bin && \
 	if [ "$(CONFIG_FUSE_PROVISIONING)" = "y" ]; then \
-		cp -f build/$(MACHINE)/release/fuse_fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fuse_fip$$secext.bin; \
+		cp -f build$$platform/release/fuse_fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fuse_fip$$secext.bin; \
 	fi
 endef
 
 atf:
-	@$(call download_repo,atf,bsp) && \
+	@$(call download_repo,atf,bsp,git) && \
+         $(call patch_apply,atf,bsp) && \
     if [ "$(MACHINE)" = all ]; then \
         $(call fbprint_w,"Please specify '-m <machine>'") && exit 0; \
     fi && \

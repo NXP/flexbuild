@@ -37,7 +37,7 @@ device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
 imx8mmevk, imx8mpevk, imx8mpfrdm, imx93evk, imx93frdm, imx91evk, imx91frdm, imx91sfrdm, imx95evk, imx95frdm
 
 - __Layerscape platform__:  
-ls1028ardb, ls1043ardb, ls1046ardb, lx2160ardb
+ls1028ardb, ls1043ardb, ls1046ardb, lx2160ardb, lx2160aqds, la1224rdb, la1224rdb_revc
 
 
 ## Flexbuild Usage
@@ -59,6 +59,7 @@ Most used example with automated build:
 Most used example with automated build:
  bld -m imx8mpevk                # automatically build BSP + kernel + NXP-specific components + Debian RootFS for imx8mpevk platform
  bld -m lx2160ardb               # same as above, for lx2160ardb platform
+ bld -m la1224rdb_revc           # same as above, for la1224rdb/Glasgow platform
 ```
 
 Most used example with separate command:

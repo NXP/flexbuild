@@ -38,6 +38,8 @@ generate_bootpartition_tarball() {
     cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules $bootpartdir
     modversion=$(ls $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules|xargs echo|cut -d' ' -f1)
     rm -f $bootpartdir/modules/$modversion/{build,source}
+    ln -sf /usr/src/linux-headers-$modversion $bootpartdir/modules/$modversion/build
+    ln -sf /usr/src/linux  $bootpartdir/modules/$modversion/source
 
     # install distro boot script
     fbprint_n "Installing distro boot script "

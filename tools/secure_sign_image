@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2017-2021 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,7 +8,7 @@
 
 
 secure_sign_image() {
-    # $1: <machine>,  $2: <boottype>
+    # $1: <machine>,  $2: <boottype> $3: <board name>
     [ ! -f $FBDIR/configs/board/$1.conf ] && echo $FBDIR/configs/board/$1.conf not exist! && exit
     [ -f $PKGDIR/apps/security/cst/uni_sign ] || bld cst -m $1
     [ $MACHINE = ls1012afrwy ] && secfile=IMG7 || secfile=IMG4
@@ -35,9 +35,22 @@ secure_sign_image() {
     fi
 
     cd $PKGDIR/apps/security/cst && \
-    rm -f bootscript uImage.dtb uImage.bin kernel.itb secboot_hdrs*.bin hdr*.out && \
-    cp -f $FBOUTDIR/$distro_bootscript bootscript && log_mute echo "Copying bootscript" && \
-    cp -f $FBOUTDIR/$device_tree uImage.dtb && log_mute echo "Copying dtb" && \
+    rm -f bootscript uImage.dtb uImage.bin kernel.itb secboot_hdrs*.bin hdr*.out
+    if [[ "la1224rdb" = $3 ]]; then
+		cp -f $FBOUTDIR/linux/kernel/arm64/LS/fsl-la1224-rdb.dtb uImage.dtb && \
+		log_mute echo "Copying device tree for $3"
+		cp -f $FBOUTDIR/firmware/u-boot/la1224rdb/la1224rdb_boot.scr bootscript && \
+		log_mute echo "Copying BOOTSCR $3"
+    elif [[ "la1224rdb_revc" = $3 ]]; then
+		cp -f $FBOUTDIR/linux/kernel/arm64/LS/fsl-la1224-rdb-revc.dtb uImage.dtb && \
+		log_mute echo "Copying device tree for $3"
+		cp -f $FBOUTDIR/firmware/u-boot/la1224rdb/la1224rdb_boot.scr bootscript && \
+		log_mute echo "Copying BOOTSCR $3"
+    else
+    	cp -f $FBOUTDIR/$distro_bootscript bootscript && log_mute echo "Copying bootscript" && \
+	cp -f $FBOUTDIR/$device_tree uImage.dtb && log_mute echo "Copying dtb"
+    fi
+
     cp -f $tiny_itb kernel.itb && log_mute echo "Copying linux tiny itb" && \
     cp -f $kernel_img uImage.bin && log_mute echo "Copying kernel" && cd "$FBDIR"
 
@@ -63,7 +76,7 @@ secure_sign_image() {
     [ -f $pfe_fw ] || bld pfe_bin -m $1
     [ ${1:0:7} = ls1012a ] && cp $pfe_fw $PKGDIR/apps/security/cst/pfe.itb && log_mute echo "Copying PFE"
 
-    if [ ${1:0:7} = ls1088a -o ${1:0:7} = ls2088a -o ${1:0:5} = lx216 ]; then
+    if [ ${1:0:7} = ls1088a -o ${1:0:7} = ls2088a -o ${1:0:5} = lx216 -o ${1:0:4} = la12 ]; then
 	[ -f $FBOUTDIR/$COMPOSITE_IMG11_FILE ] || bld mc_bin -m $1
 	[ -f $FBOUTDIR/$COMPOSITE_IMG13_FILE ] || bld mc_utils -m $1
 	cp -f $FBOUTDIR/$COMPOSITE_IMG11_FILE $PKGDIR/apps/security/cst/mc.itb
@@ -98,6 +111,9 @@ secure_sign_image() {
     cp -f $PKGDIR/apps/security/cst/hdr_linux.out $FBOUTDIR/bsp/secboot_hdrs/$1
     [ $1 = ls1012afrwy ] && cp $PKGDIR/apps/security/cst/hdr_kernel.out $FBOUTDIR/bsp/secboot_hdrs/$1
     cp  $PKGDIR/apps/security/cst/hdr_bs.out $FBOUTDIR/bsp/secboot_hdrs/$1/hdr_${1}_bs.out
+    sudo cp -f $PKGDIR/apps/security/cst/srk_hash.txt $FBOUTDIR/images
+    sudo cp -f $PKGDIR/apps/security/cst/srk.pri $FBOUTDIR/images
+    sudo cp -f $PKGDIR/apps/security/cst/srk.pub $FBOUTDIR/images
     [ "$ENCAP" = y ] && cp -f $PKGDIR/apps/security/cst/hdr_bs_dec.out \
     $FBOUTDIR/bsp/secboot_hdrs/$1/hdr_${1}_bs_dec.out
     if [ "$IMA_EVM" = y ]; then

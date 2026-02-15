@@ -1,12 +1,12 @@
 #
-# Copyright 2017-2023 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 
 linux:
-	$(call download_repo,linux,linux) && \
+	$(call download_repo,linux,linux,git) && \
 	$(call patch_apply,linux,linux) && \
 	cd $(KERNEL_PATH) && \
 	$(call fbprint_b,"$(KERNEL_TREE) with $(KERNEL_BRANCH)") && \

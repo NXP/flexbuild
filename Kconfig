@@ -75,17 +75,17 @@ config SOC_IMX93
 	bool
 	default y if SOC_IMX93FRDM || SOC_IMX93EVK
 
-config SOC_IMX95-15x15
+config SOC_IMX95_15X15
 	bool
-	default y if SOC_IMX95-15x15-FRDM || SOC_IMX95-15x15-EVK
+	default y if SOC_IMX95_15X15_FRDM || SOC_IMX95_15X15_EVK
 
-config SOC_IMX95-19x19
+config SOC_IMX95_19X19
 	bool
-	default y if SOC_IMX95-19x19-FRDM-pro || SOC_IMX95-19x19-EVK
+	default y if SOC_IMX95_19X19_FRDM_PRO || SOC_IMX95_19X19_EVK
 
 config SOC_IMX95
 	bool
-	default y if SOC_IMX95-15x15 || SOC_IMX95-19x19
+	default y if SOC_IMX95_15X15 || SOC_IMX95_19X19
 
 # ============================================================================
 # Build Configuration Categories

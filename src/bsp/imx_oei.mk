@@ -10,15 +10,14 @@
 # the processor returns to ROM execution.
 
 
-ifeq ($(filter imx95-15x15%,$(MACHINE)),$(MACHINE))
-	IMX_OEI_BOARD = mx95lp4x-15
+ifeq ($(CONFIG_SOC_IMX95_15X15),y)
+    IMX_OEI_BOARD = mx95lp4x-15
 else
-	IMX_OEI_BOARD = mx95lp5
+    IMX_OEI_BOARD = mx95lp5
 endif
 
 imx_oei:
-	[[ ! "$(MACHINE)" == *"imx95"* ]] && exit 0 || \
-	$(call download_repo,imx_oei,bsp) && \
+	@$(call download_repo,imx_oei,bsp) && \
 	$(call patch_apply,imx_oei,bsp) && \
 	$(call fbprint_b,"imx_oei") && \
 	cd $(BSPDIR)/imx_oei && \

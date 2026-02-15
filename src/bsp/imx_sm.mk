@@ -13,8 +13,7 @@
 
 
 imx_sm:
-	[[ ! "$(MACHINE)" == *"imx95"* ]] && exit 0 || \
-	$(call download_repo,imx_sm,bsp) && \
+	@$(call download_repo,imx_sm,bsp) && \
 	$(call patch_apply,imx_sm,bsp) && \
 	$(call fbprint_b,"imx_sm") && \
 	cd $(BSPDIR)/imx_sm && \

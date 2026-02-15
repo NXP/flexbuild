@@ -59,3 +59,6 @@ RUN set -eux; \
       protobuf-compiler libgdk-pixbuf-2.0-dev libxml2-utils libprotobuf-dev \
       gtk-doc-tools pandoc && \
     rm -rf /var/lib/apt/lists/*
+
+RUN git config --global user.email  "debian@nxp.com"
+RUN git config --global user.name "NXP debian"

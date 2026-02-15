@@ -163,7 +163,8 @@ repo:
 # kernel and modules git repositories
 # --------------------------------------------------------------------------------------
   linux:
-    url:  https://github.com/nxp-imx/linux-imx.git
+    url:  https://github.com/nxp-qoriq/linux.git
+    tag:  Real-Time-Edge-v3.3-202512
 
   cryptodev_linux:
     url:  https://github.com/cryptodev-linux/cryptodev-linux.git

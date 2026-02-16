@@ -6,17 +6,15 @@
 
 # RCW for NXP QorIQ Layerscape SoC.
 
+RCW_MACHINE := $(if $(filter y,$(CONFIG_SOC_LX2160ARDB)),$(MACHINE)_rev2,$(MACHINE))
+RCW_INST_DIR   := $(FBOUTDIR)/bsp/rcw
+
 .PHONY: rcw
 rcw:
-	@$(call download_repo,rcw,bsp) && \
-    $(call fbprint_b,"RCW for $(MACHINE)") && \
-	cd $(BSPDIR) && mkdir -p $(FBOUTDIR)/bsp/rcw && \
-	if [ $${MACHINE:0:6} = lx2160 ]; then \
-		machine=$${MACHINE:0:10}_rev2; \
-	else \
-		machine=$(MACHINE); \
-	fi && \
-	$(MAKE) -C rcw/$$machine $(LOG_MUTE) && \
-	$(MAKE) -C rcw/$$machine install DESTDIR=$(FBOUTDIR)/bsp/rcw/$(MACHINE) $(LOG_MUTE) && \
-	rm -f $(FBOUTDIR)/bsp/rcw/*/README && \
+	@$(call download_repo,rcw,bsp)
+	$(call fbprint_b,"RCW for $(MACHINE)")
+	mkdir -p $(RCW_INST_DIR)
+	$(MAKE) -C $(BSPDIR)/rcw/$(RCW_MACHINE) $(LOG_MUTE)
+	$(MAKE) -C $(BSPDIR)/rcw/$(RCW_MACHINE) install DESTDIR=$(RCW_INST_DIR)/$(MACHINE) $(LOG_MUTE)
+	rm -f $(RCW_INST_DIR)/*/README
 	$(call fbprint_d,"RCW")

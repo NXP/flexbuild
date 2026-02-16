@@ -17,13 +17,10 @@ else
     uboot_cfg := $(UBOOT_CONFIG_1)
 endif
 
-
+.PHONY: uboot u-boot
 uboot u-boot:
 	@$(call download_repo,uboot,bsp) && \
 	$(call patch_apply,uboot,bsp) && \
-	if [ "$(MACHINE)" = all ]; then \
-		$(call fbprint_w,"Please specify '-m <machine>'") && exit 0; \
-	fi && \
 	if [ "$(CONFIG_SECURE_BOOT)" = y ]; then \
 		$(call fbprint_b,"u-boot for $(MACHINE) [secure boot]"); \
 	else \

@@ -13,29 +13,22 @@ UBOOT_CONFIG_2 := $(word 2,$(UBOOT_CONFIG_CLEAN))
 
 ifeq ($(CONFIG_SECURE_BOOT),y)
     uboot_cfg := $(UBOOT_CONFIG_2)
+	UBOOT_SECOPT := [secure boot]
 else
     uboot_cfg := $(UBOOT_CONFIG_1)
+	UBOOT_SECOPT :=
 endif
 
 .PHONY: uboot u-boot
 uboot u-boot:
-	@$(call download_repo,uboot,bsp) && \
-	$(call patch_apply,uboot,bsp) && \
-	if [ "$(CONFIG_SECURE_BOOT)" = y ]; then \
-		$(call fbprint_b,"u-boot for $(MACHINE) [secure boot]"); \
-	else \
-		$(call fbprint_b,"u-boot for $(MACHINE)"); \
-	fi && \
-	cd $(BSPDIR)/uboot && \
-	if [ -z "$(uboot_cfg)" ]; then \
-		$(call fbprint_e,"Failed to determine u-boot configuration") && exit 1; \
-	fi && \
-	\
-	export ARCH=arm64 && export CROSS_COMPILE=aarch64-linux-gnu-; \
-	opdir=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/output/$(uboot_cfg) && mkdir -p $$opdir && \
-	unset PKG_CONFIG_SYSROOT_DIR && \
-	\
-	$(call fbprint_n,"config = $(uboot_cfg)") && \
-	$(MAKE) -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $(uboot_cfg) $(LOG_MUTE) && \
-	make -C $(BSPDIR)/uboot -j$(JOBS) O=$$opdir $(LOG_MUTE) && \
-	$(call fbprint_d,"u-boot for $(MACHINE) in $(FBOUTDIR)/bsp/u-boot/$(MACHINE)");
+	@$(call download_repo,uboot,bsp)
+	$(call patch_apply,uboot,bsp)
+	$(call fbprint_b,"u-boot for $(MACHINE) $(UBOOT_SECOPT)")
+	[ -n "$(uboot_cfg)" ] || { $(call fbprint_e,"Failed to determine u-boot configuration"); exit 1; }
+	opdir=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/output/$(uboot_cfg)
+	mkdir -p "$$opdir" || exit 1
+	unset PKG_CONFIG_SYSROOT_DIR
+	$(call fbprint_n,"config = $(uboot_cfg)")
+	$(MAKE) -C $(BSPDIR)/uboot O="$$opdir" $(uboot_cfg) $(LOG_MUTE)
+	$(MAKE) -C $(BSPDIR)/uboot O="$$opdir" $(LOG_MUTE)
+	$(call fbprint_d,"u-boot for $(MACHINE) in $(FBOUTDIR)/bsp/u-boot/$(MACHINE)")

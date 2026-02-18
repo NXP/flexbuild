@@ -90,6 +90,5 @@ ddr_phy_bin:
 	@$(call download_repo,ddr_phy_bin,bsp) && \
 	 if [ ! -f $(FBOUTDIR)/bsp/ddr_phy_bin/fip_ddr.bin ]; then \
 	     ln -sf $(BSPDIR)/ddr_phy_bin $(FBOUTDIR)/bsp/ddr_phy_bin; \
-	     cp -f $(BSPDIR)/ddr_phy_bin/lx2160a/*.bin $(BSPDIR)/atf/; \
 	 fi && \
 	 $(call fbprint_d,"ddr_phy_bin")

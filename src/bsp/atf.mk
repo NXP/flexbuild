@@ -75,6 +75,7 @@ define atf_ls
 	if [ "$(CONFIG_SOC_LX2160ARDB)" = "y" -a "$(CONFIG_SECURE_BOOT)" = y ]; then
 		$(MAKE) fip_ddr PLAT=$(MACHINE) BOOT_MODE=$$bootmode $(SECOpt) $(bldstr) $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a $(LOG_MUTE)
 		cp -f "build/$(MACHINE)/release/ddr_fip_sec.bin" "$(FBOUTDIR)/bsp/atf/$(MACHINE)/"
+		cp -f $(BSPDIR)/ddr_phy_bin/lx2160a/*.bin $(BSPDIR)/atf/
 	fi
 	cp -f build/$(MACHINE)/release/bl2_"$$bootmode"*.pbl "$(FBOUTDIR)/bsp/atf/$(MACHINE)/"
 	cp -f build/$(MACHINE)/release/fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fip_"$1""$(SECExt)".bin

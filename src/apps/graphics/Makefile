@@ -19,7 +19,8 @@ GFX_MODULES := \
     cogl \
     gputop \
     gpu_viv \
-    imx_dpu_g2d \
+    imx_dpu_g2d_v1 \
+    imx_dpu_g2d_v2 \
     imx_g2d_samples \
     imx_gpu_g2d \
     imx_pxp_g2d \

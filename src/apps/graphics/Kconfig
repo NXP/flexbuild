@@ -39,8 +39,16 @@ config GFX_GPUTOP
 	help
 	  GPU profiling tool for Intel graphics
 
-config GFX_IMX_DPU_G2D
-	bool "i.MX DPU G2D support"
+config GFX_IMX_DPU_G2D_V1
+	bool "i.MX DPU G2D V1 support"
+	default y
+	depends on SOC_IMX8QMMEK
+	select GFX_LIBDRM
+	help
+	  i.MX Display Processing Unit 2D graphics acceleration
+
+config GFX_IMX_DPU_G2D_V2
+	bool "i.MX DPU G2D V2 support"
 	default y
 	depends on SOC_IMX95
 	select GFX_LIBDRM
@@ -53,7 +61,8 @@ config GFX_IMX_G2D_SAMPLES
 	select GFX_IMX_GPU_G2D if SOC_IMX8
 	select GFX_GPU_VIV if SOC_IMX8
 	select GFX_IMX_PXP_G2D if SOC_IMX91 || SOC_IMX93
-	select GFX_IMX_DPU_G2D if SOC_IMX95
+	select GFX_IMX_DPU_G2D_V1 if SOC_IMX8QMMEK
+	select GFX_IMX_DPU_G2D_V2 if SOC_IMX95
 	select GFX_MALI_IMX if SOC_IMX95
 	help
 	  Sample applications for i.MX G2D API
@@ -148,7 +157,8 @@ config GFX_WESTON
 	default y
 	depends on SOC_LS1028ARDB || PLATFORM_IMX
 	select GFX_MALI_IMX if SOC_IMX95
-	select GFX_IMX_DPU_G2D if SOC_IMX95
+	select GFX_IMX_DPU_G2D_V1 if SOC_IMX8QMMEK
+	select GFX_IMX_DPU_G2D_V2 if SOC_IMX95
 	select GFX_IMX_PXP_G2D if SOC_IMX91 || SOC_IMX93
 	select GFX_GPU_VIV if SOC_IMX8 || SOC_LS1028ARDB
 	select GFX_IMX_GPU_G2D if SOC_IMX8 || SOC_LS1028ARDB

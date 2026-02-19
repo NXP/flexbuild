@@ -5,14 +5,9 @@
 #
 # SDK BSP Components
 
-
-#EXCLUDE_BSPMK_FILES := grub.mk
-#BSP_MK_FILES := $(filter-out $(addprefix $(FBDIR)/src/bsp/,$(EXCLUDE_BSPMK_FILES)),$(wildcard $(FBDIR)/src/bsp/*.mk))
-
+BSPDIR := $(PKGDIR)/bsp
 
 BSP_MK_FILES := $(wildcard $(FBDIR)/src/bsp/*.mk)
+BSP_TARGETS := $(basename $(notdir $(BSP_MK_FILES)))
 include $(BSP_MK_FILES)
 
-BSP_TARGETS := $(basename $(notdir $(BSP_MK_FILES)))
-
-BSPDIR = $(PKGDIR)/bsp

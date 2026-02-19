@@ -10,7 +10,6 @@
 .PHONY: bsp fw distroscr fwall bspall distroscrall rfs packrfs packapp packapps itb mklinux boot merge-apps host-dep docker
 
 
-
 linux_itb=$(FBOUTDIR)/images/$(DISTRIB_VERSION)_poky_tiny_${SOCFAMILY}_arm64.itb
 LINUX_IMAGE=$(FBOUTDIR)/linux/linux/arm64/$(SOCFAMILY)/Image.gz
 LINUX_TS=$(FBDIR)/logs/.linux_timestamp_$(SOCFAMILY)
@@ -60,12 +59,7 @@ merge-apps:
 	@$(BLD) merge-apps -m $(MACHINE)
 
 host-dep:
-	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
-		echo "ERROR: must be run inside a Docker container!" >&2; \
-		echo "       Please run "make docker" first"; \
-		exit 1; \
-	fi
-	$(BLD) host-dep; \
+	@$(BLD) host-dep
 
 
 docker:

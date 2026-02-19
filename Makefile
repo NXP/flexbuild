@@ -1,8 +1,9 @@
 # Flexbuild Kconfig-based Build System
 # This Makefile integrates Kconfig configuration with flexbuild
 
+.ONESHELL:
 SHELL=/bin/bash
-#.SHELLFLAGS := -ex -o pipefail -c
+.SHELLFLAGS = -ec
 
 DISTRIB_VERSION := lsdk2606
 DEFAULT_REPO_TAG := lf-6.12.49-2.2.0
@@ -24,12 +25,6 @@ MC_FW_VERSION := "10.39.0"
 
 LOG_LEVEL ?= 2
 
-# Colors for output
-RED := \033[0;31m
-GREEN := \033[0;32m
-YELLOW := \033[1;33m
-NC := \033[0m # No Color
-
 NO_CONFIG_TARGETS := menuconfig defconfig help host-dep docker
 ifneq ($(filter $(NO_CONFIG_TARGETS),$(MAKECMDGOALS)),$(MAKECMDGOALS))
 ifeq ("$(wildcard $(FBDIR)/.config)","")
@@ -48,42 +43,38 @@ export GIT_SSL_NO_VERIFY := 1
 # Load configuration
 -include $(FBDIR)/.config
 
-#IMX_SOC_LIST := imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm imx8mpevk imx8mpfrdm imx8mmevk imx8qmmek
-#LS_SOC_LIST := ls1028ardb ls1043ardb ls1046ardb lx2160ardb
-
-SOC_FILES := $(wildcard $(FBDIR)/configs/board/*.conf)
-SOC_LISTS := $(basename $(notdir $(SOC_FILES)))
-IMX_SOC_LIST := $(filter imx%,$(SOC_LISTS))
-LS_SOC_LIST := $(filter ls% lx%,$(SOC_LISTS))
-SOC_LIST := $(IMX_SOC_LIST) $(LS_SOC_LIST)
-
+SOC_LIST := $(basename $(notdir $(wildcard $(FBDIR)/configs/board/*.conf)))
 ifeq ($(CONFIG_PLATFORM_IMX),y)
 SOCFAMILY := IMX
 PLATFORM := IMX
 KERNEL_CFG := imx_v8_defconfig
-MACHINE_LIST := "imx8mpfrdm imx8mpevk imx8mmevk imx8qmmek imx91frdm imx91evk imx91sfrdm imx93evk imx93frdm imx95-15x15-frdm imx95-15x15-evk imx95-19x19-frdm-pro imx95-19x19-evk "
 include configs/board/common/imx_memorylayout.cfg
 else ifeq ($(CONFIG_PLATFORM_LS),y)
 SOCFAMILY := LS
 PLATFORM := LS
 KERNEL_CFG := defconfig lsdk.config
-MACHINE_LIST := ls1028ardb ls1043ardb ls1046ardb lx2160ardb
 include configs/board/common/layerscape_memorylayout.cfg
 else
 SOCFAMILY := IMX
 endif
 
-$(foreach soc,$(SOC_LIST), \
-    $(if $(filter y,$(CONFIG_SOC_$(shell echo $(soc) | tr a-z A-Z))), \
-		$(eval include configs/board/$(soc).conf) \
-		$(eval MACHINE := $(shell echo $(soc))) \
-	) \
+get_soc_cfg_name = CONFIG_SOC_$(subst -,_,$(shell echo $(1) | tr a-z A-Z))
+$(foreach s,$(SOC_LIST), \
+    $(eval CURRENT_CFG := $(call get_soc_cfg_name,$(s))) \
+    $(if $(filter y,$($(CURRENT_CFG))), \
+        $(if $(wildcard configs/board/$(s).conf), \
+            $(eval include configs/board/$(s).conf) \
+            $(eval MACHINE := $(s)) \
+        , \
+            $(error [ERROR] Missing config file: configs/board/$(s).conf) \
+        ) \
+    ) \
 )
-
 ifeq ($(CONFIG_BUILD_VERBOSE),y)
 LOG_LEVEL=0
 endif
 
+export JOBS := $(CONFIG_JOBS)
 export BOOT_TYPE
 export SOCFAMILY DESTARCH DISTRIB_VERSION DEFAULT_REPO_TAG FBDIR DISTRO_SVR_URL MC_FW_VERSION
 export ARCH := arm64
@@ -115,26 +106,21 @@ export SHFLAGS = -c
 export GIT_SSL_NO_VERIFY=1
 export LOG_MUTE
 export MACHINE
-JOBS := $(CONFIG_JOBS)
-
 
 $(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
 $(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
 $(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))
 $(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR)/usr/local/{lib,bin,include})
-$(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images} $(PKGDIR)/linux $(FBDIR)/{logs,dl})
+$(shell mkdir -p $(FBOUTDIR)/{bsp/atf,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
 $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics} $(KERNEL_OUTPUT_PATH))
 
 $(shell python3 $(FBDIR)/tools/parse_yaml.py $(FBDIR)/configs/sdk.yml $(FBDIR)/configs/.sdk.cfg)
+$(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
 
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk
 include $(FBDIR)/include/patch_apply.mk
 include $(FBDIR)/configs/.sdk.cfg
-
-ifdef CONFIG_SECURE_BOOT
-	export CONFIG_SECURE_BOOT=y
-endif
 
 # ============================================================================
 # Main build target - builds based on configuration

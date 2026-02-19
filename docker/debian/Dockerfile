@@ -66,6 +66,7 @@ RUN set -eux; \
       python3 python3-dev python3-pip python3-wheel python3-pybind11 \
       python3-yaml python3-pyelftools python3-requests python3-tqdm \
       python3-jinja2 python3-ply python3-numpy python3-kconfiglib \
+      python3-cryptography python3-pyelftools \
       protobuf-compiler libgdk-pixbuf-2.0-dev libxml2-utils libprotobuf-dev \
       gtk-doc-tools pandoc && \
     rm -rf /var/lib/apt/lists/*

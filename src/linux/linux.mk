@@ -4,10 +4,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-KOUTDIR := $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)
-KTGT_DIR := $(FBOUTDIR)/linux/$(KERNEL_TREE)/arm64/$(SOCFAMILY)
-DTBSTR := $(if $(filter y,$(CONFIG_PLATFORM_IMX)),imx*.dtb,fsl*.dtb)
-KERNEL_IMAGE := $(KTGT_DIR)/Image
 
 define kernel_pre
 	@$(call download_repo,linux,linux)
@@ -42,8 +38,9 @@ linux $(KERNEL_IMAGE):
 
 
 
-cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt: $(KERNEL_IMAGE)
-linux-modules: cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt
+cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt perf: $(KERNEL_IMAGE)
+KMOD_DEPS := $(if $(filter y,$(CONFIG_PLATFORM_IMX)),isp_vvcam_module nxp_wlan_bt,mdio_proxy_module)
+linux-modules: cryptodev_linux perf $(KMOD_DEPS)
 	@$(call fbprint_d,"linux-modules")
 
 

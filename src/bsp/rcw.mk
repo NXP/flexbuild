@@ -12,6 +12,7 @@ RCW_INST_DIR   := $(FBOUTDIR)/bsp/rcw
 .PHONY: rcw
 rcw:
 	@$(call download_repo,rcw,bsp)
+	$(call patch_apply,rcw,bsp)
 	$(call fbprint_b,"RCW for $(MACHINE)")
 	mkdir -p $(RCW_INST_DIR)
 	$(MAKE) -C $(BSPDIR)/rcw/$(RCW_MACHINE) $(LOG_MUTE)

@@ -1,4 +1,4 @@
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -10,18 +10,14 @@
 # the processor returns to ROM execution.
 
 
-ifeq ($(CONFIG_SOC_IMX95_15X15),y)
-    IMX_OEI_BOARD = mx95lp4x-15
-else
-    IMX_OEI_BOARD = mx95lp5
-endif
 
+OEI_DEPS := $(if $(filter y,$(CONFIG_SOC_IMX95_15X15)),mx95lp4x-15,mx95lp5)
 imx_oei:
-	@$(call download_repo,imx_oei,bsp) && \
-	$(call patch_apply,imx_oei,bsp) && \
-	$(call fbprint_b,"imx_oei") && \
-	cd $(BSPDIR)/imx_oei && \
-	export PATH=/usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin:$(PATH) && \
-	$(MAKE) board=$(IMX_OEI_BOARD) oei=ddr clean $(LOG_MUTE); \
-	$(MAKE) board=$(IMX_OEI_BOARD) oei=ddr DEBUG=1 OEI_CROSS_COMPILE=arm-none-eabi- r=B0 $(LOG_MUTE); \
+	@$(call download_repo,imx_oei,bsp)
+	$(call patch_apply,imx_oei,bsp)
+	$(call fbprint_b,"imx_oei")
+	export PATH=/usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin:$(PATH)
+	$(MAKE) board=$(OEI_DEPS) oei=ddr -C $(BSPDIR)/imx_oei clean $(LOG_MUTE)
+	$(MAKE) board=$(OEI_DEPS) oei=ddr DEBUG=1 -C $(BSPDIR)/imx_oei \
+		OEI_CROSS_COMPILE=arm-none-eabi- r=B0 $(LOG_MUTE)
 	$(call fbprint_d,"imx_oei")

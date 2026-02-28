@@ -25,16 +25,26 @@ MC_FW_VERSION := "10.39.0"
 
 LOG_LEVEL ?= 2
 
-NO_CONFIG_TARGETS := menuconfig defconfig help host-dep docker
-ifneq ($(filter $(NO_CONFIG_TARGETS),$(MAKECMDGOALS)),$(MAKECMDGOALS))
-ifeq ("$(wildcard $(FBDIR)/.config)","")
-$(info )
-$(info =====================================================)
-$(info .config not found. Please run 'make menuconfig' first)
-$(info =====================================================)
-$(info )
-$(error Build stopped due to missing .config)
-endif
+NO_CONFIG_TARGETS := menuconfig help docker
+IS_DOCKER := $(wildcard /.dockerenv)
+CURRENT_GOALS := $(or $(MAKECMDGOALS),all)
+ifneq ($(filter $(CURRENT_GOALS),$(NO_CONFIG_TARGETS)),$(CURRENT_GOALS))
+    ifeq ($(IS_DOCKER),)
+        $(info )
+        $(info =====================================================)
+        $(info NOT in Docker environment. Please run 'make docker')
+        $(info =====================================================)
+        $(info )
+        $(error Build stopped: outside of Docker)
+    endif
+    ifeq ("$(wildcard $(FBDIR)/.config)","")
+        $(info )
+        $(info =====================================================)
+        $(info .config not found. Please run 'make menuconfig')
+        $(info =====================================================)
+        $(info )
+        $(error Build stopped: missing .config)
+    endif
 endif
 
 export PATH := $(FBDIR):$(FBDIR)/tools:$(PATH)
@@ -107,6 +117,8 @@ export GIT_SSL_NO_VERIFY=1
 export LOG_MUTE
 export MACHINE
 
+export linux_itb=$(FBOUTDIR)/images/$(DISTRIB_VERSION)_poky_tiny_${SOCFAMILY}_arm64.itb
+
 $(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
 $(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
 $(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))
@@ -114,7 +126,11 @@ $(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR
 $(shell mkdir -p $(FBOUTDIR)/{bsp/atf,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
 $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics} $(KERNEL_OUTPUT_PATH))
 
-$(shell python3 $(FBDIR)/tools/parse_yaml.py $(FBDIR)/configs/sdk.yml $(FBDIR)/configs/.sdk.cfg)
+CUSTOM_CONFIG := $(subst ",,$(strip $(CONFIG_CUSTOM_SDK_CONFIG)))
+SDK_YML := $(if $(CUSTOM_CONFIG),\
+                $(FBDIR)/configs/$(CUSTOM_CONFIG),\
+                $(FBDIR)/configs/sdk.yml)
+$(shell python3 $(FBDIR)/tools/parse_yaml.py $(SDK_YML) $(FBDIR)/configs/.sdk.cfg)
 $(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
 
 include $(FBDIR)/include/utils.mk
@@ -155,12 +171,10 @@ help:
 	@echo "               Flexbuild Kconfig Build System"
 	@echo "==================================================================="
 	@echo ""
-	@echo "Configuration targets:"
-	@echo "  make menuconfig          - Configure flexbuild options"
-	@echo "  make kernel-menuconfig   - Configure Linux kernel"
-	@echo ""
 	@echo "Main targets:"
-	@echo "  make linux|kernel        - Build Linux kernel with default config"
+	@echo "  make menuconfig          - Configure flexbuild options"
+	@echo "  make linux | kernel      - Build Linux kernel with default config"
+	@echo "  make kernel-menuconfig   - Configure Linux kernel"
 	@echo "  make atf                 - Build ARM Trusted Firmware"
 	@echo "  make uboot               - Build U-Boot"
 	@echo "  make rcw                 - Build RCW for layerscape platform"
@@ -173,13 +187,13 @@ help:
 	@echo "                             default target, 'all' can be omitted"
 	@echo ""
 	@echo "Misc target:"
-	@echo "  make packapps|packapp    - Pack NXP apps to a debian package"
+	@echo "  make docker              - Construct the docker container"
+	@echo "  make packapps            - Pack NXP apps to a debian package"
 	@echo "  make merge-apps          - Merge NXP apps to rootfs"
 	@echo "  make packrfs             - Pack and comporess rootfs"
-	@echo "  make host-dep            - Build host compiling environment"
-	@echo "  make docker              - Construct the docker container"
 	@echo "  make show-enabled-apps   - show enabled applications"
 	@echo "  make list-all-apps       - list all applications"
+	@echo ""
 	@echo ""
 	@echo "Clean targets:"
 	@echo "  make clean-linux         - Clean linux kernel, the same as clean-kernel "
@@ -187,13 +201,13 @@ help:
 	@echo "  make clean-apps          - Clean all application components"
 	@echo "  make clean-boot          - Clean boot partition images"
 	@echo "  make clean-rfs           - Clean root filesystem image"
-	@echo "  make distclean           - Clean everything"
 	@echo "  make clean-config        - Clean .config configuration file"
+	@echo "  make distclean           - Clean everything"
+	@echo ""
 	@echo ""
 	@echo "==================================================================="
-	@echo "Machine:              $(MACHINE)"
-	@echo "Version:              $(DISTRIB_VERSION)"
-	@echo "Cross Compile:        $(shell $(CROSS_COMPILE)gcc -v 2>&1 | tail -1)"
+	@echo "Machine:                   $(MACHINE)"
+	@echo "Version:                   $(DISTRIB_VERSION)"
 	@echo "==================================================================="
 	@echo ""
 	@echo ""
@@ -207,10 +221,9 @@ include $(FBDIR)/include/func.mk
 
 ifneq ("$(wildcard $(FBDIR)/.config)","")
 
+include $(FBDIR)/src/linux/Makefile
 
 include $(FBDIR)/src/bsp/Makefile
-
-include $(FBDIR)/src/linux/Makefile
 
 include $(FBDIR)/src/apps/Makefile
 

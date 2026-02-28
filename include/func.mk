@@ -10,22 +10,6 @@
 .PHONY: bsp fw distroscr fwall bspall distroscrall rfs packrfs packapp packapps itb mklinux boot merge-apps host-dep docker
 
 
-linux_itb=$(FBOUTDIR)/images/$(DISTRIB_VERSION)_poky_tiny_${SOCFAMILY}_arm64.itb
-LINUX_IMAGE=$(FBOUTDIR)/linux/linux/arm64/$(SOCFAMILY)/Image.gz
-LINUX_TS=$(FBDIR)/logs/.linux_timestamp_$(SOCFAMILY)
-
-$(LINUX_TS):
-	@echo "Building Linux for $(SOCFAMILY)..."
-	$(MAKE) linux
-	@touch $(LINUX_TS)
-
-$(LINUX_IMAGE): $(LINUX_TS)
-	@echo "Verifying Linux image..."
-	@if [ ! -f "$(LINUX_IMAGE)" ]; then \
-		echo "Error: Linux image not generated: $(LINUX_IMAGE)"; \
-		echo "Expected path: $(FBOUTDIR)/linux/linux/arm64/$(SOCFAMILY)/Image.gz"; \
-		exit 1; \
-	fi
 
 fw bsp:
 	@$(BLD) bsp -m $(MACHINE)

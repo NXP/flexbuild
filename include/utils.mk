@@ -43,7 +43,7 @@ define fbprint_e
         echo -e "$(red)$1 $(NC)"
 endef
 
-FB_OUT  = printf "[INFO] %s$(RESET)\n" "$(1)"
+FB_OUT  = printf "[INFO] %s\n" "$(1)"
 FB_INFO  = printf "$(GREEN)[INFO] %s$(RESET)\n" "$(1)"
 FB_BUILDING = printf "$(green)Building %s$(RESET)\n" "$(1)"
 FB_DONE = printf "$(GREEN)%s [Done]$(RESET)\n" "$(1)"

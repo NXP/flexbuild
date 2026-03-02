@@ -10,22 +10,17 @@
 .PHONY: bsp fw distroscr fwall bspall distroscrall rfs packrfs packapp packapps itb mklinux boot merge-apps host-dep docker
 
 
-
-fw bsp:
-	@$(BLD) bsp -m $(MACHINE)
-
-fwall bspall:
-	@for brd in $(MACHINE_LIST); do \
-		$(BLD) bsp -m $$brd; \
-	done
+BSP_DEPS := $(KERNEL_IMAGE) itb distroscr
+BSP_DEPS += $(if $(filter y,$(CONFIG_PLATFORM_LS)),atf layerscape_fw,flash.bin)
+ifeq ($(CONFIG_SECURE_BOOT),y)
+    export CONFIG_SECURE_BOOT
+    BSP_DEPS += cst
+endif
+fw bsp: $(BSP_DEPS)
+	@/bin/bash -e $(FBDIR)/tools/create_composite_firmware
 
 distroscr:
 	@$(BLD) distroscr -m $(MACHINE)
-
-distroscrall:
-	@for brd in $(MACHINE_LIST); do \
-		$(BLD) distroscr -m $$brd; \
-	done
 
 packrfs:
 	@$(BLD) packrfs -m $(MACHINE)
@@ -33,7 +28,7 @@ packrfs:
 packapp packapps:
 	@$(BLD) packapps -m $(MACHINE)
 
-itb mklinux:
+itb mklinux: $(KERNEL_IMAGE)
 	@$(BLD) itb -m $(MACHINE)
 
 boot:
@@ -44,7 +39,6 @@ merge-apps:
 
 host-dep:
 	@$(BLD) host-dep
-
 
 docker:
 	@$(BLD) docker

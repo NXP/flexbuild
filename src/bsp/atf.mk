@@ -49,6 +49,7 @@ define atf_imx
 	cp -f build/$(ATF_PLATFORM)/release/bl31.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/bl31-${ATF_PLATFORM}.bin
 endef
 
+
 define atf_ls
 	[ -z "$1" ] && { $(call fbprint_e,"Boot type parameter is required"); exit 1; }
 	bl33=$(FBOUTDIR)/bsp/u-boot/$(MACHINE)/output/$(uboot_cfg)/u-boot.bin
@@ -73,29 +74,34 @@ define atf_ls
 	bootmode=$$( [ "$(1)" = xspi ] && echo flexspi_nor || echo "$(1)" )
 	$(MAKE) fip pbl PLAT=$(MACHINE) BOOT_MODE=$$bootmode RCW=$$rcwbin BL33=$$bl33 $$bl32opt $(SECOpt) $$fuseopt $(bldstr) $(LOG_MUTE)
 	if [ "$(CONFIG_SOC_LX2160ARDB)" = "y" -a "$(CONFIG_SECURE_BOOT)" = y ]; then
+		cp -f $(BSPDIR)/ddr_phy_bin/lx2160a/*.bin $(BSPDIR)/atf/
 		$(MAKE) fip_ddr PLAT=$(MACHINE) BOOT_MODE=$$bootmode $(SECOpt) $(bldstr) $$fuseopt DDR_PHY_BIN_PATH=$(PKGDIR)/bsp/ddr_phy_bin/lx2160a $(LOG_MUTE)
 		cp -f "build/$(MACHINE)/release/ddr_fip_sec.bin" "$(FBOUTDIR)/bsp/atf/$(MACHINE)/"
-		cp -f $(BSPDIR)/ddr_phy_bin/lx2160a/*.bin $(BSPDIR)/atf/
 	fi
 	cp -f build/$(MACHINE)/release/bl2_"$$bootmode"*.pbl "$(FBOUTDIR)/bsp/atf/$(MACHINE)/"
 	cp -f build/$(MACHINE)/release/fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fip_"$1""$(SECExt)".bin
 	if [ "$(CONFIG_FUSE_PROVISIONING)" = "y" ]; then
 		cp -f build/$(MACHINE)/release/fuse_fip.bin $(FBOUTDIR)/bsp/atf/$(MACHINE)/fuse_fip"$(SECExt)".bin
 	fi
+	if [ "$(CONFIG_SECURE_BOOT)" = "y" ]; then \
+		/bin/bash -e $(FBDIR)/tools/secure_sign_image "$(MACHINE)" "$(1)"
+	fi
 endef
 
 fip.bin atf: $(ATF_DEPS)
+#atf:
 	@$(call download_repo,atf,bsp)
 	$(call patch_apply,atf,bsp)
 	$(call fbprint_b,"ATF for $(MACHINE) $(ATF_SECINFO) $(ATF_OPTINFO) $(ATF_FUSEINFO)")
-	cd $(BSPDIR)/atf
 	mkdir -p $(FBOUTDIR)/bsp/atf/$(MACHINE)
 	if [ "$(CONFIG_PLATFORM_IMX)" = "y" ]; then
+		cd $(BSPDIR)/atf
 		$(MAKE) realclean $(LOG_MUTE)
 		$(call atf_imx)
 	else
 		boottypes=$$(echo $(BOOT_TYPE) | tr -d '"')
 		for boottype in $$boottypes; do
+			cd $(BSPDIR)/atf
 			$(MAKE) realclean $(LOG_MUTE)
 			$(call atf_ls,$$boottype) || exit 1
 		done

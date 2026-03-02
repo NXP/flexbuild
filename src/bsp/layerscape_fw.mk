@@ -7,7 +7,8 @@
 
 
 
-layerscape_fw: mc_bin mc_utils fm_ucode qe_ucode dp_fw_cadence phy_cortina phy_inphi pfe_bin ddr_phy_bin
+LSFW_DEPS += $(if $(CONFIG_SOC_LS1028ARDB),dp_fw_cadence)
+layerscape_fw: mc_bin mc_utils fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin ddr_phy_bin $(LSFW_DEPS)
 	@touch $(FBDIR)/logs/.lsfwdone
 
 
@@ -44,7 +45,7 @@ qe_ucode:
 
 
 dp_fw_cadence:
-	@bld firmware_imx -m $(MACHINE); \
+	@$(MAKE) firmware_imx && \
 	$(call fbprint_d,"dp_fw_cadence")
 
 

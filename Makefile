@@ -52,20 +52,20 @@ export GIT_SSL_NO_VERIFY := 1
 
 # Load configuration
 -include $(FBDIR)/.config
+ifneq ($(wildcard $(FBDIR)/.config),)
+    CONFIG_VARS := $(shell grep -o '^CONFIG_[^=]*' $(FBDIR)/.config)
+    export $(CONFIG_VARS)
+endif
 
 SOC_LIST := $(basename $(notdir $(wildcard $(FBDIR)/configs/board/*.conf)))
 ifeq ($(CONFIG_PLATFORM_IMX),y)
 SOCFAMILY := IMX
-PLATFORM := IMX
 KERNEL_CFG := imx_v8_defconfig
-include configs/board/common/imx_memorylayout.cfg
 else ifeq ($(CONFIG_PLATFORM_LS),y)
 SOCFAMILY := LS
-PLATFORM := LS
 KERNEL_CFG := defconfig lsdk.config
-include configs/board/common/layerscape_memorylayout.cfg
 else
-SOCFAMILY := IMX
+$(error Platform not supported)
 endif
 
 get_soc_cfg_name = CONFIG_SOC_$(subst -,_,$(shell echo $(1) | tr a-z A-Z))
@@ -117,7 +117,6 @@ export GIT_SSL_NO_VERIFY=1
 export LOG_MUTE
 export MACHINE
 
-export linux_itb=$(FBOUTDIR)/images/$(DISTRIB_VERSION)_poky_tiny_${SOCFAMILY}_arm64.itb
 
 $(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
 $(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
@@ -173,7 +172,7 @@ help:
 	@echo ""
 	@echo "Main targets:"
 	@echo "  make menuconfig          - Configure flexbuild options"
-	@echo "  make linux | kernel      - Build Linux kernel with default config"
+	@echo "  make linux               - Build Linux kernel with default config"
 	@echo "  make kernel-menuconfig   - Configure Linux kernel"
 	@echo "  make atf                 - Build ARM Trusted Firmware"
 	@echo "  make uboot               - Build U-Boot"
@@ -191,8 +190,9 @@ help:
 	@echo "  make packapps            - Pack NXP apps to a debian package"
 	@echo "  make merge-apps          - Merge NXP apps to rootfs"
 	@echo "  make packrfs             - Pack and comporess rootfs"
-	@echo "  make show-enabled-apps   - show enabled applications"
-	@echo "  make list-all-apps       - list all applications"
+	@echo "  make show-enabled-apps   - Show enabled applications"
+	@echo "  make list-all-apps       - List all applications"
+	@echo "  make help                - Print this menu"
 	@echo ""
 	@echo ""
 	@echo "Clean targets:"
@@ -202,7 +202,7 @@ help:
 	@echo "  make clean-boot          - Clean boot partition images"
 	@echo "  make clean-rfs           - Clean root filesystem image"
 	@echo "  make clean-config        - Clean .config configuration file"
-	@echo "  make distclean           - Clean everything"
+	@echo "  make distclean           - Clean everything including source code"
 	@echo ""
 	@echo ""
 	@echo "==================================================================="
@@ -217,8 +217,6 @@ help:
 # BSP Components
 # ============================================================================
 
-include $(FBDIR)/include/func.mk
-
 ifneq ("$(wildcard $(FBDIR)/.config)","")
 
 include $(FBDIR)/src/linux/Makefile
@@ -228,6 +226,8 @@ include $(FBDIR)/src/bsp/Makefile
 include $(FBDIR)/src/apps/Makefile
 
 endif
+
+include $(FBDIR)/include/func.mk
 
 
 # ============================================================================

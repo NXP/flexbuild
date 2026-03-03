@@ -64,7 +64,7 @@ secure_sign_image() {
     # Source board-specific configurations
     . "$conf_file"
 
-    fbprint_n "Signing ${boot_type}boot images for ${machine} "
+    fbprint_n "Signing image for $machine ${boot_type}boot"
 
     # 2. Workspace Initialization: Prepare CST directory and clean old artifacts
     [ "$ENCAP" = "y" ] && cp "$FBOUTDIR/$bootscript_dec" "$cst_dir/bootscript_dec" && log_mute echo "Copying bootscript_decap"
@@ -125,7 +125,7 @@ secure_sign_image() {
         cp -f "$cst_dir/hdr_initramfs.out" "$out_hdr_dir/"
     fi
 
-    fbprint_d "sign image for $machine ${boot_type}boot"
+    fbprint_d "Signing image for $machine ${boot_type}boot"
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then

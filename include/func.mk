@@ -12,10 +12,6 @@
 
 BSP_DEPS := $(KERNEL_IMAGE) itb distroscr
 BSP_DEPS += $(if $(filter y,$(CONFIG_PLATFORM_LS)),atf layerscape_fw,flash.bin)
-ifeq ($(CONFIG_SECURE_BOOT),y)
-    export CONFIG_SECURE_BOOT
-    BSP_DEPS += cst
-endif
 fw bsp: $(BSP_DEPS)
 	@/bin/bash -e $(FBDIR)/tools/create_composite_firmware
 

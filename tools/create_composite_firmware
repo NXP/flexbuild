@@ -56,14 +56,13 @@ NC='\e[0m'
 
 create_composite_firmware() {
     set -e -o pipefail
-    if [ $SOCFAMILY = LS ]; then
+    if [ "$CONFIG_PLATFORM_LS" = "y" ]; then
         . $FBDIR/configs/board/common/layerscape_memorylayout.cfg
-    elif [ $SOCFAMILY = IMX ]; then
+    else
         . $FBDIR/configs/board/common/imx_memorylayout.cfg
     fi
 
-    local conf_file="$FBDIR/configs/board/${MACHINE}.conf"
-    . "$conf_file"
+    . $FBDIR/configs/board/${MACHINE}.conf
 
     if [ -z "${BOOTTYPE}" ] && [ -n "$BOOT_TYPE" ]; then
         BOOTTYPELIST=${BOOT_TYPE}
@@ -87,20 +86,18 @@ create_composite_firmware() {
             img_offset=$(eval echo '$'COMPOSITE_IMG"$i"_OFFSET)
             img_file=""
 
-            if [ "${SOCFAMILY}" = "LS" ]; then
+            if [ "$CONFIG_PLATFORM_LS" = "y" ]; then
                 # Skip secure header if secure boot is disabled
-                [ "${CONFIG_SECURE_BOOT}" != "y" ] && [ "$i" = "${SECURE_HEADER_NUM}" ] && continue
+                [ "${CONFIG_SECURE_BOOT}" != "y" ] && [ "$i" = "4" ] && continue
 
                 # Build search candidates by priority
                 candidates=""
                 if [ "${CONFIG_SECURE_BOOT}" = "y" ]; then
                     case $i in
                         1|2|4|5|6)
-                        # Priority 1: _<boottype>_sec, Priority 2: _sec
                         candidates="COMPOSITE_IMG${i}_FILE_${boottype}_sec COMPOSITE_IMG${i}_FILE_sec"
                         ;;
                         *)
-                        # Standard secure priority
                         candidates="COMPOSITE_IMG${i}_FILE"
                         ;;
                     esac
@@ -145,7 +142,7 @@ create_composite_firmware() {
     done
 
     # Copy SRK hash files for LS family if security tools exist
-    if [ -f "$PKGDIR/apps/security/cst/srk_hash.txt" ] && [ "$SOCFAMILY" = "LS" ]; then
+    if [ "$CONFIG_PLATFORM_LS" = "y" ] && [ "${CONFIG_SECURE_BOOT}" = "y" ]; then
         cp -f "$PKGDIR/apps/security/cst/srk"* "$FBOUTDIR/images/"
     fi
 }

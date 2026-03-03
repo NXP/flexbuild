@@ -1,102 +1,89 @@
 #!/bin/bash
-
-# Copyright 2017-2023 NXP
-#
+# Copyright 2017-2023, 2026 NXP
 # SPDX-License-Identifier: BSD-3-Clause
 
+# Enable pipefail to ensure pipeline errors are captured
+set -o pipefail
+
+# Color definitions for output
+GREEN='\e[1;32m'
+green='\e[0;32m'
+NC='\e[0m'
+
+fbprint_n() { echo -e "${green}\n$1 ${NC}"; }
+fbprint_d() { echo -e "${GREEN}$1     [Done] ${NC}"; }
+
 generate_bootpartition_tarball() {
-    # check kernel image
-    [ ! -f $kernel_img -o ! -f $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release ] && \
-        echo Building the dependent $kernel_img && \
-        bld linux -p $SOCFAMILY -a $DESTARCH
+    # Local variable declarations for path safety
+    local tiny_itb="$FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_arm64.itb"
+    local bootpartname="boot_${SOCFAMILY}_arm64"
+    local bootpartdir="$FBOUTDIR/images/$bootpartname"
+    local rootfs_cpio="$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_tiny_arm64.cpio.gz"
+    
+    mkdir -p "$bootpartdir"
 
-    [ ! -d $PKGDIR/linux/cryptodev_linux ] && bld linux-modules -p $SOCFAMILY -a $DESTARCH
+    # 2. Copy RootFS if exists
+    [[ -f "$rootfs_cpio" ]] && cp -f "$rootfs_cpio" "$bootpartdir/"
 
-    bootpartname=boot_${SOCFAMILY}_${DESTARCH}
-    bootpartdir=$FBOUTDIR/images/$bootpartname
-    mkdir -p $bootpartdir
+    fbprint_n "Installing kernel and dtb"
+    [[ -f "$tiny_itb" ]] && cp -f "$tiny_itb" "$bootpartdir/"
+    
+    # Retrieve kernel release version from build artifacts
+    local kernel_mk="$KERNEL_PATH/Makefile"
+    local kernelrelease
+    kernelrelease=$(cat "$KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release" 2>/dev/null)
+    
+    # Batch copy kernel artifacts using brace expansion
+    cp -f "$FBOUTDIR/linux/kernel/arm64/$SOCFAMILY"/{*.dtb,Image*,config-$kernelrelease} "$bootpartdir/"
+    cp -f "$FBOUTDIR/linux/kernel/arm64/$SOCFAMILY/vmlinuz-$kernelrelease" "$bootpartdir/"
 
-    [ $SOCFAMILY = IMX ] && socseries=im
-    [ $SOCFAMILY = LS  ] && socseries=l
-    [ -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz ] && \
-        cp -f $FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_${DISTROVARIANT}_${DESTARCH}.cpio.gz $bootpartdir
+    # 3. Install kernel modules
+    fbprint_n "Installing kernel modules"
+    local module_src="$KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules"
+    cp -rf "$module_src" "$bootpartdir/"
+    
+    # Identify module version directory and clean up build/source symlinks
+    local modversion
+    modversion=$(ls "$module_src" | head -n 1)
+    rm -f "$bootpartdir/modules/$modversion"/{build,source}
 
-    fbprint_n "Installing kernel and dtb "
-    [ -f $tiny_itb ] && cp -f $tiny_itb $bootpartdir
-    [ -f $base_itb ] && cp -f $base_itb $bootpartdir
-    kernelrelease=$(cat $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/include/config/kernel.release)
-    [ $DESTARCH = arm64 ] && kernelimg=Image* || kernelimg=zImage*
-    cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/{*.dtb,$kernelimg,config-$kernelrelease} $bootpartdir
-    if [ $DESTARCH = arm64 ]; then
-        cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/vmlinuz-$kernelrelease $bootpartdir
-    elif [ $DESTARCH = arm32 ]; then
-        cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/uImage* $bootpartdir
-    fi
-
-    # install kernel modules
-    fbprint_n "Installing kernel modules "
-    cp -rf $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules $bootpartdir
-    modversion=$(ls $KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules|xargs echo|cut -d' ' -f1)
-    rm -f $bootpartdir/modules/$modversion/{build,source}
-
-    # install distro boot script
-    fbprint_n "Installing distro boot script "
-    if [ $DESTARCH = arm64 -a $SOCFAMILY = LS ]; then
-        socseries=l; scrmask="-v ls1021atwr"
-    elif [ $DESTARCH = arm32 -a $SOCFAMILY = LS ]; then
-        socseries=l; scrmask=ls1021atwr
-    elif [ $DESTARCH = arm64 -a $SOCFAMILY = IMX ]; then
-        socseries=imx*; scrmask='imx8|imx9'
-    elif [ $DESTARCH = arm32 -a $SOCFAMILY = IMX ]; then
-        socseries=imx*; scrmask='imx6|imx7'
-    fi
-
-    if [ "$MACHINE" = all ]; then
-        bld distroscrall -a $DESTARCH -p $SOCFAMILY
+    # 4. Install distro boot scripts with platform-specific filtering
+    fbprint_n "Installing distro boot script"
+    if [ "$CONFIG_PLATFORM_LS" = "y" ]; then
+        cp -rf "$FBOUTDIR"/boot/LS/*boot.scr "$bootpartdir/"
     else
-        bld distroscr -m $MACHINE
+        cp -rf "$FBOUTDIR"/boot/IMX/*boot.scr "$bootpartdir/"
     fi
 
-    ls $FBOUTDIR/bsp/u-boot/$socseries*/*boot.scr | grep -E $scrmask | xargs -I {} cp {} $bootpartdir
-
-    # secure boot headers
-    if [ $SOCFAMILY = LS -a "$SECURE" = y ]; then
-        [ -n "$BOOTTYPE" ] && boottype=$BOOTTYPE
-        for brd in $machinelist; do
-            [ ! -f $FBOUTDIR/firmware/secboot_hdrs/${MACHINE:0:10}/hdr_dtb.out ] && \
-                bld signimg -m $brd -a $DESTARCH
-        done
-        cp -rf $FBOUTDIR/bsp/secboot_hdrs $bootpartdir
-        ls $FBOUTDIR/bsp/secboot_hdrs/*/*bs.out | grep $scrmask | xargs -I {} cp {} $bootpartdir
+    # 5. Handle secure boot headers for Layerscape
+    if [ "$CONFIG_PLATFORM_LS" = "y" ] && [ "${CONFIG_SECURE_BOOT}" = "y" ]; then
+        cp -rf "$FBOUTDIR/bsp/secboot_hdrs" "$bootpartdir/"
+        find "$FBOUTDIR/bsp/secboot_hdrs" -name "*bs.out" | xargs -I {} cp {} "$bootpartdir/"
     fi
 
-    # check IMA/EVM
-    if [ "$IMA_EVM" = y -a $SOCFAMILY = LS ]; then
-        [ -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img ] || \
-            bld rfs -r buildroot:imaevm -a $DESTARCH
+    # 6. Extract kernel version components using sed for better performance
+    local kernelver
+    kernelver=$(sed -n 's/^VERSION = //p;s/^PATCHLEVEL = //p;s/^SUBLEVEL = //p' "$kernel_mk" | tr '\n' '.' | sed 's/\.$//')
+    
+    local timestamp=$(date +%Y%m%d%H%M)
+    local final_name="${bootpartname}_lts_${kernelver}"
+    local boottarball="${final_name}_${timestamp}"
 
-        cp -f $FBOUTDIR/images/initramfs_imaevm_${DESTARCH}.img $bootpartdir/initramfs.img
-        for brd in $LS_MACHINE_LIST; do
-            [ -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr ] && \
-                cp -f $FBOUTDIR/bsp/u-boot/$brd/${brd}_enforce_boot.scr $bootpartdir
-        done
-    fi
+    # 7. Create compressed tarball (using -C to avoid unsafe directory switching)
+    echo "$boottarball" > "$bootpartdir/buildinfo"
+    tar --zstd -cf "$FBOUTDIR/images/$boottarball.tar.zst" -C "$bootpartdir" .
 
-    # install kernel tools/perf
-    [ $DESTARCH = arm64 -a ! -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && bld perf -m $MACHINE
-    [ -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf ] && mkdir -p $bootpartdir/tools && \
-        cp -f $FBOUTDIR/linux/kernel/$DESTARCH/$SOCFAMILY/perf $bootpartdir/tools
+    # 8. Finalize naming and create symbolic links
+    rm -rf "$FBOUTDIR/images/$final_name"
+    mv "$bootpartdir" "$FBOUTDIR/images/$final_name"
+    ln -sf "$boottarball.tar.zst" "$FBOUTDIR/images/$final_name.tar.zst"
 
-    majorver=`grep "^VERSION =" $KERNEL_PATH/Makefile | cut -d' ' -f3`
-    patchlevel=`grep "^PATCHLEVEL =" $KERNEL_PATH/Makefile | cut -d' ' -f3`
-    sublevel=`grep "^SUBLEVEL =" $KERNEL_PATH/Makefile | cut -d' ' -f3`
-    kernelver=$majorver.$patchlevel.$sublevel
-    boottarball=${bootpartname}_lts_${kernelver}${imaevmopt}_`date +%Y%m%d%H%M`
-    echo $boottarball > $bootpartdir/buildinfo
-    cd $bootpartdir && tar --zstd -cf ../$boottarball.tar.zst *
-    cd $FBOUTDIR/images && rm -rf ${bootpartname}_lts_${kernelver}${imaevmopt}
-    mv $bootpartname ${bootpartname}_lts_${kernelver}${imaevmopt}
-    ln -sf $boottarball.tar.zst ${bootpartname}_lts_${kernelver}${imaevmopt}.tar.zst
-
-    fbprint_d $FBOUTDIR/images/$boottarball.tar.zst
+    fbprint_d "$FBOUTDIR/images/$boottarball.tar.zst"
 }
+
+# Entry point check
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    # Enable debug trace if LOG_LEVEL is set to 0
+    [[ "${LOG_LEVEL}" == "0" ]] && set -x
+    generate_bootpartition_tarball "$@"
+fi

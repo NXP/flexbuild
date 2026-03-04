@@ -48,3 +48,6 @@ host-dep:
 docker:
 	@$(BLD) docker
 
+
+rfs $(RFSFILE):
+	@/bin/bash -e $(FBDIR)/tools/distro_debian

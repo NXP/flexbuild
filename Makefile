@@ -15,13 +15,12 @@ PYTHON := python3
 DISTRO_SVR_URL := http://sun.ap.freescale.net/images/debian
 #DISTRO_SVR_URL := https://www.nxp.com/lgfiles/sdk
 DESTARCH := arm64
-DISTRIB_NAME := NXP Debian Linux SDK
+DISTRIB_NAME := "NXP Debian Linux SDK"
 RELEASE_TYPE := external
 DEFAULT_OUT_PATH := $(FBDIR)/build_${DISTRIB_VERSION}
 DEFAULT_PKGDIR := $(FBDIR)/components_${DISTRIB_VERSION}
 DEBIAN_CODENAME := trixie
-DEBIAN_VERSION :=  13
-MC_FW_VERSION := "10.39.0"
+DEBIAN_VERSION := 13
 
 LOG_LEVEL ?= 2
 
@@ -85,8 +84,8 @@ LOG_LEVEL=0
 endif
 
 export JOBS := $(CONFIG_JOBS)
-export BOOT_TYPE
-export SOCFAMILY DESTARCH DISTRIB_VERSION DEFAULT_REPO_TAG FBDIR DISTRO_SVR_URL MC_FW_VERSION
+export BOOT_TYPE DEBIAN_VERSION DEFAULT_OUT_PATH DEFAULT_PKGDIR DEBIAN_CODENAME
+export SOCFAMILY DESTARCH DISTRIB_VERSION DEFAULT_REPO_TAG FBDIR DISTRO_SVR_URL
 export ARCH := arm64
 export SOCARCH := aarch64
 export SYSARCH := arm64
@@ -228,20 +227,6 @@ include $(FBDIR)/src/apps/Makefile
 endif
 
 include $(FBDIR)/include/func.mk
-
-
-# ============================================================================
-# Root Filesystem
-# ============================================================================
-
-.PHONY: rfs rootfs
-rfs rootfs:
-	@echo -e "$(GREEN)Building root filesystem$(NC)"
-	@echo "Distribution: Debian $(DEBIAN_CODENAME)"
-	@echo "Version: $(DEBIAN_VERSION)"
-	@$(BLD) rfs -m $(MACHINE) && \
-	echo -e "$(GREEN)Root filesystem build complete!$(NC)"
-
 
 # ============================================================================
 # Clean Targets

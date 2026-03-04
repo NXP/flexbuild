@@ -35,7 +35,7 @@ install -D -m 644 configs/debian/extra_packages_list "$ROOTDIR"/etc/
 # ---- Rootfs configuration inside chroot ----
 #echo "[POST_ROOTFS] Configuring rootfs in chroot"
 
-chroot "$ROOTDIR" /bin/bash -e <<'EOF'
+chroot "$ROOTDIR" /usr/bin/env LC_ALL=C LANG=C bin/bash -e <<'EOF'
 # Create missing directories
 mkdir -p /usr/local/bin \
          /etc/udev/rules.d \

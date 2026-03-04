@@ -1,35 +1,104 @@
 #!/bin/bash
 
-# Copyright 2017-2025 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-build_distro_rfs_debian() {
-    [ $DISTROTYPE = debian ] && [ -f $RFSDIR/etc/buildinfo ] && \
-    log_mute echo "$RFSDIR already exists!" && exit 0
-	rfs_umount "$RFSDIR"
+# Enable pipefail to ensure pipeline errors are captured
+set -o pipefail
 
-    [ `whoami` = root ] && sudopt="" || sudopt=sudo
+# Color definitions for output
+GREEN='\e[1;32m'
+green='\e[0;32m'
+NC='\e[0m'
+
+log_mute() {
+  case "${LOG_LEVEL:-2}" in
+    0)
+      "$@"
+      ;;
+    1)
+      "$@" >/dev/null
+      ;;
+    2)
+      "$@" >/dev/null 2>&1 || {
+        echo "Error: Command '$*' failed. Please export LOG_LEVEL=0 and retry."
+        exit 1
+      }
+      ;;
+	*)
+		echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
+		exit 1
+		;;
+  esac
+}
+
+rfs_umount() {
+	for mnt in dev/pts dev sys/kernel/security sys  proc; do
+		 if mountpoint -q "$1/$mnt"; then
+			 if ! umount "$1/$mnt"; then
+				 sleep 2
+				 umount -f "$1/$mnt" || true
+				 log_mute echo umount $1/$mnt failed
+			 else
+				 log_mute echo umont $mnt successfully
+			 fi
+		 else
+			 log_mute echo $mnt is not mounted.
+		 fi
+	done
+}
+
+rfs_mount() {
+	if ! mountpoint -q "$1/proc"; then
+		mount -t proc /proc "$1/proc"
+	fi
+	if ! mountpoint -q "$1/sys"; then
+		mount -t sysfs /sys "$1/sys"
+	fi
+	if ! mountpoint -q "$1/dev"; then
+		mount --bind /dev "$1/dev"
+	fi
+	if ! mountpoint -q "$1/dev/pts"; then
+		mount --bind /dev/pts "$1/dev/pts"
+	fi
+}
+
+
+fbprint_n() { echo -e "${green}\n$1 ${NC}"; }
+fbprint_d() { echo -e "${GREEN}$1     [Done] ${NC}"; }
+
+build_distro_rfs_debian() {
+    [ -f $RFSDIR/etc/buildinfo ] && fbprint_n "$RFSDIR already exists!" && exit 0
+	rfs_umount "$RFSDIR"
+    . $FBDIR/configs/debian/extra_packages_list
 
     fbprint_n "Generating rootfs: $RFSDIR"
     cd $FBDIR
-    test -c $RFSDIR/dev/pts/ptmx && $sudopt umount $RFSDIR/dev/pts
-    test -f $RFSDIR/proc/uptime && $sudopt umount $RFSDIR/proc
-    [ -n "$RFSDIR" ] && $sudopt rm -rf $RFSDIR/*
+    test -c $RFSDIR/dev/pts/ptmx && umount $RFSDIR/dev/pts
+    test -f $RFSDIR/proc/uptime && umount $RFSDIR/proc
+    [ -n "$RFSDIR" ] && rm -rf $RFSDIR/*
 
 
-    if [ -n "$DISTROVARIANT" -a "$DISTROVARIANT" = "base" ]; then
+    if [ -n "$RFS_BASE" ]; then
         PKGS=''
         NEWRFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64
         RFSCMD=$FBDIR/configs/debian/debian_base_arm64.sh
     else
-		case "$MACHINE" in
-			   imx8*|imx95*)    PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}"); log_mute echo gnome package ;;
-			   imx9*)           PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}"); log_mute echo imx package ;;
-			   l*)  	        PKGS=("${ls_pkgs[@]}"); log_mute echo ls  package ;;
-			   *)               PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}"); log_mute echo imx package ;;
-		esac
+        if [[ "$CONFIG_SOC_IMX8" == "y" || "$CONFIG_SOC_IMX95" == "y" ]]; then
+            PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}")
+            log_mute echo gnome package
+        elif [[ "$CONFIG_SOC_IMX91" == "y" || "$CONFIG_SOC_IMX93" == "y" ]]; then
+            PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}")
+            log_mute echo imx package
+        elif [[ "$CONFIG_SOC_LS" == "y" ]]; then
+            PKGS=("${ls_pkgs[@]}")
+            log_mute echo ls package
+        else
+            PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}")
+            log_mute echo imx package
+        fi
         NEWRFSDIR=$RFSDIR
         RFSCMD=$FBDIR/configs/debian/debian_server_arm64.sh
     fi
@@ -40,23 +109,23 @@ build_distro_rfs_debian() {
     if [ -n "$CONFIG_RFS_GRADUAL" ]; then
 
 		# construct basic rfs
-		$sudopt bash $RFSCMD "$NEWRFSDIR"
+		/bin/bash $RFSCMD "$NEWRFSDIR"
 
         rfs_mount $NEWRFSDIR
 
-        show_one_line $sudopt chroot $NEWRFSDIR apt-get update
+        show_one_line chroot $NEWRFSDIR apt-get update
 
         install_success=false
         MAX_RETRIES=3
         for ((attempt=1; attempt<=$MAX_RETRIES; attempt++)); do
             log_mute echo "Try to generate rootfs for the $attempt time..."
-            if show_one_line $sudopt chroot $NEWRFSDIR apt-get install --no-install-recommends -y "${PKGS[@]}"; then
+            if show_one_line chroot $NEWRFSDIR apt-get install --no-install-recommends -y "${PKGS[@]}"; then
                 install_success=true
                 break
             else
                 if [ $attempt -lt $MAX_RETRIES ]; then
                     sleep 5
-                    show_one_line $sudopt chroot apt update --fix-missing > /dev/null 2>&1
+                    show_one_line chroot apt update --fix-missing > /dev/null 2>&1
                 fi
             fi
         done
@@ -67,20 +136,27 @@ build_distro_rfs_debian() {
 
 
         # clean cached packages
-        log_mute $sudopt chroot $NEWRFSDIR apt clean
-        log_mute $sudopt chroot $NEWRFSDIR apt autoclean
-        log_mute $sudopt chroot $NEWRFSDIR apt autoremove -y
+        log_mute chroot $NEWRFSDIR apt clean
+        log_mute chroot $NEWRFSDIR apt autoclean
+        log_mute chroot $NEWRFSDIR apt autoremove -y
 
         rfs_umount $NEWRFSDIR
 	else
-		$sudopt bash $RFSCMD "$NEWRFSDIR" "${PKGS[@]}"
+		/bin/bash $RFSCMD "$NEWRFSDIR" "${PKGS[@]}"
 	fi
 
-    $sudopt bash $FBDIR/configs/debian/debian_post_config.sh "$NEWRFSDIR"
+    /bin/bash $FBDIR/configs/debian/debian_post_config.sh "$NEWRFSDIR"
 
-    if [ -z "$DISTROVARIANT" ] || [ "$DISTROVARIANT" != "base" ]; then
+    if [ "$RFS_BASE" != "y" ]; then
         ln -sf /lib/systemd/system/platcfg.service "$NEWRFSDIR"/etc/systemd/system/multi-user.target.wants/platcfg.service
     fi
 
     fbprint_d $NEWRFSDIR
 }
+
+# Entry point check
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    # Enable debug trace if LOG_LEVEL is set to 0
+    [[ "${LOG_LEVEL}" == "0" ]] && set -x
+    build_distro_rfs_debian "$@"
+fi

@@ -1,58 +1,6 @@
 # NXP Debian Linux SDK Distribution configuration for iMX and Layerscape MPU platforms
 
-DISTRIB_NAME:    "NXP Debian Linux SDK"
-DISTRIB_VERSION: "lsdk2606"
-RELEASE_TYPE:    "external"
-
-
-# default repo tag which can be overrided by specified tag
-DEFAULT_REPO_TAG: "lf-6.12.49-2.2.0"
-
-# default Debian version for target userland
-DEBIAN_CODENAME: "trixie"
-DEBIAN_VERSION:  "13"
-
-# y if git information is needed
-CONFIG_KEEP_GIT: n
-
-# enable/disable custom packagegroups
-# This feature is intended for advanced users.
-# Improper configuration may lead to build failures
-# or cause the system to operate incorrectly.
-# It is strongly recommended not to modify this setting.
-PKG_GROUPS_NETWORKING: y
-PKG_GROUPS_UTILS: y
-PKG_GROUPS_SECURITY: y
-PKG_GROUPS_ML: y
-PKG_GROUPS_GOPOINT: y
-PKG_GROUPS_ROBOTICS: n
-
-# default IMX if '-p' option is not specified, change to LS for Layerscape SoC
-DEFAULT_SOC_FAMILY: IMX
-
-# force build in docker environment
-# must be 'y'
-FORCE_BUILD_IN_DOCKER: y
-
-# The URL for pre-built images
-DISTRO_SVR_URL: "https://www.nxp.com/lgfiles/sdk"
-
-# fuse provisioning
-CONFIG_FUSE_PROVISIONING: n
-
-# user can customize the default path of components source and build output path
-DEFAULT_OUT_PATH: $FBDIR/build_${DISTRIB_VERSION}
-DEFAULT_PKGDIR: $FBDIR/components_${DISTRIB_VERSION}
-
-
-# default kernel config list
-KERNEL_CONFIG:
-  ARM64_LS:  "defconfig lsdk.config"
-  ARM64_IMX: "imx_v8_defconfig"
-
-
-# DPAA2 MC firmware version
-MC_FW_VERSION:  "10.39.0"
+# All the micro definitions are moved to Makefile.
 
 # flexbuild repo list
 repo:
@@ -597,3 +545,4 @@ repo:
   imx_camera_rotation:
     url: https://github.com/nxp-imx-support/imx-camera-rotation.git
     ver: e8d7f8b
+

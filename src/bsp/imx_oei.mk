@@ -11,13 +11,13 @@
 
 
 
-OEI_DEPS := $(if $(filter y,$(CONFIG_SOC_IMX95_15X15)),mx95lp4x-15,mx95lp5)
+OEI_PARA := $(if $(filter y,$(CONFIG_SOC_IMX95_15X15)),mx95lp4x-15,mx95lp5)
 imx_oei:
 	@$(call download_repo,imx_oei,bsp)
 	$(call patch_apply,imx_oei,bsp)
 	$(call fbprint_b,"imx_oei")
 	export PATH=/usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin:$(PATH)
-	$(MAKE) board=$(OEI_DEPS) oei=ddr -C $(BSPDIR)/imx_oei clean $(LOG_MUTE)
-	$(MAKE) board=$(OEI_DEPS) oei=ddr DEBUG=1 -C $(BSPDIR)/imx_oei \
+	$(MAKE) board=$(OEI_PARA) oei=ddr -C $(BSPDIR)/imx_oei clean $(LOG_MUTE)
+	$(MAKE) board=$(OEI_PARA) oei=ddr DEBUG=1 -C $(BSPDIR)/imx_oei \
 		OEI_CROSS_COMPILE=arm-none-eabi- r=B0 $(LOG_MUTE)
 	$(call fbprint_d,"imx_oei")

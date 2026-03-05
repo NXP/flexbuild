@@ -11,10 +11,12 @@ KOUTDIR := $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)
 KTGT_DIR := $(FBOUTDIR)/linux/$(KERNEL_TREE)/arm64/$(SOCFAMILY)
 DTBSTR := $(if $(filter y,$(CONFIG_PLATFORM_IMX)),imx*.dtb,fsl*.dtb)
 KERNEL_IMAGE := $(KTGT_DIR)/Image
+KHEADER_FILE := $(DESTDIR)/usr/include/linux/version.h
 
 # Find and include all .mk files in this directory
-LINUX_MK_FILES := $(wildcard $(FBDIR)/src/linux/*.mk)
-include $(LINUX_MK_FILES)
+LINUX_MAP-y                       := linux.mk cryptodev_linux.mk perf.mk
+LINUX_MAP-$(CONFIG_PLATFORM_IMX)  := isp_vvcam_module.mk nxp_wlan_bt.mk
+LINUX_MAP-$(CONFIG_PLATFORM_LS)   := mdio_proxy_module.mk
 
-# All Linux targets in this directory (derived from .mk files)
-LINUX_TARGETS := $(basename $(notdir $(LINUX_MK_FILES)))
+LINUX_MK_FILES := $(sort $(LINUX_MAP-y))
+include $(addprefix src/linux/,$(LINUX_MK_FILES))

@@ -45,7 +45,7 @@ linux-modules: cryptodev_linux perf $(KMOD_DEPS)
 
 
 
-linux-headers: $(KERNEL_IMAGE)
+linux-headers $(KHEADER_FILE): $(KERNEL_IMAGE)
 	@$(call download_repo,linux,linux)
 	 mkdir -p $(DESTDIR)/usr
 	 $(MAKE) headers_install INSTALL_HDR_PATH=$(DESTDIR)/usr -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)

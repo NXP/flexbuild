@@ -49,5 +49,5 @@ docker:
 	@$(BLD) docker
 
 
-rfs $(RFSFILE):
+rfs: $(KHEADER_FILE)
 	@/bin/bash -e $(FBDIR)/tools/distro_debian

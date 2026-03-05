@@ -9,7 +9,7 @@
 
 LSFW_DEPS += $(if $(CONFIG_SOC_LS1028ARDB),dp_fw_cadence)
 layerscape_fw: mc_bin mc_utils fm_ucode qe_ucode phy_cortina phy_inphi pfe_bin ddr_phy_bin $(LSFW_DEPS)
-	@touch $(FBDIR)/logs/.lsfwdone
+	@$(call fbprint_d,"Layerscape firmware done.")
 
 
 UTILSDIR = $(PKGDIR)/apps/utils

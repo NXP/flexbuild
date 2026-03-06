@@ -30,7 +30,7 @@ imx_secure_enclave: openssl mbedtls
 			DESTDIR=$(DESTDIR) \
 			install_tests $(LOG_MUTE); \
 	fi && \
-	make clean && \
+	make clean $(LOG_MUTE) && \
 	$(MAKE) -j$(JOBS) PLAT=ele \
 		SYSTEMD_DIR=/usr/lib/systemd/system \
 		OPENSSL_PATH=$(SECDIR)/openssl \

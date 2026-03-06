@@ -13,8 +13,10 @@
 
 ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
   DEP_GSTBASE = mali_imx imx_dpu_g2d_v2
-else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
-  DEP_GSTBASE = gpu_viv imx_gpu_g2d imx_dpu_g2d_v1
+else ifeq ($(filter imx8M%,$(MACHINE)),$(MACHINE))
+  DEP_GSTBASE = gpu_viv imx_gpu_g2d
+else ifeq ($(filter imx8Q%,$(MACHINE)),$(MACHINE))
+  DEP_GSTBASE = imx_dpu_g2d_v1
 else
   DEP_GSTBASE =
 endif

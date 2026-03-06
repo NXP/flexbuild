@@ -12,8 +12,10 @@
 
 ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
   DEP_WESTON = mali_imx imx_dpu_g2d_v2
-else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
-  DEP_WESTON = gpu_viv imx_gpu_g2d imx_dpu_g2d_v1
+else ifeq ($(filter imx8m%,$(MACHINE)),$(MACHINE))
+  DEP_WESTON = gpu_viv imx_gpu_g2d
+else ifeq ($(filter imx8q%,$(MACHINE)),$(MACHINE))
+  DEP_WESTON = gpu_viv imx_dpu_g2d_v1
 else ifeq ($(filter l%,$(MACHINE)),$(MACHINE))
   DEP_WESTON = gpu_viv imx_gpu_g2d
 else ifeq ($(filter imx9%,$(MACHINE)),$(MACHINE))
@@ -23,7 +25,7 @@ else
 endif
 
 #weston:
-weston: $(DEP_WESTON) libdrm wayland wayland_protocols
+weston: $(DEP_WESTON) libdrm wayland_protocols
 	@[ $(SOCFAMILY) != IMX -a $${MACHINE:0:7} != ls1028a ] && exit || \
 	 $(call download_repo,weston,apps/graphics) && \
 	 $(call patch_apply,weston,apps/graphics) && \

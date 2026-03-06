@@ -13,7 +13,7 @@ GPNT_APPS_FOLDER = /opt/gopoint-apps
 
 IMX_NNSTREANER_DIR = $(GPNT_APPS_FOLDER)/scripts/machine_learning/nnstreamer
 
-imx_nnstreamer_examples: gstreamer
+imx_nnstreamer_examples: gstreamer tflite gst_plugins_good
 	@[ $(SOCFAMILY) != IMX  ] && exit || \
 	 $(call download_repo,imx_nnstreamer_examples,apps/gopoint) && \
 	 $(call patch_apply,imx_nnstreamer_examples,apps/gopoint) && \

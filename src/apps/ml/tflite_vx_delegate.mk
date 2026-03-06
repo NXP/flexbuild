@@ -7,10 +7,6 @@
 # DEPEND: tensorflow-lite tim-vx
 
 # ./benchmark_model --external_delegate_path=<patch_to_libvx_delegate.so> --graph=<tflite_model.tflite>
-
-#
-# TFLITE_BUILD_DIR was defined in src/apps/ml/tflite_neutron_delegate.mk as:
-# TFLITE_BUILD_DIR = "$(MLDIR)"/tflite/build_debian_arm64
 #
 
 

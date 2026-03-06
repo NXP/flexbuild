@@ -10,7 +10,7 @@ restool:
 	 $(call patch_apply,restool,apps/networking) && \
 	 $(call fbprint_b,"restool") && \
 	 cd $(NETDIR)/restool && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"restool")

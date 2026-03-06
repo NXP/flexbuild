@@ -12,9 +12,12 @@
 ifeq ($(filter imx93%,$(MACHINE)),$(MACHINE))
 	_GST_PLUGIN_PLAT = MX9
 	DEP_GST_PLUGIN = imx_pxp_g2d
-else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
+else ifeq ($(filter imx8m%,$(MACHINE)),$(MACHINE))
 	_GST_PLUGIN_PLAT = MX8
-	DEP_GST_PLUGIN = imx_gpu_g2d imx_dpu_g2d_v1
+	DEP_GST_PLUGIN = imx_gpu_g2d imx_vpu_hantro_vc imx_vpuwrap
+else ifeq ($(filter imx8q%,$(MACHINE)),$(MACHINE))
+	_GST_PLUGIN_PLAT = MX8
+	DEP_GST_PLUGIN = imx_dpu_g2d_v1
 else ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
 	_GST_PLUGIN_PLAT = MX9
 	DEP_GST_PLUGIN = imx_dpu_g2d_v2
@@ -24,7 +27,7 @@ else
 endif
 
 #imx_gst_plugin:
-imx_gst_plugin: $(DEP_GST_PLUGIN) imx_lib libdrm imx_parser gst_plugins_bad imx_vpu_hantro_vc imx_vpuwrap imx_codec
+imx_gst_plugin: $(DEP_GST_PLUGIN) imx_lib libdrm imx_parser gst_plugins_bad imx_codec
 	@[ $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,imx_gst_plugin,apps/multimedia) && \
 	 $(call patch_apply,imx_gst_plugin,apps/multimedia) && \

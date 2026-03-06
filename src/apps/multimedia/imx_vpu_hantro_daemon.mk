@@ -27,7 +27,7 @@ imx_vpu_hantro_daemon: imx_vpu_hantro imx_vpu_hantro_vc
 	     -e 's|HANTRO_H1_LIB_DIR =.*|HANTRO_H1_LIB_DIR = $(DESTDIR)/usr/lib|' \
 	     -e 's|CTRLSW_HDRPATH =.*|CTRLSW_HDRPATH = $(DESTDIR)/usr/include|' -i Makefile && \
 	for socplat in $(SOCLIST); do \
-	     $(MAKE) clean && \
+	     $(MAKE) clean $(LOG_MUTE) && \
 	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat $(LOG_MUTE) && \
 	     $(MAKE) SDKTARGETSYSROOT=$(RFSDIR) DEST_DIR=$(DESTDIR) PLATFORM=$$socplat install $(LOG_MUTE) && \
 	     mv $(DESTDIR)/usr/bin/vsidaemon $(DESTDIR)/usr/bin/vsidaemon-$$socplat; \

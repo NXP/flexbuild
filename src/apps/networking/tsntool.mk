@@ -20,7 +20,7 @@ tsntool:
 	 cd $(NETDIR)/tsntool && \
 	 mkdir -p include/linux && \
 	 cp -f $(KERNEL_PATH)/include/uapi/linux/tsn.h include/linux && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/usr/local/bin && install -d $(DESTDIR)/usr/lib && \
 	 install -m 755 tsntool $(DESTDIR)/usr/local/bin/tsntool && \

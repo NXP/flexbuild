@@ -16,7 +16,7 @@ imx_pxp_g2d:
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 $(call fbprint_b,"imx_pxp_g2d") && \
 	 cd $(GRAPHICSDIR)/imx_pxp_g2d && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) PLATFORM=IMX93 INCLUDE='-I$(DESTDIR)/usr/include' DEST_DIR=$(DESTDIR) $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS)  DEST_DIR=$(DESTDIR) install $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_pxp_g2d")

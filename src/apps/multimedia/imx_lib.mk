@@ -19,7 +19,7 @@ imx_lib:
          else \
              SOCPLATFORM="MX8"; \
          fi && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
      # to enable PXP, IMX8ULP must be assigned && \
 	 PLATFORM=IMX8ULP $(MAKE) -j$(JOBS) all $(LOG_MUTE) && \
 	 #PLATFORM=$${SOCPLATFORM} $(MAKE) -j$(JOBS) all && \

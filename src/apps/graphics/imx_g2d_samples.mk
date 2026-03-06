@@ -21,8 +21,11 @@ else ifeq ($(filter imx93%,$(MACHINE)),$(MACHINE))
 else ifeq ($(filter imx943%,$(MACHINE)),$(MACHINE))
 	DEP_G2D = imx_pxp_g2d
 	BUILD_IMPLEMENTATION = pxp
-else ifeq ($(filter imx8%,$(MACHINE)),$(MACHINE))
-	DEP_G2D = imx_gpu_g2d gpu_viv imx_dpu_g2d_v1
+else ifeq ($(filter imx8m%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = imx_gpu_g2d gpu_viv
+	BUILD_IMPLEMENTATION = gpu-drm
+else ifeq ($(filter imx8q%,$(MACHINE)),$(MACHINE))
+	DEP_G2D = gpu_viv imx_dpu_g2d_v1
 	BUILD_IMPLEMENTATION = gpu-drm
 else
 	DEP_G2D =
@@ -41,7 +44,7 @@ imx_g2d_samples: $(DEP_G2D)
 	 export SDKTARGETSYSROOT=$(RFSDIR) && \
 	 export CFLAGS="-I$(DESTDIR)/usr/include" && \
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-rpath-link=$(DESTDIR)/usr/lib" && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) install DESTDIR=$(DESTDIR) $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_g2d_samples")

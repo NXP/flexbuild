@@ -12,6 +12,7 @@
 
 
 TFLITE_VERSION = tensorflow-lite-2.18.0
+TFLITE_BUILD_DIR = "$(MLDIR)"/tflite/build_debian_arm64
 
 tflite: flatbuffers
 	@[ $(SOCFAMILY) != IMX  ] && exit || \

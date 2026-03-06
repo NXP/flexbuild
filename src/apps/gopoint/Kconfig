@@ -54,6 +54,8 @@ config GP_IMX_NNSTREAMER_EXAMPLES
 	bool "i.MX NNStreamer examples"
 	default n
 	select ML_NNSTREAMER
+    select ML_TFLITE
+    select MM_GST_PLUGINS_GOOD
 	help
 	  NNStreamer examples for i.MX platforms
 

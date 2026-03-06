@@ -20,7 +20,7 @@ ceetm:
 	 fi && \
 	 export IPROUTE2_DIR=$(NETDIR)/ceetm/$(IPROUTE2_PKG) && \
 	 export CC=$(CROSS_COMPILE)gcc && \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
 	 $(MAKE) install $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/usr/lib/aarch64-linux-gnu/tc && \

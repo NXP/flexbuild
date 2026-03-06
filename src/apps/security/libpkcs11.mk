@@ -15,7 +15,7 @@ libpkcs11: secure_obj
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
 	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
 	 $(MAKE) clean $(LOG_MUTE) && \
-	 $(MAKE) all OPENSSL_PATH=$(SECDIR)/openssl $(LOG_MUTE) \
+	 $(MAKE) all OPENSSL_PATH=$(SECDIR)/openssl -j1 \
 	 EXPORT_DIR=$(DESTDIR)/usr/local CURDIR=$(SECDIR)/libpkcs11 \
 	 SECURE_OBJ_PATH=$(SECDIR)/secure_obj/securekey_lib $(LOG_MUTE) && \
 	 mkdir -p $(DESTDIR)/usr/local/bin && \

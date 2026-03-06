@@ -4,7 +4,6 @@
 
 # DEPEND: tensorflow-lite neutron
 
-TFLITE_BUILD_DIR = "$(MLDIR)"/tflite/build_debian_arm64
 
 #tflite_neutron_delegate:
 tflite_neutron_delegate: tflite neutron

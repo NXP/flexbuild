@@ -18,7 +18,7 @@ nxp_afe: alsa_lib
 	 export INSTALLDIR=$(MMDIR)/nxp_afe/deploy_afe && \
 	 sed -i '/^INSTALLDIR/c INSTALLDIR := ./deploy_afe' makefile && \
 	 \
-	 $(MAKE) clean && \
+	 $(MAKE) clean $(LOG_MUTE) && \
 	 $(MAKE) -j$(JOBS) all $(LOG_MUTE) && \
 	 \
 	 install -d $(DESTDIR)/usr/lib/nxp-afe && \

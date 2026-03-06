@@ -71,7 +71,6 @@ config ML_NNSHARK
 config ML_NNSTREAMER_EDGE
 	bool "NNStreamer Edge"
 	default n
-    select ML_NNSTREAMER
 	help
 	  NNStreamer for edge AI applications
 

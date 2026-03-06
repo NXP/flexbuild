@@ -5,7 +5,7 @@
 
 
 mbedtls:
-	$(call download_repo,mbedtls,apps/security,submod) && \
+	@$(call download_repo,mbedtls,apps/security,submod) && \
 	$(call patch_apply,mbedtls,apps/security) && \
 	\
 	$(call fbprint_b,"mbedtls") && \

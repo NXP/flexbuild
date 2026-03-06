@@ -63,8 +63,6 @@ KERNEL_CFG := imx_v8_defconfig
 else ifeq ($(CONFIG_PLATFORM_LS),y)
 SOCFAMILY := LS
 KERNEL_CFG := defconfig lsdk.config
-else
-$(error Platform not supported)
 endif
 
 get_soc_cfg_name = CONFIG_SOC_$(subst -,_,$(shell echo $(1) | tr a-z A-Z))
@@ -117,19 +115,6 @@ export LOG_MUTE
 export MACHINE
 
 
-$(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
-$(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
-$(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))
-$(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR)/usr/local/{lib,bin,include})
-$(shell mkdir -p $(FBOUTDIR)/{bsp/atf,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
-$(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics} $(KERNEL_OUTPUT_PATH))
-
-CUSTOM_CONFIG := $(subst ",,$(strip $(CONFIG_CUSTOM_SDK_CONFIG)))
-SDK_YML := $(if $(CUSTOM_CONFIG),\
-                $(FBDIR)/configs/$(CUSTOM_CONFIG),\
-                $(FBDIR)/configs/sdk.yml)
-$(shell python3 $(FBDIR)/tools/parse_yaml.py $(SDK_YML) $(FBDIR)/configs/.sdk.cfg)
-$(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
 
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk
@@ -147,7 +132,6 @@ all:
 	@time $(BLD) -m $(MACHINE)
 	@echo -e "$(GREEN)Build complete!$(NC)"
 
-
 # MENUCONFIG_STYLE can be: default, aquatic, monochrome
 .PHONY: menuconfig
 menuconfig:
@@ -159,7 +143,6 @@ menuconfig:
 	$(PYTHON) -m menuconfig && \
 	$(PYTHON) tools/kconfig_hooks.py && \
 	$(MAKE) host-dep
-
 
 # Help target
 .PHONY: help
@@ -217,6 +200,20 @@ help:
 # ============================================================================
 
 ifneq ("$(wildcard $(FBDIR)/.config)","")
+
+$(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
+$(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
+$(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))
+$(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR)/usr/local/{lib,bin,include})
+$(shell mkdir -p $(FBOUTDIR)/{bsp/atf,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
+$(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics} $(KERNEL_OUTPUT_PATH))
+
+CUSTOM_CONFIG := $(subst ",,$(strip $(CONFIG_CUSTOM_SDK_CONFIG)))
+SDK_YML := $(if $(CUSTOM_CONFIG),\
+                $(FBDIR)/configs/$(CUSTOM_CONFIG),\
+                $(FBDIR)/configs/sdk.yml)
+$(shell python3 $(FBDIR)/tools/parse_yaml.py $(SDK_YML) $(FBDIR)/configs/.sdk.cfg)
+$(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
 
 include $(FBDIR)/src/linux/Makefile
 

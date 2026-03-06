@@ -71,12 +71,14 @@ config ML_NNSHARK
 config ML_NNSTREAMER_EDGE
 	bool "NNStreamer Edge"
 	default n
+    select ML_NNSTREAMER
 	help
 	  NNStreamer for edge AI applications
 
 config ML_NNSTREAMER
 	bool "NNStreamer"
 	default n
+    depends on SOC_IMX8 || SOC_IMX95 || SOC_IMX93
 	select MM_GSTREAMER
 	select MM_GST_PLUGINS_BASE
 	select ML_NNSTREAMER_EDGE

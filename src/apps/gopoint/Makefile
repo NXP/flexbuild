@@ -23,6 +23,7 @@ GP_MODULES := \
     imx_voiceplayer \
     imx_voiceui \
     nxp_afe \
+    imx_camera_rotation \
     nxp_demo_experience_assets
 
 # ============================================================================

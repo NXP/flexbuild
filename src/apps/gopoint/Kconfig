@@ -36,6 +36,7 @@ config GP_IMX_DEMOS_LIST
 config GP_IMX_EBIKE_VIT
 	bool "i.MX E-bike VIT demo"
 	default n
+    depends on SOC_IMX8 || SOC_IMX95 || SOC_IMX93
 	#select GP_NXP_AFE
 	#select GP_IMX_VOICEUI
 	help
@@ -68,6 +69,7 @@ config GP_IMX_SMART_FITNESS
 config GP_IMX_SMART_KITCHEN
 	bool "i.MX Smart Kitchen demo"
 	default n
+    depends on SOC_IMX8 || SOC_IMX95 || SOC_IMX93
 	#select GP_IMX_VOICEUI
 	help
 	  Smart kitchen assistant demonstration

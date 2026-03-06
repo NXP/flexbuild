@@ -22,38 +22,13 @@ config ARM64
 	  Define the arm64 architecture
 
 choice
-	prompt "Target Platform Family"
-	default PLATFORM_IMX
+	prompt "Target Platform"
+	default SOC_IMX93FRDM
 	help
 	  Select the target platform family
 
-config PLATFORM_IMX
-	bool "NXP i.MX Platform"
-	help
-	  Build for NXP i.MX family processors
-
-config PLATFORM_LS
-	bool "NXP LayerScape Platform"
-	help
-	  Build for NXP LayerScape family processors
-
-endchoice
-
-
-
-# ============================================================================
-# SubTarget Configuration Categories
-# ============================================================================
-choice
-	prompt "Subtarget platform Family"
-	default SOC_IMX93EVK if PLATFORM_IMX
-	default SOC_LX2160ARDB if PLATFORM_LS
-	help
-	  Select the subtarget platform family
-
 # Source board configurations
-source "configs/board/Kconfig.imx"
-source "configs/board/Kconfig.ls"
+source "configs/board/Kconfig"
 
 endchoice
 
@@ -90,6 +65,14 @@ config SOC_IMX95
 config SOC_LS104
     bool
     default y if SOC_LS1046ARDB || SOC_LS1043ARDB
+
+config PLATFORM_IMX
+    bool
+    default y if SOC_IMX8 || SOC_IMX91 || SOC_IMX93 || SOC_IMX95
+
+config PLATFORM_LS
+    bool
+    default y if SOC_LS1028ARDB || SOC_LS104 || SOC_LX2160ARDB
 
 # ============================================================================
 # Build Configuration Categories

@@ -11,15 +11,12 @@ imx_test: libdrm alsa_lib
 	@[ $(DESTARCH) != arm64 -o $(SOCFAMILY) != IMX ] && exit || \
 	 $(call download_repo,imx_test,apps/utils) && \
 	 $(call patch_apply,imx_test,apps/utils) && \
-	 if [ ! -d $(DESTDIR)/usr/include/linux ]; then \
-	     bld linux-headers -m $(MACHINE); \
-	 fi && \
 	 sudo cp -rf $(DESTDIR)/usr/include/alsa $(RFSDIR)/usr/include && \
 	 $(call fbprint_b,"imx_test") && \
 	 cd $(UTILSDIR)/imx_test && \
 	 mkdir -p $(DESTDIR)/opt/unit_tests && \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -I$(RFSDIR)/usr/include -I$(DESTDIR)/usr/include -O2 -pipe -g" && \
-	 V=0 VERBOSE='' SDKTARGETSYSROOT=$(DESTDIR) IMX_TEST_PLAT=$(IMX_TEST_PLAT) \
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
-	 $(MAKE) install DESTDIR=$(DESTDIR)/opt/unit_tests IMX_TEST_PLAT=$(IMX_TEST_PLAT) $(LOG_MUTE) && \
+	 V=0 VERBOSE='' SDKTARGETSYSROOT=$(DESTDIR) PLATFORM=$(IMX_TEST_PLAT) \
+	 $(MAKE) $(LOG_MUTE) && \
+	 $(MAKE) install DESTDIR=$(DESTDIR)/opt/unit_tests PLATFORM=$(IMX_TEST_PLAT) $(LOG_MUTE) && \
 	 $(call fbprint_d,"imx_test")

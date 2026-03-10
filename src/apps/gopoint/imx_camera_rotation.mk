@@ -25,6 +25,7 @@ imx_camera_rotation:
 	ln -sfn /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
 	cp -f $(DESTDIR)/usr/include/g2d.h $(RFSDIR)/usr/include && \
 	cp -af $(DESTDIR)/usr/lib/libg2d* $(RFSDIR)/usr/lib && \
+	cp -af $(DESTDIR)/usr/lib/libdrm.so* $(RFSDIR)/usr/lib && \
 	CFLAGS="$$(PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) pkg-config --cflags opencv4 wayland-client) -Wall -g" \
 	CXXFLAGS="$$(PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) pkg-config --cflags opencv4 wayland-client) -Wall -g" \
 	LDFLAGS="-L$(RFSDIR)/usr/lib/aarch64-linux-gnu -Wl,-rpath-link,$(RFSDIR)/usr/lib/aarch64-linux-gnu" \

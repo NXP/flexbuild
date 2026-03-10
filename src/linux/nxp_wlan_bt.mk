@@ -15,6 +15,7 @@ nxp_wlan_bt:
 	export INSTALL_MOD_PATH=$(KOUTDIR)/tmp
 	cd $(PKGDIR)/linux/nxp_wlan_bt
 	$(MAKE) build KERNELDIR=$(KERNEL_PATH) O=$(KOUTDIR) -C $(PKGDIR)/linux/nxp_wlan_bt $(LOG_MUTE)
-	install -d $(KOUTDIR)/tmp/lib/modules/*/kernel/drivers/net/wireless/nxp
-	cp -f mlan.ko moal.ko $(KOUTDIR)/tmp/lib/modules/*/updates/
+	kernelrelease=$$(cat "$(KOUTDIR)/include/config/kernel.release" 2>/dev/null)
+	install -d $(KOUTDIR)/tmp/lib/modules/"$$kernelrelease"/kernel/drivers/net/wireless/nxp
+	cp -f mlan.ko moal.ko $(KOUTDIR)/tmp/lib/modules/"$$kernelrelease"/updates/
 	$(call fbprint_d,"nxp_wlan_bt")

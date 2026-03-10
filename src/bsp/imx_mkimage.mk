@@ -64,7 +64,7 @@ define build_soc_recipe
 	@echo "Building flash.bin for iMX8QM $(ATF_OPTINFO)"
 	$(call dl_imx_scfw)
 	$(call dl_imx_seco)
-	cp -f $(UBOOT_OUT_DIR)/u-boot.bin $(IMX_MKIMAGE_DIR)/iMX8QM/
+	cp -f $(UBOOT_OUT_DIR)/u-boot.bin $(UBOOT_OUT_DIR)/spl/u-boot-spl.bin $(IMX_MKIMAGE_DIR)/iMX8QM/
 	cp -f $(BSPDIR)/imx-scfw/mx8qm-mek-scfw-tcm.bin $(IMX_MKIMAGE_DIR)/iMX8QM/scfw_tcm.bin
 	cp -f $(BSPDIR)/atf/build/imx8qm/release/bl31.bin $(IMX_MKIMAGE_DIR)/iMX8QM/
 	cp -f $(BSPDIR)/imx-seco/firmware/seco/mx8qmb0-ahab-container.img $(IMX_MKIMAGE_DIR)/iMX8QM/
@@ -120,12 +120,12 @@ define build_soc_recipe
 
 	@# 2. Case Specific Files (M7 and OEI)
 	$(if $(CONFIG_SOC_IMX95_15X15), \
-		cp -f $(BSPDIR)/imx_oei/build/mx95lp5/ddr/oei-m33-ddr.bin $(IMX95DIR)/; \
+		cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-15/ddr/oei-m33-ddr.bin $(IMX95DIR)/; \
 		cp -f $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-15x15-evk_m7_TCM_power_mode_switch.bin $(IMX95DIR)/m7_image.bin; \
 		$(MAKE) SOC=iMX95 REV=B0 OEI=YES LPDDR_TYPE=lpddr4x flash_all $(LOG_MUTE); \
 	)
 	$(if $(CONFIG_SOC_IMX95_19X19), \
-		cp -f $(BSPDIR)/imx_oei/build/mx95lp4x-19/ddr/oei-m33-ddr.bin $(IMX95DIR)/; \
+		cp -f $(BSPDIR)/imx_oei/build/mx95lp5/ddr/oei-m33-ddr.bin $(IMX95DIR)/; \
 		cp -f $(UTILSDIR)/mcore_demo/imx95-m7-demo/imx95-19x19-evk_m7_TCM_power_mode_switch.bin $(IMX95DIR)/m7_image.bin; \
 		$(MAKE) SOC=iMX95 REV=B0 OEI=YES flash_all $(LOG_MUTE); \
 	)

@@ -5,7 +5,7 @@
 # libssl-dev for opensslconf.h
 
 #secure_obj:
-secure_obj: optee_os optee_client
+secure_obj: optee_os optee_client openssl
 	@$(call download_repo,secure_obj,apps/security)
 	 $(call patch_apply,secure_obj,apps/security)
 	 $(call fbprint_b,"secure_obj")

@@ -5,7 +5,7 @@
 
 
 
-openssl:
+openssl: cryptodev_linux
 	 @$(call download_repo,openssl,apps/security,submod) && \
 	 $(call patch_apply,openssl,apps/security) && \
 	 if [ ! -d $(DESTDIR)/usr/local/include/crypto ]; then \

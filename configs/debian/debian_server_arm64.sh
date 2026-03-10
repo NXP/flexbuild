@@ -36,6 +36,7 @@ mmdebstrap \
   --aptopt='Acquire::https::Timeout=30' \
   --aptopt='APT::Get::Assume-Yes=true' \
   --aptopt='DPkg::Options::=--force-confnew' \
+  --aptopt='Dpkg::Progress-Fancy=1' \
   --aptopt='Acquire::Languages="none"' \
   --skip=download/bytecode \
   --variant=standard \

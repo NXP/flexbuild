@@ -119,7 +119,10 @@ export MACHINE
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk
 include $(FBDIR)/include/patch_apply.mk
-include $(FBDIR)/configs/.sdk.cfg
+
+$(shell mkdir -p $(PKGDIR) $(FBOUTDIR))
+$(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
+$(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics})
 
 # ============================================================================
 # Main build target - builds based on configuration
@@ -128,9 +131,29 @@ include $(FBDIR)/configs/.sdk.cfg
 # Default target
 .PHONY: all
 all:
+	@start_time=$$(date +%s)
 	@echo -e "Building for $(MACHINE)"
-	@time $(BLD) -m $(MACHINE)
+	@$(MAKE) linux
+	@$(MAKE) linux-headers linux-modules
+	@$(MAKE) rfs
+	@$(MAKE) apps
+	@if [ "$(CONFIG_PLATFORM_IMX)" = "y" ]; then \
+		$(MAKE) flash.bin; \
+	else \
+		$(MAKE) bsp; \
+	fi
+	@$(MAKE) boot
+	@$(MAKE) merge-apps
+	@$(MAKE) packrfs
+	@end_time=$$(date +%s)
+	@duration=$$((end_time - start_time))
 	@echo -e "$(GREEN)Build complete!$(NC)"
+	@echo "Total build time: $$(($$duration / 60))m $$(($$duration % 60))s"
+
+LOG_FILE=$(FBDIR)/logs/build_$(MACHINE)_$(shell date +%Y%m%d_%H%M%S).log
+all-log:
+	@script -e -q -c "$(MAKE) all" /dev/null | tee -a $(LOG_FILE)
+	@echo "Log saved to: $(LOG_FILE)"
 
 # MENUCONFIG_STYLE can be: default, aquatic, monochrome
 .PHONY: menuconfig
@@ -199,14 +222,12 @@ help:
 # BSP Components
 # ============================================================================
 
-ifneq ("$(wildcard $(FBDIR)/.config)","")
+ifneq ($(wildcard .config),)
 
-$(shell mkdir -p $(PKGDIR) $(DESTDIR) $(RFSDIR) $(FBOUTDIR))
-$(shell mkdir -p $(FBOUTDIR)/firmware/u-boot/$(MACHINE))
+$(shell mkdir -p $(DESTDIR) $(RFSDIR) $(KERNEL_OUTPUT_PATH))
 $(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))
 $(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR)/usr/local/{lib,bin,include})
-$(shell mkdir -p $(FBOUTDIR)/{bsp/atf,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
-$(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics} $(KERNEL_OUTPUT_PATH))
+
 
 CUSTOM_CONFIG := $(subst ",,$(strip $(CONFIG_CUSTOM_SDK_CONFIG)))
 SDK_YML := $(if $(CUSTOM_CONFIG),\
@@ -214,6 +235,8 @@ SDK_YML := $(if $(CUSTOM_CONFIG),\
                 $(FBDIR)/configs/sdk.yml)
 $(shell python3 $(FBDIR)/tools/parse_yaml.py $(SDK_YML) $(FBDIR)/configs/.sdk.cfg)
 $(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
+
+include $(FBDIR)/configs/.sdk.cfg
 
 include $(FBDIR)/src/linux/Makefile
 

@@ -135,7 +135,7 @@ generate_distro_bootscr() {
 
     # 4. Generate Distro Boot Script
     local out_base="$FBOUTDIR"
-    if [[ "$machine" =~ ^l ]]; then
+    if [[ "$machine" =~ ^(ls|lx) ]]; then
         plat="LS"
     else
         plat="IMX"
@@ -177,8 +177,10 @@ get_prebuilt_initrd() {
     tfile=rootfs_${DISTRIB_VERSION}_poky_tiny_arm64.cpio.gz
     if [ ! -f $FBOUTDIR/images/$tfile ]; then
         [ $HOSTARCH = x86_64 ] && check_http_request $initrd_bin_url/$tfile
+        rm -f /tmp/$tfile
         log_mute wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress \
-            $DISTRO_SVR_URL/$DISTRIB_VERSION/$tfile -O $FBOUTDIR/images/$tfile
+            $DISTRO_SVR_URL/$DISTRIB_VERSION/$tfile -O /tmp/$tfile
+        mv /tmp/$tfile $FBOUTDIR/images/$tfile
     fi
 }
 
@@ -437,13 +439,15 @@ check_host_dependent_pkg() {
     fi
 
     # for imx95 m core toolchain
-    if [ ! -d /usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin ] && [[ "$MACHINE" =~ ^imx(95|94) ]]; then
+    if [ ! -d /usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin ] && [ "$CONFIG_SOC_IMX95" = "y" ]; then
         if [ ! -f "$FBDIR/dl/arm-toolchain.tar.xz" ]; then
+            rm -rf /tmp/arm-toolchain.tar.xz
             wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress \
                 https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi.tar.xz \
-                -O $FBDIR/dl/arm-toolchain.tar.xz
+                -O /tmp/arm-toolchain.tar.xz
         fi
-        tar -xf $FBDIR/dl/arm-toolchain.tar.xz -C /usr
+        tar -xf /tmp/arm-toolchain.tar.xz -C /usr
+        mv /tmp/arm-toolchain.tar.xz $FBDIR/dl/arm-toolchain.tar.xz
     fi
 }
 
@@ -873,12 +877,8 @@ tmppath=$(realpath $FBOUTDIR/linux/kernel)
 
 if [ $MACHINE = all -a $SOCFAMILY = LS -a $DESTARCH = arm64 ]; then
     machinelist=$LS_MACHINE_LIST
-elif [ $MACHINE = all -a $SOCFAMILY = LS -a $DESTARCH = arm32 ]; then
-    machinelist="ls1021atwr ls1021aqds"
 elif [ $MACHINE = all -a $SOCFAMILY = IMX -a $DESTARCH = arm64 ]; then
     machinelist=$IMX_MACHINE_LIST
-elif [ $MACHINE = all -a $SOCFAMILY = IMX -a $DESTARCH = arm32 ]; then
-    machinelist="imx6qsabresd imx6qpsabresd imx6sllevk imx7ulpevk"
 else
     machinelist=$MACHINE
 fi

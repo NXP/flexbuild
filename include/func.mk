@@ -16,7 +16,7 @@ fw bsp: $(BSP_DEPS)
 	@/bin/bash -e $(FBDIR)/tools/create_composite_firmware
 
 distroscr:
-	@$(BLD) distroscr -m $(MACHINE)
+	@$(BLD) distroscr
 
 CONF_FILES := $(wildcard configs/board/*.conf)
 distroscrall:
@@ -28,19 +28,19 @@ distroscrall:
 	done
 
 packrfs:
-	@$(BLD) packrfs -m $(MACHINE)
+	@$(BLD) packrfs
 
 packapp packapps:
-	@$(BLD) packapps -m $(MACHINE)
+	@$(BLD) packapps
 
 itb mklinux: $(KERNEL_IMAGE)
-	@$(BLD) itb -m $(MACHINE)
+	@$(BLD) itb
 
 boot: $(KERNEL_IMAGE) linux-modules distroscr
 	@/bin/bash -e $(FBDIR)/tools/create_bootpartition
 
 merge-apps:
-	@$(BLD) merge-apps -m $(MACHINE)
+	@$(BLD) merge-apps
 
 host-dep:
 	@$(BLD) host-dep

@@ -1,4 +1,4 @@
-# Copyright 2023 NXP
+# Copyright 2023,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,7 +8,7 @@
 
 # clutter-1.0 depends on cogl-1.0
 
-ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
+ifeq ($((CONFIG_SOC_IMX95),y)
   DEP_COGL = mali_imx
   DEP_COGL_LDFLAGS = -lmali -lEGL -lGLESv2 -lgbm
 else
@@ -18,22 +18,21 @@ endif
 
 #cogl:
 cogl: $(DEP_COGL)
-	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:5} != imx95 ] && exit || \
-	 $(call download_repo,cogl,apps/graphics,submod) && \
-	 $(call patch_apply,cogl,apps/graphics) && \
-	 $(call fbprint_b,"cogl") && \
-	 cd $(GRAPHICSDIR)/cogl && \
-	 export CROSS=$(CROSS_COMPILE) && \
-	 export CC="$(CROSS_COMPILE)gcc" && \
+	@$(call download_repo,cogl,apps/graphics,submod)
+	 $(call patch_apply,cogl,apps/graphics)
+	 $(call fbprint_b,"cogl")
+	 cd $(GRAPHICSDIR)/cogl
+	 export CROSS=$(CROSS_COMPILE)
+	 export CC="$(CROSS_COMPILE)gcc"
 	 export CFLAGS="--sysroot=$(RFSDIR) \
 		-march=armv8-a+crc+crypto -mbranch-protection=standard -O2 \
 		-fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat \
 		-Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized \
-		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" && \
-	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)" && \
+		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include"
+	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)"
 	 \
-	 [ -f Makefile ] && $(MAKE) distclean &>/dev/null || true && \
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE) && \
+	 [ -f Makefile ] && $(MAKE) distclean &>/dev/null || true
+	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE)
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
 		--build=x86_64-linux-gnu \
@@ -56,7 +55,7 @@ cogl: $(DEP_COGL)
 		--enable-gl \
 		--enable-glx \
 		--enable-wayland-egl-server \
-		--enable-nls $(LOG_MUTE) && \
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
-	 $(MAKE) install $(LOG_MUTE) && \
+		--enable-nls $(LOG_MUTE)
+	 $(MAKE) -j$(JOBS) $(LOG_MUTE)
+	 $(MAKE) install $(LOG_MUTE)
 	 $(call fbprint_d,"cogl")

@@ -9,15 +9,17 @@
 # http://wayland.freedesktop.org
 
 
-ifeq ($(filter imx95%,$(MACHINE)),$(MACHINE))
+ifeq ($(CONFIG_SOC_IMX95),y)
   DEP_WESTON = mali_imx imx_dpu_g2d_v2
-else ifeq ($(filter imx8m%,$(MACHINE)),$(MACHINE))
+else ifeq ($(CONFIG_SOC_IMX8M),y)
   DEP_WESTON = gpu_viv imx_gpu_g2d
-else ifeq ($(filter imx8q%,$(MACHINE)),$(MACHINE))
+else ifeq ($(CONFIG_SOC_IMX8QMMEK),y)
   DEP_WESTON = gpu_viv imx_dpu_g2d_v1
-else ifeq ($(filter l%,$(MACHINE)),$(MACHINE))
+else ifeq ($(CONFIG_SOC_LS1028ARDB),y)
   DEP_WESTON = gpu_viv imx_gpu_g2d
-else ifeq ($(filter imx9%,$(MACHINE)),$(MACHINE))
+else ifeq ($(CONFIG_SOC_IMX91),y)
+  DEP_WESTON = imx_pxp_g2d
+else ifeq ($(CONFIG_SOC_IMX93),y)
   DEP_WESTON = imx_pxp_g2d
 else
   DEP_WESTON =

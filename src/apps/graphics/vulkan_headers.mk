@@ -1,4 +1,4 @@
-# Copyright 2020-2024 NXP
+# Copyright 2020-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,13 +7,12 @@
 
 
 vulkan_headers:
-	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call download_repo,vulkan_headers,apps/graphics) && \
-	 $(call patch_apply,vulkan_headers,apps/graphics) && \
-	 $(call fbprint_b,"vulkan_headers") && \
-	 cd $(GRAPHICSDIR)/vulkan_headers && \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
-	 cmake -S . -B build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
-	 $(call fbprint_d,"vulkan_headers")
+	@ $(call download_repo,vulkan_headers,apps/graphics)
+	$(call patch_apply,vulkan_headers,apps/graphics)
+	$(call fbprint_b,"vulkan_headers")
+	cd $(GRAPHICSDIR)/vulkan_headers
+	rm -rf build_$(DISTROTYPE)_$(ARCH)
+	mkdir -p build_$(DISTROTYPE)_$(ARCH)
+	cmake -S . -B build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE)
+	cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE)
+	$(call fbprint_d,"vulkan_headers")

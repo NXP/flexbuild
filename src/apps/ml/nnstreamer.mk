@@ -1,4 +1,4 @@
-# Copyright 2024 NXP
+# Copyright 2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,20 +8,18 @@
 
 #nnstreamer:
 nnstreamer: gst_plugins_base tflite nnstreamer_edge
-	@[ $(SOCFAMILY) != IMX  ] && exit || \
-	 $(call download_repo,nnstreamer,apps/ml) && \
-	 $(call patch_apply,nnstreamer,apps/ml) && \
-	 cd $(MLDIR)/nnstreamer && \
-	 rm -rf build_debian_arm64 && \
-	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig && \
+	@$(call download_repo,nnstreamer,apps/ml)
+	 $(call patch_apply,nnstreamer,apps/ml)
+	 cd $(MLDIR)/nnstreamer
+	 rm -rf build_debian_arm64
+	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 \
-	 $(call fbprint_b,"nnstreamer") && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
-	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto" && \
-	 export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -fcanon-prefix-map" && \
-	 cp -af $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
+	 $(call fbprint_b,"nnstreamer")
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto"
+	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR) -march=armv8-a+crc+crypto"
+	 export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -fcanon-prefix-map"
+	 cp -af $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file meson.cross \
 		--prefix=/usr --buildtype=release \
@@ -44,6 +42,6 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge
 		-Dpython3-support=enabled \
 		-Dnnstreamer-edge-support=enabled \
 		-Dtflite2-support=enabled \
-		-Dtvm-support=disabled $(LOG_MUTE) && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
+		-Dtvm-support=disabled $(LOG_MUTE)
+	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	 $(call fbprint_d,"nnstreamer")

@@ -1,4 +1,4 @@
-# Copyright 2024 NXP
+# Copyright 2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -12,26 +12,25 @@
 
 #tim_vx:
 tim_vx: gpu_viv
-	@[ $${MACHINE:0:5} != imx8m  ] && exit || \
-	 $(call download_repo,tim_vx,apps/ml) && \
-	 $(call patch_apply,tim_vx,apps/ml) && \
-	 $(call fbprint_b,"tim_vx") && \
-	 cd $(MLDIR)/tim_vx && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(DESTDIR)" && \
-	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(DESTDIR)" && \
-	 mkdir -p $(DESTDIR)/usr/include/VX && \
-	 cp -f prebuilt-sdk/*linux/include/VX/vx_khr_cnn.h $(DESTDIR)/usr/include/VX && \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
+	@$(call download_repo,tim_vx,apps/ml)
+	 $(call patch_apply,tim_vx,apps/ml)
+	 $(call fbprint_b,"tim_vx")
+	 cd $(MLDIR)/tim_vx
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(DESTDIR)"
+	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(DESTDIR)"
+	 mkdir -p $(DESTDIR)/usr/include/VX
+	 cp -f prebuilt-sdk/*linux/include/VX/vx_khr_cnn.h $(DESTDIR)/usr/include/VX
+	 rm -rf build_$(DISTROTYPE)_$(ARCH)
+	 mkdir -p build_$(DISTROTYPE)_$(ARCH)
 	 cmake  -S $(MLDIR)/tim_vx \
 		-B $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_C_FLAGS="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
 		-DCONFIG=YOCTO \
 		-DTIM_VX_ENABLE_TEST=off \
-		-DTIM_VX_USE_EXTERNAL_OVXLIB=off $(LOG_MUTE) && \
-	 cmake --build $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
-	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so && \
-	 cp build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so $(DESTDIR)/usr/lib && \
-	 install -d $(DESTDIR)/usr/include/tim && \
-	 cp -rf $(MLDIR)/tim_vx/include/tim/{transform,vx} $(DESTDIR)/usr/include/tim && \
+		-DTIM_VX_USE_EXTERNAL_OVXLIB=off $(LOG_MUTE)
+	 cmake --build $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE)
+	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so
+	 cp build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so $(DESTDIR)/usr/lib
+	 install -d $(DESTDIR)/usr/include/tim
+	 cp -rf $(MLDIR)/tim_vx/include/tim/{transform,vx} $(DESTDIR)/usr/include/tim
 	 $(call fbprint_d,"tim_vx")

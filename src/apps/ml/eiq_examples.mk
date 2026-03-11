@@ -1,4 +1,4 @@
-# Copyright 2022-2024 NXP
+# Copyright 2022-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -8,11 +8,10 @@
 
 
 eiq_examples:
-	@[ $(SOCFAMILY) != IMX  ] && exit || \
-	 $(call download_repo,eiq_examples,apps/ml) && \
-	 $(call patch_apply,eiq_examples,apps/ml) && \
-	 $(call fbprint_b,"eiq_examples") && \
-	 cd $(MLDIR)/eiq_examples && \
-	 install -d $(DESTDIR)/usr/bin/eiq-examples && \
-	 cp -rfa * $(DESTDIR)/usr/bin/eiq-examples && \
+	@$(call download_repo,eiq_examples,apps/ml)
+	 $(call patch_apply,eiq_examples,apps/ml)
+	 $(call fbprint_b,"eiq_examples")
+	 cd $(MLDIR)/eiq_examples
+	 install -d $(DESTDIR)/usr/bin/eiq-examples
+	 cp -rfa * $(DESTDIR)/usr/bin/eiq-examples
 	 $(call fbprint_d,"eiq_examples")

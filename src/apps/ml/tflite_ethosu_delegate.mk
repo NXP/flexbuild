@@ -1,4 +1,4 @@
-# Copyright 2023-2024 NXP
+# Copyright 2023-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -13,16 +13,15 @@
 
 #tflite_ethosu_delegate:
 tflite_ethosu_delegate: tflite ethosu_driver_stack
-	@[ $${MACHINE:0:5} != imx93  ] && exit || \
-	$(call download_repo,tflite_ethosu_delegate,apps/ml) && \
-	$(call patch_apply,tflite_ethosu_delegate,apps/ml) && \
-	$(call fbprint_b,"tflite_ethosu_delegate") && \
-	cd $(MLDIR)/tflite_ethosu_delegate && \
-	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include" && \
-	export CMAKE_TLS_VERIFY=0 && \
-	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
+	@$(call download_repo,tflite_ethosu_delegate,apps/ml)
+	$(call patch_apply,tflite_ethosu_delegate,apps/ml)
+	$(call fbprint_b,"tflite_ethosu_delegate")
+	cd $(MLDIR)/tflite_ethosu_delegate
+	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
+	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include"
+	export CMAKE_TLS_VERIFY=0
+	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
 	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
 		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
 		cd build_$(DISTROTYPE)_$(ARCH); \
@@ -31,7 +30,7 @@ tflite_ethosu_delegate: tflite ethosu_driver_stack
 			example_proto_generated examples/*.o tools/*.o tmp/*; \
 		find . -type d -name "CMakeFiles" -exec rm -rf {} +; \
 		cd ..; \
-	fi && \
+	fi
 	cmake  -S $(MLDIR)/tflite_ethosu_delegate \
 		-B build_$(DISTROTYPE)_$(ARCH) -Wno-dev \
 		-DPSIMD_SOURCE_DIR=$(TFLITE_BUILD_DIR)/psimd-source \
@@ -51,9 +50,9 @@ tflite_ethosu_delegate: tflite ethosu_driver_stack
 		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so \
 		-DPython_INCLUDE_DIRS=$(RFSDIR)/usr/include/python3.13 \
 		-DPython_EXECUTABLE=$(RFSDIR)/usr/bin/python3.13 \
-		-DPython_LIBRARY=$(RFSDIR)/usr/lib/aarch64-linux-gnu/libpython3.13.so $(LOG_MUTE) && \
-	$(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) ethosu_delegate $(LOG_MUTE) && \
-	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so && \
-	install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so $(DESTDIR)/usr/lib && \
-	rm -f /lib/ld-linux-aarch64.so.1 && \
+		-DPython_LIBRARY=$(RFSDIR)/usr/lib/aarch64-linux-gnu/libpython3.13.so $(LOG_MUTE)
+	$(MAKE) -C build_$(DISTROTYPE)_$(ARCH) ethosu_delegate $(LOG_MUTE)
+	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so
+	install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so $(DESTDIR)/usr/lib
+	rm -f /lib/ld-linux-aarch64.so.1
 	$(call fbprint_d,"tflite_ethosu_delegate")

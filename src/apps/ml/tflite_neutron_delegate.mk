@@ -1,4 +1,4 @@
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -7,20 +7,19 @@
 
 #tflite_neutron_delegate:
 tflite_neutron_delegate: tflite neutron
-	@[ $${MACHINE:0:5} != imx95 ] && exit || \
-	$(call download_repo,tflite_neutron_delegate,apps/ml) && \
-	$(call patch_apply,tflite_neutron_delegate,apps/ml) && \
-	$(call fbprint_b,"tflite_neutron_delegate") && \
-	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include" && \
-	export CFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include" && \
-	export CMAKE_TLS_VERIFY=0 && \
-	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1 && \
-	mkdir -p $(RFSDIR)/usr/include/neutron && \
-	cp -f $(DESTDIR)/usr/include/neutron/* $(RFSDIR)/usr/include/neutron && \
-	cp -f $(DESTDIR)/usr/lib/libNeutronDriver* $(RFSDIR)/usr/lib/ && \
-	cd $(MLDIR)/tflite_neutron_delegate && \
+	@$(call download_repo,tflite_neutron_delegate,apps/ml)
+	$(call patch_apply,tflite_neutron_delegate,apps/ml)
+	$(call fbprint_b,"tflite_neutron_delegate")
+	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
+	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include"
+	export CFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include"
+	export CMAKE_TLS_VERIFY=0
+	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
+	mkdir -p $(RFSDIR)/usr/include/neutron
+	cp -f $(DESTDIR)/usr/include/neutron/* $(RFSDIR)/usr/include/neutron
+	cp -f $(DESTDIR)/usr/lib/libNeutronDriver* $(RFSDIR)/usr/lib/
+	cd $(MLDIR)/tflite_neutron_delegate
 	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
 		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
 		cd build_$(DISTROTYPE)_$(ARCH); \
@@ -29,7 +28,7 @@ tflite_neutron_delegate: tflite neutron
 			example_proto_generated examples/*.o tools/*.o tmp/*; \
 		find . -type d -name "CMakeFiles" -exec rm -rf {} +; \
 		cd ..; \
-	fi && \
+	fi
 	cmake  -S $(MLDIR)/tflite_neutron_delegate \
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DPSIMD_SOURCE_DIR=$(TFLITE_BUILD_DIR)/psimd-source \
@@ -58,9 +57,9 @@ tflite_neutron_delegate: tflite neutron
 		-DTENSORFLOW_SOURCE_DIR=$(MLDIR)/tflite \
 		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so \
 		-DPython_EXECUTABLE=$(RFSDIR)/usr/bin/python3.13 \
-		-DCMAKE_EXE_LINKER_FLAGS="-L$(DESTDIR)/usr/lib" $(LOG_MUTE) && \
-	 $(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE) && \
-	 rm -f /lib/ld-linux-aarch64.so.1 && \
-	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libneutron_delegate.so && \
-	 install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libneutron_delegate.so $(DESTDIR)/usr/lib && \
+		-DCMAKE_EXE_LINKER_FLAGS="-L$(DESTDIR)/usr/lib" $(LOG_MUTE)
+	 $(MAKE) -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE)
+	 rm -f /lib/ld-linux-aarch64.so.1
+	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libneutron_delegate.so
+	 install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libneutron_delegate.so $(DESTDIR)/usr/lib
 	 $(call fbprint_d,"tflite_neutron_delegate")

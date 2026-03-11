@@ -1,4 +1,4 @@
-# Copyright 2024 NXP
+# Copyright 2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -19,36 +19,35 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 tvm:
 #tvm: tim_vx
 ifeq ($(CONFIG_TVM),y)
-	@[ $(SOCFAMILY) != IMX  ] && exit || \
-	 $(call download_repo,tvm,apps/ml,submod) && \
-	 $(call patch_apply,tvm,apps/ml) && \
-	 sudo cp $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib && \
-	 $(call fbprint_b,"tvm") && \
-	 cd $(MLDIR)/tvm && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
+	 @$(call download_repo,tvm,apps/ml,submod)
+	 $(call patch_apply,tvm,apps/ml)
+	 sudo cp $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib
+	 $(call fbprint_b,"tvm")
+	 cd $(MLDIR)/tvm
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
+	 rm -rf build_$(DISTROTYPE)_$(ARCH)
+	 mkdir -p build_$(DISTROTYPE)_$(ARCH)
 	 cmake  -S $(MLDIR)/tvm \
 		-B $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
 		-DCMAKE_STRIP=strip \
 		-DUSE_VSI_NPU=ON \
-		-DUSE_VSI_NPU_RUNTIME=ON $(LOG_MUTE) && \
-	 cmake --build $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
-	 cd $(MLDIR)/tvm/python && \
+		-DUSE_VSI_NPU_RUNTIME=ON $(LOG_MUTE)
+	 cmake --build $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE)
+	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE)
+	 cd $(MLDIR)/tvm/python
 	 NO_FETCH_BUILD=1 STAGING_INCDIR=$(RFSDIR)/usr/include STAGING_LIBDIR=$(RFSDIR)/usr/lib \
-	 python3 setup.py bdist_wheel --verbose --dist-dir $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH)/dist $(LOG_MUTE) && \
+	 python3 setup.py bdist_wheel --verbose --dist-dir $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH)/dist $(LOG_MUTE)
 	 pip3 install --ignore-installed --disable-pip-version-check -vvv -t $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) \
-	      --no-cache-dir --no-deps $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH)/dist/tvm-*linux*.whl $(LOG_MUTE) && \
+	      --no-cache-dir --no-deps $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH)/dist/tvm-*linux*.whl $(LOG_MUTE)
 	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/tvmc ]; then \
 	     mv $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/tvmc $(DESTDIR)/usr/bin; \
-	 fi && \
-	 chmod 755 $(DESTDIR)/usr/lib/libtvm*.so && \
-	 install -d $(DESTDIR)/usr/bin/tvm/examples $(DESTDIR)/usr/lib/pkgconfig $(DESTDIR)/usr/include/dlpack && \
-	 install -m 0644 $(FBDIR)/src/system/pkgconfig/tvm_runtime.pc $(DESTDIR)/usr/lib/pkgconfig/tvm_runtime.pc && \
-	 cp ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples && \
-	 cp ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/ && \
+	 fi
+	 chmod 755 $(DESTDIR)/usr/lib/libtvm*.so
+	 install -d $(DESTDIR)/usr/bin/tvm/examples $(DESTDIR)/usr/lib/pkgconfig $(DESTDIR)/usr/include/dlpack
+	 install -m 0644 $(FBDIR)/src/system/pkgconfig/tvm_runtime.pc $(DESTDIR)/usr/lib/pkgconfig/tvm_runtime.pc
+	 cp ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples
+	 cp ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/
 	 $(call fbprint_d,"tvm")
 endif

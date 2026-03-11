@@ -1,4 +1,4 @@
-# Copyright 2023-2024 NXP
+# Copyright 2023-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -12,8 +12,7 @@
 
 #tflite_vx_delegate:
 tflite_vx_delegate: tflite tim_vx
-	@[ $${MACHINE:0:5} != imx8m  ] && exit || \
-	$(call download_repo,tflite_vx_delegate,apps/ml) && \
+	@$(call download_repo,tflite_vx_delegate,apps/ml) && \
 	$(call patch_apply,tflite_vx_delegate,apps/ml) && \
 	$(call fbprint_b,"tflite_vx_delegate") && \
 	cd $(MLDIR)/tflite_vx_delegate && \
@@ -52,7 +51,7 @@ tflite_vx_delegate: tflite tim_vx
 		-DTIM_VX_INSTALL=$(DESTDIR)/usr \
 		-DFETCHCONTENT_SOURCE_DIR_TENSORFLOW=$(MLDIR)/tflite \
 		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so $(LOG_MUTE) && \
-	$(MAKE) -j$(JOBS) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE) && \
+	$(MAKE) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE) && \
 	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so && \
 	cp -f build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so $(DESTDIR)/usr/lib && \
 	install -d $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate && \

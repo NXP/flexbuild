@@ -1,4 +1,4 @@
-# Copyright 2023-2024 NXP
+# Copyright 2023-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -10,24 +10,23 @@
 # DEPENDS: gtest
 
 nnstreamer_edge:
-	@[ $(SOCFAMILY) != IMX  ] && exit || \
-	 $(call download_repo,nnstreamer_edge,apps/ml) && \
-	 $(call patch_apply,nnstreamer_edge,apps/ml) && \
-	 $(call fbprint_b,"nnstreamer_edge") && \
-	 cd $(MLDIR)/nnstreamer_edge && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-         export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig && \
-         export PKG_CONFIG_PATH=$(RFSDIR)/usr/share/pkgconfig && \
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH) && \
-	 cmake  -S $(MLDIR)/nnstreamer_edge \
+	@$(call download_repo,nnstreamer_edge,apps/ml)
+	$(call patch_apply,nnstreamer_edge,apps/ml)
+	$(call fbprint_b,"nnstreamer_edge")
+	cd $(MLDIR)/nnstreamer_edge
+	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
+	export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig
+	export PKG_CONFIG_PATH=$(RFSDIR)/usr/share/pkgconfig
+	mkdir -p build_$(DISTROTYPE)_$(ARCH)
+	cmake  -S $(MLDIR)/nnstreamer_edge \
 		-B build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_BUILD_TYPE=release \
-		-DENABLE_TEST=OFF $(LOG_MUTE) && \
-	 cmake --build build_$(DISTROTYPE)_$(ARCH) -j$(JOBS) --target all $(LOG_MUTE) && \
-	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE) && \
-	 mkdir -p $(RFSDIR)/usr/local/include/nnstreamer && \
-	 mv $(DESTDIR)/usr/local/include/nnstreamer/*.h $(DESTDIR)/usr/include && \
-	 mv $(DESTDIR)/pkgconfig/nnstreamer-edge.pc $(DESTDIR)/usr/lib/pkgconfig/ && \
-	 rm -rf $(DESTDIR)/pkgconfig && \
-	 $(call fbprint_d,"nnstreamer_edge")
+		-DENABLE_TEST=OFF $(LOG_MUTE)
+	cmake --build build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE)
+	cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE)
+	mkdir -p $(RFSDIR)/usr/local/include/nnstreamer
+	mv $(DESTDIR)/usr/local/include/nnstreamer/*.h $(DESTDIR)/usr/include
+	mv $(DESTDIR)/pkgconfig/nnstreamer-edge.pc $(DESTDIR)/usr/lib/pkgconfig/
+	rm -rf $(DESTDIR)/pkgconfig
+	$(call fbprint_d,"nnstreamer_edge")

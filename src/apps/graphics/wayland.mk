@@ -23,6 +23,6 @@ ifeq ($(CONFIG_WAYLAND),y)
 		--prefix=/usr \
 		--buildtype=release \
 		--cross-file=meson.cross $(LOG_MUTE)
-	 DESTDIR=$(DESTDIR) ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
+	 DESTDIR=$(DESTDIR) ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	 $(call fbprint_d,"wayland")
 endif

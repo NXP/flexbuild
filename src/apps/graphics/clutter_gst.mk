@@ -34,6 +34,6 @@ clutter_gst: gst_plugins_bad cogl libdrm
 		--disable-static \
 		--enable-nls \
 		--prefix=/usr $(LOG_MUTE)
-	$(MAKE) -j$(JOBS) $(LOG_MUTE)
+	$(MAKE) $(LOG_MUTE)
 	$(MAKE) install $(LOG_MUTE)
 	$(call fbprint_d,"clutter_gst")

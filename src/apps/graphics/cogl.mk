@@ -8,7 +8,7 @@
 
 # clutter-1.0 depends on cogl-1.0
 
-ifeq ($((CONFIG_SOC_IMX95),y)
+ifeq ($(CONFIG_SOC_IMX95),y)
   DEP_COGL = mali_imx
   DEP_COGL_LDFLAGS = -lmali -lEGL -lGLESv2 -lgbm
 else
@@ -30,8 +30,9 @@ cogl: $(DEP_COGL)
 		-Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized \
 		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include"
 	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)"
-	 \
-	 [ -f Makefile ] && $(MAKE) distclean &>/dev/null || true
+	 if [ -f Makefile ]; then \
+		 $(MAKE) distclean &>/dev/null; \
+	 fi
 	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE)
 	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	 	--host=aarch64-linux-gnu \
@@ -56,6 +57,6 @@ cogl: $(DEP_COGL)
 		--enable-glx \
 		--enable-wayland-egl-server \
 		--enable-nls $(LOG_MUTE)
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE)
+	 $(MAKE) $(LOG_MUTE)
 	 $(MAKE) install $(LOG_MUTE)
 	 $(call fbprint_d,"cogl")

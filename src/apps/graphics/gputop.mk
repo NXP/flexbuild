@@ -18,6 +18,6 @@ gputop: libgpuperfcnt
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(GRAPHICSDIR)/gputop/cmake/OEToolchainConfig.cmake \
 	       -DGPUPERFCNT_INCLUDE_PATH=$(DESTDIR)/usr/include \
 	       -DGPUPERFCNT_LIB_PATH=$(DESTDIR)/usr/lib .. $(LOG_MUTE)
-	$(MAKE) -j$(JOBS) $(LOG_MUTE) && $(MAKE) install $(LOG_MUTE)
+	$(MAKE) $(LOG_MUTE) && $(MAKE) install $(LOG_MUTE)
 	install -m 0444 ../man/* $(DESTDIR)/usr/local/share/man/man8/
 	$(call fbprint_d,"gputop")

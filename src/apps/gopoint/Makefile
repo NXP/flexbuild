@@ -30,7 +30,7 @@ GP_MODULES := \
 # Automatically include enabled modules and build APPS_GP
 # ============================================================================
 APPS_GP :=
-
+GPNT_APPS_FOLDER := /opt/gopoint-apps
 $(foreach m,$(GP_MODULES), \
     $(eval _cfg := CONFIG_GP_$(shell echo $(m) | tr a-z A-Z)) \
     $(if $(filter y,$($(_cfg))), \

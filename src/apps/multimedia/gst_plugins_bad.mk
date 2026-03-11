@@ -1,4 +1,4 @@
-# Copyright 2021-2024 NXP
+# Copyright 2021-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -11,29 +11,27 @@
 
 #gst_plugins_bad:
 gst_plugins_bad: gst_plugins_base
-	@[ $(SOCFAMILY) != IMX  ] && exit || \
-	 $(call download_repo,gst_plugins_bad,apps/multimedia) && \
-	 $(call patch_apply,gst_plugins_bad,apps/multimedia) && \
-	 cd $(MMDIR)/gst_plugins_bad && \
+	@$(call download_repo,gst_plugins_bad,apps/multimedia)
+	 $(call patch_apply,gst_plugins_bad,apps/multimedia)
+	 cd $(MMDIR)/gst_plugins_bad
 	 if ! grep -q libexecdir= meson.build; then \
-	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build && \
+	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build \
 	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build; \
-	 fi && \
+	 fi
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 $(call fbprint_b,"gst_plugins_bad") && \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
+	 $(call fbprint_b,"gst_plugins_bad")
+	 rm -rf build_$(DISTROTYPE)_$(ARCH)
 	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1} && \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} && \
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1} \
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} \
 	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}; \
-	 fi && \
-	 \
-	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib && \
-	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/ && \
-	 sudo cp -rf $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include && \
-	 sudo cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/ && \
-	 sudo cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/ && \
+	 fi
+	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib
+	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/
+	 sudo cp -rf $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include
+	 sudo cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/
+	 sudo cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
 			  -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/lib/gstreamer-1.0/include \
@@ -157,6 +155,6 @@ gst_plugins_bad: gst_plugins_base
 		-Dwebrtcdsp=disabled \
 		-Dx11=enabled \
 		-Dx265=disabled \
-		-Dzbar=disabled $(LOG_MUTE) && \
-	ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
+		-Dzbar=disabled $(LOG_MUTE)
+	ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	$(call fbprint_d,"gst_plugins_bad")

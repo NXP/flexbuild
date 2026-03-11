@@ -1,4 +1,4 @@
-# Copyright 2021-2024 NXP
+# Copyright 2021-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -13,17 +13,15 @@
 
 #cheese:
 cheese: clutter_gst gst_plugins_bad
-	@[ $${MACHINE:0:4} != imx8 -a $${MACHINE:0:5} != imx95 ] && exit || \
-	 $(call download_repo,cheese,apps/multimedia,submod) && \
-	 $(call patch_apply,cheese,apps/multimedia) && \
-	 cd $(MMDIR)/cheese && \
+	@$(call download_repo,cheese,apps/multimedia,submod)
+	 $(call patch_apply,cheese,apps/multimedia)
+	 cd $(MMDIR)/cheese
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 $(call fbprint_b,"cheese") && \
-	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstallocators-1.0.so.0 && \
-	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include && \
-	 \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
+	 $(call fbprint_b,"cheese")
+	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstallocators-1.0.so.0
+	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include
+	 rm -rf build_$(DISTROTYPE)_$(ARCH)
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 -I$(DESTDIR)/usr/include \
 			  -I$(DESTDIR)/usr/include/clutter-gst-3.0" \
@@ -34,8 +32,8 @@ cheese: clutter_gst gst_plugins_bad
 		--strip \
 		-Dintrospection=false \
 		-Dgtk_doc=false \
-		-Dman=false $(LOG_MUTE) && \
-	 ninja -v -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
-	 rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/org.gnome.Cheese.svg && \
-	 rm -f $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/org.gnome.Cheese-symbolic.svg && \
+		-Dman=false $(LOG_MUTE)
+	 ninja -v -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
+	 rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/org.gnome.Cheese.svg
+	 rm -f $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/org.gnome.Cheese-symbolic.svg
 	 $(call fbprint_d,"cheese")

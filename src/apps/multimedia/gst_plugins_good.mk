@@ -1,4 +1,4 @@
-# Copyright 2021-2024 NXP
+# Copyright 2021-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -6,17 +6,16 @@
 
 
 gst_plugins_good: gst_plugins_base libdrm
-	@[ $(SOCFAMILY) != IMX  ] && exit || \
-	 $(call download_repo,gst_plugins_good,apps/multimedia) && \
-	 $(call patch_apply,gst_plugins_good,apps/multimedia) && \
-	 cd $(MMDIR)/gst_plugins_good && \
-	 rm -rf build_$(DISTROTYPE)_$(ARCH) && \
+	@$(call download_repo,gst_plugins_good,apps/multimedia)
+	 $(call patch_apply,gst_plugins_good,apps/multimedia)
+	 cd $(MMDIR)/gst_plugins_good
+	 rm -rf build_$(DISTROTYPE)_$(ARCH)
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
-	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross && \
-	 mkdir -p $(RFSDIR)/usr/include/gstreamer-1.0 && \
-	 rsync -a $(DESTDIR)/usr/include/gstreamer-1.0/ $(RFSDIR)/usr/include/gstreamer-1.0/ && \
-	 rsync -a --inplace $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib/ && \
-	 $(call fbprint_b,"gst_plugins_good") && \
+	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
+	 mkdir -p $(RFSDIR)/usr/include/gstreamer-1.0
+	 rsync -a $(DESTDIR)/usr/include/gstreamer-1.0/ $(RFSDIR)/usr/include/gstreamer-1.0/
+	 rsync -a --inplace $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib/
+	 $(call fbprint_b,"gst_plugins_good")
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 \
 			  -I$(DESTDIR)/usr/lib/gstreamer-1.0/include -I$(DESTDIR)/usr/include" \
@@ -72,6 +71,6 @@ gst_plugins_good: gst_plugins_base libdrm
 		-Dosxvideo=disabled \
 		-Dshout2=disabled \
 		-Dtwolame=disabled \
-		-Dwaveform=disabled $(LOG_MUTE) && \
-	 ninja -j $(JOBS) -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE) && \
+		-Dwaveform=disabled $(LOG_MUTE)
+	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	 $(call fbprint_d,"gst_plugins_good")

@@ -1,12 +1,11 @@
-# Copyright 2017-2024 NXP
+# Copyright 2017-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 #gst_python:
 gst_python: gstreamer gst_plugins_bad
-	@[ $(SOCFAMILY) != IMX ] && exit || \
-	$(call dl_by_wget,gst_python_tar,gst-python.tar.xz)
+	@$(call dl_by_wget,gst_python_tar,gst-python.tar.xz)
 	if [ ! -d "$(MMDIR)"/gst_python ]; then \
 		mkdir -p $(MMDIR)/gst_python; \
 		tar xf $(FBDIR)/dl/gst-python.tar.xz --strip-components=1 --wildcards -C $(MMDIR)/gst_python; \

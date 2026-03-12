@@ -1,4 +1,4 @@
-# Copyright 2023-2024 NXP
+# Copyright 2023-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -14,18 +14,14 @@
 
 ros:
 ifeq ($(CONFIG_ROS), "y")
-	@[ $(DISTROVARIANT) = base ] && exit || \
 	 if [ -d $(RFSDIR)/opt/ros2_jazzy ]; then \
 	     $(call fbprint_n,"ROS was already installed in $(RFSDIR)/opt/ros2_jazzy") && exit; \
-	 fi && \
-	 if [ ! -d $(RFSDIR)/usr/lib/aarch64-linux-gnu ]; then \
-	     bld rfs -m $(MACHINE); \
-	 fi && \
-	 $(call fbprint_b,"ROS2") && \
-	 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o $(RFSDIR)/usr/share/keyrings/ros-archive-keyring.gpg && \
+	 fi
+	 $(call fbprint_b,"ROS2")
+	 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o $(RFSDIR)/usr/share/keyrings/ros-archive-keyring.gpg
 	 echo "deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu bookworm main" | \
-	       sudo tee $(RFSDIR)/etc/apt/sources.list.d/ros2.list > /dev/null && \
-	 sudo chroot $(RFSDIR) apt update && \
+	       sudo tee $(RFSDIR)/etc/apt/sources.list.d/ros2.list > /dev/null
+	 sudo chroot $(RFSDIR) apt update
 	 sudo chroot $(RFSDIR) apt install -y \
 	 python3-flake8-blind-except \
 	 python3-flake8-class-newline \
@@ -39,7 +35,7 @@ ifeq ($(CONFIG_ROS), "y")
 	 python3-pytest-rerunfailures \
 	 python3-pytest-runner \
 	 python3-pytest-timeout \
-	 ros-dev-tools && \
-	 sudo mkdir -p $(RFSDIR)/opt/ros2_jazzy/src && \
+	 ros-dev-tools
+	 sudo mkdir -p $(RFSDIR)/opt/ros2_jazzy/src
 	 $(call fbprint_d,"ROS2 Jazzy in $(RFSDIR)/opt/ros2_jazzy")
 endif

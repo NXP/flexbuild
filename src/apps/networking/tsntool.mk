@@ -1,4 +1,4 @@
-# Copyright 2017-2024 NXP
+# Copyright 2017-2024,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -21,7 +21,7 @@ tsntool:
 	 mkdir -p include/linux && \
 	 cp -f $(KERNEL_PATH)/include/uapi/linux/tsn.h include/linux && \
 	 $(MAKE) clean $(LOG_MUTE) && \
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) $(LOG_MUTE) && \
 	 install -d $(DESTDIR)/usr/local/bin && install -d $(DESTDIR)/usr/lib && \
 	 install -m 755 tsntool $(DESTDIR)/usr/local/bin/tsntool && \
 	 install -m 755 libtsn.so $(DESTDIR)/usr/lib/libtsn.so && \

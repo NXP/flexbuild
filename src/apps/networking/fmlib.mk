@@ -1,4 +1,4 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2023,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -15,6 +15,6 @@ fmlib:
 	 export KERNEL_SRC=$(KERNEL_PATH) && \
 	 export CFLAGS="-O2 -pipe -I$(RFSDIR)/usr/include -I$(RFSDIR)/usr/include/aarch64-linux-gnu" && \
 	 $(MAKE) clean $(LOG_MUTE) && \
-	 $(MAKE) -j$(JOBS) $(LOG_MUTE) && \
+	 $(MAKE) $(LOG_MUTE) && \
 	 $(MAKE) install-libfm-arm $(LOG_MUTE) && \
 	 $(call fbprint_d,"fmlib")

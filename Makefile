@@ -178,7 +178,7 @@ help:
 	@echo "Main targets:"
 	@echo "  make menuconfig          - Configure flexbuild options"
 	@echo "  make linux               - Build Linux kernel with default config"
-	@echo "  make kernel-menuconfig   - Configure Linux kernel"
+	@echo "  make linux-menuconfig    - Configure Linux kernel"
 	@echo "  make atf                 - Build ARM Trusted Firmware"
 	@echo "  make uboot               - Build U-Boot"
 	@echo "  make rcw                 - Build RCW for layerscape platform"
@@ -238,11 +238,8 @@ $(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
 
 include $(FBDIR)/configs/.sdk.cfg
 
-include $(FBDIR)/src/linux/Makefile
 
-include $(FBDIR)/src/bsp/Makefile
-
-include $(FBDIR)/src/apps/Makefile
+include $(FBDIR)/src/Makefile
 
 endif
 

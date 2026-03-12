@@ -143,6 +143,7 @@ esac
 #    safe_run sed -i 's/^SUBSYSTEM/#SUBSYSTEM/' /usr/lib/udev/rules.d/50-firmware.rules
 #fi
 safe_run /usr/bin/hostnamectl set-hostname "${board_id}"
+safe_run echo "127.0.0.1       ${board_id}" >> /etc/hosts
 
 safe_disable_service strongswan
 

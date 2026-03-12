@@ -42,6 +42,10 @@ config SOC_IMX8M
 	bool
 	default y if SOC_IMX8MPEVK || SOC_IMX8MPFRDM || SOC_IMX8MMEVK
 
+config SOC_IMX8MP
+	bool
+	default y if SOC_IMX8MPEVK || SOC_IMX8MPFRDM
+
 config SOC_IMX91
 	bool
 	default y if SOC_IMX91SFRDM || SOC_IMX91FRDM || SOC_IMX91EVK

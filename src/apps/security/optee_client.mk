@@ -1,20 +1,16 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2023,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 
 optee_client:
-ifeq ($(CONFIG_OPTEE),y)
-	@[ $(DESTARCH) != arm64  ] && exit || \
-	 $(call download_repo,optee_client,apps/security) && \
-	 $(call patch_apply,optee_client,apps/security) && \
-	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu" && \
-	 export PKG_CONFIG=pkg-config && \
-	 \
-	 $(call fbprint_b,"optee_client") && \
-	 cd $(SECDIR)/optee_client && \
-	 $(MAKE) ARCH=arm64 CFLAGS="-I$(RFSDIR)/usr/include/uuid" $(LOG_MUTE) && \
+	@$(call download_repo,optee_client,apps/security)
+	 $(call patch_apply,optee_client,apps/security)
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	 export LDFLAGS="-L$(RFSDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu"
+	 export PKG_CONFIG=pkg-config
+	 $(call fbprint_b,"optee_client")
+	 cd $(SECDIR)/optee_client
+	 $(MAKE) ARCH=arm64 CFLAGS="-I$(RFSDIR)/usr/include/uuid" $(LOG_MUTE)
 	 $(call fbprint_d,"optee_client")
-endif

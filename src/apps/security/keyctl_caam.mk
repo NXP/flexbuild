@@ -1,15 +1,15 @@
-# Copyright 2017-2023 NXP
+# Copyright 2017-2023,2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 
 keyctl_caam:
-ifeq ($(CONFIG_OPENSSL),y)
-	 @$(call download_repo,keyctl_caam,apps/security) && \
-	 $(call patch_apply,keyctl_caam,apps/security) && \
-	 $(call fbprint_b,"keyctl_caam") && \
-	 cd $(SECDIR)/keyctl_caam && \
-	 export OPENSSL_PATH=$(SECDIR)/openssl && \
-	 $(MAKE) CC=$(CROSS_COMPILE)gcc DESTDIR=$(DESTDIR) install $(LOG_MUTE) && \
+ifeq ($(CONFIG_SEC_KEYCTL_CAAM),y)
+	 @$(call download_repo,keyctl_caam,apps/security)
+	 $(call patch_apply,keyctl_caam,apps/security)
+	 $(call fbprint_b,"keyctl_caam")
+	 cd $(SECDIR)/keyctl_caam
+	 export OPENSSL_PATH=$(SECDIR)/openssl
+	 $(MAKE) CC=$(CROSS_COMPILE)gcc DESTDIR=$(DESTDIR) install $(LOG_MUTE)
 	 $(call fbprint_d,"keyctl_caam")
 endif

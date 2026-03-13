@@ -53,4 +53,10 @@ config UTILS_FIRMWARE_IMX
 	help
 	  Firmware binaries for i.MX platforms (VPU, SDMA, etc.)
 
+config UTILS_PERF
+    bool "Kernel perf tool"
+    default y
+    help
+      This enables the 'perf' user-space tool for performance analysis.
+
 endif # APP_UTILS

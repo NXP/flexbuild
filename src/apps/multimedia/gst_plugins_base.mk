@@ -12,14 +12,15 @@
 
 
 ifeq ($(CONFIG_SOC_IMX95),y)
-  DEP_GSTBASE = mali_imx imx_dpu_g2d_v2
+  DEP_GSTBASE := mali_imx imx_dpu_g2d_v2
 else ifeq ($(CONFIG_SOC_IMX8M),y)
-  DEP_GSTBASE = gpu_viv imx_gpu_g2d
-else ifeq ($(CONFIG_SOC_IMX8QMMEK))
-  DEP_GSTBASE = imx_dpu_g2d_v1
+  DEP_GSTBASE := gpu_viv imx_gpu_g2d
+else ifeq ($(CONFIG_SOC_IMX8QMMEK),y)
+  DEP_GSTBASE := imx_dpu_g2d_v1
 else
-  DEP_GSTBASE =
+  DEP_GSTBASE :=
 endif
+
 
 #gst_plugins_base:
 gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer alsa_lib wayland_protocols $(KHEADER_FILE)

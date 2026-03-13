@@ -16,7 +16,8 @@ UTILS_MODULES := \
     imx_firmware \
     imx_test \
     mcore_demo \
-    wireless_regdb
+    wireless_regdb \
+	perf
 
 # ============================================================================
 # Automatically include enabled modules and build APPS_UTILS

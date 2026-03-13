@@ -23,7 +23,7 @@ base_pkgs=(
 
 ls_pkgs=(
     efitools libxml2-dev libtinyxml2-dev libssl-dev libsbc-dev libsndfile1-dev libwebp-dev
-    dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses-dev libelf-dev
+    dh-autoreconf libnuma-dev libpcap-dev libtclap-dev libncurses-dev
     libnl-genl-3-dev libreadline-dev libffi-dev libudev-dev libinput-dev libpixman-1-dev
     libxkbcommon-dev libpng-dev libcairo2-dev libpam0g-dev liblua5.4-dev libsystemd-dev
     libxcb-composite0-dev libxcursor-dev libxcb-cursor-dev libseat-dev seatd
@@ -33,6 +33,8 @@ ls_pkgs=(
     python3-lxml libwaffle-dev libpciaccess-dev clinfo libcogl-pango-dev
     liborc-0.4-dev libbluetooth-dev libpangocairo-1.0-0 libvorbis-dev
     libjpeg62-turbo-dev libjsoncpp-dev dbus-user-session hostapd
+    libtraceevent-dev libtracefs-dev libslang2-dev libperl-dev binutils-dev
+    libelf-dev libdw-dev libunwind-dev
 )
 
 

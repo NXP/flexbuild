@@ -9,6 +9,7 @@ mdio_proxy_module:
 	$(call patch_apply,mdio_proxy_module,linux)
 	$(call fbprint_b,"mdio-proxy-module")
 	cd $(PKGDIR)/linux/mdio_proxy_module
+	krelease=$$(cat "$(KOUTDIR)/include/config/kernel.release" 2>/dev/null)
 	$(MAKE) KBUILD_DIR=$(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
-	cp -f mdio-proxy.ko $(KOUTDIR)/tmp/lib/modules/*/kernel/drivers/net/mdio/
+	cp -f mdio-proxy.ko $(KOUTDIR)/tmp/lib/modules/"$$krelease"/kernel/drivers/net/mdio/
 	$(call fbprint_d,"mdio_proxy_module")

@@ -14,7 +14,7 @@ secure_obj: optee_os optee_client openssl
 	 fi
 	 kerneloutdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)
 	 mkdir -p $(DESTDIR)/usr/lib
-	 kernelrelease=`cat $$kerneloutdir/include/config/kernel.release`
+	 krelease=$$(cat "$(KOUTDIR)/include/config/kernel.release" 2>/dev/null)
 	 if [ $(SOCFAMILY) = "IMX" ]; then \
 		 socfamily=imx; \
 	 else \
@@ -37,7 +37,7 @@ secure_obj: optee_os optee_client openssl
 	 mkdir -p $(DESTDIR)/usr/lib/optee_armtz
 	 MAKEFLAGS=-j1 ./compile.sh $(LOG_MUTE)
 	 cp images/libeng_secure_obj.so $(DESTDIR)/usr/lib/aarch64-linux-gnu/openssl-1.0.0/engines
-	 mkdir -p $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)/tmp/lib/modules/$$kernelrelease/extra
+	 mkdir -p $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)/tmp/lib/modules/$$krelease/extra
 	 cp images/*.ta $(DESTDIR)/usr/lib/optee_armtz
 	 cp images/*.so $(DESTDIR)/usr/local/lib
 	 cp images/{*_app,mp_verify} $(DESTDIR)/usr/local/bin

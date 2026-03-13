@@ -38,9 +38,9 @@ linux $(KERNEL_IMAGE):
 
 
 
-cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt perf: $(KERNEL_IMAGE)
+cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt: $(KERNEL_IMAGE)
 KMOD_DEPS := $(if $(filter y,$(CONFIG_PLATFORM_IMX)),isp_vvcam_module nxp_wlan_bt,mdio_proxy_module)
-linux-modules: cryptodev_linux perf $(KMOD_DEPS)
+linux-modules: cryptodev_linux $(KMOD_DEPS)
 	@$(call fbprint_d,"linux-modules")
 
 

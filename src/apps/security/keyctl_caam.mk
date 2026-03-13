@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-keyctl_caam:
-ifeq ($(CONFIG_SEC_KEYCTL_CAAM),y)
+keyctl_caam: openssl
 	 @$(call download_repo,keyctl_caam,apps/security)
 	 $(call patch_apply,keyctl_caam,apps/security)
 	 $(call fbprint_b,"keyctl_caam")
@@ -12,4 +11,3 @@ ifeq ($(CONFIG_SEC_KEYCTL_CAAM),y)
 	 export OPENSSL_PATH=$(SECDIR)/openssl
 	 $(MAKE) CC=$(CROSS_COMPILE)gcc DESTDIR=$(DESTDIR) install $(LOG_MUTE)
 	 $(call fbprint_d,"keyctl_caam")
-endif

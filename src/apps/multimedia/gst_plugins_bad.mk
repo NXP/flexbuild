@@ -14,18 +14,18 @@ gst_plugins_bad: gst_plugins_base
 	@$(call download_repo,gst_plugins_bad,apps/multimedia)
 	 $(call patch_apply,gst_plugins_bad,apps/multimedia)
 	 cd $(MMDIR)/gst_plugins_bad
-	 if ! grep -q libexecdir= meson.build; then \
-	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build \
-	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build; \
+	 if ! grep -q libexecdir= meson.build; then
+	     sed -i "/pkgconfig_variables =/a\  'libexecdir=\$\{prefix\}/libexec'," meson.build
+	     sed -i "/pkgconfig_variables =/a\  'datadir=\$\{prefix\}/share'," meson.build
 	 fi
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 $(call fbprint_b,"gst_plugins_bad")
 	 rm -rf build_$(DISTROTYPE)_$(ARCH)
-	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1} \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so} \
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}; \
+	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1}
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so}
+	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}
 	 fi
 	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib
 	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/

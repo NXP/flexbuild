@@ -79,14 +79,13 @@ config MM_GST_PLUGINS_BAD
 	help
 	  GStreamer plugins with potential quality or licensing issues
 
-config MM_GST_PLUGINS_UGLY
-	bool
-	#bool "GStreamer ugly plugins"
-	default n
-	select MM_GSTREAMER
-	select MM_GST_PLUGINS_BASE
-	help
-	  GStreamer plugins with licensing issues
+#config MM_GST_PLUGINS_UGLY
+#	bool "GStreamer ugly plugins"
+#	default n
+#	select MM_GSTREAMER
+#	select MM_GST_PLUGINS_BASE
+#	help
+#	  GStreamer plugins with licensing issues
 
 config MM_GST_PYTHON
 	bool "GStreamer Python bindings"

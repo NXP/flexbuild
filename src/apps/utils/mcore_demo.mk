@@ -10,20 +10,24 @@ mcore_demo:
 	@echo -e "\nInstalling mcore demos for $(MACHINE)"
 	mkdir -p $(UTILSDIR)/mcore_demo
 	cd $(UTILSDIR)/mcore_demo
-	if [ "$(CONFIG_SOC_IMX8MMEVK)" = "y" ]; then \
-		DL=imx8mm_mdemo; BIN=imx8mm-m4-demo.bin; _SOC=imx8mm; _NAME=imx8mm-m4-demo; \
-	elif [ "$(CONFIG_SOC_IMX8MP)" = "y" ]; then \
-		DL=imx8mp_mdemo; BIN=imx8mp-m7-demo.bin; _SOC=imx8mp; _NAME=imx8mp-m7-demo; \
-	elif [ "$(CONFIG_SOC_IMX8QMMEK)" = "y" ]; then \
-		DL=imx8qm_mdemo; BIN=imx8qm-m4-demo.bin; _SOC=imx8qm; _NAME=imx8qm-m4-demo; \
-	elif [ "$(CONFIG_SOC_IMX93)" = "y" ]; then \
-		DL=imx93_mdemo; BIN=imx93-m33-demo.bin; _SOC=imx93; _NAME=imx93-m33-demo; \
-	elif [ "$(CONFIG_SOC_IMX95)" = "y" ]; then \
-		DL=imx95_mdemo; BIN=imx95-m7-demo.bin; _SOC=imx95; _NAME=imx95-m7-demo; \
-	else \
-		exit; \
+	if [ "$(CONFIG_SOC_IMX8MMEVK)" = "y" ]; then
+		$(call dl_by_wget,imx8mm_mdemo,imx8mm-m4-demo.bin)
+		_SOC=imx8mm; _NAME=imx8mm-m4-demo
+	elif [ "$(CONFIG_SOC_IMX8MP)" = "y" ]; then
+		$(call dl_by_wget,imx8mp_mdemo,imx8mp-m7-demo.bin)
+		_SOC=imx8mp; _NAME=imx8mp-m7-demo
+	elif [ "$(CONFIG_SOC_IMX8QMMEK)" = "y" ]; then
+		$(call dl_by_wget,imx8qm_mdemo,imx8qm-m4-demo.bin)
+		_SOC=imx8qm; _NAME=imx8qm-m4-demo
+	elif [ "$(CONFIG_SOC_IMX93)" = "y" ]; then
+		$(call dl_by_wget,imx93_mdemo,imx93-m33-demo.bin)
+		_SOC=imx93; _NAME=imx93-m33-demo
+	elif [ "$(CONFIG_SOC_IMX95)" = "y" ]; then
+		$(call dl_by_wget,imx95_mdemo,imx95-m7-demo.bin)
+		_SOC=imx95; _NAME=imx95-m7-demo
+	else
+		exit 0
 	fi
-	$(call dl_by_wget,$${DL},$${BIN})
 	if [ ! -d $${_NAME} ]; then \
 		chmod +x $(FBDIR)/dl/$${_NAME}.bin; \
 		$(FBDIR)/dl/$${_NAME}.bin --auto-accept --force $(LOG_MUTE); \

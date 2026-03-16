@@ -7,7 +7,7 @@ SMART_KITCHEN_DIR = ${GPNT_APPS_FOLDER}/scripts/multimedia/smart-kitchen
 
 imx_smart_kitchen:
 	@$(call download_repo,imx_smart_kitchen,apps/gopoint,git)
-	 $(call patch_apply,imx_smart_kitchen,apps/gopoint)
+#	 $(call patch_apply,imx_smart_kitchen,apps/gopoint)
 #	 if  [ ! -f $(DESTDIR)/usr/lib/nxp-afe/libdummyimpl.so.1.0 ]; then \
 #	     bld nxp_afe -m $(MACHINE); \
 #	 fi

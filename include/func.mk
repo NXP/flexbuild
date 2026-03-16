@@ -46,7 +46,7 @@ host-dep:
 	@$(BLD) host-dep
 
 docker:
-	@$(BLD) docker
+	+@$(BLD) docker
 
 
 rfs: $(KHEADER_FILE)

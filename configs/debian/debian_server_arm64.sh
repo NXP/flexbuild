@@ -32,12 +32,16 @@ echo "sources.list: ${MIRRORS[@]}"
 mmdebstrap \
   --arch=$ARCH \
   --aptopt='Acquire::Retries=5' \
+  --aptopt='Acquire::Queue-Mode=access' \
+  --aptopt='Acquire::http::Pipeline-Depth=200' \
   --aptopt='Acquire::http::Timeout=30' \
   --aptopt='Acquire::https::Timeout=30' \
+  --aptopt='Acquire::http::Proxy="http://127.0.0.1:3142"' \
+  --aptopt='Acquire::Languages="none"' \
   --aptopt='APT::Get::Assume-Yes=true' \
+  --aptopt='APT::Acquire::Retries=5' \
   --aptopt='DPkg::Options::=--force-confnew' \
   --aptopt='Dpkg::Progress-Fancy=1' \
-  --aptopt='Acquire::Languages="none"' \
   --skip=download/bytecode \
   --variant=standard \
   --components=main,contrib \

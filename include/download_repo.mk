@@ -133,7 +133,7 @@ define dl_by_wget
 		echo "[INFO] Downloading $(1)"; \
 		mkdir -p $(FBDIR)/dl /tmp && \
 		rm -f /tmp/$(2) && \
-		$(WGET) $(repo_$(1)_url)  -O /tmp/$(2) $(LOG_MUTE) && \
+		$(WGET) $(repo_$(1)_url)  -O /tmp/$(2) $(LOG_MUTE) || { echo "Download $1 error"; exit 1; } && \
 		if [ $$? -ne 0 ]; then \
 			echo "Downloading $(1) failed." && exit 1; \
 		fi && \

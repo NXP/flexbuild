@@ -68,5 +68,5 @@ RUN set -eux; \
       python3-jinja2 python3-ply python3-numpy python3-kconfiglib \
       python3-cryptography python3-pyelftools \
       protobuf-compiler libgdk-pixbuf-2.0-dev libxml2-utils libprotobuf-dev \
-      gtk-doc-tools pandoc && \
+      gtk-doc-tools pandoc apt-cacher-ng && \
     rm -rf /var/lib/apt/lists/*

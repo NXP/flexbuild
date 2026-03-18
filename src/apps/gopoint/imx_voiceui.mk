@@ -19,8 +19,7 @@ endif
 imx_voiceui:
 ifeq ($(CONFIG_IMX_VOICEUI),y)
 #imx_voiceui: nxp_afe nxp_demo_experience_assets
-	@[ $(SOCFAMILY) != IMX ] && exit || \
-	 $(call download_repo,imx_voiceui,apps/gopoint)
+	@$(call download_repo,imx_voiceui,apps/gopoint)
 	 $(call patch_apply,imx_voiceui,apps/gopoint)
 	 \
 	 $(call fbprint_b,"imx_voiceui")

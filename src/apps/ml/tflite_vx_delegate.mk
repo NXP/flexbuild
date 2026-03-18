@@ -12,13 +12,13 @@
 
 #tflite_vx_delegate:
 tflite_vx_delegate: tflite tim_vx
-	@$(call download_repo,tflite_vx_delegate,apps/ml) && \
-	$(call patch_apply,tflite_vx_delegate,apps/ml) && \
-	$(call fbprint_b,"tflite_vx_delegate") && \
-	cd $(MLDIR)/tflite_vx_delegate && \
-	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" && \
-	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)" && \
-	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(RFSDIR)//usr/include/python3.13" && \
+	@$(call download_repo,tflite_vx_delegate,apps/ml)
+	$(call patch_apply,tflite_vx_delegate,apps/ml)
+	$(call fbprint_b,"tflite_vx_delegate")
+	cd $(MLDIR)/tflite_vx_delegate
+	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
+	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(RFSDIR)//usr/include/python3.13"
 	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
 		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
 		cd build_$(DISTROTYPE)_$(ARCH); \
@@ -27,7 +27,7 @@ tflite_vx_delegate: tflite tim_vx
 			example_proto_generated examples/*.o tools/*.o tmp/*; \
 		find . -type d -name "CMakeFiles" -exec rm -rf {} +; \
 		cd ..; \
-	fi && \
+	fi
 	cmake  -S $(MLDIR)/tflite_vx_delegate \
 		-B build_$(DISTROTYPE)_$(ARCH) -Wno-dev \
 		-DPSIMD_SOURCE_DIR=$(TFLITE_BUILD_DIR)/psimd-source \
@@ -50,11 +50,11 @@ tflite_vx_delegate: tflite tim_vx
 		-DXNNPACK_TARGET_PROCESSOR=arm64 \
 		-DTIM_VX_INSTALL=$(DESTDIR)/usr \
 		-DFETCHCONTENT_SOURCE_DIR_TENSORFLOW=$(MLDIR)/tflite \
-		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so $(LOG_MUTE) && \
-	$(MAKE) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE) && \
-	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so && \
-	cp -f build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so $(DESTDIR)/usr/lib && \
-	install -d $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate && \
+		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so $(LOG_MUTE)
+	$(MAKE) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE)
+	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so
+	cp -f build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so $(DESTDIR)/usr/lib
+	install -d $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate
 	cp --parents vsi_npu_custom_op.h op_map.h utils.h delegate_main.h examples/util.h \
-	   $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate && \
+	   $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate
 	$(call fbprint_d,"tflite_vx_delegate")

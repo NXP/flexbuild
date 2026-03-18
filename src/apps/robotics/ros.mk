@@ -14,8 +14,8 @@
 
 ros:
 ifeq ($(CONFIG_ROS), "y")
-	 if [ -d $(RFSDIR)/opt/ros2_jazzy ]; then \
-	     $(call fbprint_n,"ROS was already installed in $(RFSDIR)/opt/ros2_jazzy") && exit; \
+	 if [ -d $(RFSDIR)/opt/ros2_jazzy ]; then
+	     $(call fbprint_n,"ROS was already installed in $(RFSDIR)/opt/ros2_jazzy") && exit 0
 	 fi
 	 $(call fbprint_b,"ROS2")
 	 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o $(RFSDIR)/usr/share/keyrings/ros-archive-keyring.gpg

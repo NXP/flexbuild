@@ -9,16 +9,16 @@ secure_obj: optee_os optee_client openssl
 	@$(call download_repo,secure_obj,apps/security)
 	 $(call patch_apply,secure_obj,apps/security)
 	 $(call fbprint_b,"secure_obj")
-	 if [ "$(CONFIG_OPTEE)" != "y" ]; then \
-	     $(call fbprint_d,"secure_obj"); exit ; \
+	 if [ "$(CONFIG_OPTEE)" != "y" ]; then
+	     $(call fbprint_d,"secure_obj"); exit 0
 	 fi
 	 kerneloutdir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)
 	 mkdir -p $(DESTDIR)/usr/lib
 	 krelease=$$(cat "$(KOUTDIR)/include/config/kernel.release" 2>/dev/null)
-	 if [ $(SOCFAMILY) = "IMX" ]; then \
-		 socfamily=imx; \
-	 else \
-		 socfamily=ls; \
+	 if [ $(SOCFAMILY) = "IMX" ]; then
+		 socfamily=imx
+	 else
+		 socfamily=ls
 	 fi
 	 cd $(SECDIR)/secure_obj
 	 export CC="$(CROSS_COMPILE)gcc -Wno-deprecated-declarations --sysroot=$(RFSDIR)"

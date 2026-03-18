@@ -7,7 +7,6 @@
 
 
 imx_smw: optee_client
-ifeq ($(CONFIG_SMW),y)
 	@$(call download_repo,imx_smw,apps/security)
 	 $(call patch_apply,imx_smw,apps/security)
 	 $(call fbprint_b,"imx_smw")
@@ -24,4 +23,3 @@ ifeq ($(CONFIG_SMW),y)
 	 cmake --build build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE)
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE)
 	 $(call fbprint_d,"imx_smw")
-endif

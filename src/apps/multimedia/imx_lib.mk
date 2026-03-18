@@ -4,7 +4,7 @@
 
 # Gstreamer iMX lib 
 
-imx_lib:
+imx_lib: $(KHEADER_FILE)
 	@$(call download_repo,imx_lib,apps/multimedia)
 	 $(call patch_apply,imx_lib,apps/multimedia)
 	 $(call fbprint_b,"imx_lib")

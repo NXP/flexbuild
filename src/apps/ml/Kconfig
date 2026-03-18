@@ -14,34 +14,29 @@ if APP_ML && PLATFORM_IMX
 
 config ML_EIQ_EXAMPLES
 	bool "eIQ ML examples"
-	default n
-	depends on SOC_IMX93
-	select ML_TFLITE
+	default y
+	depends on SOC_IMX93 && ML_TFLITE
 	help
 	  NXP eIQ machine learning examples and demos
 
 config ML_ETHOSU_DRIVER_STACK
 	bool "Ethos-U NPU driver stack"
-	default n
-	depends on SOC_IMX93
-	select ML_ETHOSU_FIRMWARE
-	select ML_FLATBUFFERS
-	select ML_TFLITE
+	default y
+	depends on SOC_IMX93 && ML_ETHOSU_FIRMWARE && ML_FLATBUFFERS && ML_TFLITE
 	help
 	  Arm Ethos-U NPU driver stack
 
 config ML_ETHOSU_FIRMWARE
 	bool "Ethos-U NPU firmware"
-	default n
+	default y
 	depends on SOC_IMX93
 	help
 	  Firmware for Arm Ethos-U NPU
 
 config ML_ETHOSU_VELA
 	bool "Ethos-U Vela compiler"
-	default n
-	depends on SOC_IMX93
-	select ML_ETHOSU_DRIVER_STACK
+	default y
+	depends on SOC_IMX93 && ML_ETHOSU_DRIVER_STACK
 	help
 	  Neural network compiler for Arm Ethos-U NPU
 
@@ -53,96 +48,83 @@ config ML_FLATBUFFERS
 
 config ML_NEUTRON
 	bool "Neutron NPU driver"
-	default n
+	default y
 	depends on SOC_IMX95
 	help
 	  NXP Neutron NPU driver and runtime
 
 config ML_NNSHARK
 	bool "nnshark profiling tool"
-	default n
-	depends on SOC_IMX8
-	select MM_GST_PLUGINS_BAD
-	select GFX_LIBGPUPERFCNT
-	select ML_NNSTREAMER
+	default y
+	depends on SOC_IMX8 && MM_GST_PLUGINS_BAD && GFX_LIBGPUPERFCNT && ML_NNSTREAMER
 	help
 	  Neural network profiling tool for NNStreamer
 
 config ML_NNSTREAMER_EDGE
 	bool "NNStreamer Edge"
-	default n
+	default y
 	help
 	  NNStreamer for edge AI applications
 
 config ML_NNSTREAMER
 	bool "NNStreamer"
-	default n
+	default y
     depends on SOC_IMX8 || SOC_IMX95 || SOC_IMX93
-	select MM_GSTREAMER
-	select MM_GST_PLUGINS_BASE
-	select ML_NNSTREAMER_EDGE
-	select ML_TFLITE
+	depends on MM_GSTREAMER && MM_GST_PLUGINS_BASE && ML_NNSTREAMER_EDGE && ML_TFLITE
 	help
 	  Neural network streaming framework based on GStreamer
 
 # config ML_PYTORCH
-# 	bool
-# 	#bool "PyTorch deep learning framework"
-# 	default n
+# 	bool "PyTorch deep learning framework"
+# 	default y
 # 	help
 # 	  PyTorch machine learning framework
 
 config ML_SSAT
 	bool "SSAT - Shell Script Automated Tester"
-	default n
+	default y
+    depends on ML_NNSTREAMER
 	help
 	  Testing framework for NNStreamer
 
 config ML_TFLITE_ETHOSU_DELEGATE
 	bool "TensorFlow Lite Ethos-U delegate"
-	default n
-	depends on SOC_IMX93
-	select ML_TFLITE
-	select ML_ETHOSU_DRIVER_STACK
+	default y
+	depends on SOC_IMX93 && ML_TFLITE && ML_ETHOSU_DRIVER_STACK
 	help
 	  TensorFlow Lite delegate for Arm Ethos-U NPU
 
 config ML_TFLITE
 	bool "TensorFlow Lite"
 	default y
-	select ML_FLATBUFFERS
+	depends on ML_FLATBUFFERS
 	help
 	  TensorFlow Lite inference framework
 
 config ML_TFLITE_NEUTRON_DELEGATE
 	bool "TensorFlow Lite Neutron delegate"
-	default n
-	depends on SOC_IMX95
-	select ML_TFLITE
-	select ML_NEUTRON
+	default y
+	depends on SOC_IMX95 && ML_TFLITE && ML_NEUTRON
 	help
 	  TensorFlow Lite delegate for NXP Neutron NPU
 
 config ML_TFLITE_VX_DELEGATE
 	bool "TensorFlow Lite VX delegate"
-	default n
-	depends on SOC_IMX8
-	select ML_TFLITE
-	select ML_TIM_VX
+	default y
+	depends on SOC_IMX8 && ML_TFLITE && ML_TIM_VX
 	help
 	  TensorFlow Lite delegate for Vivante NPU
 
 config ML_TIM_VX
 	bool "TIM-VX - Tensor Interface Module"
-	default n
-	depends on SOC_IMX8
+	default y
+	depends on SOC_IMX8 && GFX_GPU_VIV
 	help
 	  Tensor Interface Module for Vivante NPU
 
 # config ML_TVM
-# 	bool
-# 	#bool "Apache TVM deep learning compiler"
-# 	default n
+# 	bool "Apache TVM deep learning compiler"
+# 	default y
 # 	help
 # 	  Apache TVM deep learning compiler stack
 

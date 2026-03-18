@@ -48,7 +48,7 @@ endif # PLATFORM_IMX
 
 config UTILS_FIRMWARE_IMX
 	bool "i.MX firmware package"
-	default y if PLATFORM_IMX
+	default y
 	depends on PLATFORM_IMX || SOC_LS1028ARDB
 	help
 	  Firmware binaries for i.MX platforms (VPU, SDMA, etc.)

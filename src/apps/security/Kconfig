@@ -12,59 +12,56 @@ if APP_SECURITY
 
 
 config SEC_CRCONF
-	bool "CrConf - Crypto Configuration tool"
-	default n
+	bool "CrConf - Linux crypto layer configuraton tool"
+	default y
 	help
-	  Cryptographic configuration tool for LayerScape platforms
+	  Cryptographic configuration tool
 
 config SEC_CST
 	bool "Code Signing Tool"
-	default y if SECURE_BOOT
+	default y
 	depends on PLATFORM_LS && SECURE_BOOT
 	help
 	  NXP Code Signing Tool for secure boot
 
 config SEC_ECC_EXAMPLE
 	bool "ECC cryptography examples"
-	default n
-	depends on PLATFORM_IMX
-	select SEC_OPENSSL
+	default y
+	depends on PLATFORM_IMX && SEC_OPENSSL
 	help
 	  Elliptic Curve Cryptography example applications
 
 config SEC_IMX_SECURE_ENCLAVE
 	bool "i.MX Secure Enclave"
-	default n
-	depends on SOC_IMX93
+	default y
+	depends on (SOC_IMX93 || SOC_IMX95) && SEC_OPENSSL && SEC_MBEDTLS
 	help
 	  i.MX Secure Enclave firmware and libraries
 
-# config SEC_IMX_SMW
-# 	bool
-# 	#bool "i.MX Security Middleware"
-# 	default n
-# 	depends on PLATFORM_IMX
-# 	help
-# 	  i.MX Security Middleware framework
+config SEC_IMX_SMW
+    bool "i.MX Security Middleware Library"
+    default y
+    depends on PLATFORM_IMX && SEC_OPTEE_CLIENT && SEC_OPTEE_OS
+    help
+      i.MX Security Middleware Library
 
-# # config SEC_KEYCTL_CAAM
-# 	bool
-# 	#bool "CAAM keyctl utility"
-# 	default n
-# 	help
-# 	  Key control utility for CAAM (Cryptographic Acceleration and Assurance Module)
+config SEC_KEYCTL_CAAM
+    bool "CAAM keyctl utility"
+    default y
+    depends on SEC_OPENSSL
+    help
+      Key control utility for CAAM (Cryptographic Acceleration and Assurance Module)
 
 config SEC_LIBPKCS11
 	bool "PKCS#11 cryptographic library"
 	default n
-	depends on OPTEE
-	select SEC_SECURE_OBJ
+	depends on PLATFORM_LS && OPTEE && SEC_SECURE_OBJ && SEC_OPENSSL
 	help
 	  PKCS#11 Cryptographic Token Interface library
 
 config SEC_MBEDTLS
 	bool "Mbed TLS cryptographic library"
-	default n
+	default y
 	help
 	  Lightweight cryptographic and SSL/TLS library
 
@@ -77,41 +74,35 @@ config SEC_OPENSSL
 config SEC_OPENSSL_PROVIDER_SE05X
 	bool "OpenSSL provider for SE05x secure element"
 	default n
-	depends on PLATFORM_IMX
-	select SEC_OPENSSL
+	depends on PLATFORM_IMX && SEC_OPENSSL
 	help
 	  OpenSSL provider for NXP SE05x secure element
 
 config SEC_OPTEE_CLIENT
 	bool "OP-TEE client libraries"
-	default y if OPTEE
-	depends on OPTEE
-	select SEC_OPTEE_OS
+	default y
+	depends on OPTEE && SEC_OPTEE_OS
 	help
 	  OP-TEE client libraries and utilities
 
 config SEC_OPTEE_OS
 	bool "OP-TEE Trusted OS"
-	default y if OPTEE
+	default y
 	depends on OPTEE
 	help
 	  Open Portable Trusted Execution Environment OS
 
 config SEC_OPTEE_TEST
 	bool "OP-TEE test suite"
-	default n
-	depends on OPTEE
-	select SEC_OPTEE_OS
-	select SEC_OPTEE_CLIENT
+	default y
+	depends on OPTEE && SEC_OPTEE_CLIENT && SEC_OPTEE_OS
 	help
 	  OP-TEE compliance test suite and examples
 
 config SEC_SECURE_OBJ
 	bool "Secure Object library"
-	default n
-	depends on OPTEE
-	select SEC_OPTEE_CLIENT
-	select SEC_OPTEE_OS
+	default y
+	depends on PLATFORM_LS && OPTEE && SEC_OPTEE_CLIENT && SEC_OPTEE_OS
 	help
 	  Secure Object library for trusted applications
 

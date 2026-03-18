@@ -13,118 +13,113 @@ if APP_NETWORKING
 
 config NET_AIOPSL
 	bool "AIOP Service Layer"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  AIOP (Advanced I/O Processor) Service Layer for DPAA2
 
 config NET_AQUANTIA_FW_UTIL
 	bool "Aquantia firmware utilities"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  Firmware utilities for Aquantia network adapters
 
 config NET_CEETM
 	bool "CEETM QoS support"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  Customer Edge Egress Traffic Management for QoS
 
 config NET_DCE
 	bool "Data Compression Engine"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  DPAA2 Data Compression Engine support
 
 config NET_DPDK
 	bool "DPDK - Data Plane Development Kit"
-	default y if PLATFORM_LS
-	default n if PLATFORM_IMX
+	default y
 	help
 	  Data Plane Development Kit for fast packet processing
 
 config NET_FLIB
 	bool "DPAA Frame Manager library"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  DPAA Frame Manager user space library
 
 config NET_FMC
 	bool "Frame Manager Configuration tool"
-	default n
-	depends on PLATFORM_LS
-	select NET_FMLIB
+	default y
+	depends on PLATFORM_LS && NET_FMLIB
 	help
 	  Frame Manager Configuration tool for DPAA
 
 config NET_FMLIB
 	bool "Frame Manager library"
-	default n
-	depends on PLATFORM_LS
-	select NET_FLIB
+	default y
+	depends on PLATFORM_LS && NET_FLIB
 	help
 	  Frame Manager user space library for DPAA
 
 config NET_GPP_AIOPTOOL
 	bool "GPP AIOP programming tool"
-	default n
-	depends on PLATFORM_LS
-	select NET_AIOPSL
+	default y
+	depends on PLATFORM_LS && NET_AIOPSL
 	help
 	  General Purpose Processor tool for AIOP programming
 
 #config NET_OVS_DPDK
 #	bool "Open vSwitch with DPDK"
-#	default n
+#	default y
 #	depends on PLATFORM_LS
-#	select NET_DPDK
+#	depends on NET_DPDK
 #	help
 #	  Open vSwitch accelerated with DPDK
 
 config NET_PKTGEN_DPDK
 	bool "Pktgen for DPDK"
-	default n
-	depends on PLATFORM_LS
-	select NET_DPDK
+	default y
+	depends on PLATFORM_LS && NET_DPDK
 	help
 	  High-performance packet generator built on DPDK
 
 config NET_QBMAN_USERSPACE
 	bool "QBMan userspace driver"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  Queue and Buffer Manager userspace driver for DPAA
 
 config NET_RESTOOL
 	bool "DPAA2 resource manager tool"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  Resource manager tool for DPAA2 objects
 
 config NET_SPC
 	bool "Soft Parser Configuration tool"
-	default n
+	default y
 	depends on PLATFORM_LS
 	help
 	  Soft Parser Configuration tool for DPAA2
 
 config NET_TSNTOOL
 	bool "TSN (Time-Sensitive Networking) tools"
-	default n
+	default y
 	help
 	  Tools for Time-Sensitive Networking configuration
 
 #config NET_VPP
 #	bool "VPP - Vector Packet Processing"
-#	default n
+#	default y
 #	depends on PLATFORM_LS
-#	select NET_DPDK
+#	depends on NET_DPDK
 #	help
 #	  Fast, scalable layer 2-4 multi-platform network stack
 

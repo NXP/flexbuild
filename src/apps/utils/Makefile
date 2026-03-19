@@ -17,24 +17,33 @@ UTILS_MODULES := \
     imx_test \
     mcore_demo \
     wireless_regdb \
-	perf
+    perf
 
 # ============================================================================
-# Automatically include enabled modules and build APPS_UTILS
+# Conditionally include enabled modules based on Kconfig
 # ============================================================================
-APPS_UTILS :=
+APPS_UTILS-y :=
 
-$(foreach m,$(UTILS_MODULES), \
-    $(eval _cfg := CONFIG_UTILS_$(shell echo $(m) | tr a-z A-Z)) \
-    $(if $(filter y,$($(_cfg))), \
-        $(eval include $(FBDIR)/src/apps/utils/$(m).mk)) \
-    $(if $(filter y,$($(_cfg))), \
-        $(eval APPS_UTILS += $(m))) \
-)
+# Add modules based on CONFIG_UTILS_* settings
+APPS_UTILS-$(CONFIG_UTILS_FIRMWARED) += firmwared
+APPS_UTILS-$(CONFIG_UTILS_FIRMWARE_IMX) += firmware_imx
+APPS_UTILS-$(CONFIG_UTILS_IMX_FIRMWARE) += imx_firmware
+APPS_UTILS-$(CONFIG_UTILS_IMX_TEST) += imx_test
+APPS_UTILS-$(CONFIG_UTILS_MCORE_DEMO) += mcore_demo
+APPS_UTILS-$(CONFIG_UTILS_WIRELESS_REGDB) += wireless_regdb
+APPS_UTILS-$(CONFIG_UTILS_PERF) += perf
+
+# Create alias for backward compatibility
+APPS_UTILS := $(APPS_UTILS-y)
 
 # ============================================================================
-# Utility target using APPS_UTILS
+# Include makefiles for enabled modules
+# ============================================================================
+$(foreach m,$(APPS_UTILS-y), \
+    $(eval include $(FBDIR)/src/apps/utils/$(m).mk))
+
+# ============================================================================
+# Utility target using APPS_UTILS-y
 # ============================================================================
 .PHONY: utils
-utils: $(APPS_UTILS)
-
+utils: $(APPS_UTILS-y)

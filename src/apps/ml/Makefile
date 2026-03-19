@@ -30,21 +30,41 @@ ML_MODULES := \
     tvm
 
 # ============================================================================
-# Automatically include enabled modules and build APPS_ML
+# Conditionally include enabled modules based on Kconfig
 # ============================================================================
-APPS_ML :=
-$(foreach m,$(ML_MODULES), \
-    $(eval _cfg := CONFIG_ML_$(shell echo $(m) | tr a-z A-Z)) \
-    $(if $(filter y,$($(_cfg))), \
-        $(eval include $(FBDIR)/src/apps/ml/$(m).mk)) \
-    $(if $(filter y,$($(_cfg))), \
-        $(eval APPS_ML += $(m))) \
-)
+APPS_ML-y :=
+
+# Add modules based on CONFIG_ML_* settings
+APPS_ML-$(CONFIG_ML_EIQ_EXAMPLES) += eiq_examples
+APPS_ML-$(CONFIG_ML_ETHOSU_DRIVER_STACK) += ethosu_driver_stack
+APPS_ML-$(CONFIG_ML_ETHOSU_FIRMWARE) += ethosu_firmware
+APPS_ML-$(CONFIG_ML_ETHOSU_VELA) += ethosu_vela
+APPS_ML-$(CONFIG_ML_FLATBUFFERS) += flatbuffers
+APPS_ML-$(CONFIG_ML_NEUTRON) += neutron
+APPS_ML-$(CONFIG_ML_NNSHARK) += nnshark
+APPS_ML-$(CONFIG_ML_NNSTREAMER_EDGE) += nnstreamer_edge
+APPS_ML-$(CONFIG_ML_NNSTREAMER) += nnstreamer
+APPS_ML-$(CONFIG_ML_PYTORCH) += pytorch
+APPS_ML-$(CONFIG_ML_SSAT) += ssat
+APPS_ML-$(CONFIG_ML_TFLITE_ETHOSU_DELEGATE) += tflite_ethosu_delegate
+APPS_ML-$(CONFIG_ML_TFLITE) += tflite
+APPS_ML-$(CONFIG_ML_TFLITE_NEUTRON_DELEGATE) += tflite_neutron_delegate
+APPS_ML-$(CONFIG_ML_TFLITE_VX_DELEGATE) += tflite_vx_delegate
+APPS_ML-$(CONFIG_ML_TIM_VX) += tim_vx
+APPS_ML-$(CONFIG_ML_TVM) += tvm
+
+# Create alias for backward compatibility
+APPS_ML := $(APPS_ML-y)
 
 # ============================================================================
-# ML target using APPS_ML
+# Include makefiles for enabled modules
+# ============================================================================
+$(foreach m,$(APPS_ML-y), \
+    $(eval include $(FBDIR)/src/apps/ml/$(m).mk))
+
+# ============================================================================
+# ML target using APPS_ML-y
 # ============================================================================
 .PHONY: ml
-ml: $(APPS_ML)
-
+ml: $(APPS_ML-y)
 

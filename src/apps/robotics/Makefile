@@ -1,4 +1,3 @@
-
 #
 # Copyright 2026 NXP
 #
@@ -15,23 +14,24 @@ ROBOTICS_MODULES := \
     ros
 
 # ============================================================================
-# Automatically include enabled modules and build APPS_ROBOTICS
+# Conditionally include enabled modules based on Kconfig
 # ============================================================================
-APPS_ROBOTICS :=
+APPS_ROBOTICS-y :=
 
+# Add modules based on CONFIG_ROBOTICS_* settings
+APPS_ROBOTICS-$(CONFIG_ROBOTICS_ROS) += ros
 
-$(foreach m,$(ROBOTICS_MODULES), \
-    $(eval _m_upper = $(shell echo '$(m)' | tr 'a-z' 'A-Z')) \
-    $(eval _cfg = CONFIG_ROBOTICS_$(_m_upper)) \
-    $(if $(filter y,$($(_cfg))), \
-        $(eval include $(FBDIR)/src/apps/robotics/$(m).mk)) \
-    $(if $(filter y,$($(_cfg))), \
-        $(eval APPS_ROBOTICS += $(m))) \
-)
+# Create alias for backward compatibility
+APPS_ROBOTICS := $(APPS_ROBOTICS-y)
 
 # ============================================================================
-# Robotics target using APPS_ROBOTICS
+# Include makefiles for enabled modules
+# ============================================================================
+$(foreach m,$(APPS_ROBOTICS-y), \
+    $(eval include $(FBDIR)/src/apps/robotics/$(m).mk))
+
+# ============================================================================
+# Robotics target using APPS_ROBOTICS-y
 # ============================================================================
 .PHONY: robotics
-robotics: $(APPS_ROBOTICS)
-
+robotics: $(APPS_ROBOTICS-y)

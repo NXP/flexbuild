@@ -33,6 +33,8 @@ linux $(KERNEL_IMAGE):
 	\
 	$(MAKE) modules -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	$(MAKE) modules_install INSTALL_MOD_PATH=$(DESTDIR) -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
+	krelease=$$(cat "$(KOUTDIR)/include/config/kernel.release" 2>/dev/null)
+	rm -rf $(DESTDIR)/lib/modules/"$$krelease"/build
 	cp $(KOUTDIR)/arch/arm64/boot/dts/freescale/$(DTBSTR) $(KTGT_DIR)
 	$(call fbprint_d,"$(KERNEL_TREE) $(KERNEL_BRANCH) in $(KTGT_DIR)")
 

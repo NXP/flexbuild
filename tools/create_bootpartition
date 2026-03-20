@@ -37,23 +37,9 @@ generate_bootpartition_tarball() {
     cp -f "$FBOUTDIR/linux/kernel/arm64/$SOCFAMILY"/{*.dtb,Image*,config-$kernelrelease} "$bootpartdir/"
     cp -f "$FBOUTDIR/linux/kernel/arm64/$SOCFAMILY/vmlinuz-$kernelrelease" "$bootpartdir/"
 
-    # 3. Install kernel modules
-    fbprint_n "Installing kernel modules"
-    local module_src="$KERNEL_OUTPUT_PATH/$KERNEL_BRANCH/tmp/lib/modules"
-    cp -rf "$module_src" "$bootpartdir/"
-    
-    # Identify module version directory and clean up build/source symlinks
-    local modversion
-    modversion=$(ls "$module_src" | head -n 1)
-    rm -f "$bootpartdir/modules/$modversion"/{build,source}
-
     # 4. Install distro boot scripts with platform-specific filtering
     fbprint_n "Installing distro boot script"
-    if [ "$CONFIG_PLATFORM_LS" = "y" ]; then
-        cp -rf "$FBOUTDIR"/boot/LS/*boot.scr "$bootpartdir/"
-    else
-        cp -rf "$FBOUTDIR"/boot/IMX/*boot.scr "$bootpartdir/"
-    fi
+    cp -rf "$FBOUTDIR"/boot/${SOCFAMILY}_boot.scr "$bootpartdir/boot.scr"
 
     # 5. Handle secure boot headers for Layerscape
     if [ "$CONFIG_PLATFORM_LS" = "y" ] && [ "${CONFIG_SECURE_BOOT}" = "y" ]; then

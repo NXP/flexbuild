@@ -1,0 +1,42 @@
+echo "[boot] start boot.scr"
+
+if test -z "${fdtfile}"; then
+    echo "*** ERROR: fdtfile is not set. Aborting boot."
+    exit
+fi
+
+if test -z "${image}"; then
+    echo "*** ERROR: image is not set. Aborting boot."
+    exit
+fi
+
+env exists devpart_boot || setenv devpart_boot 1
+env exists devpart_root || setenv devpart_root 2
+env exists mmcpart || setenv mmcpart 1
+env exists devnum || setenv devnum 1
+env exists devtype || setenv devtype mmc
+
+if part uuid ${devtype} ${devnum}:${devpart_root} partuuidr; then
+    echo "[boot] PARTUUID=${partuuidr}"
+else
+    echo "*** ERROR: part uuid failed"
+    exit
+fi
+
+setenv bootargs "console=${console} root=PARTUUID=${partuuidr} rw rootwait ${othbootargs}"
+
+if load ${devtype} ${devnum}:${mmcpart} ${fdt_addr_r} ${fdtfile}; then
+    echo "[boot] DTB loaded"
+else
+    echo "*** ERROR: load DTB failed"
+    exit
+fi
+
+if load ${devtype} ${devnum}:${mmcpart} ${loadaddr} ${image}; then
+    echo "[boot] kernel loaded"
+else
+    echo "*** ERROR: load kernel failed"
+    exit
+fi
+
+booti ${loadaddr} - ${fdt_addr_r}

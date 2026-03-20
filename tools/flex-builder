@@ -161,6 +161,26 @@ generate_distro_bootscr() {
     fbprint_d "${out_base}/$bootdir"
 }
 
+build_bootscr() {
+    CONF_FILE="${FBDIR}/configs/board/${SOCFAMILY}_boot.txt"
+    OUT_PATH="${FBOUTDIR}/boot/${SOCFAMILY}_boot.scr"
+
+    if [ ! -f "$CONF_FILE" ]; then
+        echo "Error: Configuration file not found at $CONF_FILE"
+        exit 1
+    fi
+
+    mkdir -p "$(dirname "$OUT_PATH")"
+
+    log_mute mkimage -A arm64 -O linux -T script -C none -a 0 -e 0 -n "boot.scr" -d "$CONF_FILE" "$OUT_PATH"
+
+    if [ $? -eq 0 ]; then
+        echo "Success: Created $OUT_PATH"
+    else
+        echo "Error: mkimage failed"
+        exit 1
+    fi
+}
 
 check_http_request() {
     retcode=$(curl -I -m 10 -o /dev/null -s -w %{http_code} $1) || true
@@ -445,9 +465,9 @@ check_host_dependent_pkg() {
             wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress \
                 https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi.tar.xz \
                 -O /tmp/arm-toolchain.tar.xz
+            mv /tmp/arm-toolchain.tar.xz $FBDIR/dl/arm-toolchain.tar.xz
         fi
-        tar -xf /tmp/arm-toolchain.tar.xz -C /usr
-        mv /tmp/arm-toolchain.tar.xz $FBDIR/dl/arm-toolchain.tar.xz
+        tar -xf $FBDIR/dl/arm-toolchain.tar.xz -C /usr
     fi
 }
 
@@ -942,7 +962,7 @@ case "$1" in
         ;;
     distroscr)
         check_board_valid $MACHINE
-        generate_distro_bootscr $MACHINE
+        build_bootscr
         exit
         ;;
     distroscrall)

@@ -18,15 +18,6 @@ fw bsp: $(BSP_DEPS)
 distroscr:
 	@$(BLD) distroscr
 
-CONF_FILES := $(wildcard configs/board/*.conf)
-distroscrall:
-	@for file in $(CONF_FILES); do \
-		machine=$$(grep '^machine=' $$file | cut -d'=' -f2); \
-		if [ -n "$$machine" ]; then \
-			$(MAKE) distroscr MACHINE=$$machine; \
-		fi \
-	done
-
 packrfs:
 	@$(BLD) packrfs
 

@@ -102,7 +102,7 @@ config SEC_OPTEE_TEST
 config SEC_SECURE_OBJ
 	bool "Secure Object library"
 	default y
-	depends on PLATFORM_LS && OPTEE && SEC_OPTEE_CLIENT && SEC_OPTEE_OS
+	depends on OPTEE && SEC_OPTEE_CLIENT && SEC_OPTEE_OS
 	help
 	  Secure Object library for trusted applications
 

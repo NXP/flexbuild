@@ -14,16 +14,16 @@ if APP_UTILS
 if PLATFORM_IMX
 
 config UTILS_FIRMWARED
-	bool "Firmware daemon"
+	bool "Firmware loading daemon"
 	default y
 	help
-	  Firmware loading daemon for system devices
+	  Firmware loading daemon for system devices, like ap1302 camera
 
 config UTILS_IMX_FIRMWARE
-	bool "i.MX system firmware"
+	bool "NXP WIFI module firmware"
 	default y
 	help
-	  System firmware for i.MX platforms (DDR, HDMI, etc.)
+	  NXP WIFI module, like IW612, SD8997 etc, firmware
 
 config UTILS_IMX_TEST
 	bool "i.MX test utilities"
@@ -47,11 +47,11 @@ config UTILS_WIRELESS_REGDB
 endif # PLATFORM_IMX
 
 config UTILS_FIRMWARE_IMX
-	bool "i.MX firmware package"
+	bool "i.MX system firmware package"
 	default y
 	depends on PLATFORM_IMX || SOC_LS1028ARDB
 	help
-	  Firmware binaries for i.MX platforms (VPU, SDMA, etc.)
+	  Firmware binaries for i.MX platforms (HDMI, VPU, etc.)
 
 config UTILS_PERF
     bool "Kernel perf tool"

@@ -14,9 +14,11 @@ KERNEL_IMAGE := $(KTGT_DIR)/Image
 KHEADER_FILE := $(DESTDIR)/usr/include/linux/version.h
 
 # Find and include all .mk files in this directory
-LINUX_MAP-y                       := linux.mk cryptodev_linux.mk
-LINUX_MAP-$(CONFIG_PLATFORM_IMX)  += isp_vvcam_module.mk nxp_wlan_bt.mk
-LINUX_MAP-$(CONFIG_PLATFORM_LS)   += mdio_proxy_module.mk
+LINUX_MAP-y                           := linux.mk
+LINUX_MAP-$(CONFIG_CRYPTODEV_LINUX)   += cryptodev_linux.mk
+LINUX_MAP-$(CONFIG_ISP_VVCAM_MODULE)  += isp_vvcam_module.mk
+LINUX_MAP-$(CONFIG_NXP_WLAN_BT)       += nxp_wlan_bt.mk
+LINUX_MAP-$(CONFIG_MDIO_PROXY_MODULE) += mdio_proxy_module.mk
 
 LINUX_MK_FILES := $(sort $(LINUX_MAP-y))
 include $(addprefix src/linux/,$(LINUX_MK_FILES))

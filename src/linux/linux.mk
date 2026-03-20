@@ -32,17 +32,9 @@ linux $(KERNEL_IMAGE):
 	cp $(KOUTDIR)/arch/arm64/boot/Image* $(KTGT_DIR)
 	\
 	$(MAKE) modules -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
-	$(MAKE) modules_install INSTALL_MOD_PATH=$(KOUTDIR)/tmp -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
+	$(MAKE) modules_install INSTALL_MOD_PATH=$(DESTDIR) -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	cp $(KOUTDIR)/arch/arm64/boot/dts/freescale/$(DTBSTR) $(KTGT_DIR)
 	$(call fbprint_d,"$(KERNEL_TREE) $(KERNEL_BRANCH) in $(KTGT_DIR)")
-
-
-
-cryptodev_linux mdio_proxy_module isp_vvcam_module nxp_wlan_bt: $(KERNEL_IMAGE)
-KMOD_DEPS := $(if $(filter y,$(CONFIG_PLATFORM_IMX)),isp_vvcam_module nxp_wlan_bt,mdio_proxy_module)
-linux-modules: cryptodev_linux $(KMOD_DEPS)
-	@$(call fbprint_d,"linux-modules")
-
 
 
 linux-headers $(KHEADER_FILE): $(KERNEL_IMAGE)

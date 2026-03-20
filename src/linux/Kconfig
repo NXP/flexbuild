@@ -1,0 +1,45 @@
+# ============================================================================
+# Linux Kernel Modules Configuration
+# ============================================================================
+config LINUX_KMOD
+    bool "Linux Kernel Modules"
+    default y
+    help
+      Select the linux kernel out-of-tree modules.
+
+if LINUX_KMOD
+
+config CRYPTODEV_LINUX
+	bool "Cryptodev Linux Module"
+	default y
+	help
+	  Cryptodev-linux is a device that allows access to Linux kernel
+	  cryptographic drivers; thus allowing userspace applications to
+	  take advantage of hardware accelerators.
+
+config ISP_VVCAM_MODULE
+	bool "ISP VVCAM Module"
+	default y
+	depends on PLATFORM_IMX && SOC_IMX8MP
+	help
+	  ISP (Image Signal Processor) VVCAM (Vivante Video Capture and
+	  Memory) module for i.MX platforms. Provides camera and image
+	  processing support.
+
+config NXP_WLAN_BT
+	bool "NXP WLAN/Bluetooth Module"
+	default y
+    depends on PLATFORM_IMX
+	help
+	  NXP wireless LAN and Bluetooth driver module.
+	  Supports NXP WiFi and Bluetooth chipsets.
+
+config MDIO_PROXY_MODULE
+	bool "MDIO Proxy Module"
+	default y
+	depends on PLATFORM_LS
+	help
+	  MDIO (Management Data Input/Output) proxy module for LayerScape
+	  platforms. Provides interface for managing Ethernet PHYs.
+
+endif # LINUX_KMOD

@@ -12,11 +12,10 @@ fi
 
 env exists devpart_boot || setenv devpart_boot 1
 env exists devpart_root || setenv devpart_root 2
-env exists mmcpart || setenv mmcpart 1
-env exists devnum || setenv devnum 1
+env exists mmcdev || setenv mmcdev 1
 env exists devtype || setenv devtype mmc
 
-if part uuid ${devtype} ${devnum}:${devpart_root} partuuidr; then
+if part uuid ${devtype} ${mmcdev}:${devpart_root} partuuidr; then
     echo "[boot] PARTUUID=${partuuidr}"
 else
     echo "*** ERROR: part uuid failed"
@@ -25,14 +24,14 @@ fi
 
 setenv bootargs "console=${console} root=PARTUUID=${partuuidr} rw rootwait ${othbootargs}"
 
-if load ${devtype} ${devnum}:${mmcpart} ${fdt_addr_r} ${fdtfile}; then
+if load ${devtype} ${mmcdev}:${devpart_boot} ${fdt_addr_r} ${fdtfile}; then
     echo "[boot] DTB loaded"
 else
     echo "*** ERROR: load DTB failed"
     exit
 fi
 
-if load ${devtype} ${devnum}:${mmcpart} ${loadaddr} ${image}; then
+if load ${devtype} ${mmcdev}:${devpart_boot} ${loadaddr} ${image}; then
     echo "[boot] kernel loaded"
 else
     echo "*** ERROR: load kernel failed"

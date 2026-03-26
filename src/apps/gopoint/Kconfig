@@ -14,7 +14,7 @@ if APP_GOPOINT && PLATFORM_IMX
 config GP_GTEC_DEMO_FRAMEWORK
 	bool "Gtec demo framework"
 	default y
-    depends on (SOC_IMX8M  && GFX_GPU_VIV) || \
+	depends on (SOC_IMX8M  && GFX_GPU_VIV) || \
                (SOC_IMX95 && GFX_MALI_IMX)
 	help
 	  Gtec demo framework for creating graphical demos
@@ -35,7 +35,7 @@ config GP_IMX_DEMOS_LIST
 config GP_IMX_EBIKE_VIT
 	bool "i.MX E-bike VIT demo"
 	default y
-    depends on SOC_IMX8 || SOC_IMX95 || SOC_IMX93
+	depends on SOC_IMX8 || SOC_IMX95 || SOC_IMX93
 	#depends on GP_NXP_AFE
 	#depends on GP_IMX_VOICEUI
 	help
@@ -65,7 +65,7 @@ config GP_IMX_SMART_FITNESS
 config GP_IMX_SMART_KITCHEN
 	bool "i.MX Smart Kitchen demo"
 	default y
-    depends on SOC_IMX8M || SOC_IMX95 || SOC_IMX93
+	depends on SOC_IMX8M || SOC_IMX95 || SOC_IMX93
 	#depends on GP_IMX_VOICEUI
 	help
 	  Smart kitchen assistant demonstration
@@ -73,7 +73,7 @@ config GP_IMX_SMART_KITCHEN
 config GP_IMX_CAMERA_ROTATION
 	bool "i.MX Camera Rotation"
 	default y
-    depends on (SOC_IMX8M || SOC_IMX95) && \
+	depends on (SOC_IMX8M || SOC_IMX95) && \
                (!SOC_IMX8M || (GFX_IMX_GPU_G2D && GFX_GPU_VIV)) && \
                (!SOC_IMX95 || (GFX_IMX_DPU_G2D_V2 && GFX_MALI_IMX))
 	help

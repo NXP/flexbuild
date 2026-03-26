@@ -37,4 +37,6 @@ libdrm:
 		-Dc_link_args="-pthread" $(LOG_MUTE)
 	 PYTHONNOUSERSITE=y DESTDIR=$(DESTDIR) \
 	 ninja install -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE)
+	 PYTHONNOUSERSITE=y DESTDIR=$(RFSDIR) \
+	 ninja install -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE)
 	 $(call fbprint_d,"libdrm")

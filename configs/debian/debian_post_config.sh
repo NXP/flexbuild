@@ -101,6 +101,7 @@ printf "/usr/lib\n" >> /etc/ld.so.conf.d/01-sdk.conf
   echo " * Support:   https://www.nxp.com/support"
   echo " * Licensing: https://lsdk.github.io/eula"
 } > /etc/update-motd.d/20-help-text
+printf "FallbackNTP=time1.google.com time2.google.com time3.google.com time4.google.com ntp.aliyun.com ntp.tencent.com\n" >> /etc/systemd/timesyncd.conf
 printf "Build: $(date --rfc-3339 seconds)\n" >> /etc/buildinfo
 EOF
 

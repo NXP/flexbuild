@@ -1,0 +1,82 @@
+From 22116e92664a9a3cf6189296cb459ef3a8dce293 Mon Sep 17 00:00:00 2001
+From: "Chunguang.Li" <chunguang.li_2@nxp.com>
+Date: Fri, 27 Mar 2026 17:50:26 +0900
+Subject: [PATCH 2/4] ls1043ardb: refactor EXTRA_ENV_SETTINGS and add
+ board-specific overrides
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+u-boot: ls1043a: rename and reorganize EXTRA_ENV_SETTINGS for board overrides
+
+- Rename CFG_EXTRA_ENV_SETTINGS → EXTRA_ENV_SETTINGS in ls1043a_common.h
+- Adjust console parameter in the common environment
+- Add CFG_EXTRA_ENV_SETTINGS in ls1043ardb.h with additional board/image/fdtfile variables
+- Set CFG_EXTRA_ENV_SETTINGS in ls1043aqds.h to EXTRA_ENV_SETTINGS
+
+Enables board‑specific env customization while keeping LS1043A common env shared.
+---
+ include/configs/ls1043a_common.h | 4 ++--
+ include/configs/ls1043aqds.h     | 5 +++++
+ include/configs/ls1043ardb.h     | 9 +++++++++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/ls1043a_common.h b/include/configs/ls1043a_common.h
+index d82502d628e..b042fb999a9 100644
+--- a/include/configs/ls1043a_common.h
++++ b/include/configs/ls1043a_common.h
+@@ -88,7 +88,7 @@
+ #include <config_distro_bootcmd.h>
+ 
+ /* Initial environment variables */
+-#define CFG_EXTRA_ENV_SETTINGS		\
++#define EXTRA_ENV_SETTINGS              \
+ 	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
+ 	"fdt_high=0xffffffffffffffff\0"		\
+ 	"initrd_high=0xffffffffffffffff\0"	\
+@@ -110,7 +110,7 @@
+ 	"kernel_size_sd=0x14000\0"		\
+ 	"kernelhdr_addr_sd=0x3000\0"		\
+ 	"kernelhdr_size_sd=0x10\0"		\
+-	"console=ttyS0,115200\0"		\
++	"console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500\0"		\
+ 	"boot_os=y\0"				\
+ 	BOOTENV					\
+ 	"boot_scripts=ls1043ardb_boot.scr\0"	\
+diff --git a/include/configs/ls1043aqds.h b/include/configs/ls1043aqds.h
+index 7ccbb20bf2e..3756dbfff7c 100644
+--- a/include/configs/ls1043aqds.h
++++ b/include/configs/ls1043aqds.h
+@@ -295,6 +295,11 @@
+ /*
+  * Environment
+  */
++#ifndef SPL_NO_MISC
++/* Initial environment variables */
++#define CFG_EXTRA_ENV_SETTINGS      \
++    EXTRA_ENV_SETTINGS
++#endif
+ 
+ #include <asm/fsl_secure_boot.h>
+ 
+diff --git a/include/configs/ls1043ardb.h b/include/configs/ls1043ardb.h
+index ef8fdc1912b..8cad992fb27 100644
+--- a/include/configs/ls1043ardb.h
++++ b/include/configs/ls1043ardb.h
+@@ -201,4 +201,13 @@
+ 
+ #include <asm/fsl_secure_boot.h>
+ 
++#ifndef SPL_NO_MISC
++/* Initial environment variables */
++#define CFG_EXTRA_ENV_SETTINGS      \
++    EXTRA_ENV_SETTINGS				\
++    "board=ls1043ardb\0"			\
++    "fdtfile=fsl-ls1043a-rdb-sdk.dtb\0"		\
++    "image=Image\0"
++#endif
++
+ #endif /* __LS1043ARDB_H__ */
+-- 
+2.34.1
+

@@ -1,0 +1,98 @@
+From ae3b9f4441cd5238e3fe9a346c25e81f69c9b491 Mon Sep 17 00:00:00 2001
+From: "Chunguang.Li" <chunguang.li_2@nxp.com>
+Date: Fri, 27 Mar 2026 17:53:33 +0900
+Subject: [PATCH 3/4] ls1046a: rename and reorganize EXTRA_ENV_SETTINGS for
+ board overrides
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Rename CFG_EXTRA_ENV_SETTINGS → EXTRA_ENV_SETTINGS in ls1046a_common.h
+- Adjust console parameter in the common environment
+- Add CFG_EXTRA_ENV_SETTINGS in ls1046ardb.h with additional board/image/fdtfile variables
+- Set CFG_EXTRA_ENV_SETTINGS in ls1046aqds.h to EXTRA_ENV_SETTINGS
+
+Enables board‑specific env customization while keeping LS1046A common env shared.
+---
+ include/configs/ls1046a_common.h | 4 ++--
+ include/configs/ls1046afrwy.h    | 6 ++++++
+ include/configs/ls1046aqds.h     | 5 +++++
+ include/configs/ls1046ardb.h     | 9 +++++++++
+ 4 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/include/configs/ls1046a_common.h b/include/configs/ls1046a_common.h
+index 8666aff0f33..50b78e22cf4 100644
+--- a/include/configs/ls1046a_common.h
++++ b/include/configs/ls1046a_common.h
+@@ -83,7 +83,7 @@
+ #endif
+ #ifndef SPL_NO_MISC
+ /* Initial environment variables */
+-#define CFG_EXTRA_ENV_SETTINGS		\
++#define EXTRA_ENV_SETTINGS		\
+ 	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
+ 	"ramdisk_addr=0x800000\0"		\
+ 	"ramdisk_size=0x2000000\0"		\
+@@ -107,7 +107,7 @@
+ 	"kernel_size_sd=0x14000\0"		\
+ 	"kernelhdr_addr_sd=0x3000\0"		\
+ 	"kernelhdr_size_sd=0x10\0"		\
+-	"console=ttyS0,115200\0"                \
++	"console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500\0"                \
+ 	 CONFIG_MTDPARTS_DEFAULT "\0"		\
+ 	BOOTENV					\
+ 	LS1046A_BOOT_SRC_AND_HDR		\
+diff --git a/include/configs/ls1046afrwy.h b/include/configs/ls1046afrwy.h
+index 21804fc6654..d29fb3a4aba 100644
+--- a/include/configs/ls1046afrwy.h
++++ b/include/configs/ls1046afrwy.h
+@@ -70,6 +70,12 @@
+ /*
+  * Environment
+  */
++#ifndef SPL_NO_MISC
++/* Initial environment variables */
++#define CFG_EXTRA_ENV_SETTINGS      \
++    EXTRA_ENV_SETTINGS
++#endif
++
+ #define CFG_SYS_FSL_QSPI_BASE	0x40000000
+ 
+ #undef BOOT_TARGET_DEVICES
+diff --git a/include/configs/ls1046aqds.h b/include/configs/ls1046aqds.h
+index 4b4bd7cbe48..1f44cb51fd8 100644
+--- a/include/configs/ls1046aqds.h
++++ b/include/configs/ls1046aqds.h
+@@ -312,6 +312,11 @@
+ /*
+  * Environment
+  */
++#ifndef SPL_NO_MISC
++/* Initial environment variables */
++#define CFG_EXTRA_ENV_SETTINGS      \
++    EXTRA_ENV_SETTINGS
++#endif
+ 
+ #ifdef CONFIG_TFABOOT
+ #define IFC_NAND_BOOTCOMMAND "run distro_bootcmd; run nand_bootcmd; "	\
+diff --git a/include/configs/ls1046ardb.h b/include/configs/ls1046ardb.h
+index b2a8bd5cf8a..fa8a7498688 100644
+--- a/include/configs/ls1046ardb.h
++++ b/include/configs/ls1046ardb.h
+@@ -132,4 +132,13 @@
+ 
+ #include <asm/fsl_secure_boot.h>
+ 
++#ifndef SPL_NO_MISC
++/* Initial environment variables */
++#define CFG_EXTRA_ENV_SETTINGS      \
++    EXTRA_ENV_SETTINGS				\
++    "board=ls1046ardb\0"            \
++    "fdtfile=fsl-ls1046a-rdb-sdk.dtb\0"     \
++    "image=Image\0"
++#endif
++
+ #endif /* __LS1046ARDB_H__ */
+-- 
+2.34.1
+

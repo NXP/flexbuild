@@ -1,0 +1,43 @@
+From 31ebb16d87de14547a3bd6c23da529c49877c81d Mon Sep 17 00:00:00 2001
+From: "Chunguang.Li" <chunguang.li_2@nxp.com>
+Date: Fri, 27 Mar 2026 17:41:45 +0900
+Subject: [PATCH 1/4] ls1028ardb: adjust env settings for unified boot.scr
+
+Updated CFG_EXTRA_ENV_SETTINGS in include/configs/ls1028ardb.h:
+
+- Add 'image', 'extra_bootargs' and 'othbootargs' environment variables
+- Update 'console' parameter
+- Adjust environment settings to support a unified boot.scr boot flow
+
+This change unifies the boot script behavior across platforms and ensures
+consistent boot argument handling on ls1028ardb.
+---
+ include/configs/ls1028ardb.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/ls1028ardb.h b/include/configs/ls1028ardb.h
+index 005667d20b6..2764b473930 100644
+--- a/include/configs/ls1028ardb.h
++++ b/include/configs/ls1028ardb.h
+@@ -54,6 +54,9 @@
+ 	"board=ls1028ardb\0"			\
+ 	"hwconfig=fsl_ddr:bank_intlv=auto\0"	\
+ 	"fdtfile=fsl-ls1028a-rdb.dtb\0"         \
++	"image=Image\0"					\
++	"extra_bootargs=iommu.passthrough=1 arm-smmu.disable_bypass=0\0"	\
++	"othbootargs=video=1920x1080-32@60 cma=640M\0"    \
+ 	"ramdisk_addr=0x800000\0"		\
+ 	"ramdisk_size=0x2000000\0"		\
+ 	"bootm_size=0x10000000\0"		\
+@@ -76,7 +79,7 @@
+ 	"kernel_size_sd=0x14000\0"		\
+ 	"kernelhdr_addr_sd=0x3000\0"		\
+ 	"kernelhdr_size_sd=0x20\0"		\
+-	"console=ttyS0,115200\0"                \
++	"console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500\0"			\
+ 	BOOTENV					\
+ 	"boot_scripts=ls1028ardb_boot.scr\0"    \
+ 	"boot_script_hdr=hdr_ls1028ardb_bs.out\0"	\
+-- 
+2.34.1
+

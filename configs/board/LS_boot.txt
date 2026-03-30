@@ -1,48 +1,28 @@
 echo "[boot] start boot.scr"
 
-# --- 1. Platform Detection and Specific Settings ---
-if test "${board}" = "ls1028ardb"; then
-    env exists dtb || setenv dtb fsl-ls1028a-rdb.dtb
-    setenv extra_bootargs "iommu.passthrough=1 arm-smmu.disable_bypass=0"
-    setenv console_cfg "console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500"
-    setenv sec_path "ls1028ardb"
-elif test "${board}" = "ls1043ardb"; then
-    env exists dtb || setenv dtb fsl-ls1043a-rdb-sdk.dtb
-    setenv console_cfg "console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500"
-    setenv sec_path "ls1043ardb"
-elif test "${board}" = "ls1046ardb"; then
-    env exists dtb || setenv dtb fsl-ls1046a-rdb-sdk.dtb
-    setenv console_cfg "console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500"
-    setenv sec_path "ls1046ardb"
-elif test "${board}" = "lx2160ardb"; then
-    env exists dtb || setenv dtb fsl-lx2160a-rdb.dtb
-    setenv extra_bootargs "pci=pcie_bus_perf"
-    setenv console_cfg "console=ttyAMA0,115200 earlycon=pl011,mmio32,0x21c0000"
-    setenv sec_path "lx2160ardb"
+if test -z "${fdtfile}"; then
+    echo "*** ERROR: fdtfile is not set. Aborting boot."
+    exit
 fi
 
-# --- 2. Common Defaults ---
-env exists kernel_image || setenv kernel_image Image
+env exists image || setenv image Image
 env exists devpart_boot || setenv devpart_boot 1
 env exists devpart_root || setenv devpart_root 2
 env exists devtype || setenv devtype mmc
 env exists devnum || setenv devnum 1
 
-# --- 3. Secure Boot Validation Command ---
-setenv secureboot_validate "load ${devtype} ${devnum}:${devpart_boot} ${kernelheader_addr_r} /secboot_hdrs/${sec_path}/hdr_linux.out; load ${devtype} ${devnum}:${devpart_boot} ${fdtheader_addr_r} /secboot_hdrs/${sec_path}/hdr_dtb.out; esbc_validate ${kernelheader_addr_r}; esbc_validate ${fdtheader_addr_r}"
-
-# --- 4. Boot Execution Flow ---
 part uuid ${devtype} ${devnum}:${devpart_root} partuuidr
-setenv bootargs "${console_cfg} root=PARTUUID=${partuuidr} rw rootwait ${extra_bootargs} ${othbootargs}"
+setenv bootargs "${console} root=PARTUUID=${partuuidr} rw rootwait ${extra_bootargs} ${othbootargs}"
+setenv secureboot_validate "load ${devtype} ${devnum}:${devpart_boot} ${kernelheader_addr_r} /secboot_hdrs/${board}/hdr_linux.out; load ${devtype} ${devnum}:${devpart_boot} ${fdtheader_addr_r} /secboot_hdrs/${board}/hdr_dtb.out; esbc_validate ${kernelheader_addr_r}; esbc_validate ${fdtheader_addr_r}"
 
-if load ${devtype} ${devnum}:${devpart_boot} ${fdt_addr_r} ${dtb}; then
-    echo "[boot] DTB loaded"
+if load ${devtype} ${devnum}:${devpart_boot} ${fdt_addr_r} ${fdtfile}; then
+    echo "[boot] fdtfile loaded"
 else
-    echo "*** ERROR: load DTB failed"
+    echo "*** ERROR: load fdtfile failed"
     exit
 fi
 
-if load ${devtype} ${devnum}:${devpart_boot} ${kernel_addr_r} ${kernel_image}; then
+if load ${devtype} ${devnum}:${devpart_boot} ${kernel_addr_r} ${image}; then
     echo "[boot] kernel loaded"
 else
     echo "*** ERROR: load kernel failed"
@@ -51,6 +31,10 @@ fi
 
 if env exists secureboot; then
     echo "Validating Secure Boot signatures..."
+    if test -z "${board}"; then
+        echo "*** ERROR: board is not set. Aborting boot."
+        exit
+    fi
     run secureboot_validate
 fi
 

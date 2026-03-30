@@ -10,7 +10,7 @@ DEFAULT_REPO_TAG := lf-6.12.49-2.2.0
 FBDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR := $(FBDIR)/scripts
 BLD := $(FBDIR)/tools/flex-builder
-bld := $(FBDIR)/tools/flex-builder
+FINST := $(FBDIR)/tools/flex-installer
 PYTHON := python3
 DISTRO_SVR_URL := http://sun.ap.freescale.net/images/debian
 #DISTRO_SVR_URL := https://www.nxp.com/lgfiles/sdk
@@ -60,7 +60,7 @@ SOC_LIST := $(basename $(notdir $(wildcard $(FBDIR)/configs/board/*.conf)))
 ifeq ($(CONFIG_PLATFORM_IMX),y)
 SOCFAMILY := IMX
 KERNEL_CFG := imx_v8_defconfig
-else ifeq ($(CONFIG_PLATFORM_LS),y)
+else
 SOCFAMILY := LS
 KERNEL_CFG := defconfig lsdk.config
 endif
@@ -98,7 +98,7 @@ export RFSDIR := $(FBOUTDIR)/rfs/rootfs_${DISTRIB_VERSION}_debian_$(MACHINE)
 export KERNEL_TREE := linux
 export MAKE := make
 export MAKEFLAGS += -j$(JOBS) --no-print-directory
-export KERNEL_PATH := $(PKGDIR)/linux/$(KERNEL_TREE)
+export KERNEL_PATH := $(PKGDIR)/linux/linux
 export KERNEL_OUTPUT_PATH := $(FBOUTDIR)/linux/linux/arm64/$(SOCFAMILY)/output
 export INSTALL_MOD_PATH := $(FBOUTDIR)/linux/kernel/arm64/$(SOCFAMILY)
 export HOSTARCH := x86_64
@@ -133,9 +133,9 @@ $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security
 all:
 	@start_time=$$(date +%s)
 	@echo -e "Building for $(MACHINE)"
-	@$(MAKE) linux
-	@$(MAKE) linux-headers linux-modules
 	@$(MAKE) rfs
+	@$(MAKE) linux
+	@$(MAKE) linux-headers
 	@$(MAKE) apps
 	@if [ "$(CONFIG_PLATFORM_IMX)" = "y" ]; then \
 		$(MAKE) flash.bin; \
@@ -176,6 +176,8 @@ help:
 	@echo "==================================================================="
 	@echo ""
 	@echo "Main targets:"
+	@echo "  make [ all ]             - Build everything (BSP+kernel+apps+rfs)"
+	@echo "                             default target, 'all' can be omitted"
 	@echo "  make menuconfig          - Configure flexbuild options"
 	@echo "  make linux               - Build Linux kernel with default config"
 	@echo "  make linux-menuconfig    - Configure Linux kernel"
@@ -187,8 +189,6 @@ help:
 	@echo "  make apps                - Build all applications"
 	@echo "  make app_name            - Build a specific application"
 	@echo "  make rfs                 - Build root filesystem"
-	@echo "  make [ all ]             - Build everything (BSP+kernel+apps+rfs)"
-	@echo "                             default target, 'all' can be omitted"
 	@echo ""
 	@echo "Misc target:"
 	@echo "  make docker              - Construct the docker container"

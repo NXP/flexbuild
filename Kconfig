@@ -46,6 +46,14 @@ config SOC_IMX8MP
 	bool
 	default y if SOC_IMX8MPEVK || SOC_IMX8MPFRDM
 
+config SOC_IMX8QM
+	bool
+	default y if SOC_IMX8QMMEK
+
+config SOC_IMX8MM
+	bool
+	default y if SOC_IMX8MMEVK
+
 config SOC_IMX91
 	bool
 	default y if SOC_IMX91SFRDM || SOC_IMX91FRDM || SOC_IMX91EVK
@@ -111,7 +119,7 @@ config KEEP_GIT
 
 config OPTEE
 	bool "Enable OPTEE feature"
-	default n
+	default y
 	help
 	  Use Open Portable Trusted Execution Environment(OPTEE)
 	  designed to run secure code alongside a normal operating system
@@ -156,6 +164,7 @@ endmenu # Build Configuration
 # ============================================================================
 menu "NXP Component Selection"
 
+source "src/linux/Kconfig"
 source "src/apps/Kconfig"
 
 endmenu # Component Selection

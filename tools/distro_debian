@@ -70,17 +70,7 @@ fbprint_n() { echo -e "${green}\n$1 ${NC}"; }
 fbprint_d() { echo -e "${GREEN}$1     [Done] ${NC}"; }
 
 build_distro_rfs_debian() {
-    [ -f $RFSDIR/etc/buildinfo ] && fbprint_n "$RFSDIR already exists!" && exit 0
-	rfs_umount "$RFSDIR"
     . $FBDIR/configs/debian/extra_packages_list
-
-    fbprint_n "Generating rootfs: $RFSDIR"
-    cd $FBDIR
-    test -c $RFSDIR/dev/pts/ptmx && umount $RFSDIR/dev/pts
-    test -f $RFSDIR/proc/uptime && umount $RFSDIR/proc
-    [ -n "$RFSDIR" ] && rm -rf $RFSDIR/*
-
-
     if [ -n "$RFS_BASE" ]; then
         PKGS=''
         NEWRFSDIR=$FBOUTDIR/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64
@@ -102,8 +92,10 @@ build_distro_rfs_debian() {
         NEWRFSDIR=$RFSDIR
         RFSCMD=$FBDIR/configs/debian/debian_server_arm64.sh
     fi
-    [ -f $NEWRFSDIR/etc/buildinfo ] && log_mute echo "$NEWRFSDIR already exists!" && exit 0
+    [ -f $NEWRFSDIR/etc/buildinfo ] && fbprint_n "$NEWRFSDIR already exists!" && exit 0
+	rfs_umount "$NEWRFSDIR"
 
+    fbprint_n "Generating rootfs: $NEWRFSDIR"
     rm -rf $NEWRFSDIR && mkdir -p $NEWRFSDIR
 
     if [ -n "$CONFIG_RFS_GRADUAL" ]; then

@@ -27,7 +27,7 @@ packapp packapps:
 itb mklinux: $(KERNEL_IMAGE)
 	@$(BLD) itb
 
-boot: $(KERNEL_IMAGE) linux-modules distroscr
+boot: $(KERNEL_IMAGE) distroscr
 	@/bin/bash -e $(FBDIR)/tools/create_bootpartition
 
 merge-apps:
@@ -40,5 +40,5 @@ docker:
 	+@$(BLD) docker
 
 
-rfs: $(KHEADER_FILE)
+rfs:
 	@/bin/bash -e $(FBDIR)/tools/distro_debian

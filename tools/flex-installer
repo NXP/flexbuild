@@ -20,6 +20,7 @@ DEFAULT_LOOP_DEVICE_PARTITION="2P=512M:-1"
 DEFAULT_SDCARD_IMG_SIZE_MB=10240
 DEFAULT_RAW_PARTITION_SIZE_MB=256
 DEFAULT_DISTRO_SVR_URL=https://www.nxp.com/lgfiles/sdk/$FIVERSION
+MAX_PRIMARY_PARTITIONS=4  # Maximum number of primary partitions in MBR partition table
 # Cleanup function for signal handling
 cleanup_on_exit() {
     local exit_code=$?
@@ -352,18 +353,18 @@ partition_format_disk() {
 
 	# use logical partition in case more than 4 partitions for Layerscape SoC
 	# as only 4KB space available as partition table of SD card for Layerscape SoC, 32KB for i.MX SoC
-	if [ $pnum -le 4 ]; then
+	if [ $pnum -le $MAX_PRIMARY_PARTITIONS ]; then
 	    parttype=primary
-	elif [ $i -le 3 ]; then
+	elif [ $i -le $(($MAX_PRIMARY_PARTITIONS - 1)) ]; then
 	    parttype=primary
-	elif [ $i -eq 4 ]; then
+	elif [ $i -eq $MAX_PRIMARY_PARTITIONS ]; then
 	    parttype=extended
 	    end=100%
 	    umount_device
 	    sudo parted -a $aligntype -s /dev/$devname mkpart $parttype ${s_p}MiB $end
 	    s_p=$[ $s_p + 1 ]
 	    parttype=logical
-	    extendedpart=4
+	    extendedpart=$MAX_PRIMARY_PARTITIONS
 	else
 	    parttype=logical
 	fi
@@ -454,7 +455,7 @@ flex_install_distro() {
 
     if [ $instruction = auto -o $instruction = install -o $instruction = mkwic ]; then
 	if [ $bootpartnum != 0 ]; then
-	    uuid_boot=$(lsblk -l --output UUID $bootdev | grep -)
+	    uuid_boot=$(sudo blkid -s UUID -o value $bootdev)
 	    [ -z "$uuid_boot" ] && print_e "Failed to get PARTUUID on $bootdev, please partition and format /dev/$devname" && exit
 	    bootmountfile=$rootpartition/lib/systemd/system/boot.mount
 	    if [ -f $bootmountfile ] && grep -q '^What=UUID=' $bootmountfile; then
@@ -983,10 +984,10 @@ elif [ $instruction = mkwic ]; then
     pzstd -f ${wic_image} -o ${wic_image_zst}
     rm -f ${wic_image}
 
-    print_n "Created ${wic_image_zst} successfully"
-    ls -lh ${wic_image_zst}
+    print_n "Created ${wic_image_zst} successfully\n"
+    # ls -lh ${wic_image_zst}
     print_n "Run the following command to burn ${wic_image_zst} to SD card:"
-    print_n "zstd -d ${wic_image_zst} && sudo dd if=${wic_image} of=/dev/<device> bs=1M conv=fsync status=progress"
+    print_n "zstd -d ${wic_image_zst} && sudo dd if=${wic_image} of=/dev/<dev> bs=1M conv=fsync status=progress\n"
 elif [ $instruction = backup ]; then
     mount_device
     [ -z "$backupdir" ] && backupdir=$backuppartition; mkdir -p $backupdir; timestamp=$(date +%Y%m%d%H%M)

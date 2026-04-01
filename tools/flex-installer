@@ -83,7 +83,7 @@ Usage:  flex-installer [ -i <instruction> ] [ -b <boot> ] [ -r <rootfs> ] [ -f <
 OPTION:
  -i, --instruction  Instruction to execute, valid argument as below:
      'auto[:distrover]'	      Automatically download and install [specified] distro images to storage device
-     'pf'                     Partition and format storage device
+     'pf[:distrover]'         Partition and format storage device
      'install'                Install distro images to storage device without downloading
      'list'                   List the supported machines and environments for installation
      'download[:distrover]'   Only download [specified] distro images without installation
@@ -426,9 +426,10 @@ flex_install_distro() {
                 exit 1 ;;
         esac
         sudo find "$bootpartition" -maxdepth 1 -type f -name "*.dtb" ! -name "${prefix_to_keep}*.dtb" -delete 2>/dev/null || true
-        #sudo find "$bootpartition" -maxdepth 1 -type f -name "*.scr" ! -name "${machine}_boot.scr" -delete 2>/dev/null || true
-
-        #[ -n "$machine" ] && sudo ln -sf ${machine}_boot.scr $bootpartition/boot.scr
+        if [[ $distroversion == lsdk24* || $distroversion == lsdk25* ]]; then
+			sudo find "$bootpartition" -maxdepth 1 -type f -name "*.scr" ! -name "${machine}_boot.scr" -delete 2>/dev/null || true
+			[ -n "$machine" ] && sudo ln -sf ${machine}_boot.scr $bootpartition/boot.scr
+		fi
         print_d "Install $bootimg_n in $bootdev"
     fi
 
@@ -604,7 +605,7 @@ download_distro() {
 	else
 		echo -e "\n Downloading $firmware_url "
 		if curl -ROfk --output-dir $temp_dir $firmware_url; then
-			mv $temp_dir/${firmware_url##*/} ./ && ls -l ${firmware_url##*/}
+			mv $temp_dir/${firmware_url##*/} ./
 		else
 			print_w "Not found $firmware_url"
 		fi
@@ -723,6 +724,8 @@ do
 		    echo distroversion: $distrover
 		elif [ ${2:0:9} = download: ]; then
 		    distrover=$(echo $2 | cut -d: -f2)
+		elif [ ${2:0:3} = pf: ]; then
+		    distrover=$(echo $2 | cut -d: -f2)
 		elif [ ${2:0:7} = backup: ]; then
 		    backupdir=$(echo $2 | cut -d: -f2)
 		fi
@@ -794,6 +797,12 @@ fi
 [ -z "$disksize" ] && disksize=0
 [ -n "$distrover" ] && distroversion=$distrover || distroversion=${FIVERSION}
 linux_ver=$(get_linux_version "$distroversion")
+if [[ $distroversion == lsdk24* || $distroversion == lsdk25* ]]; then
+	DEFAULT_PARTITION_NUMBER=4
+	DEFAULT_ROOT_PARTITION_NUM=3
+	DEFAULT_DISK_PARTITION="3P=512M:8G:-1"
+	DEFAULT_LOOP_DEVICE_PARTITION="3P=512M:64M:-1"
+fi
 
 if [ -z "$diskpartlist" ]; then
     [ "${devname:0:4}" = loop -o $disksize -le 16 ] && diskpartition=$DEFAULT_LOOP_DEVICE_PARTITION || \

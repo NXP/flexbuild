@@ -192,6 +192,7 @@ help:
 	@echo ""
 	@echo "Misc target:"
 	@echo "  make docker              - Construct the docker container"
+	@echo "  make list                - List all supported machines"
 	@echo "  make packapps            - Pack NXP apps to a debian package"
 	@echo "  make merge-apps          - Merge NXP apps to rootfs"
 	@echo "  make packrfs             - Pack and comporess rootfs"
@@ -310,6 +311,15 @@ clean-config:
 # ============================================================================
 # Helper targets
 # ============================================================================
+
+.PHONY: list
+list:
+	@for conf in configs/board/*.conf; do \
+		if [ -f "$$conf" ]; then \
+			. "$$conf"; \
+			echo "  - $$machine"; \
+		fi; \
+	done
 
 .PHONY: show-enabled-apps
 show-enabled-apps:

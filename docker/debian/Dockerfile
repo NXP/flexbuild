@@ -43,8 +43,8 @@ RUN set -eux; \
       locales \
       sudo arch-test gpg vim rename xxd autopoint valac hwdata cpio debhelper-compat \
       build-essential git wget curl rsync ccache pkg-config lsb-release \
-      autoconf automake libtool cmake meson ninja-build \
-      gawk gettext zip unzip xz-utils zstd ruby efitools \
+      autoconf automake libtool cmake meson ninja-build parted psmisc e2fsprogs udev \
+      gawk gettext zip unzip xz-utils zstd ruby efitools fdisk \
       crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu \
       device-tree-compiler u-boot-tools bc flex bison lzop && \
     sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \

@@ -172,7 +172,7 @@ menuconfig:
 help:
 	@echo ""
 	@echo ""
-	@echo "               Flexbuild Kconfig Build System"
+	@echo "               NXP Debian Kconfig Build System"
 	@echo "==================================================================="
 	@echo ""
 	@echo "Main targets:"
@@ -195,6 +195,7 @@ help:
 	@echo "  make packapps            - Pack NXP apps to a debian package"
 	@echo "  make merge-apps          - Merge NXP apps to rootfs"
 	@echo "  make packrfs             - Pack and comporess rootfs"
+	@echo "  make wic                 - Generate the WIC file and compress it"
 	@echo "  make show-enabled-apps   - Show enabled applications"
 	@echo "  make list-all-apps       - List all applications"
 	@echo "  make help                - Print this menu"

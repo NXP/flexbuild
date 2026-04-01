@@ -39,6 +39,8 @@ host-dep:
 docker:
 	+@$(BLD) docker
 
-
 rfs:
 	@/bin/bash -e $(FBDIR)/tools/distro_debian
+
+wic:
+	@$(BLD) wic

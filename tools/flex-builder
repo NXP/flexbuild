@@ -471,6 +471,78 @@ check_host_dependent_pkg() {
     fi
 }
 
+generate_wic_img() {
+    check_board_valid $MACHINE
+
+    # Check if flex-installer exists
+    if [ ! -f "$FBDIR/tools/flex-installer" ]; then
+        fbprint_e "flex-installer not found at $FBDIR/tools/flex-installer"
+        exit 1
+    fi
+
+    # Check required images exist
+	local kernel_mk="$KERNEL_PATH/Makefile"
+	local kernelver
+    kernelver=$(sed -n 's/^VERSION = //p;s/^PATCHLEVEL = //p;s/^SUBLEVEL = //p' "$kernel_mk" | tr '\n' '.' | sed 's/\.$//')
+    local bootimg=boot_${SOCFAMILY}_arm64_lts_${kernelver}.tar.zst
+    local rootfsimg=rootfs_${DISTRIB_VERSION}_debian_${MACHINE}.tar.zst
+
+    # Determine firmware image name
+    local firmware
+    if [[ "$SOCFAMILY" = "LS" ]]; then
+        firmware=firmware_${MACHINE}_sdboot.img
+    else
+        firmware=${MACHINE}-sd-flash.bin
+    fi
+
+    # Check if required images exist
+    if [ ! -f "$FBOUTDIR/images/$bootimg" ]; then
+        fbprint_e "Boot image not found: $FBOUTDIR/images/$bootimg"
+        fbprint_w "Please run 'make boot' first"
+        exit 1
+    fi
+
+    if [ ! -f "$FBOUTDIR/images/$rootfsimg" ]; then
+        fbprint_e "Rootfs image not found: $FBOUTDIR/images/$rootfsimg"
+        fbprint_w "Please run 'make rfs' first"
+        exit 1
+    fi
+
+    if [ ! -f "$FBOUTDIR/images/$firmware" ]; then
+        fbprint_e "Firmware image not found: $FBOUTDIR/images/$firmware"
+        fbprint_w "Please run 'make bsp' first"
+        exit 1
+    fi
+
+    fbprint_n "Generating WIC image for $MACHINE"
+
+    # Change to images directory to run flex-installer
+    cd "$FBOUTDIR/images"
+
+    # Run flex-installer to create WIC image
+    $FBDIR/tools/flex-installer -i mkwic \
+        -m "$MACHINE" \
+        -f "$firmware" \
+        -b "$bootimg" \
+        -r "$rootfsimg"
+
+    if [ $? -eq 0 ]; then
+        local wic_image="rootfs_${DISTRIB_VERSION}_debian_${MACHINE}.wic.zst"
+        if [ -f "$FBOUTDIR/images/$wic_image" ]; then
+            fbprint_d "WIC image created: $FBOUTDIR/images/$wic_image"
+            log_mute ls -lh "$FBOUTDIR/images/$wic_image"
+        else
+            fbprint_e "WIC image creation failed"
+            exit 1
+        fi
+    else
+        fbprint_e "flex-installer mkwic failed"
+        exit 1
+    fi
+
+    cd "$FBDIR"
+}
+
 check_linux_config() {
     [ $DESTARCH = arm32 ] && tarch=arm || tarch=arm64
     if [ -n "$FRAGMENT_CFG" ]; then
@@ -1008,6 +1080,9 @@ case "$1" in
         ;;
     host-dep)
         check_host_dependent_pkg; exit
+        ;;
+    wic)
+        generate_wic_img; exit
         ;;
 esac
 

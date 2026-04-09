@@ -39,8 +39,11 @@ host-dep:
 docker:
 	+@$(BLD) docker
 
+RFS_FILE = $(RFSDIR)/etc/buildinfo
 rfs:
 	@/bin/bash -e $(FBDIR)/tools/distro_debian
+
+$(RFS_FILE): rfs
 
 wic:
 	@$(BLD) wic

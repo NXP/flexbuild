@@ -160,7 +160,7 @@ all-log:
 menuconfig:
 	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
 		echo "ERROR: must be run inside a Docker container!" >&2; \
-		echo "       Please run "make docker" first"; \
+		echo "       Please run 'make docker' first"; \
 		exit 1; \
 	fi && \
 	$(PYTHON) -m menuconfig && \
@@ -187,7 +187,7 @@ help:
 	@echo "  make flash.bin           - Build flash.bin image for imx platform"
 	@echo "  make bsp                 - Build BSP (ATF, U-Boot, etc.)"
 	@echo "  make apps                - Build all applications"
-	@echo "  make app_name            - Build a specific application"
+	@echo "  make <app_name>          - Build a specific application"
 	@echo "  make rfs                 - Build root filesystem"
 	@echo ""
 	@echo "Misc target:"

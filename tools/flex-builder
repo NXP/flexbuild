@@ -117,7 +117,7 @@ generate_composite_firmware() {
         fi
 	done
 
-    [ $SOCFAMILY = LS -a ! -f $FBDIR/logs/.lsfwdone ] && bld layerscape_fw -m $MACHINE
+    [ $SOCFAMILY = LS ] && bld layerscape_fw -m $MACHINE
 
     [ ! -f $FBOUTDIR/images/${DISTRIB_VERSION}_poky_tiny_${SOCFAMILY}_${DESTARCH}.itb ] && \
     bld itb -r poky:tiny -a $DESTARCH -p $SOCFAMILY

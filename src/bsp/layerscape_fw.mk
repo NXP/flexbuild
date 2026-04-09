@@ -1,5 +1,5 @@
 #
-# Copyright 2017-2023 NXP
+# Copyright 2017-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -8,7 +8,7 @@
 
 
 layerscape_fw: mc_bin mc_utils fm_ucode qe_ucode dp_fw_cadence phy_cortina phy_inphi pfe_bin ddr_phy_bin
-	@touch $(FBDIR)/logs/.lsfwdone
+	@touch $(FBDIR)/logs/.lsfwdone_$(MACHINE)
 
 
 UTILSDIR = $(PKGDIR)/apps/utils

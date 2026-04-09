@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2021 NXP
+# Copyright 2021, 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -14,6 +14,8 @@ clean_bsp_components() {
 
     [ -d $PKGDIR/bsp/mc_utils/config ] &&
     $MAKE clean -C $PKGDIR/bsp/mc_utils/config
+
+    rm -rf $FBDIR/logs/.lsfwdone*
 }
 
 

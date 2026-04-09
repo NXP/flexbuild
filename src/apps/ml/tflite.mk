@@ -18,25 +18,25 @@ tflite: flatbuffers
 	@$(call download_repo,tflite,apps/ml)
 	 $(call patch_apply,tflite,apps/ml)
 	 cd $(MLDIR)/tflite
-	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then \
-		$(call dl_by_wget,model_mobv1,mobilenet.tgz); \
+	 if [ ! -f $(FBDIR)/dl/mobilenet.tgz ]; then
+		$(call dl_by_wget,model_mobv1,mobilenet.tgz)
 	 fi
-	 if ! ls mobilenet_v1* >/dev/null 2>&1; then \
-		 tar xf $(FBDIR)/dl/mobilenet.tgz; \
+	 if ! ls mobilenet_v1* >/dev/null 2>&1; then
+		 tar xf $(FBDIR)/dl/mobilenet.tgz
 	 fi
 	 $(call fbprint_b,"tensorflow-lite")
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
 	 export CMAKE_TLS_VERIFY=0
-	 if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
-		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
-		cd build_$(DISTROTYPE)_$(ARCH);  \
+	 if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then
+		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean &>/dev/null || :
+		cd build_$(DISTROTYPE)_$(ARCH)
 		rm -rf CMakeCache.txt Makefile cmake_install.cmake compile_commands.json \
 			CMakeFiles bin lib/*.so* lib/*.a \
 			example_proto_generated examples/*.o \
-			tools/*.o tmp/* ; \
-		find . -type d -name "CMakeFiles" -exec rm -rf {} + ; \
-		cd ..; \
+			tools/*.o tmp/*
+		find . -type d -name "CMakeFiles" -exec rm -rf {} + &>/dev/null || :
+		cd ..
 	 fi
 	 cmake  -S tensorflow/lite \
 		-B build_$(DISTROTYPE)_$(ARCH) \

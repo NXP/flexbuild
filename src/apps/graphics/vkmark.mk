@@ -8,7 +8,6 @@
 
 
 vkmark: vulkan_headers
-ifeq ($(CONFIG_VKMARK),y)
 	@$(call download_repo,vkmark,apps/graphics)
 	 $(call patch_apply,vkmark,apps/graphics)
 	 $(call fbprint_b,"vkmark")
@@ -27,4 +26,3 @@ ifeq ($(CONFIG_VKMARK),y)
 		-Dc_args="-I$(DESTDIR)/usr/include/vulkan" $(LOG_MUTE)
 	 ninja install -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE)
 	 $(call fbprint_d,"vkmark")
-endif

@@ -20,14 +20,14 @@ tflite_neutron_delegate: tflite neutron
 	cp -f $(DESTDIR)/usr/include/neutron/* $(RFSDIR)/usr/include/neutron
 	cp -f $(DESTDIR)/usr/lib/libNeutronDriver* $(RFSDIR)/usr/lib/
 	cd $(MLDIR)/tflite_neutron_delegate
-	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
-		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean || true; \
-		cd build_$(DISTROTYPE)_$(ARCH); \
+	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then
+		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean || true
+		cd build_$(DISTROTYPE)_$(ARCH)
 		rm -rf CMakeCache.txt Makefile cmake_install.cmake compile_commands.json \
 			CMakeFiles bin lib/*.so* lib/*.a \
-			example_proto_generated examples/*.o tools/*.o tmp/*; \
-		find . -type d -name "CMakeFiles" -exec rm -rf {} +; \
-		cd ..; \
+			example_proto_generated examples/*.o tools/*.o tmp/*
+		find . -type d -name "CMakeFiles" -exec rm -rf {} + &>/dev/null || :
+		cd ..
 	fi
 	cmake  -S $(MLDIR)/tflite_neutron_delegate \
 		-B build_$(DISTROTYPE)_$(ARCH) \

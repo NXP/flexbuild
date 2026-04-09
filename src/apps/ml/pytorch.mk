@@ -12,7 +12,6 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3.13/dist-packages"
 
 
 pytorch:
-ifeq ($(CONFIG_PYTORCH),y)
 	@$(call download_repo,pytorch,apps/ml)
 	 $(call patch_apply,pytorch,apps/ml)
 	 $(call fbprint_b,"pytorch")
@@ -27,4 +26,3 @@ ifeq ($(CONFIG_PYTORCH),y)
 	 rm -rf $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin
 	 rm -rf $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/torch/bin/test_cpp_rpc
 	 $(call fbprint_d,"pytorch")
-endif

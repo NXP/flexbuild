@@ -9,7 +9,6 @@
 
 imx_video2texture:
 #imx_video2texture: gst_plugins_good
-ifeq ($(CONFIG_IMX_VIDEO2TEXTURE),y)
 	@$(call download_repo,imx_video2texture,apps/gopoint)
 	$(call patch_apply,imx_video2texture,apps/gopoint)
 	$(call fbprint_b,"imx_video2texture")
@@ -44,4 +43,3 @@ ifeq ($(CONFIG_IMX_VIDEO2TEXTURE),y)
 	ninja -C $(GPDIR)/imx_video2texture/build -v all $(LOG_MUTE)
 	rm -rf /lib/ld-linux-aarch64.so.1
 	$(call fbprint_d,"imx_video2texture")
-endif

@@ -10,10 +10,10 @@
 libgpuperfcnt:
 	@$(call dl_by_wget,libgpuperfcnt_bin,libgpuperfcnt.bin)
 	cd $(GRAPHICSDIR)
-	if [ ! -d "$(GRAPHICSDIR)"/libgpuperfcnt ]; then \
-		chmod +x $(FBDIR)/dl/libgpuperfcnt.bin; \
-		$(FBDIR)/dl/libgpuperfcnt.bin --auto-accept --force $(LOG_MUTE); \
-		mv libgpuperfcnt-* libgpuperfcnt; \
+	if [ ! -d "$(GRAPHICSDIR)"/libgpuperfcnt ]; then
+		chmod +x $(FBDIR)/dl/libgpuperfcnt.bin
+		$(FBDIR)/dl/libgpuperfcnt.bin --auto-accept --force $(LOG_MUTE)
+		mv libgpuperfcnt-* libgpuperfcnt
 	fi
 	$(call fbprint_b,"libgpuperfcnt")
 	cp -Prf libgpuperfcnt/usr $(DESTDIR)

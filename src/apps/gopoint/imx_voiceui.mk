@@ -17,16 +17,13 @@ else
 endif
 
 imx_voiceui:
-ifeq ($(CONFIG_IMX_VOICEUI),y)
 #imx_voiceui: nxp_afe nxp_demo_experience_assets
 	@$(call download_repo,imx_voiceui,apps/gopoint)
 	 $(call patch_apply,imx_voiceui,apps/gopoint)
-	 \
 	 $(call fbprint_b,"imx_voiceui")
 	 cd $(GPDIR)/imx_voiceui
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
-	 \
 	 install -d $(DESTDIR)/usr/lib/nxp-afe
 	 install -d $(DESTDIR)/unit_tests/nxp-afe
 	 $(MAKE) clean
@@ -36,12 +33,11 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 install -m 0644 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/usr/lib/nxp-afe/
 	 install -m 0755 release/voice_ui_app    $(DESTDIR)/unit_tests/nxp-afe/
 	 install -m 0644 release/Config.ini    $(DESTDIR)/unit_tests/nxp-afe
-	 \
 # The following is for imx-voice-example
-	 if [ "$(VOICEUI_ARCH)" = "CortexA53" ]; then \
+	 if [ "$(VOICEUI_ARCH)" = "CortexA53" ]; then
 	 	cp -f $(GPDIR)/nxp_demo_experience_assets/build/demo-experience-voice-demo/VIT_Model_en.h \
-			vit/platforms/iMX8M_CortexA53/lib/VIT_Model_en.h; \
-	 else \
+			vit/platforms/iMX8M_CortexA53/lib/VIT_Model_en.h
+	 else
 	 	cp -f $(GPDIR)/nxp_demo_experience_assets/build/demo-experience-voice-demo/VIT_Model_en.h \
 			vit/platforms/iMX9_CortexA55/lib/VIT_Model_en.h; \
 	 fi
@@ -50,7 +46,6 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 		BUILD_ARCH=$(VOICEUI_ARCH) $(LOG_MUTE)
 	 install -d $(DESTDIR)/$(GPNT_APPS_FOLDER)/bin
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/bin/
-	 \
 	 exit 1
 # The following is for smart-kitchen &&\
 	 cp -f $(GPDIR)/nxp_demo_experience_assets/build/demo-experience-smart-kitchen/VIT_Model_en.h \
@@ -66,7 +61,6 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
 		BUILD_ARCH=CortexA55 $(LOG_MUTE)
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/smart-kitchen/voice_ui_app.a55
-	 \
 # The following is for demo-experience-ebike-vit &&\
 	 cp -f $(GPDIR)/nxp_demo_experience_assets/build/demo-experience-ebike-vit/VIT_Model_en.h \
 		vit/platforms/iMX8M_CortexA53/lib/VIT_Model_en.h
@@ -81,7 +75,6 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 $(MAKE) VOICE_UI_APP enable-armv8=1 bindir=$(DESTDIR)/unit_tests/ libdir=$(DESTDIR)/usr/lib \
 		BUILD_ARCH=CortexA55 $(LOG_MUTE)
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/multimedia/ebike-vit/voice_ui_app.a55
-	 \
 # The following is for demo-experience-voice-player &&\
 	 cp -f $(GPDIR)/nxp_demo_experience_assets/build/demo-experience-voice-player/VIT_Model_en.h \
 		vit/platforms/iMX8M_CortexA53/lib/VIT_Model_en.h
@@ -100,6 +93,4 @@ ifeq ($(CONFIG_IMX_VOICEUI),y)
 	 	BUILD_ARCH=CortexA55 $(LOG_MUTE)
 	 install -m 0755 release/voice_ui_app $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX9X_A55
 	 install -m 0755 release/libvoiceseekerlight.so.2.0 $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/i.MX9X_A55
-	 \
 	 $(call fbprint_d,"imx_voiceui")
-endif

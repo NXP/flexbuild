@@ -15,8 +15,8 @@ imx_ele: imx_secure_enclave
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
 	 export ELE_ROOT=$(PKGDIR)/apps/security/imx_secure_enclave
 	 cd $(GPDIR)/imx_ele/lv_drivers
-	 if [ -d $(FBDIR)/patch/imx_ele ] && [ ! -f .patchdone ]; then \
-		 git apply $(FBDIR)/patch/imx_ele/*.patch && touch .patchdone; \
+	 if [ -d $(FBDIR)/patch/imx_ele ] && [ ! -f .patchdone ]; then
+		 git apply $(FBDIR)/patch/imx_ele/*.patch && touch .patchdone
 	 fi
 	 cd $(GPDIR)/imx_ele
 	 cp -rf protocols/ lv_drivers/wayland/

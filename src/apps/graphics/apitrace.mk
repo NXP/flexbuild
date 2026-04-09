@@ -10,7 +10,6 @@
 
 
 apitrace:
-ifeq ($(CONFIG_APITRACE),y)
 	@$(call fbprint_b,"apitrace")
 	 $(call download_repo,apitrace,apps/graphics)
 	 $(call patch_apply,apitrace,apps/graphics)
@@ -39,4 +38,3 @@ ifeq ($(CONFIG_APITRACE),y)
 		-DCMAKE_BUILD_TYPE=release $(LOG_MUTE)
 	 VERBOSE=1 cmake --build $(GRAPHICSDIR)/apitrace/build_$(DISTROTYPE)_$(ARCH) --target install $(LOG_MUTE)
 	 $(call fbprint_d,"apitrace")
-endif

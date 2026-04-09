@@ -22,14 +22,14 @@ tflite_ethosu_delegate: tflite ethosu_driver_stack
 	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include"
 	export CMAKE_TLS_VERIFY=0
 	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
-	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
-		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
-		cd build_$(DISTROTYPE)_$(ARCH); \
+	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then
+		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean &>/dev/null || :
+		cd build_$(DISTROTYPE)_$(ARCH)
 		rm -rf CMakeCache.txt Makefile cmake_install.cmake compile_commands.json \
 			CMakeFiles bin lib/*.so* lib/*.a \
-			example_proto_generated examples/*.o tools/*.o tmp/*; \
-		find . -type d -name "CMakeFiles" -exec rm -rf {} +; \
-		cd ..; \
+			example_proto_generated examples/*.o tools/*.o tmp/*
+		find . -type d -name "CMakeFiles" -exec rm -rf {} + &>/dev/null || :
+		cd ..
 	fi
 	cmake  -S $(MLDIR)/tflite_ethosu_delegate \
 		-B build_$(DISTROTYPE)_$(ARCH) -Wno-dev \

@@ -9,10 +9,10 @@
 imx_sw_pdm:
 	@$(call dl_by_wget,imx_sw_pdm_bin,imx_sw_pdm.bin)
 	cd $(MMDIR)
-	if [ ! -d "$(MMDIR)"/imx_sw_pdm ]; then \
-		chmod +x $(FBDIR)/dl/imx_sw_pdm.bin; \
-		$(FBDIR)/dl/imx_sw_pdm.bin --auto-accept --force $(LOG_MUTE); \
-		mv imx-sw-pdm* imx_sw_pdm; \
+	if [ ! -d "$(MMDIR)"/imx_sw_pdm ]; then
+		chmod +x $(FBDIR)/dl/imx_sw_pdm.bin
+		$(FBDIR)/dl/imx_sw_pdm.bin --auto-accept --force $(LOG_MUTE)
+		mv imx-sw-pdm* imx_sw_pdm
 	fi
 	$(call fbprint_b,"imx_sw_pdm")
 	cd imx_sw_pdm

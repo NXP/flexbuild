@@ -12,10 +12,10 @@
 imx_dpu_g2d_v1:
 	@$(call dl_by_wget,imx_dpu_g2d_bin_v1,imx_dpu_g2d_v1.bin)
 	cd $(GRAPHICSDIR)
-	if [ ! -d "$(GRAPHICSDIR)"/imx_dpu_g2d_v1 ]; then \
-		chmod +x $(FBDIR)/dl/imx_dpu_g2d_v1.bin; \
-		$(FBDIR)/dl/imx_dpu_g2d_v1.bin --auto-accept --force $(LOG_MUTE); \
-		mv imx-dpu-g2d-* imx_dpu_g2d_v1; \
+	if [ ! -d "$(GRAPHICSDIR)"/imx_dpu_g2d_v1 ]; then
+		chmod +x $(FBDIR)/dl/imx_dpu_g2d_v1.bin
+		$(FBDIR)/dl/imx_dpu_g2d_v1.bin --auto-accept --force $(LOG_MUTE)
+		mv imx-dpu-g2d-* imx_dpu_g2d_v1
 	fi
 	$(call fbprint_b,"imx_dpu_g2d_v1")
 	cd imx_dpu_g2d_v1

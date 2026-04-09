@@ -12,10 +12,10 @@ ceetm:
 	 $(call patch_apply,ceetm,apps/networking)
 	 $(call fbprint_b,"CEETM")
 	 cd $(NETDIR)/ceetm
-	 if [ ! -d $(IPROUTE2_PKG) ]; then \
-		 rm -rf $(IPROUTE2_PKG).tar.gz; \
-	     $(WGET) --no-check-certificate $(iproute2_src_url) $(LOG_MUTE); \
-	     tar xzf $(IPROUTE2_PKG).tar.gz; \
+	 if [ ! -d $(IPROUTE2_PKG) ]; then
+		 rm -rf $(IPROUTE2_PKG).tar.gz
+	     $(WGET) --no-check-certificate $(iproute2_src_url) $(LOG_MUTE)
+	     tar xzf $(IPROUTE2_PKG).tar.gz
 	 fi
 	 export IPROUTE2_DIR=$(NETDIR)/ceetm/$(IPROUTE2_PKG)
 	 export CC=$(CROSS_COMPILE)gcc

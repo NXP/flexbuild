@@ -28,10 +28,10 @@ mcore_demo:
 	else
 		exit 0
 	fi
-	if [ ! -d $${_NAME} ]; then \
-		chmod +x $(FBDIR)/dl/$${_NAME}.bin; \
-		$(FBDIR)/dl/$${_NAME}.bin --auto-accept --force $(LOG_MUTE); \
-		mv $${_NAME}-* $${_NAME}; \
+	if [ ! -d $${_NAME} ]; then
+		chmod +x $(FBDIR)/dl/$${_NAME}.bin
+		$(FBDIR)/dl/$${_NAME}.bin --auto-accept --force $(LOG_MUTE)
+		mv $${_NAME}-* $${_NAME}
 	fi
 	mkdir -p $(DESTDIR)/lib/firmware
 	cp -Prf ./$${_NAME}/$${_SOC}* $(DESTDIR)/lib/firmware

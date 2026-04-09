@@ -7,7 +7,6 @@
 
 
 gst_plugins_ugly: gst_plugins_base
-ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 	@$(call download_repo,gst_plugins_ugly,apps/multimedia)
 	 $(call patch_apply,gst_plugins_ugly,apps/multimedia)
 	 cd $(MMDIR)/gst_plugins_ugly
@@ -28,4 +27,3 @@ ifeq ($(CONFIG_GST_PLUGINS_UGLY),y)
 		-Dorc=enabled $(LOG_MUTE)
 	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	 $(call fbprint_d,"gst_plugins_ugly")
-endif

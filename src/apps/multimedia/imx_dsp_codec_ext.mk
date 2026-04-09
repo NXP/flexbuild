@@ -18,10 +18,10 @@ endif
 imx_dsp_codec_ext:
 	@$(call dl_by_wget,imx_dsp_codec_ext_bin,imx_dsp_codec_ext.bin)
 	cd $(MMDIR)
-	if [ ! -d "$(MMDIR)"/imx_dsp_codec_ext ]; then \
-		chmod +x $(FBDIR)/dl/imx_dsp_codec_ext.bin; \
-		$(FBDIR)/dl/imx_dsp_codec_ext.bin --auto-accept --force $(LOG_MUTE); \
-		mv imx-dsp-codec-ext* imx_dsp_codec_ext; \
+	if [ ! -d "$(MMDIR)"/imx_dsp_codec_ext ]; then
+		chmod +x $(FBDIR)/dl/imx_dsp_codec_ext.bin
+		$(FBDIR)/dl/imx_dsp_codec_ext.bin --auto-accept --force $(LOG_MUTE)
+		mv imx-dsp-codec-ext* imx_dsp_codec_ext
 	fi
 	$(call fbprint_b,"imx_dsp_codec_ext")
 	cd imx_dsp_codec_ext

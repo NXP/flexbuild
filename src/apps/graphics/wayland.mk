@@ -4,7 +4,6 @@
 
 
 wayland:
-ifeq ($(CONFIG_WAYLAND),y)
 	@$(call download_repo,wayland,apps/graphics,git)
 	 $(call patch_apply,wayland,apps/graphics)
 	 $(call fbprint_b,"wayland")
@@ -25,4 +24,3 @@ ifeq ($(CONFIG_WAYLAND),y)
 		--cross-file=meson.cross $(LOG_MUTE)
 	 DESTDIR=$(DESTDIR) ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	 $(call fbprint_d,"wayland")
-endif

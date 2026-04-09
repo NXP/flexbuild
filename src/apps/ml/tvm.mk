@@ -18,7 +18,6 @@ PYTHON_SITEPACKAGES_DIR = "/usr/lib/python3/dist-packages"
 
 tvm:
 #tvm: tim_vx
-ifeq ($(CONFIG_TVM),y)
 	 @$(call download_repo,tvm,apps/ml,submod)
 	 $(call patch_apply,tvm,apps/ml)
 	 sudo cp $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib
@@ -41,8 +40,8 @@ ifeq ($(CONFIG_TVM),y)
 	 python3 setup.py bdist_wheel --verbose --dist-dir $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH)/dist $(LOG_MUTE)
 	 pip3 install --ignore-installed --disable-pip-version-check -vvv -t $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) \
 	      --no-cache-dir --no-deps $(MLDIR)/tvm/build_$(DISTROTYPE)_$(ARCH)/dist/tvm-*linux*.whl $(LOG_MUTE)
-	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/tvmc ]; then \
-	     mv $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/tvmc $(DESTDIR)/usr/bin; \
+	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/tvmc ]; then
+	     mv $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/tvmc $(DESTDIR)/usr/bin
 	 fi
 	 chmod 755 $(DESTDIR)/usr/lib/libtvm*.so
 	 install -d $(DESTDIR)/usr/bin/tvm/examples $(DESTDIR)/usr/lib/pkgconfig $(DESTDIR)/usr/include/dlpack
@@ -50,4 +49,3 @@ ifeq ($(CONFIG_TVM),y)
 	 cp ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples
 	 cp ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/
 	 $(call fbprint_d,"tvm")
-endif

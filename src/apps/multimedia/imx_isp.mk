@@ -12,10 +12,10 @@
 imx_isp: imx_gpu_g2d gpu_viv libdrm $(KHEADER_FILE)
 	@$(call dl_by_wget,imx_isp_bin,imxisp.bin)
 	cd $(MMDIR)
-	if [ ! -d "$(MMDIR)"/imx_isp ]; then \
-		chmod +x $(FBDIR)/dl/imxisp.bin; \
-		$(FBDIR)/dl/imxisp.bin --auto-accept --force $(LOG_MUTE); \
-		mv isp-imx-* imx_isp; \
+	if [ ! -d "$(MMDIR)"/imx_isp ]; then
+		chmod +x $(FBDIR)/dl/imxisp.bin
+		$(FBDIR)/dl/imxisp.bin --auto-accept --force $(LOG_MUTE)
+		mv isp-imx-* imx_isp
 	fi
 	$(call fbprint_b,"imx_isp")
 	cd imx_isp/appshell
@@ -64,8 +64,8 @@ imx_isp: imx_gpu_g2d gpu_viv libdrm $(KHEADER_FILE)
 	chmod +x $(DESTDIR)/opt/imx8-isp/bin/start_isp.sh
 	sed -i 's/bin\/sh/bin\/bash/' $(DESTDIR)/opt/imx8-isp/bin/run.sh
 	find $(MMDIR)/imx_isp -name "*.drv" | xargs -I {} cp {} $(DESTDIR)/opt/imx8-isp/bin/
-	if ! grep -q After= $(MMDIR)/imx_isp/imx/imx8-isp.service; then \
-		 sed -i "5 a\After=gdm3.service" $(MMDIR)/imx_isp/imx/imx8-isp.service; \
+	if ! grep -q After= $(MMDIR)/imx_isp/imx/imx8-isp.service; then
+		 sed -i "5 a\After=gdm3.service" $(MMDIR)/imx_isp/imx/imx8-isp.service
 	fi
 	install -m 0644 $(MMDIR)/imx_isp/imx/imx8-isp.service $(DESTDIR)/usr/lib/systemd/system/
 	$(call fbprint_d,"imx_isp")

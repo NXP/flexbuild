@@ -9,8 +9,6 @@
 # depends on libmnl-dev for libmnl/libmnl.h
 # Need git information to compile, so must use git clone
 
-vpp:
-ifeq ($(CONFIG_VPP),y)
 vpp: dpdk
 	@$(call download_repo,vpp,apps/networking,git)
 	 $(call patch_apply,vpp,apps/networking)
@@ -25,11 +23,11 @@ vpp: dpdk
 	 export DPDK_PATH=$(DESTDIR)/usr
 	 export PYTHONPATH=$(RFSDIR)/usr/lib/python3.13:$(PYTHONPATH)
 	 export LD_LIBRARY_PATH=$(DESTDIR)/usr/local/lib:$(RFSDIR)/lib/aarch64-linux-gnu:$(RFSDIR)/lib
-	 if [ -f $(RFSDIR)/usr/include/mbedtls/ssl.h ]; then \
-		mv $(RFSDIR)/usr/include/mbedtls/ssl.h $(RFSDIR)/usr/include/mbedtls/ssl.h.bak; \
+	 if [ -f $(RFSDIR)/usr/include/mbedtls/ssl.h ]; then
+		mv $(RFSDIR)/usr/include/mbedtls/ssl.h $(RFSDIR)/usr/include/mbedtls/ssl.h.bak
 	 fi
-	 if [ -f $(DESTDIR)/usr/include/mbedtls/ssl.h ]; then \
-		mv $(DESTDIR)/usr/include/mbedtls/ssl.h $(DESTDIR)/usr/include/mbedtls/ssl.h.bak; \
+	 if [ -f $(DESTDIR)/usr/include/mbedtls/ssl.h ]; then
+		mv $(DESTDIR)/usr/include/mbedtls/ssl.h $(DESTDIR)/usr/include/mbedtls/ssl.h.bak
 	 fi
 	 cd $(NETDIR)/vpp
 	 $(MAKE) install-dep $(LOG_MUTE)
@@ -39,11 +37,10 @@ vpp: dpdk
 	 mkdir -p $(DESTDIR)/usr/local/vpp ${DESTDIR}/etc/vpp
 	 cp -f *.deb $(DESTDIR)/usr/local/vpp
 	 cp -f $(NETDIR)/vpp/src/vpp/conf/startup.conf $(DESTDIR)/etc/vpp/startup.conf
-	 if [ -f $(DESTDIR)/usr/include/mbedtls/ssl.h.bak ]; then \
-		mv $(DESTDIR)/usr/include/mbedtls/ssl.h.bak $(DESTDIR)/usr/include/mbedtls/ssl.h; \
+	 if [ -f $(DESTDIR)/usr/include/mbedtls/ssl.h.bak ]; then
+		mv $(DESTDIR)/usr/include/mbedtls/ssl.h.bak $(DESTDIR)/usr/include/mbedtls/ssl.h
 	 fi
-	 if [ -f $(RFSDIR)/usr/include/mbedtls/ssl.h.bak ]; then \
-		mv $(RFSDIR)/usr/include/mbedtls/ssl.h.bak $(RFSDIR)/usr/include/mbedtls/ssl.h; \
+	 if [ -f $(RFSDIR)/usr/include/mbedtls/ssl.h.bak ]; then
+		mv $(RFSDIR)/usr/include/mbedtls/ssl.h.bak $(RFSDIR)/usr/include/mbedtls/ssl.h
 	 fi
 	 $(call fbprint_d,"vpp")
-endif

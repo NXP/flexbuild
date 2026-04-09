@@ -6,9 +6,9 @@
 #gst_python:
 gst_python: gstreamer gst_plugins_bad
 	@$(call dl_by_wget,gst_python_tar,gst-python.tar.xz)
-	if [ ! -d "$(MMDIR)"/gst_python ]; then \
-		mkdir -p $(MMDIR)/gst_python; \
-		tar xf $(FBDIR)/dl/gst-python.tar.xz --strip-components=1 --wildcards -C $(MMDIR)/gst_python; \
+	if [ ! -d "$(MMDIR)"/gst_python ]; then
+		mkdir -p $(MMDIR)/gst_python
+		tar xf $(FBDIR)/dl/gst-python.tar.xz --strip-components=1 --wildcards -C $(MMDIR)/gst_python
 	fi
 	$(call fbprint_b,"gst_python")
 	cd $(MMDIR)/gst_python

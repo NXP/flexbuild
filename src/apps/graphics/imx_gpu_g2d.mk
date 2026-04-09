@@ -10,10 +10,10 @@
 imx_gpu_g2d:
 	@$(call dl_by_wget,imx_gpu_g2d_bin,imx_gpu_g2d.bin)
 	cd $(GRAPHICSDIR)
-	if [ ! -d "$(GRAPHICSDIR)"/imx_gpu_g2d ]; then \
-		chmod +x $(FBDIR)/dl/imx_gpu_g2d.bin; \
-		$(FBDIR)/dl/imx_gpu_g2d.bin --auto-accept --force $(LOG_MUTE); \
-		mv imx-gpu-g2d-* imx_gpu_g2d; \
+	if [ ! -d "$(GRAPHICSDIR)"/imx_gpu_g2d ]; then
+		chmod +x $(FBDIR)/dl/imx_gpu_g2d.bin
+		$(FBDIR)/dl/imx_gpu_g2d.bin --auto-accept --force $(LOG_MUTE)
+		mv imx-gpu-g2d-* imx_gpu_g2d
 	fi
 	$(call fbprint_b,"imx_gpu_g2d")
 	cd imx_gpu_g2d

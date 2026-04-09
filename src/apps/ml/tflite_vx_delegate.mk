@@ -19,14 +19,14 @@ tflite_vx_delegate: tflite tim_vx
 	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
 	export CXXFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(RFSDIR)//usr/include/python3.13"
-	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then \
-		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean; \
-		cd build_$(DISTROTYPE)_$(ARCH); \
+	if [ -d "build_$(DISTROTYPE)_$(ARCH)" ]; then
+		cmake --build build_$(DISTROTYPE)_$(ARCH) --target clean &>/dev/null || :
+		cd build_$(DISTROTYPE)_$(ARCH)
 		rm -rf CMakeCache.txt Makefile cmake_install.cmake compile_commands.json \
 			CMakeFiles bin lib/*.so* lib/*.a \
-			example_proto_generated examples/*.o tools/*.o tmp/*; \
-		find . -type d -name "CMakeFiles" -exec rm -rf {} +; \
-		cd ..; \
+			example_proto_generated examples/*.o tools/*.o tmp/*
+		find . -type d -name "CMakeFiles" -exec rm -rf {} + &>/dev/null || :
+		cd ..
 	fi
 	cmake  -S $(MLDIR)/tflite_vx_delegate \
 		-B build_$(DISTROTYPE)_$(ARCH) -Wno-dev \

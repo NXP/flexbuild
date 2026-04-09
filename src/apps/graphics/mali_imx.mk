@@ -9,10 +9,10 @@ mali_imx:
 	@$(call fbprint_b,"mali_imx ")
 	mkdir -p $(GRAPHICSDIR) && cd $(GRAPHICSDIR)
 	$(call dl_by_wget,mali_imx_bin,mali_imx.bin)
-	if [ ! -d $(GRAPHICSDIR)/mali_imx ]; then \
-		chmod a+x $(FBDIR)/dl/mali_imx.bin; \
-		$(FBDIR)/dl/mali_imx.bin --auto-accept --force $(LOG_MUTE); \
-		mv mali-imx-* mali_imx && rm -f mali_imx.bin; \
+	if [ ! -d $(GRAPHICSDIR)/mali_imx ]; then
+		chmod a+x $(FBDIR)/dl/mali_imx.bin
+		$(FBDIR)/dl/mali_imx.bin --auto-accept --force $(LOG_MUTE)
+		mv mali-imx-* mali_imx && rm -f mali_imx.bin
 	fi
 	cd $(GRAPHICSDIR)/mali_imx
 	mkdir -p $(DESTDIR)/etc $(DESTDIR)/usr $(RFSDIR)/usr

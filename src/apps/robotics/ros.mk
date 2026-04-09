@@ -13,7 +13,6 @@
 
 
 ros:
-ifeq ($(CONFIG_ROS), "y")
 	 if [ -d $(RFSDIR)/opt/ros2_jazzy ]; then
 	     $(call fbprint_n,"ROS was already installed in $(RFSDIR)/opt/ros2_jazzy") && exit 0
 	 fi
@@ -38,4 +37,3 @@ ifeq ($(CONFIG_ROS), "y")
 	 ros-dev-tools
 	 sudo mkdir -p $(RFSDIR)/opt/ros2_jazzy/src
 	 $(call fbprint_d,"ROS2 Jazzy in $(RFSDIR)/opt/ros2_jazzy")
-endif

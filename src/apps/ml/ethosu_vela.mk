@@ -28,7 +28,7 @@ ethosu_vela:
 	 cp -rfa build/lib.linux-*cpython*/ethosu $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)
 	 rename -f "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so
 	 rm -rf $(DESTDIR)/data
-	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela ]; then \
-	     mv $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela $(DESTDIR)/usr/bin/; \
+	 if [ -f $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela ]; then
+	     mv $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/bin/vela $(DESTDIR)/usr/bin/
 	 fi
 	 $(call fbprint_d,"ethosu_vela")

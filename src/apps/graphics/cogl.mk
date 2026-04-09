@@ -17,24 +17,22 @@ else
 endif
 
 #cogl:
-cogl: $(DEP_COGL)
+cogl: $(DEP_COGL) libdrm wayland_protocols
 	@$(call download_repo,cogl,apps/graphics,submod)
 	 $(call patch_apply,cogl,apps/graphics)
 	 $(call fbprint_b,"cogl")
 	 cd $(GRAPHICSDIR)/cogl
+	 [ -f Makefile ] && rm -rf Makefile >/dev/null 2>&1 || true
 	 export CROSS=$(CROSS_COMPILE)
-	 export CC="$(CROSS_COMPILE)gcc"
+	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CFLAGS="--sysroot=$(RFSDIR) \
 		-march=armv8-a+crc+crypto -mbranch-protection=standard -O2 \
 		-fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat \
 		-Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized \
 		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include"
 	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)"
-	 if [ -f Makefile ]; then \
-		 $(MAKE) distclean &>/dev/null; \
-	 fi
 	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE)
-	 ./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
+	 ./configure \
 	 	--host=aarch64-linux-gnu \
 		--build=x86_64-linux-gnu \
 		--prefix=/usr \
@@ -54,7 +52,6 @@ cogl: $(DEP_COGL)
 		--disable-static \
 		--enable-gles2 \
 		--enable-gl \
-		--enable-glx \
 		--enable-wayland-egl-server \
 		--enable-nls $(LOG_MUTE)
 	 $(MAKE) $(LOG_MUTE)

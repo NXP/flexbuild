@@ -6,7 +6,7 @@
 # DPAA1 Frame Manager User Space Library
 
 fmlib:
-	 $(call download_repo,fmlib,apps/networking)
+	 @$(call download_repo,fmlib,apps/networking)
 	 $(call patch_apply,fmlib,apps/networking)
 	 $(call fbprint_b,"fmlib")
 	 cd $(NETDIR)/fmlib

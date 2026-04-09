@@ -26,16 +26,16 @@ libcamera: gstreamer gst_plugins_base $(DEP_LIBCAM)
 	 install -m 644 $(DESTDIR)/usr/lib/libgstbase-1.0* $(RFSDIR)/usr/lib/
 	 install -m 644 $(DESTDIR)/usr/lib/libgstallocators-1.0* $(RFSDIR)/usr/lib/
 	 install -m 644 $(DESTDIR)/usr/lib/libEGL.so.* $(RFSDIR)/usr/lib/
-	 if [ "$(CONFIG_SOC_IMX8)" = "y" ]; then \
-		install -m 644 $(DESTDIR)/usr/lib/libGAL.so* $(RFSDIR)/usr/lib/; \
-		install -m 644 $(DESTDIR)/usr/lib/libdrm.so* $(RFSDIR)/usr/lib/; \
-		install -m 644 $(DESTDIR)/usr/lib/libgbm.so* $(RFSDIR)/usr/lib/; \
-		install -m 644 $(DESTDIR)/usr/lib/libgbm_viv.so* $(RFSDIR)/usr/lib/; \
+	 if [ "$(CONFIG_SOC_IMX8)" = "y" ]; then
+		install -m 644 $(DESTDIR)/usr/lib/libGAL.so* $(RFSDIR)/usr/lib/
+		install -m 644 $(DESTDIR)/usr/lib/libdrm.so* $(RFSDIR)/usr/lib/
+		install -m 644 $(DESTDIR)/usr/lib/libgbm.so* $(RFSDIR)/usr/lib/
+		install -m 644 $(DESTDIR)/usr/lib/libgbm_viv.so* $(RFSDIR)/usr/lib/
 	 fi
-	 if [ -d "$(DESTDIR)/usr/include/libpisp" ]; then \
-		mkdir -p "$(RFSDIR)/usr/include/libpisp"; \
-		cp -r "$(DESTDIR)/usr/include/libpisp/." "$(RFSDIR)/usr/include/libpisp/"; \
-		install -m 644 $(DESTDIR)/usr/lib/libpisp.so* "$(RFSDIR)/usr/lib"; \
+	 if [ -d "$(DESTDIR)/usr/include/libpisp" ]; then
+		mkdir -p "$(RFSDIR)/usr/include/libpisp"
+		cp -r "$(DESTDIR)/usr/include/libpisp/." "$(RFSDIR)/usr/include/libpisp/"
+		install -m 644 $(DESTDIR)/usr/lib/libpisp.so* "$(RFSDIR)/usr/lib"
 	 fi
 	 meson setup build \
 		--prefix=/usr --buildtype=release \

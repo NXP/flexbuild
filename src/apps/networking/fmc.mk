@@ -11,9 +11,9 @@ fmc: fmlib
 	 $(call patch_apply,fmc,apps/networking)
 	 $(call download_repo,eth_config,apps/networking)
 	 $(call patch_apply,eth_config,apps/networking)
-	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then \
+	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then
 	     mkdir -p $(DESTDIR)/etc/fmc/config
-	     cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config; \
+	     cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config
 	 fi
 	 xmlhdr=$(RFSDIR)/usr/include/libxml2
 	 $(call fbprint_b,"fmc")

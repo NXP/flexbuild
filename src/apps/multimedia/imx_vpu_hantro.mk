@@ -11,10 +11,10 @@
 imx_vpu_hantro: $(KHEADER_FILE)
 	@$(call dl_by_wget,vpu_hantro_bin,vpu_hantro.bin)
 	cd $(MMDIR)
-	if [ ! -d "$(MMDIR)"/imx_vpu_hantro ]; then \
-		chmod +x $(FBDIR)/dl/vpu_hantro.bin; \
-		$(FBDIR)/dl/vpu_hantro.bin --auto-accept --force $(LOG_MUTE); \
-		mv imx-vpu-hantro-* imx_vpu_hantro; \
+	if [ ! -d "$(MMDIR)"/imx_vpu_hantro ]; then
+		chmod +x $(FBDIR)/dl/vpu_hantro.bin
+		$(FBDIR)/dl/vpu_hantro.bin --auto-accept --force $(LOG_MUTE)
+		mv imx-vpu-hantro-* imx_vpu_hantro
 	fi
 	$(call fbprint_b,"imx_vpu_hantro")
 	cd imx_vpu_hantro

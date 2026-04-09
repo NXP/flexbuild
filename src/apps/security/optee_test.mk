@@ -8,10 +8,10 @@ optee_test: optee_client optee_os
 	@$(call download_repo,optee_test,apps/security)
 	 $(call patch_apply,optee_test,apps/security)
 	 $(call fbprint_b,"optee_test")
-	 if [ $(SOCFAMILY) = "IMX" ]; then \
-		socfamily=imx; \
-	 else \
-		socfamily=ls; \
+	 if [ $(SOCFAMILY) = "IMX" ]; then
+		socfamily=imx
+	 else
+		socfamily=ls
 	 fi
 	 cd $(SECDIR)/optee_test
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"

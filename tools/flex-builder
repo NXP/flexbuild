@@ -101,9 +101,6 @@ generate_linux_itb() {
     local tmpits
     tmpits=$(mktemp --suffix=.its)
 
-    # Ensure temporary file is removed even if the script exits prematurely (set -e)
-    trap 'rm -f "$tmpits"' EXIT
-
     # Prepare the ITS file by replacing placeholders with actual environment paths
     cp -f "$its_template" "$tmpits"
     sed -i "s|../../build|${FBOUTDIR}|g" "$tmpits"
@@ -112,6 +109,7 @@ generate_linux_itb() {
     # Generate the FIT image; mkimage will trigger set -e and exit if it fails
     mkimage -f "$tmpits" "$linux_itb" >/dev/null
 
+    rm -f "$tmpits"
     # Display the final image path on success
     fbprint_d "$linux_itb"
 }
@@ -335,21 +333,21 @@ check_binfmt_qemu() {
 
 
 flexbuild_launch_docker() {
-    dnum=$(printf '%s' "$FBDIR" | md5sum | cut -c1-6)
-    containername="${username}_fbdebian_${DEBIAN_VERSION}_${dnum}"
+	docker_hash=$(md5sum "$FBDIR/docker/debian/Dockerfile" | cut -c1-8)
+	imagename="fbdebian:${DEBIAN_VERSION}-${docker_hash}"
+	containername="${username}_fbdebian_${DEBIAN_VERSION}_${docker_hash}"
 
     # check if container exists and get its status (running / exited / not found)
     status=$(docker container inspect -f '{{.State.Status}}' "$containername" 2>/dev/null || true)
 
     if [ -z "$status" ]; then
         # ensure image exists
-        if ! docker image inspect "fbdebian:${DEBIAN_VERSION}" >/dev/null 2>&1; then
-            $MAKE -C "$FBDIR/docker/debian" || {
-                echo "ERROR: failed to build fbdebian:${DEBIAN_VERSION}" >&2
+		if ! docker image inspect "$imagename" >/dev/null 2>&1; then
+			$MAKE -C "$FBDIR/docker/debian" IMAGE_TAG="$imagename" || {
+				echo "ERROR: failed to build $imagename" >&2
                 return 1
             }
         fi
-
         docker run -it --hostname fbdebian --name="$containername" --privileged --net=host \
             -v "$HOME":"$HOME" -v "$FBDIR":"$FBDIR" -v /lib/modules:/lib/modules -v /dev:/dev \
             -v /etc/localtime:/etc/localtime:ro -w "$FBDIR" "fbdebian:${DEBIAN_VERSION}" /bin/bash
@@ -723,7 +721,7 @@ if [ "$1" = docker ]; then
     fi
     [ $HOSTARCH = x86_64 -o $HOSTARCH = i686 ] && check_binfmt_qemu
     [ -z "$(ls /dev/loop* 2>/dev/null)" ] && sudo losetup -f
-    flexbuild_launch_docker; exit
+    flexbuild_launch_docker; exit 0
 fi
 
 if [ ! -f "$FBDIR/.config" ]; then

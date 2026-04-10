@@ -5,7 +5,7 @@
 
 
 
-define kernel_pre
+dl-kernel dl-linux:
 	@$(call download_repo,linux,linux)
 	$(call patch_apply,linux,linux)
 	$(call fbprint_b,"$(KERNEL_TREE) with $(KERNEL_BRANCH)")
@@ -17,16 +17,17 @@ define kernel_pre
 	if [ ! -f $(KOUTDIR)/.config ]; then \
 	    $(MAKE) $(KERNEL_CFG) $(CONFIG_LINUX_EXTRA_CONFIG) -C $(KERNEL_PATH) O=$(KOUTDIR) 1>/dev/null 2>&1
 	fi
+	$(call FB_OUT,kernel source: $(PKGDIR)/linux/linux)
 
-endef
 
 kernel-menuconfig linux-menuconfig:
-	@$(call kernel_pre)
+	@$(MAKE) dl-kernel
 	$(MAKE) menuconfig -C $(KERNEL_PATH) O=$(KOUTDIR)
 	$(call FB_OUT,The kernel configuration is complete. Please run 'make linux' to compile the kernel)
 
-linux $(KERNEL_IMAGE):
-	@$(call kernel_pre)
+$(KERNEL_IMAGE): linux
+linux:
+	@$(MAKE) dl-kernel
 	$(MAKE) all -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	$(MAKE) zinstall INSTALL_PATH=$(KTGT_DIR) -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	cp $(KOUTDIR)/arch/arm64/boot/Image* $(KTGT_DIR)
@@ -39,7 +40,8 @@ linux $(KERNEL_IMAGE):
 	$(call fbprint_d,"$(KERNEL_TREE) $(KERNEL_BRANCH) in $(KTGT_DIR)")
 
 
-linux-headers $(KHEADER_FILE): $(KERNEL_IMAGE)
+$(KHEADER_FILE): linux-headers
+linux-headers: $(KERNEL_IMAGE)
 	@$(call download_repo,linux,linux)
 	 mkdir -p $(DESTDIR)/usr
 	 $(MAKE) headers_install INSTALL_HDR_PATH=$(DESTDIR)/usr -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)

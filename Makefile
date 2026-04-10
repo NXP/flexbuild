@@ -4,6 +4,7 @@
 .ONESHELL:
 SHELL=/bin/bash
 .SHELLFLAGS = -ec
+.DEFAULT_GOAL := help
 
 DISTRIB_VERSION := lsdk2606
 DEFAULT_REPO_TAG := lf-6.12.49-2.2.0
@@ -24,10 +25,13 @@ DEBIAN_VERSION := 13
 
 LOG_LEVEL ?= 2
 
-NO_CONFIG_TARGETS := menuconfig help docker
+NO_CONFIG_FIXED := menuconfig help docker
+CURRENT_GOALS := $(or $(MAKECMDGOALS),help)
+FIXED_MATCH     := $(filter $(NO_CONFIG_FIXED),$(CURRENT_GOALS))
+DEFCONFIG_MATCH := $(filter %_defconfig,$(CURRENT_GOALS))
+NEED_CONFIG_GOALS := $(filter-out $(FIXED_MATCH) $(DEFCONFIG_MATCH), $(CURRENT_GOALS))
 IS_DOCKER := $(wildcard /.dockerenv)
-CURRENT_GOALS := $(or $(MAKECMDGOALS),all)
-ifneq ($(filter $(CURRENT_GOALS),$(NO_CONFIG_TARGETS)),$(CURRENT_GOALS))
+ifneq ($(NEED_CONFIG_GOALS),)
     ifeq ($(IS_DOCKER),)
         $(info )
         $(info =====================================================)
@@ -36,11 +40,11 @@ ifneq ($(filter $(CURRENT_GOALS),$(NO_CONFIG_TARGETS)),$(CURRENT_GOALS))
         $(info )
         $(error Build stopped: outside of Docker)
     endif
-    ifeq ("$(wildcard $(FBDIR)/.config)","")
+    ifeq ($(wildcard $(FBDIR)/.config),)
         $(info )
-        $(info =====================================================)
-        $(info .config not found. Please run 'make menuconfig')
-        $(info =====================================================)
+        $(info =========================================================================)
+        $(info .config not found. Please run 'make menuconfig' or '<machine>_defconfig')
+        $(info =========================================================================)
         $(info )
         $(error Build stopped: missing .config)
     endif
@@ -160,10 +164,23 @@ all-log:
 menuconfig:
 	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
 		echo "ERROR: must be run inside a Docker container!" >&2; \
-		echo "       Please run 'make docker' first"; \
+		echo "       Please run "make docker" first"; \
 		exit 1; \
 	fi && \
 	$(PYTHON) -m menuconfig && \
+	$(PYTHON) tools/kconfig_hooks.py && \
+	$(MAKE) host-dep
+
+.PHONY: %_defconfig
+%_defconfig:
+	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
+		echo "ERROR: must be run inside a Docker container!" >&2; \
+		echo "       Please run 'make docker' first"; \
+		exit 1; \
+	fi && \
+	BOARD=$(@:_defconfig=) && \
+	echo "==> Generating defconfig for $$BOARD" && \
+	$(PYTHON) tools/gen_defconfig.py Kconfig $$BOARD && \
 	$(PYTHON) tools/kconfig_hooks.py && \
 	$(MAKE) host-dep
 
@@ -176,9 +193,9 @@ help:
 	@echo "==================================================================="
 	@echo ""
 	@echo "Main targets:"
-	@echo "  make [ all ]             - Build everything (BSP+kernel+apps+rfs)"
-	@echo "                             default target, 'all' can be omitted"
+	@echo "  make all                 - Build everything (BSP+kernel+apps+rfs)"
 	@echo "  make menuconfig          - Configure flexbuild options"
+	@echo "  make <machine>_defconfig - Use default config for <machine>"
 	@echo "  make linux               - Build Linux kernel with default config"
 	@echo "  make linux-menuconfig    - Configure Linux kernel"
 	@echo "  make atf                 - Build ARM Trusted Firmware"
@@ -199,7 +216,7 @@ help:
 	@echo "  make wic                 - Generate the WIC file and compress it"
 	@echo "  make show-enabled-apps   - Show enabled applications"
 	@echo "  make list-all-apps       - List all applications"
-	@echo "  make help                - Print this menu"
+	@echo "  make [ help ]            - Print this menu, default target"
 	@echo ""
 	@echo ""
 	@echo "Clean targets:"

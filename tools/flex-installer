@@ -411,7 +411,7 @@ flex_install_distro() {
         echo Installing $bootimg_n to $bootdev
         [ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
         [ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
-        [ $bootimgtype = zst ] && zstd -d -f $bootimg_n && sudo tar xfm ${bootimg_n%.*} -C $bootpartition
+        [ "$bootimgtype" = "zst" ] && zstd -dc "$bootimg_n" | sudo tar xf - -C "$bootpartition"
 
         prefix_to_keep=""
         case "$machine" in
@@ -444,7 +444,7 @@ flex_install_distro() {
 	case $rfsimgtype in
 	    dir)  sudo cp -rfp $rootfsimg_n/* $rootpartition;;
 	    tgz)  sudo tar xfm $rootfsimg_n -C $rootpartition;;
-	    zst)  zstd -d -f $rootfsimg_n && sudo tar xfm ${rootfsimg_n%.*} -C $rootpartition;;
+        zst)  zstd -dc "$rootfsimg_n" | sudo tar xfm - -C "$rootpartition" ;;
 	ext|wic)  sudo dd if=$rootfsimg_n of=$rootdev bs=4M && sync;;
 	cpio.gz)  mv $rootfsimg_n $rootpartition && cd $rootpartition && \
 		  gunzip $rootfsimg_n && cpio -idm < ${rootfsimg_n::-3} && cd -;;
@@ -596,44 +596,34 @@ check_http_request() {
 
 
 download_distro() {
-	temp_dir=$(mktemp -d)
 
-	check_http_request $bootimg_url
+    temp_dir=$(mktemp -d)
+    check_http_request $bootimg_url
 
-	if [ -f ${firmware_url##*/} ]; then
-		echo -e "${firmware_url##*/} already exists"
-	else
-		echo -e "\n Downloading $firmware_url "
-		if curl -ROfk --output-dir $temp_dir $firmware_url; then
-			mv $temp_dir/${firmware_url##*/} ./
-		else
-			print_w "Not found $firmware_url"
-		fi
-	fi
+    local original_dir=$(pwd)
 
-	if [ -f ${bootimg_url##*/} ]; then
-		echo -e "${bootimg_url##*/} already exists"
-	else
-		echo -e "\n Downloading $bootimg_url "
-		if curl -ROfk --output-dir $temp_dir $bootimg_url; then
-			mv $temp_dir/${bootimg_url##*/} ./
-		else
-			print_e "Failed to download boot image" && exit
-		fi
-	fi
+    download_item() {
+        local url=$1
+        local err_msg=$2
+        local filename=${url##*/}
 
-	if [ -f ${rootfsimg_url##*/} ]; then
-		echo -e "${rootfsimg_url##*/} already exists"
-	else
-		echo -e "\n Downloading $rootfsimg_url "
-		if curl -ROfk --output-dir $temp_dir $rootfsimg_url; then
-			mv $temp_dir/${rootfsimg_url##*/} ./
-		else
-			print_e "Failed to download rootfs image" && exit
-		fi
-	fi
+        if [ -f "$original_dir/$filename" ]; then
+            echo -e "$filename already exists"
+        else
+            echo -e "\n Downloading $url"
+            if (cd "$temp_dir" && curl -ROfk "$url"); then
+                mv "$temp_dir/$filename" "$original_dir/"
+            else
+                print_e "$err_msg" && exit
+            fi
+        fi
+    }
 
-	print_n "Downloaded distro images [Done]"
+    download_item "$firmware_url" "Failed to download firmware image: $firmware_url"
+    download_item "$bootimg_url" "Failed to download boot image: $bootimg_url"
+    download_item "$rootfsimg_url" "Failed to download rootfs image: $rootfsimg_url"
+
+    print_n "Downloaded distro images [Done]"
 }
 
 check_board_valid() {

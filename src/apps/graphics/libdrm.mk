@@ -35,6 +35,8 @@ libdrm:
 		-Dvivante=true \
 		-Dvmwgfx=enabled \
 		-Dc_link_args="-pthread" $(LOG_MUTE)
+	 rm -f $(DESTDIR)/usr/lib/libdrm.so*
+	 rm -f $(RFSDIR)/usr/lib/libdrm.so*
 	 PYTHONNOUSERSITE=y DESTDIR=$(DESTDIR) \
 	 ninja install -C build_$(DISTROTYPE)_$(ARCH) $(LOG_MUTE)
 	 PYTHONNOUSERSITE=y DESTDIR=$(RFSDIR) \

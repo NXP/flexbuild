@@ -5,9 +5,20 @@
 
 
 
+ifeq ($(CONFIG_SOC_IMX95),y)
+	DEP_CAMROTATION = imx_dpu_g2d_v2
+else ifeq ($(CONFIG_SOC_IMX91),y)
+	DEP_CAMROTATION = imx_pxp_g2d
+else ifeq ($(CONFIG_SOC_IMX93),y)
+	DEP_CAMROTATION = imx_pxp_g2d
+else ifeq ($(CONFIG_SOC_IMX8M),y)
+	DEP_CAMROTATION = imx_gpu_g2d gpu_viv
+else ifeq ($(CONFIG_SOC_IMX8QMMEK),y)
+	DEP_CAMROTATION = gpu_viv imx_dpu_g2d_v1
+endif
 
 
-imx_camera_rotation:
+imx_camera_rotation: libdrm $(DEP_CAMROTATION)
 	@$(call download_repo,imx_camera_rotation,apps/gopoint)
 	$(call fbprint_b,"imx_camera_rotation")
 	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"

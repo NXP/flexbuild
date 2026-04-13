@@ -6,7 +6,7 @@
 
 
 
-imx_pxp_g2d: $(KHEADER_FILE)
+imx_pxp_g2d: libdrm $(KHEADER_FILE)
 	@$(call download_repo,imx_pxp_g2d,apps/graphics)
 	 $(call patch_apply,imx_pxp_g2d,apps/graphics)
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"

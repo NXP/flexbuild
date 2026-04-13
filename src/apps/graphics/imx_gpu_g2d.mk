@@ -7,7 +7,7 @@
 
 # GC520L                            -> imx-gpu-g2d : 8mm, 8mp, 8ulp
 
-imx_gpu_g2d:
+imx_gpu_g2d: libdrm
 	@$(call dl_by_wget,imx_gpu_g2d_bin,imx_gpu_g2d.bin)
 	cd $(GRAPHICSDIR)
 	if [ ! -d "$(GRAPHICSDIR)"/imx_gpu_g2d ]; then

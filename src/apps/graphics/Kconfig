@@ -24,6 +24,7 @@ config GFX_COGL
 	bool "Cogl 3D graphics API"
 	default y
     depends on (SOC_IMX8 && GFX_GPU_VIV) || (SOC_IMX95 && GFX_MALI_IMX)
+    depends on GFX_LIBDRM && GFX_WAYLAND_PROTOCOLS
 	help
 	  Modern 3D graphics API for Clutter
 
@@ -111,7 +112,7 @@ config GFX_GPU_VIV
 config GFX_IMX_GPU_G2D
 	bool "i.MX GPU 2D acceleration"
 	default y if PLATFORM_IMX
-	depends on (SOC_IMX8 || SOC_LS1028ARDB) && GFX_GPU_VIV
+	depends on (SOC_IMX8 || SOC_LS1028ARDB) && GFX_GPU_VIV && GFX_LIBDRM
 	help
 	  i.MX GPU-based 2D graphics acceleration library
 

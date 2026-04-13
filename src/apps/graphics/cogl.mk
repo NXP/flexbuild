@@ -16,13 +16,19 @@ else
   DEP_COGL_LDFLAGS = -lGAL -lVSC -lGLESv2 -lgbm_viv
 endif
 
+
+COGL_SRCDIR := $(GRAPHICSDIR)/cogl
+COGL_SNAME := $(if $(CONFIG_SOC_IMX95),imx95,imx8)
+COGL_BUILDDIR := $(COGL_SRCDIR)/build/cogl-$(COGL_SNAME)
+
+
 #cogl:
 cogl: $(DEP_COGL) libdrm wayland_protocols
 	@$(call download_repo,cogl,apps/graphics,submod)
 	 $(call patch_apply,cogl,apps/graphics)
 	 $(call fbprint_b,"cogl")
-	 cd $(GRAPHICSDIR)/cogl
-	 [ -f Makefile ] && rm -rf Makefile >/dev/null 2>&1 || true
+	 mkdir -p $(COGL_BUILDDIR)
+	 cd $(COGL_BUILDDIR)
 	 export CROSS=$(CROSS_COMPILE)
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CFLAGS="--sysroot=$(RFSDIR) \
@@ -31,8 +37,10 @@ cogl: $(DEP_COGL) libdrm wayland_protocols
 		-Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized \
 		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include"
 	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)"
-	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE)
-	 ./configure \
+	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR)
+	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig
+	 $(COGL_SRCDIR)/autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE)
+	 $(COGL_SRCDIR)/configure \
 	 	--host=aarch64-linux-gnu \
 		--build=x86_64-linux-gnu \
 		--prefix=/usr \

@@ -69,7 +69,6 @@ KERNEL_CFG := defconfig lsdk.config
 endif
 
 MACHINE := $(strip $(subst ",,$(CONFIG_MACHINE_NAME)))
--include configs/board/$(MACHINE).conf
 
 ifeq ($(CONFIG_BUILD_VERBOSE),y)
 LOG_LEVEL=0
@@ -236,6 +235,8 @@ help:
 # ============================================================================
 
 ifneq ($(wildcard .config),)
+
+include configs/board/$(MACHINE).conf
 
 $(shell mkdir -p $(DESTDIR) $(RFSDIR) $(KERNEL_OUTPUT_PATH))
 $(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))

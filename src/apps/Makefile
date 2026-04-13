@@ -38,7 +38,7 @@ include src/apps/robotics/Makefile
 ALL_APPS := $(APPS_GFX) $(APPS_MM) $(APPS_GP) $(APPS_UTILS) $(APPS_ML) $(APPS_SEC) $(APPS_NET) $(APPS_ROTOTICS)
 ALL_MODULES := $(GP_MODULES) $(GFX_MODULES) $(ML_MODULES) $(MM_MODULES) $(NET_MODULES) $(ROBOTICS_MODULES) $(SEC_MODULES) $(UTILS_MODULES)
 
-ALL_MODULES: $(KHEADER_FILE) $(KERNEL_IMAGE) $(RFS_FILE)
+$(ALL_MODULES): $(KHEADER_FILE) $(KERNEL_IMAGE) $(RFS_FILE)
 .PHONY: apps
 apps: multimedia graphics networking security ml gopoint utils robotics
 	@$(call fbprint_d,"apps components")

@@ -60,7 +60,6 @@ ifneq ($(wildcard $(FBDIR)/.config),)
     export $(CONFIG_VARS)
 endif
 
-SOC_LIST := $(basename $(notdir $(wildcard $(FBDIR)/configs/board/*.conf)))
 ifeq ($(CONFIG_PLATFORM_IMX),y)
 SOCFAMILY := IMX
 KERNEL_CFG := imx_v8_defconfig
@@ -69,18 +68,9 @@ SOCFAMILY := LS
 KERNEL_CFG := defconfig lsdk.config
 endif
 
-get_soc_cfg_name = CONFIG_SOC_$(subst -,_,$(shell echo $(1) | tr a-z A-Z))
-$(foreach s,$(SOC_LIST), \
-    $(eval CURRENT_CFG := $(call get_soc_cfg_name,$(s))) \
-    $(if $(filter y,$($(CURRENT_CFG))), \
-        $(if $(wildcard configs/board/$(s).conf), \
-            $(eval include configs/board/$(s).conf) \
-            $(eval MACHINE := $(s)) \
-        , \
-            $(error [ERROR] Missing config file: configs/board/$(s).conf) \
-        ) \
-    ) \
-)
+MACHINE := $(strip $(subst ",,$(CONFIG_MACHINE_NAME)))
+-include configs/board/$(MACHINE).conf
+
 ifeq ($(CONFIG_BUILD_VERBOSE),y)
 LOG_LEVEL=0
 endif
@@ -118,7 +108,11 @@ export GIT_SSL_NO_VERIFY=1
 export LOG_MUTE
 export MACHINE
 
-
+RFS_FILE := $(RFSDIR)/etc/buildinfo
+KOUTDIR := $(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH)
+KTGT_DIR := $(FBOUTDIR)/linux/linux/arm64/$(SOCFAMILY)
+KERNEL_IMAGE := $(KTGT_DIR)/Image
+KHEADER_FILE := $(DESTDIR)/usr/include/linux/version.h
 
 include $(FBDIR)/include/utils.mk
 include $(FBDIR)/include/download_repo.mk

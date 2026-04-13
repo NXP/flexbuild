@@ -86,6 +86,26 @@ config PLATFORM_LS
     bool
     default y if SOC_LS1028ARDB || SOC_LS104 || SOC_LX2160ARDB
 
+config MACHINE_NAME
+    string
+    default "imx8mpevk" if SOC_IMX8MPEVK
+    default "imx8mpfrdm" if SOC_IMX8MPFRDM
+    default "imx8mmevk" if SOC_IMX8MMEVK
+    default "imx8qmmek" if SOC_IMX8QMMEK
+    default "imx91evk" if SOC_IMX91EVK
+    default "imx91frdm" if SOC_IMX91FRDM
+    default "imx91sfrdm" if SOC_IMX91SFRDM
+    default "imx93evk" if SOC_IMX93EVK
+    default "imx93frdm" if SOC_IMX93FRDM
+    default "imx95-15x15-evk" if SOC_IMX95_15X15_EVK
+    default "imx95-15x15-frdm" if SOC_IMX95_15X15_FRDM
+    default "imx95-19x19-evk" if SOC_IMX95_19X19_EVK
+    default "imx95-19x19-frdm-pro" if SOC_IMX95_19X19_FRDM_PRO
+    default "ls1028ardb" if SOC_LS1028ARDB
+    default "ls1043ardb" if SOC_LS1043ARDB
+    default "ls1046ardb" if SOC_LS1046ARDB
+    default "lx2160ardb" if SOC_LX2160ARDB
+
 # ============================================================================
 # Build Configuration Categories
 # ============================================================================

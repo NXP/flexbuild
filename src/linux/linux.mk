@@ -25,8 +25,7 @@ kernel-menuconfig linux-menuconfig:
 	$(MAKE) menuconfig -C $(KERNEL_PATH) O=$(KOUTDIR)
 	$(call FB_OUT,The kernel configuration is complete. Please run 'make linux' to compile the kernel)
 
-$(KERNEL_IMAGE): linux
-linux:
+linux $(KERNEL_IMAGE):
 	@$(MAKE) dl-kernel
 	$(MAKE) all -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	$(MAKE) zinstall INSTALL_PATH=$(KTGT_DIR) -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
@@ -39,9 +38,7 @@ linux:
 	cp $(KOUTDIR)/arch/arm64/boot/dts/freescale/$(DTBSTR) $(KTGT_DIR)
 	$(call fbprint_d,"$(KERNEL_TREE) $(KERNEL_BRANCH) in $(KTGT_DIR)")
 
-
-$(KHEADER_FILE): linux-headers
-linux-headers: $(KERNEL_IMAGE)
+linux-headers $(KHEADER_FILE): $(KERNEL_IMAGE)
 	@$(call download_repo,linux,linux)
 	 mkdir -p $(DESTDIR)/usr
 	 $(MAKE) headers_install INSTALL_HDR_PATH=$(DESTDIR)/usr -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)

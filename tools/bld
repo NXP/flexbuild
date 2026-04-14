@@ -1,0 +1,206 @@
+#!/bin/bash
+
+# Copyright 2026 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Wrapper script for backward compatibility with old flex-builder interface
+# Now using Makefile-based build system
+
+set -e
+
+RED='\e[1;31m'
+GREEN='\e[1;32m'
+YELLOW='\e[1;33m'
+NC='\e[0m'
+
+fbprint_e() {
+    echo -e "${RED}$1${NC}" >&2
+}
+
+fbprint_w() {
+    echo -e "${YELLOW}$1${NC}"
+}
+
+fbprint_n() {
+    echo -e "${GREEN}$1${NC}"
+}
+
+usage() {
+cat <<EOF
+Usage: bld <command> -m <machine>
+   or  bld <command>
+
+This is a compatibility wrapper for the new Makefile-based build system.
+For full functionality, please use 'make' commands directly.
+
+Common commands:
+  bld -m <machine>              # Build everything for <machine>
+  bld linux -m <machine>        # Build Linux kernel
+  bld atf -m <machine>          # Build ARM Trusted Firmware
+  bld uboot -m <machine>        # Build U-Boot
+  bld flash.bin -m <machine>    # Build flash.bin for imx platform
+  bld apps -m <machine>         # Build all applications
+  bld bsp -m <machine>          # Build BSP (ATF, U-Boot, etc.)
+  bld rfs -m <machine>          # Build root filesystem
+  bld boot -m <machine>         # Build boot partition
+  bld merge-apps -m <machine>   # Merge apps to rootfs
+  bld packrfs -m <machine>      # Pack and compress rootfs
+  bld packapps -m <machine>     # Pack apps to debian package
+  bld wic -m <machine>          # Generate WIC image
+  bld clean-linux -m <machine>  # Clean Linux kernel
+  bld clean-bsp -m <machine>    # Clean BSP components
+  bld clean-apps -m <machine>   # Clean applications
+  bld clean-rfs -m <machine>    # Clean root filesystem
+
+Commands without -m parameter:
+  bld docker                    # Launch docker container
+  bld list                      # List supported machines
+  bld distclean                 # Clean build artifacts
+
+Deprecated options (use 'make menuconfig' instead):
+  -s, --secure                  # Use 'make menuconfig' to enable secure boot
+  -o, --optee                   # Use 'make menuconfig' to enable OPTEE
+  -b, --boottype                # Deprecated
+
+For more options and details, run: make help
+
+EOF
+    exit 0
+}
+
+# Check and ensure correct .config for the specified machine
+check_and_setup_config() {
+    local machine="$1"
+    local config_file=".config"
+    local board_conf="configs/board/${machine}.conf"
+
+    # Check if board config exists
+    if [[ ! -f "$board_conf" ]]; then
+        fbprint_e "Error: Board configuration not found: $board_conf"
+        fbprint_e "Please check if '$machine' is a valid machine name."
+        fbprint_n "Run 'bld list' or 'make list' to see supported machines."
+        exit 1
+    fi
+
+    # If .config doesn't exist, generate it
+    if [[ ! -f "$config_file" ]]; then
+        fbprint_n "No .config found. Generating default config for $machine"
+        make "${machine}_defconfig"
+        if [[ $? -ne 0 ]]; then
+            fbprint_e "Error: Failed to generate config for $machine"
+            exit 1
+        fi
+        return 0
+    fi
+
+    # .config exists, verify it matches the specified machine
+    # Get current configured machine name from .config
+    local current_machine=""
+    if grep -q "^CONFIG_MACHINE_NAME=" "$config_file"; then
+        current_machine=$(grep "^CONFIG_MACHINE_NAME=" "$config_file" | cut -d'=' -f2 | tr -d '"' | tr -d ' ')
+    fi
+
+    if [[ -z "$current_machine" ]]; then
+        fbprint_e "Error: CONFIG_MACHINE_NAME not found in .config, cannot verify configuration"
+        exit 1
+    fi
+
+    # Compare with specified machine
+    if [[ "$current_machine" != "$machine" ]]; then
+        fbprint_e "Error: Configuration mismatch!"
+        fbprint_e "  Current .config is for: $current_machine"
+        fbprint_e "  You specified machine:  $machine"
+        fbprint_e ""
+        fbprint_n "Options:"
+        fbprint_n "  1. Run 'make ${machine}_defconfig' to reconfigure for $machine"
+        fbprint_n "  2. Run 'make distclean' to clean everything and start fresh"
+        fbprint_n "  3. Run 'make menuconfig' to manually configure"
+        fbprint_n "  4. Use 'bld <command> -m $current_machine' to build for the configured machine"
+        exit 1
+    fi
+
+    fbprint_n "Configuration verified: building for $machine"
+}
+
+# Parse command line arguments
+COMMAND=""
+MACHINE=""
+DEPRECATED_OPTS=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help|help)
+            usage
+            ;;
+        -m|--machine)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                fbprint_e "Error: -m requires a machine name"
+                exit 1
+            fi
+            MACHINE="$2"
+            shift 2
+            ;;
+        -s|--secure)
+            DEPRECATED_OPTS="${DEPRECATED_OPTS}-s "
+            shift
+            ;;
+        -o|--optee)
+            DEPRECATED_OPTS="${DEPRECATED_OPTS}-o "
+            shift
+            ;;
+        -b|--boottype)
+            DEPRECATED_OPTS="${DEPRECATED_OPTS}-b $2 "
+            shift 2
+            ;;
+        -j|--jobs|-a|--arch|-c|--component|-f|--cfgfile|-r|--rootfs|-i|--instruction|-p|--portfolio|-B|--buildarg|-T|--cot|-k|--keyid|-e|--encap|-t|--ima-evm|-v|--version|-F|--force)
+            fbprint_w "Warning: Option $1 is deprecated. Please use 'make menuconfig' or Makefile variables."
+            shift
+            [[ "$1" != -* ]] && shift
+            ;;
+        -*)
+            fbprint_e "Error: Unknown option: $1"
+            usage
+            ;;
+        *)
+            if [[ -z "$COMMAND" ]]; then
+                COMMAND="$1"
+            else
+                fbprint_e "Error: Multiple commands specified: $COMMAND and $1"
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Show warning for deprecated options
+if [[ -n "$DEPRECATED_OPTS" ]]; then
+    fbprint_w "Warning: The following options are deprecated: $DEPRECATED_OPTS"
+    fbprint_w "Please use 'make menuconfig' to configure these settings."
+    echo ""
+    exit 1
+fi
+
+# Commands that don't require -m parameter
+NO_MACHINE_CMDS="docker list help clean-config distclean"
+
+# Check if command requires machine parameter
+if [[ -z "$COMMAND" ]]; then
+    echo "No command specified, build everything for default machine (if configured)"
+	COMMAND="all"
+fi
+
+if [[ ! " $NO_MACHINE_CMDS " =~ " $COMMAND " ]]; then
+    if [[ -z "$MACHINE" ]]; then
+        fbprint_e "Error: Command '$COMMAND' requires -m <machine> parameter"
+        echo ""
+        fbprint_n "Example: bld $COMMAND -m imx8mpevk"
+        echo ""
+        exit 1
+    fi
+    # Check and setup config for commands that require machine
+    check_and_setup_config "$MACHINE"
+fi
+
+exec make "$COMMAND"

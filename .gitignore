@@ -5,7 +5,6 @@ logs
 uuu
 configs/.sdk.cfg
 configs/.repo_pool
-tools/bld
 dl
 tmp
 .bash*

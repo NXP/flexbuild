@@ -37,6 +37,10 @@ host-dep:
 	@$(BLD) host-dep
 
 docker:
+	@if [ -f /.dockerenv ] || grep -q docker /proc/1/cgroup 2>/dev/null; then \
+		echo "ERROR: Already inside a Docker container!" >&2; \
+		exit 1; \
+	fi
 	+@$(BLD) docker
 
 rfs $(RFS_FILE):

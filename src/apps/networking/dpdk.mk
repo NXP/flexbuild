@@ -34,7 +34,6 @@ dpdk:
 	 meson setup $$build_dir \
 		--prefix=/usr \
 		--strip \
-		-Denable_kmods=false \
 		-Dkernel_dir=$(KERNEL_OUTPUT_PATH)/$(KERNEL_BRANCH) \
 		-Dexamples=$(DPDK_EXAMPLES) \
 		-Dc_args="-Ofast -fPIC -ftls-model=local-dynamic -Wno-error=implicit-function-declaration -I$(DESTDIR)/usr/include" \

@@ -148,6 +148,7 @@ repo:
 
   dpdk:
     url:  https://github.com/nxp-qoriq/dpdk.git
+    ver:  25.11-lf-rel
 
   vpp:
     url:  https://github.com/nxp-qoriq/vpp.git

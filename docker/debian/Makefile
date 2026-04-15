@@ -26,4 +26,5 @@ build:
 
 	#echo "docker build -t $(IMAGE) --network host $$ARGS ."; \
 	#docker build -t $(IMAGE) --network host .
-	docker build -t $(IMAGE) --network host $$ARGS .
+	#docker build -t $(IMAGE) --network host $$ARGS .
+	docker build --add-host fbdebian:127.0.0.1 -t $(IMAGE) --network host $$ARGS .

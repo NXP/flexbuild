@@ -44,7 +44,7 @@ RUN set -eux; \
       sudo arch-test gpg vim rename xxd autopoint valac hwdata cpio debhelper-compat \
       build-essential git wget curl rsync ccache pkg-config lsb-release \
       autoconf automake libtool cmake meson ninja-build parted psmisc e2fsprogs udev \
-      gawk gettext zip unzip xz-utils zstd ruby efitools fdisk \
+      gawk gettext zip unzip xz-utils zstd ruby efitools fdisk whiptail \
       crossbuild-essential-arm64 gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu \
       device-tree-compiler u-boot-tools bc flex bison lzop && \
     sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
@@ -70,3 +70,13 @@ RUN set -eux; \
       protobuf-compiler libgdk-pixbuf-2.0-dev libxml2-utils libprotobuf-dev \
       gtk-doc-tools pandoc apt-cacher-ng && \
     rm -rf /var/lib/apt/lists/*
+
+RUN git config --global user.email  "debian@nxp.com" && \
+    git config --global user.name "NXP debian" && \
+    git config --global http.sslVerify false && \
+    git config --global --add safe.directory '*'
+
+RUN if [ -n "${http_proxy:-}" ]; then \
+        git config --global http.proxy "${http_proxy}"; \
+        git config --global https.proxy "${https_proxy:-$http_proxy}"; \
+    fi

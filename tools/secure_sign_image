@@ -6,40 +6,8 @@
 
 # signing images for secure boot
 
-
-log_mute() {
-  case "${LOG_LEVEL:-2}" in
-    0)
-      "$@"
-      ;;
-    1)
-      "$@" >/dev/null
-      ;;
-    2)
-      "$@" >/dev/null 2>&1 || {
-        echo "Error: Command '$*' failed. Please export LOG_LEVEL=0 and retry."
-        exit 1
-      }
-      ;;
-	*)
-		echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
-		exit 1
-		;;
-  esac
-}
-
-
-fbprint_n() {
-    echo -e "${green}\n$1 ${NC}"
-}
-
-fbprint_d() {
-    echo -e "${GREEN}$1     [Done] ${NC}"
-}
-
-GREEN='\e[1;32m'
-green='\e[0;32m'
-NC='\e[0m'
+[ -n "$FBDEBUG" ] && set -xe || set -e
+source "${FBDIR}/include/console.sh"
 
 secure_sign_image() {
     # $1: <machine>,  $2: <boottype>

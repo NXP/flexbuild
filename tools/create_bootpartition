@@ -1,17 +1,11 @@
 #!/bin/bash
 # Copyright 2017-2023, 2026 NXP
 # SPDX-License-Identifier: BSD-3-Clause
-
 # Enable pipefail to ensure pipeline errors are captured
 set -o pipefail
+[ -n "$FBDEBUG" ] && set -xe || set -e
 
-# Color definitions for output
-GREEN='\e[1;32m'
-green='\e[0;32m'
-NC='\e[0m'
-
-fbprint_n() { echo -e "${green}\n$1 ${NC}"; }
-fbprint_d() { echo -e "${GREEN}$1     [Done] ${NC}"; }
+source "${FBDIR}/include/console.sh"
 
 generate_bootpartition_tarball() {
     # Local variable declarations for path safety

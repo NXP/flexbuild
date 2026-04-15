@@ -901,7 +901,7 @@ elif [ $instruction = install ]; then
 
     # Ensure at least one image is provided
     [ $has_valid_image -eq 0 ] && print_e "At least one image (rootfs/boot/firmware) must be provided" && exit 1
-    [ -z "$machine" ] && print_e "Please specify '-m <machine>' for mkwic" && exit 1
+    [ -z "$machine" ] && print_e "Please specify '-m <machine>' for installation" && exit 1
     check_images_format
 
     flex_install_distro

@@ -10,6 +10,8 @@
 [ -n "$FBDEBUG" ] && set -xe || set -e
 [ -n "$MKDEBUG" ] && SHFLAGS="-ex -o pipefail -c" || SHFLAGS="-c "
 
+source "${FBDIR}/include/console.sh"
+
 generate_linux_itb() {
     # Define paths for initrd and output ITB image
     local initrdimg="$FBOUTDIR/images/rootfs_${DISTRIB_VERSION}_poky_tiny_arm64.cpio.gz"
@@ -80,39 +82,6 @@ get_prebuilt_initrd() {
     fi
 }
 
-
-rfs_umount() {
-	for mnt in dev/pts dev sys/kernel/security sys  proc; do
-		 if mountpoint -q "$1/$mnt"; then
-			 if ! umount "$1/$mnt"; then
-				 sleep 2
-				 umount -f "$1/$mnt" || true
-				 log_mute echo umount $1/$mnt failed
-			 else
-				 log_mute echo umont $mnt successfully
-			 fi
-		 else
-			 log_mute echo $mnt is not mounted.
-		 fi
-	done
-}
-
-rfs_mount() {
-	if ! mountpoint -q "$1/proc"; then
-		mount -t proc /proc "$1/proc"
-	fi
-	if ! mountpoint -q "$1/sys"; then
-		mount -t sysfs /sys "$1/sys"
-	fi
-	if ! mountpoint -q "$1/dev"; then
-		mount --bind /dev "$1/dev"
-	fi
-	if ! mountpoint -q "$1/dev/pts"; then
-		mount --bind /dev/pts "$1/dev/pts"
-	fi
-}
-
-
 pack_distro_rfs() {
     if [ "$RFS_BASE" = "y" ]; then
         RFSDIR=${FBOUTDIR}/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64
@@ -152,21 +121,23 @@ pack_app_components() {
 
 
 merge_apps() {
-    [ ! -f $RFSDIR/etc/buildinfo ] && build_distro_rfs_debian
-
-    if [ $DISTROTYPE = debian -o $DISTROTYPE = ubuntu ] && [ $DISTROVARIANT != base ]; then
-        if [ $DESTDIR != $RFSDIR ]; then
-            for dir in lib bin sbin; do
-                [ -d $DESTDIR/$dir ] && cp -Prf --preserve=mode,timestamps $DESTDIR/$dir/* $RFSDIR/$dir/
-            done
-            ls -d $DESTDIR/* | grep -v -E "lib|bin|sbin" | xargs -I {} cp -Prf --preserve=mode,timestamps {} $RFSDIR/
-        fi
-        [ $DESTARCH = arm64 ] && tgtarch=aarch64 || tgtarch=arm
-        if update-binfmts --display qemu-$tgtarch 2>/dev/null | grep -q disabled; then
-            log_mute update-binfmts --enable qemu-$tgtarch
-        fi
-        chroot $RFSDIR ldconfig
+    if [ ! -f $RFSDIR/etc/buildinfo ]; then
+        echo "No rootfs found, please run 'make rfs' first"
+        exit 1
     fi
+
+    if [ $DESTDIR != $RFSDIR ]; then
+        for dir in lib bin sbin; do
+            [ -d $DESTDIR/$dir ] && cp -Prf --preserve=mode,timestamps $DESTDIR/$dir/* $RFSDIR/$dir/
+        done
+        ls -d $DESTDIR/* | grep -v -E "lib|bin|sbin" | xargs -I {} cp -Prf --preserve=mode,timestamps {} $RFSDIR/
+    fi
+    [ $DESTARCH = arm64 ] && tgtarch=aarch64 || tgtarch=arm
+    if update-binfmts --display qemu-$tgtarch 2>/dev/null | grep -q disabled; then
+        log_mute update-binfmts --enable qemu-$tgtarch
+    fi
+    chroot $RFSDIR ldconfig
+
     fbprint_d "merge apps to $RFSDIR"
 }
 
@@ -182,7 +153,7 @@ flexbuild_launch_docker() {
 
 	docker_hash=$(md5sum "$FBDIR/docker/debian/Dockerfile" | cut -c1-8)
 	imagename="fbdebian:${DEBIAN_VERSION}-${docker_hash}"
-	containername="${username}_fbdebian_${DEBIAN_VERSION}_${docker_hash}"
+	containername="$(whoami)_fbdebian_${DEBIAN_VERSION}_${docker_hash}"
 
     # check if container exists and get its status (running / exited / not found)
     status=$(docker container inspect -f '{{.State.Status}}' "$containername" 2>/dev/null || true)
@@ -298,97 +269,6 @@ generate_wic_img() {
 
     cd "$FBDIR"
 }
-
-log_mute() {
-  case "${LOG_LEVEL:-2}" in
-    0)
-      "$@"
-      ;;
-    1)
-      "$@" >/dev/null
-      ;;
-    2)
-      "$@" >/dev/null 2>&1 || {
-        echo "Error: Command '$*' failed. Please export LOG_LEVEL=0 and retry."
-        exit 1
-      }
-      ;;
-	*)
-		echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
-		exit 1
-		;;
-  esac
-}
-
-set_loglevel() {
-	case "${LOG_LEVEL:-2}" in
-    0)
-        LOG_MUTE=""
-        ;;
-    1)
-        LOG_MUTE=">/dev/null"
-        ;;
-    2)
-        LOG_MUTE=">/dev/null 2>&1" || {
-			echo "Error: please export LOG_LEVEL=0 and retry."
-			exit 1
-		}
-        ;;
-    *)
-        echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
-        exit 1
-        ;;
-	esac
-}
-
-show_one_line() {
-  case "${LOG_LEVEL:-2}" in
-    0)
-      "$@"
-      ;;
-    1)
-      "$@" >/dev/null
-      ;;
-    2)
-		echo
-		"$@" 2>&1 | while IFS= read -r line; do
-			printf "\033[1A\033[2K\r%s\n" "$line"
-		done
-      ;;
-	*)
-		echo "Error LOG_LEVEL must be 0, 1 or 2" >&2
-		exit 1
-		;;
-  esac
-}
-
-fbprint_e() {
-    echo -e "${RED}$1 ${NC}"
-}
-
-fbprint_n() {
-    echo -e "${green}\n$1 ${NC}"
-}
-
-fbprint_w() {
-    echo -e "${YELLOW}$1 ${NC}"
-}
-
-fbprint_d() {
-    echo -e "${GREEN}$1     [Done] ${NC}"
-}
-
-username=`whoami`
-HOSTARCH=`uname -m`
-red='\e[0;41m'
-RED='\e[1;31m'
-GREEN='\e[1;32m'
-green='\e[0;32m'
-yellow='\e[5;43m'
-YELLOW='\e[1;33m'
-NC='\e[0m'
-
-set_loglevel
 
 case "$1" in
     docker)

@@ -25,7 +25,7 @@ DEBIAN_VERSION := 13
 
 LOG_LEVEL ?= 2
 
-NO_CONFIG_FIXED := menuconfig help docker
+NO_CONFIG_FIXED := menuconfig help docker config
 CURRENT_GOALS := $(or $(MAKECMDGOALS),help)
 FIXED_MATCH     := $(filter $(NO_CONFIG_FIXED),$(CURRENT_GOALS))
 DEFCONFIG_MATCH := $(filter %_defconfig,$(CURRENT_GOALS))
@@ -120,6 +120,7 @@ include $(FBDIR)/include/patch_apply.mk
 $(shell mkdir -p $(PKGDIR) $(FBOUTDIR))
 $(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
 $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics})
+$(shell [ ! -e $(FBOUTDIR)/linux/kernel ] && ln -sf linux $(FBOUTDIR)/linux/kernel || true)
 
 # ============================================================================
 # Main build target - builds based on configuration
@@ -174,6 +175,29 @@ menuconfig:
 	BOARD=$(@:_defconfig=) && \
 	echo "==> Generating defconfig for $$BOARD" && \
 	$(PYTHON) tools/gen_defconfig.py Kconfig $$BOARD && \
+	$(PYTHON) tools/kconfig_hooks.py && \
+	$(MAKE) host-dep
+
+.PHONY: config
+config:
+	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
+		echo "ERROR: must be run inside a Docker container!" >&2; \
+		echo "       Please run 'make docker' first"; \
+		exit 1; \
+	fi && \
+	if [ -z "$(CONFIG)" ]; then \
+		echo "ERROR: <CONFIG> parameter is required!" >&2; \
+		echo "" >&2; \
+		echo "Usage: make config CONFIG=<config-file>" >&2; \
+		exit 1; \
+	fi && \
+	if [ ! -f "$(CONFIG)" ]; then \
+		echo "ERROR: CONFIG file not found: $(CONFIG)" >&2; \
+		echo "" >&2; \
+		exit 1; \
+	fi && \
+	echo "==> Generating .config from $(CONFIG)" && \
+	$(PYTHON) tools/gen_config_from_file.py Kconfig $(CONFIG) && \
 	$(PYTHON) tools/kconfig_hooks.py && \
 	$(MAKE) host-dep
 

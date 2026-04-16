@@ -93,7 +93,7 @@ OPTION:
  -B, --bootpart     Specify boot partition number to override default (default boot partition is the first)
  -R, --rootpart     Specify root partition number to override default (default root partition is the last)
  -d, --device	    Device name of the target SD/USB/SATA storage drive in Linux
- -p, --partition    Customize configurable partitions of target disk, default is "-p 3P=512M:8G:-1" if not specified
+ -p, --partition    Customize configurable partitions of target disk, default is "-P 2P=512M:-1" if not specified
  -f, --firmware	    The composite firmware image to be programmed into SD card
  -F, --force        Force partition and format target disk regardless of the existing data in disk
  -m, --machine	    Target machine name to specify the name of composite firmware for automatical deployment
@@ -108,7 +108,7 @@ Examples for various usage scenarios:
   You can specify one or several of '-b <boot> -r <rootfs> -f <firmware> -u <url>' options to override the default settings
 
 - To only partition and format target SD/eMMC card or USB/SATA disk
-  $ flex-installer -i pf -d /dev/sdx                   (default 2 partitions as 2P=512M:-1)
+  $ flex-installer -i pf -d /dev/sdx                   (default 2 partitions as 2P=512M:-1, max 4 partitions supported)
   or
   $ flex-installer -i pf -d /dev/sdx -p 4P=800M:6G:8G:-1 (specify custom partitions as 4P=800M:6G:8G:-1)
 
@@ -172,8 +172,8 @@ calculate_partition_total_size() {
         elif [ ${n_p: -1} = M ]; then
             local size_mb=${n_p%?}
         else
-            print_e "Invalid partition size format: $n_p"
-            return 1
+            print_e "Invalid partition size format: $n_p" >&2
+            exit 1
         fi
 
         total_mb=$((total_mb + size_mb))
@@ -275,7 +275,8 @@ program_firmware_to_sd() {
 	offset=4
     fi
 
-    sudo dd if=$1 of=$2 bs=1k seek=$offset && sync
+    echo "Program $1"
+    sudo dd if="$1" of="$2" bs=1k seek="$offset" status=none conv=fsync
     print_d "Program $1 to $2 with offset ${offset}K"
 }
 
@@ -291,6 +292,12 @@ check_partition_number() {
     fi
     pnum=`echo $diskpartition | cut -d= -f1`
     pnum=${pnum%?}
+
+	# Check if partition number exceeds 4
+    if [ $pnum -gt 4 ]; then
+		print_e "ERROR: The number of partitions cannot exceed 4, but you specified $pnum partitions"
+		exit 1
+    fi
     partlistnum=$(echo $diskpartition | awk -F":" '{print NF-1}')
     partlistnum=$[ $partlistnum + 1 ]
     [ $pnum != $partlistnum ] && print_e "ERROR: You set $pnum partitions, but listed $partlistnum partitions" && exit || true
@@ -445,7 +452,7 @@ flex_install_distro() {
 	    dir)  sudo cp -rfp $rootfsimg_n/* $rootpartition;;
 	    tgz)  sudo tar xfm $rootfsimg_n -C $rootpartition;;
         zst)  zstd -dc "$rootfsimg_n" | sudo tar xfm - -C "$rootpartition" ;;
-	ext|wic)  sudo dd if=$rootfsimg_n of=$rootdev bs=4M && sync;;
+	ext|wic)  sudo dd if=$rootfsimg_n of=$rootdev bs=4M status=none conv=fsync && sync;;
 	cpio.gz)  mv $rootfsimg_n $rootpartition && cd $rootpartition && \
 		  gunzip $rootfsimg_n && cpio -idm < ${rootfsimg_n::-3} && cd -;;
 	    *)    echo format $rfsimgtype is not supported; exit
@@ -498,20 +505,39 @@ flex_install_distro() {
     fi
 }
 
-check_directory() {
-    if [ -z "$force_opt" -a ${devname:0:4} != loop ] && [ "`ls -A $1`" != "" -a "`ls -A $1`" != "lost+found" ]; then
-	print_w "\nNOTICE: Appears $1 contains the existing data"
-	read -t 180 -n 1 -p "Are you sure to drop the data in $1 partition to proceed now? [y/n] " rdresult && echo ""
-	[ -z "$rdresult" ] && rdresult=n
-	[ "$rdresult" != y -a "$rdresult" != n ] && echo $rdresult is invalid, valid: y or n && exit
-	if [ $rdresult = n ]; then
-	    print_w "\nPlease backup important data in $1 if needed, or force the installation with '-F' option" && exit
-	else
-	    echo Cleaning data in $1 && sudo rm -rf $1/*
-	fi
-    fi
-}
 
+check_directory() {
+	local dir_path=$1
+	local dev_name=""
+
+	# Map directory paths to device names
+	case "$dir_path" in
+		"$rootpartition")
+			dev_name=$rootdev
+			;;
+		"$backuppartition")
+			dev_name=$backupdev
+			;;
+		"$bootpartition")
+			dev_name=$bootdev
+			;;
+		*)
+			dev_name=$dir_path
+			;;
+	esac
+
+	if [ -z "$force_opt" -a ${devname:0:4} != loop ] && [ "`ls -A $dir_path`" != "" -a "`ls -A $dir_path`" != "lost+found" ]; then
+		print_w "\nNOTICE: Appears $dev_name contains the existing data"
+		read -t 180 -n 1 -p "Are you sure to drop the data in $dev_name partition to proceed now? [y/n] " rdresult && echo ""
+		[ -z "$rdresult" ] && rdresult=n
+		[ "$rdresult" != y -a "$rdresult" != n ] && echo $rdresult is invalid, valid: y or n && exit
+		if [ $rdresult = n ]; then
+			print_w "\nPlease backup important data in $dev_name if needed, or force the installation with '-F' option" && exit
+		else
+			echo "Cleaning data in $dev_name" && sudo rm -rf $dir_path/*
+		fi
+	fi
+}
 
 check_running_rfs() {
     if mount | grep -q "$1 on / type ext4"; then

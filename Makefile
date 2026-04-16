@@ -9,7 +9,6 @@ SHELL=/bin/bash
 DISTRIB_VERSION := lsdk2606
 DEFAULT_REPO_TAG := lf-6.12.49-2.2.0
 FBDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
-SCRIPTS_DIR := $(FBDIR)/scripts
 BLD := $(FBDIR)/tools/flex-builder
 FINST := $(FBDIR)/tools/flex-installer
 PYTHON := python3
@@ -17,9 +16,6 @@ DISTRO_SVR_URL := http://sun.ap.freescale.net/images/debian
 #DISTRO_SVR_URL := https://www.nxp.com/lgfiles/sdk
 DESTARCH := arm64
 DISTRIB_NAME := "NXP Debian Linux SDK"
-RELEASE_TYPE := external
-DEFAULT_OUT_PATH := $(FBDIR)/build_${DISTRIB_VERSION}
-DEFAULT_PKGDIR := $(FBDIR)/components_${DISTRIB_VERSION}
 DEBIAN_CODENAME := trixie
 DEBIAN_VERSION := 13
 
@@ -75,20 +71,16 @@ LOG_LEVEL=0
 endif
 
 export JOBS := $(CONFIG_JOBS)
-export BOOT_TYPE DEBIAN_VERSION DEFAULT_OUT_PATH DEFAULT_PKGDIR DEBIAN_CODENAME
+export DEBIAN_VERSION DEBIAN_CODENAME
 export SOCFAMILY DESTARCH DISTRIB_VERSION DEFAULT_REPO_TAG FBDIR DISTRO_SVR_URL
 export ARCH := arm64
-export SOCARCH := aarch64
-export SYSARCH := arm64
 export CROSS_COMPILE := aarch64-linux-gnu-
 export DISTROTYPE := debian
-export DEFAULT_SOC_FAMILY := IMX
 export DISTROVARIANT := server
 export FBOUTDIR := $(FBDIR)/build_$(DISTRIB_VERSION)
 export PKGDIR := $(FBDIR)/components_$(DISTRIB_VERSION)
 export DESTDIR := $(FBOUTDIR)/apps/apps_debian_$(MACHINE)
 export RFSDIR := $(FBOUTDIR)/rfs/rootfs_${DISTRIB_VERSION}_debian_$(MACHINE)
-export KERNEL_TREE := linux
 export MAKE := make
 export MAKEFLAGS += -j$(JOBS) --no-print-directory
 export KERNEL_PATH := $(PKGDIR)/linux/linux
@@ -261,11 +253,6 @@ help:
 ifneq ($(wildcard .config),)
 
 include configs/board/$(MACHINE).conf
-
-$(shell mkdir -p $(DESTDIR) $(RFSDIR) $(KERNEL_OUTPUT_PATH))
-$(shell mkdir -p $(FBOUTDIR)/bsp/u-boot/$(MACHINE))
-$(shell mkdir -p $(DESTDIR)/{etc,opt} $(DESTDIR)/usr/{lib,bin,include} $(DESTDIR)/usr/local/{lib,bin,include})
-
 
 CUSTOM_CONFIG := $(subst ",,$(strip $(CONFIG_CUSTOM_SDK_CONFIG)))
 SDK_YML := $(if $(CUSTOM_CONFIG),\

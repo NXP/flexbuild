@@ -8,7 +8,7 @@
 dl-kernel dl-linux:
 	@$(call download_repo,linux,linux)
 	$(call patch_apply,linux,linux)
-	$(call fbprint_b,"$(KERNEL_TREE) with $(KERNEL_BRANCH)")
+	$(call fbprint_b,"linux with $(KERNEL_BRANCH)")
 	mkdir -p $(KOUTDIR)/tmp
 	if [ -f "$(FBDIR)/configs/linux/$(CONFIG_LINUX_EXTRA_CONFIG)" ]; then \
 		cp -f "$(FBDIR)/configs/linux/$(CONFIG_LINUX_EXTRA_CONFIG)" $(KERNEL_PATH)/arch/arm64/configs/
@@ -36,7 +36,7 @@ linux $(KERNEL_IMAGE):
 	krelease=$$(cat "$(KOUTDIR)/include/config/kernel.release" 2>/dev/null)
 	rm -rf $(DESTDIR)/lib/modules/"$$krelease"/build
 	cp $(KOUTDIR)/arch/arm64/boot/dts/freescale/$(DTBSTR) $(KTGT_DIR)
-	$(call fbprint_d,"$(KERNEL_TREE) $(KERNEL_BRANCH) in $(KTGT_DIR)")
+	$(call fbprint_d,"linux $(KERNEL_BRANCH) in $(KTGT_DIR)")
 
 linux-headers $(KHEADER_FILE): $(KERNEL_IMAGE)
 	@$(call download_repo,linux,linux)

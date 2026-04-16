@@ -34,11 +34,16 @@ include src/apps/security/Makefile
 include src/apps/utils/Makefile
 include src/apps/robotics/Makefile
 
+.PHONY: prepare-app-dirs
+prepare-app-dirs:
+	@mkdir -p $(DESTDIR)/{etc,opt} 2>/dev/null || true
+	@mkdir -p $(DESTDIR)/usr/{lib,bin,include} 2>/dev/null || true
+	@mkdir -p $(DESTDIR)/usr/local/{lib,bin,include} 2>/dev/null || true
 
 ALL_APPS := $(APPS_GFX) $(APPS_MM) $(APPS_GP) $(APPS_UTILS) $(APPS_ML) $(APPS_SEC) $(APPS_NET) $(APPS_ROTOTICS)
 ALL_MODULES := $(GP_MODULES) $(GFX_MODULES) $(ML_MODULES) $(MM_MODULES) $(NET_MODULES) $(ROBOTICS_MODULES) $(SEC_MODULES) $(UTILS_MODULES)
 
-$(ALL_APPS): $(KHEADER_FILE) $(KERNEL_IMAGE) $(RFS_FILE)
+$(ALL_APPS): $(KHEADER_FILE) $(KERNEL_IMAGE) $(RFS_FILE) prepare-app-dirs
 .PHONY: apps
 apps: multimedia graphics networking security ml gopoint utils robotics
 	@$(call fbprint_d,"apps components")

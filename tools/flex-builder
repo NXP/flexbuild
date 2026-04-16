@@ -580,22 +580,26 @@ check_debian_version() {
 check_host_dependent_pkg() {
 	fbprint_n "Prepare the build environment on host "
 
+    show_one_line sudo apt-get autoclean && log_mute sudo apt-get update -y
+    show_one_line sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${host_dependent_packages[@]}"
+
     if [ ! -f ~/.gitconfig ] || [[ ! `grep 'name =' ~/.gitconfig` ]]; then
-        git config --global user.email  "`whoami`@nxp.com"
-        git config --global user.name "`whoami`"
+        echo [user] > ~/.gitconfig
+        echo "        name = `whoami`" >> ~/.gitconfig
+        echo "        email = `whoami`@`hostname`.com" >> ~/.gitconfig
         if [ -n "$http_proxy" ] && [[ ! `grep 'proxy =' ~/.gitconfig` ]]; then
-            git config --global http.proxy $http_proxy
-            git config --global https.proxy $https_proxy
+            echo "[http]" >> ~/.gitconfig
+            echo "        proxy = $http_proxy" >> ~/.gitconfig
+            echo "[https]" >> ~/.gitconfig
+            echo "        proxy = $https_proxy" >> ~/.gitconfig
         fi
-        git config --global --add safe.directory '*'
     fi
+    [ `hostname` = fbdebian ] && git config --global --add safe.directory $FBDIR
     [ `hostname` = fbdebian ] && nflag=.deppkgdonefbdeb || nflag=.deppkgdone
     check_toolchain && touch $FBDIR/logs/$nflag
 
     # for creating .deb package
-    if ! command -v fpm >/dev/null 2>&1; then
-        log_mute gem install fpm
-    fi
+    log_mute gem install fpm
 
     # for imx95 m core toolchain
     if [ ! -d /usr/arm-gnu-toolchain-14.2.rel1-x86_64-arm-none-eabi/bin ] && [[ "$MACHINE" =~ ^imx(95|94) ]]; then

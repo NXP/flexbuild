@@ -40,7 +40,7 @@ imx_g2d_samples: $(DEP_G2D)
 	export SDKTARGETSYSROOT=$(RFSDIR)
 	export CFLAGS="-I$(DESTDIR)/usr/include"
 	export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-rpath-link=$(DESTDIR)/usr/lib"
-	$(MAKE) clean $(LOG_MUTE)
+	$(MAKE) clean $(LOG_MUTE) || :
 	$(MAKE) $(LOG_MUTE)
 	$(MAKE) install DESTDIR=$(DESTDIR) $(LOG_MUTE)
 	$(call fbprint_d,"imx_g2d_samples")

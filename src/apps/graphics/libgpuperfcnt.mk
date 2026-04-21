@@ -13,7 +13,7 @@ libgpuperfcnt:
 	if [ ! -d "$(GRAPHICSDIR)"/libgpuperfcnt ]; then
 		chmod +x $(FBDIR)/dl/libgpuperfcnt.bin
 		$(FBDIR)/dl/libgpuperfcnt.bin --auto-accept --force $(LOG_MUTE)
-		mv libgpuperfcnt-* libgpuperfcnt
+		mv $(basename $(notdir $(repo_libgpuperfcnt_bin_url))) libgpuperfcnt
 	fi
 	$(call fbprint_b,"libgpuperfcnt")
 	cp -Prf libgpuperfcnt/usr $(DESTDIR)

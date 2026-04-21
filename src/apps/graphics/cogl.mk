@@ -27,6 +27,7 @@ cogl: $(DEP_COGL) libdrm wayland_protocols
 	@$(call download_repo,cogl,apps/graphics,submod)
 	 $(call patch_apply,cogl,apps/graphics)
 	 $(call fbprint_b,"cogl")
+	 rm -rf $(COGL_BUILDDIR)
 	 mkdir -p $(COGL_BUILDDIR)
 	 cd $(COGL_BUILDDIR)
 	 export CROSS=$(CROSS_COMPILE)

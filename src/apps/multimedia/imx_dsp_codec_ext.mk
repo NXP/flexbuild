@@ -21,7 +21,7 @@ imx_dsp_codec_ext:
 	if [ ! -d "$(MMDIR)"/imx_dsp_codec_ext ]; then
 		chmod +x $(FBDIR)/dl/imx_dsp_codec_ext.bin
 		$(FBDIR)/dl/imx_dsp_codec_ext.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-dsp-codec-ext* imx_dsp_codec_ext
+		mv $(basename $(notdir $(repo_imx_dsp_codec_ext_bin_url))) imx_dsp_codec_ext
 	fi
 	$(call fbprint_b,"imx_dsp_codec_ext")
 	cd imx_dsp_codec_ext

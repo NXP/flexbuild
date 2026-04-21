@@ -11,7 +11,7 @@ firmware_imx:
 	if [ ! -d "$(UTILSDIR)"/firmware_imx ]; then
 		chmod +x "$(FBDIR)"/dl/firmware_imx.bin
 		"$(FBDIR)"/dl/firmware_imx.bin --auto-accept --force $(LOG_MUTE)
-		mv firmware-imx-* firmware_imx
+		mv $(basename $(notdir $(repo_firmware_imx_bin_url))) firmware_imx
 	fi
 	cd $(UTILSDIR)/firmware_imx
 	mkdir -p $(DESTDIR)/lib/firmware/imx

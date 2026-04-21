@@ -11,7 +11,7 @@ gpu_viv:
 	if [ ! -d "$(GRAPHICSDIR)"/gpu_viv ]; then
 		chmod +x $(FBDIR)/dl/gpu_viv.bin
 		$(FBDIR)/dl/gpu_viv.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-gpu-* gpu_viv
+		mv $(basename $(notdir $(repo_gpu_viv_bin_url))) gpu_viv
 	fi
 	$(call fbprint_b,"gpu_viv ")
 	cd $(GRAPHICSDIR)/gpu_viv

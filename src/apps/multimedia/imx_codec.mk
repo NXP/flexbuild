@@ -14,7 +14,7 @@ imx_codec:
 	if [ ! -d "$(MMDIR)"/imx_codec ]; then
 		chmod +x $(FBDIR)/dl/imx_codec.bin
 		$(FBDIR)/dl/imx_codec.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-codec* imx_codec
+		mv $(basename $(notdir $(repo_imx_codec_bin_url))) imx_codec
 	fi
 	$(call fbprint_b,"imx_codec")
 	cd imx_codec

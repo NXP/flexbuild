@@ -13,7 +13,7 @@ imx_dspc_asrc:
 	if [ ! -d "$(MMDIR)"/imx_dspc_asrc ]; then
 		chmod +x $(FBDIR)/dl/imx_dspc_asrc.bin
 		$(FBDIR)/dl/imx_dspc_asrc.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-dspc-asrc* imx_dspc_asrc
+		mv $(basename $(notdir $(repo_imx_dspc_asrc_bin_url))) imx_dspc_asrc
 	fi
 	$(call fbprint_b,"imx_dspc_asrc")
 	cd imx_dspc_asrc

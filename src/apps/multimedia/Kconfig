@@ -186,7 +186,7 @@ config MM_IMX_VPUWRAP
 config MM_LIBCAMERA
 	bool "libcamera framework"
 	default y
-	depends on MM_GSTREAMER && MM_GST_PLUGINS_BASE
+	depends on MM_GSTREAMER && MM_GST_PLUGINS_BASE && GFX_LIBDRM
     depends on (SOC_IMX8 && GFX_GPU_VIV) || (SOC_IMX95 && GFX_MALI_IMX)
 	help
 	  Modern camera support library for Linux

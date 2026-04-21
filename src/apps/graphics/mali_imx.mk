@@ -12,7 +12,7 @@ mali_imx:
 	if [ ! -d $(GRAPHICSDIR)/mali_imx ]; then
 		chmod a+x $(FBDIR)/dl/mali_imx.bin
 		$(FBDIR)/dl/mali_imx.bin --auto-accept --force $(LOG_MUTE)
-		mv mali-imx-* mali_imx && rm -f mali_imx.bin
+		mv $(basename $(notdir $(repo_mali_imx_bin_url))) mali_imx && rm -f mali_imx.bin
 	fi
 	cd $(GRAPHICSDIR)/mali_imx
 	mkdir -p $(DESTDIR)/etc $(DESTDIR)/usr $(RFSDIR)/usr

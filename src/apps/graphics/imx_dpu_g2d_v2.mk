@@ -8,13 +8,13 @@
 # DEPENDS: libgal-imx libdrm
 
 
-imx_dpu_g2d_v2:
+imx_dpu_g2d_v2: libdrm
 	@$(call dl_by_wget,imx_dpu_g2d_bin_v2,imx_dpu_g2d_v2.bin)
 	cd $(GRAPHICSDIR)
 	if [ ! -d "$(GRAPHICSDIR)"/imx_dpu_g2d_v2 ]; then \
 		chmod +x $(FBDIR)/dl/imx_dpu_g2d_v2.bin; \
 		$(FBDIR)/dl/imx_dpu_g2d_v2.bin --auto-accept --force $(LOG_MUTE); \
-		mv imx-dpu-g2d-* imx_dpu_g2d_v2; \
+		mv $(basename $(notdir $(repo_imx_dpu_g2d_bin_v2_url))) imx_dpu_g2d_v2; \
 	fi
 	$(call fbprint_b,"imx_dpu_g2d_v2")
 	cd imx_dpu_g2d_v2

@@ -14,7 +14,7 @@ else
 endif
 
 #libcamera:
-libcamera: gstreamer gst_plugins_base $(DEP_LIBCAM)
+libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 	@$(call download_repo,libcamera,apps/multimedia)
 	 $(call patch_apply,libcamera,apps/multimedia)
 	 $(call fbprint_b,"libcamera")

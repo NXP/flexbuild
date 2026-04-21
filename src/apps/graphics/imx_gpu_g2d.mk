@@ -13,7 +13,7 @@ imx_gpu_g2d: libdrm
 	if [ ! -d "$(GRAPHICSDIR)"/imx_gpu_g2d ]; then
 		chmod +x $(FBDIR)/dl/imx_gpu_g2d.bin
 		$(FBDIR)/dl/imx_gpu_g2d.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-gpu-g2d-* imx_gpu_g2d
+		mv $(basename $(notdir $(repo_imx_gpu_g2d_bin_url))) imx_gpu_g2d
 	fi
 	$(call fbprint_b,"imx_gpu_g2d")
 	cd imx_gpu_g2d

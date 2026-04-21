@@ -9,13 +9,13 @@
 # High Perf 2D Blit Engine -> imx-dpu-g2d-v1: imx8dxp imx8dx imx8qp imx8qm
 
 
-imx_dpu_g2d_v1:
+imx_dpu_g2d_v1: libdrm
 	@$(call dl_by_wget,imx_dpu_g2d_bin_v1,imx_dpu_g2d_v1.bin)
 	cd $(GRAPHICSDIR)
 	if [ ! -d "$(GRAPHICSDIR)"/imx_dpu_g2d_v1 ]; then
 		chmod +x $(FBDIR)/dl/imx_dpu_g2d_v1.bin
 		$(FBDIR)/dl/imx_dpu_g2d_v1.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-dpu-g2d-* imx_dpu_g2d_v1
+		mv $(basename $(notdir $(repo_imx_dpu_g2d_bin_v1_url))) imx_dpu_g2d_v1
 	fi
 	$(call fbprint_b,"imx_dpu_g2d_v1")
 	cd imx_dpu_g2d_v1

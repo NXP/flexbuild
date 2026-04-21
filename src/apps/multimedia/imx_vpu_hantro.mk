@@ -14,7 +14,7 @@ imx_vpu_hantro: $(KHEADER_FILE)
 	if [ ! -d "$(MMDIR)"/imx_vpu_hantro ]; then
 		chmod +x $(FBDIR)/dl/vpu_hantro.bin
 		$(FBDIR)/dl/vpu_hantro.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-vpu-hantro-* imx_vpu_hantro
+		mv $(basename $(notdir $(repo_vpu_hantro_bin_url))) imx_vpu_hantro
 	fi
 	$(call fbprint_b,"imx_vpu_hantro")
 	cd imx_vpu_hantro

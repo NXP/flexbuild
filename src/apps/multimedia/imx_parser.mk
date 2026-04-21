@@ -12,7 +12,7 @@ imx_parser:
 	if [ ! -d "$(MMDIR)"/imx_parser ]; then
 		chmod +x $(FBDIR)/dl/imx_parser.bin
 		$(FBDIR)/dl/imx_parser.bin --auto-accept --force $(LOG_MUTE)
-		mv imx-parser-* imx_parser
+		mv $(basename $(notdir $(repo_imx_parser_bin_url))) imx_parser
 	fi
 	$(call fbprint_b,"imx_parser")
 	cd imx_parser

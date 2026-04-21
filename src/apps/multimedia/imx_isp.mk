@@ -15,7 +15,7 @@ imx_isp: imx_gpu_g2d gpu_viv libdrm $(KHEADER_FILE)
 	if [ ! -d "$(MMDIR)"/imx_isp ]; then
 		chmod +x $(FBDIR)/dl/imxisp.bin
 		$(FBDIR)/dl/imxisp.bin --auto-accept --force $(LOG_MUTE)
-		mv isp-imx-* imx_isp
+		mv $(basename $(notdir $(repo_imx_isp_bin_url))) imx_isp
 	fi
 	$(call fbprint_b,"imx_isp")
 	cd imx_isp/appshell

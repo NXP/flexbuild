@@ -19,16 +19,9 @@ imx_dsp:
 	@$(call dl_by_wget,imx_dsp_bin,imx_dsp.bin)
 	cd $(MMDIR)
 	if [ ! -d "$(MMDIR)"/imx_dsp ]; then
-		rm -rf imx-dsp-*
 		chmod +x $(FBDIR)/dl/imx_dsp.bin
 		$(FBDIR)/dl/imx_dsp.bin --auto-accept --force $(LOG_MUTE)
-		set -- imx-dsp-*
-		if [ ! -e "$$1" ]; then
-			echo "ERROR: 'imx-dsp-*' not found under $(MMDIR)"
-			exit 1
-		fi
-		rm -rf imx_dsp
-		mv -fT -- "$$1" imx_dsp
+		mv $(basename $(notdir $(repo_imx_dsp_bin_url))) imx_dsp
 	fi
 	$(call fbprint_b,"imx_dsp")
 	cd "$(MMDIR)"/imx_dsp

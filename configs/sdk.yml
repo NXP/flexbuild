@@ -22,11 +22,11 @@ repo:
 
   mc_utils:
     url:  https://github.com/nxp-qoriq/mc-utils.git
-    tag:  mc_release_10.39.0
+    tag:  mc_release_10.40.0
 
   mc_bin:
     url:  https://github.com/nxp-qoriq/qoriq-mc-binary.git
-    tag:  mc_release_10.39.0
+    tag:  mc_release_10.40.0
 
   ddr_phy_bin:
     url:  https://github.com/nxp-qoriq/ddr-phy-binary.git
@@ -158,7 +158,7 @@ repo:
 
   pktgen_dpdk:
     url:  https://github.com/pktgen/pktgen-dpdk.git
-    tag:  pktgen-23.06.1
+    tag:  pktgen-26.02.4
 
   mtcp_dpdk:
     url:  https://github.com/nxpmicro/mtcp.git

@@ -58,28 +58,38 @@ define rawgit
 	rm -rf /tmp/$(1) && \
 	echo "[INFO] Package created: $(1)_$(3).tar.gz" $(LOG_MUTE)
 endef
-
 #
 # $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.gz only}
 #
-define download_repo
+define _download_repo_logic
 	_URL=$(repo_$(1)_url) && \
 	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)) && \
 	\
 	if [ -z "$${_URL}" ]; then \
-		echo $${_URL} is not defined ; exit 1; \
+		echo $(1) url is not defined ; exit 1; \
 	fi && \
 	if [ -z "$${_VER}" ]; then \
-		echo Repo version $${_VER}is not defined ; exit 1; \
+		echo Repo $(1) version is not defined ; exit 1; \
 	fi && \
 	\
 	mkdir -p $(PKGDIR)/$(2) && \
 	_PKG_FILE=${FBDIR}/dl/${1}_$${_VER}.tar.gz && \
 	_TARGET_DIR=$(PKGDIR)/$(2)/$(1) && \
 	\
+	_NEED_DOWNLOAD=0 && \
 	if [ -s "$${_PKG_FILE}" ]; then \
-		echo "[INFO] Package exists: $(1)_$${_VER} " $(LOG_MUTE); \
+		if tar -tzf "$${_PKG_FILE}" >/dev/null 2>&1; then \
+			echo "[INFO] Package exists and valid: $(1)_$${_VER} " $(LOG_MUTE); \
+		else \
+			echo "[WARN] Package corrupted, re-downloading: $(1)_$${_VER}"; \
+			rm -f "$${_PKG_FILE}"; \
+			_NEED_DOWNLOAD=1; \
+		fi \
 	else \
+		_NEED_DOWNLOAD=1; \
+	fi && \
+	\
+	if [ "$${_NEED_DOWNLOAD}" = "1" ]; then \
 		if [ "$(CONFIG_KEEP_GIT)" = "y" ]; then \
 			$(call rawgit,$(1),$${_URL},$${_VER},git) || { echo "Global git clone failed"; exit 1; }; \
 		else \
@@ -100,6 +110,15 @@ define download_repo
 	fi
 endef
 
+#
+# wrap the download_repo command with flock protection for parallel builds
+# $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.gz only}
+#
+define download_repo
+	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG)) && \
+	mkdir -p $(FBDIR)/dl $(FBDIR)/logs && \
+	flock $(FBDIR)/logs/.$(1)_$${_VER}.tar.gz.flock -c '$(subst ','\'',$(call _download_repo_logic,$(1),$(2),$(3)))'
+endef
 
 #
 # $1=package_name $2=dir
@@ -121,12 +140,10 @@ endef
 #
 
 WGET := wget --no-check-certificate --tries=3 --timeout=100 --continue --progress=bar --no-verbose --show-progress
-
 #
-# wrap the wget command, MD5SUM check ??
 # $1=package_link_name $2=package_target_name
 #
-define dl_by_wget
+define _dl_by_wget_logic
 	if [ -f $(FBDIR)/dl/$(2) ]; then \
 		echo "[INFO] $(1) already exists" $(LOG_MUTE); \
 	else \
@@ -134,9 +151,6 @@ define dl_by_wget
 		mkdir -p $(FBDIR)/dl /tmp && \
 		rm -f /tmp/$(2) && \
 		$(WGET) $(repo_$(1)_url)  -O /tmp/$(2) $(LOG_MUTE) || { echo "Download $1 error"; exit 1; } && \
-		if [ $$? -ne 0 ]; then \
-			echo "Downloading $(1) failed." && exit 1; \
-		fi && \
 		if [ -z "$(repo_$(1)_md5)" ]; then \
 			echo "[WARN] No expected MD5 for $(1); skip checksum." $(LOG_MUTE); \
 		else \
@@ -151,4 +165,11 @@ define dl_by_wget
 		echo "[INFO] Downloading Done" $(LOG_MUTE); \
 	fi
 endef
-
+#
+# wrap the wget command with flock protection for parallel builds
+# $1=package_link_name $2=package_target_name
+#
+define dl_by_wget
+	mkdir -p $(FBDIR)/dl $(FBDIR)/logs && \
+	flock $(FBDIR)/logs/.$(2).flock -c '$(subst ','\'',$(call _dl_by_wget_logic,$(1),$(2)))'
+endef

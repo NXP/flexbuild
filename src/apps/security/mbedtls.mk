@@ -37,5 +37,5 @@ mbedtls:
 	install -d $(DESTDIR)/usr/lib/mbedtls/ptest/framework
 	cp -f build/tests/test_suite_* $(DESTDIR)/usr/lib/mbedtls/ptest/tests/
 	find $(DESTDIR)/usr/lib/mbedtls/ptest/tests/ -type f -name "*.c" -delete
-	cp -fR framework/data_files $(DESTDIR)/usr/lib/mbedtls/ptest/framework/
+	cp -af framework/data_files $(DESTDIR)/usr/lib/mbedtls/ptest/framework/
 	$(call fbprint_d,"mbedtls")

@@ -19,5 +19,5 @@ wireless_regdb:
 	mkdir -p $(DESTDIR)/lib/firmware
 	cd "$(UTILSDIR)"/wireless_regdb
 	rm -f $1/firmware/regulatory.*
-	cp -Prf regulatory.* $(DESTDIR)/lib/firmware
+	cp -af regulatory.* $(DESTDIR)/lib/firmware
 	$(call fbprint_d,"wireless_regdb")

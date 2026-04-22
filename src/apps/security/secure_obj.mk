@@ -34,10 +34,11 @@ secure_obj: optee_os optee_client openssl
 	 mkdir -p $(DESTDIR)/usr/local/secure_obj/$(KERNEL_BRANCH)
 	 mkdir -p $(DESTDIR)/usr/lib/aarch64-linux-gnu/openssl-1.0.0/engines
 	 mkdir -p $(DESTDIR)/usr/lib/optee_armtz
+	 mkdir -p $(DESTDIR)/usr/local/lib $(DESTDIR)/usr/local/bin $(DESTDIR)/usr/local/include
 	 MAKEFLAGS=-j1 ./compile.sh $(LOG_MUTE)
-	 cp images/libeng_secure_obj.so $(DESTDIR)/usr/lib/aarch64-linux-gnu/openssl-1.0.0/engines
-	 cp images/*.ta $(DESTDIR)/usr/lib/optee_armtz
-	 cp images/*.so $(DESTDIR)/usr/local/lib
-	 cp images/{*_app,mp_verify} $(DESTDIR)/usr/local/bin
-	 cp -rf securekey_lib/include/* $(DESTDIR)/usr/local/include
+	 cp -f images/libeng_secure_obj.so $(DESTDIR)/usr/lib/aarch64-linux-gnu/openssl-1.0.0/engines
+	 cp -f images/*.ta $(DESTDIR)/usr/lib/optee_armtz
+	 cp -f images/*.so $(DESTDIR)/usr/local/lib
+	 cp -f images/{*_app,mp_verify} $(DESTDIR)/usr/local/bin
+	 cp -af securekey_lib/include/* $(DESTDIR)/usr/local/include
 	 $(call fbprint_d,"secure_obj")

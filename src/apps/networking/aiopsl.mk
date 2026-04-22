@@ -11,7 +11,7 @@ aiopsl:
 	 $(call fbprint_b,"aiopsl")
 	 cd $(NETDIR)/aiopsl
 	 mkdir -p $(DESTDIR)/usr/local/aiop/bin
-	 cp -rf misc/setup/scripts $(DESTDIR)/usr/local/aiop
-	 cp -rf misc/setup/traffic_files $(DESTDIR)/usr/local/aiop
-	 cp -rf demos/images/* $(DESTDIR)/usr/local/aiop/bin
+	 cp -af misc/setup/scripts $(DESTDIR)/usr/local/aiop
+	 cp -af misc/setup/traffic_files $(DESTDIR)/usr/local/aiop
+	 cp -af demos/images/* $(DESTDIR)/usr/local/aiop/bin
 	 $(call fbprint_d,"aiopsl")

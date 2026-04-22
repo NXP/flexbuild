@@ -16,6 +16,7 @@ spc:
 		 LIBXML2_HEADER_PATH=$$xmlhdr \
 		 TCLAP_HEADER_PATH=$(RFSDIR)/usr/include \
 		 NET_USPACE_HEADER_PATH=$(NETDIR)/spc/source/include/net $(LOG_MUTE)
-	 cp -rf $(NETDIR)/spc/source/spc $(DESTDIR)/usr/local/bin
-	 cp -rf $(NETDIR)/spc/etc $(DESTDIR)
+	 mkdir -p $(DESTDIR)/usr/local/bin
+	 cp -af $(NETDIR)/spc/source/spc $(DESTDIR)/usr/local/bin
+	 cp -af $(NETDIR)/spc/etc $(DESTDIR)/
 	 $(call fbprint_d,"spc")

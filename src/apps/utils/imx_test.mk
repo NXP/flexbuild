@@ -10,7 +10,7 @@ IMX_TEST_PLAT = IMX8
 imx_test: libdrm alsa_lib
 	@$(call download_repo,imx_test,apps/utils)
 	 $(call patch_apply,imx_test,apps/utils)
-	 sudo cp -rf $(DESTDIR)/usr/include/alsa $(RFSDIR)/usr/include
+	 cp -af $(DESTDIR)/usr/include/alsa $(RFSDIR)/usr/include
 	 $(call fbprint_b,"imx_test")
 	 cd $(UTILSDIR)/imx_test
 	 mkdir -p $(DESTDIR)/opt/unit_tests

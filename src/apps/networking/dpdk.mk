@@ -45,9 +45,10 @@ dpdk:
 		-Ddrivers_install_subdir= \
 		--cross-file=meson.cross $(LOG_MUTE)
 	 DESTDIR=$(DESTDIR) ninja -C $$build_dir install $(LOG_MUTE)
-	 cd $$build_dir/examples && find . -perm -111 -a -type f | xargs -I {} cp {} $(DESTDIR)/usr/local/bin
+	 mkdir -p $(DESTDIR)/usr/local/bin $(DESTDIR)/usr/include
+	 cd $$build_dir/examples && find . -perm -111 -a -type f | xargs -I {} cp -f {} $(DESTDIR)/usr/local/bin
 	 cd - $(LOG_MUTE) && mkdir -p $(DESTDIR)/usr/local/dpdk
-	 cp -rf $(NETDIR)/dpdk/nxp/* $(DESTDIR)/usr/local/dpdk
+	 cp -af $(NETDIR)/dpdk/nxp/* $(DESTDIR)/usr/local/dpdk
 	 cp -f $(NETDIR)/dpdk/drivers/bus/pci/bus_pci_driver.h $(DESTDIR)/usr/include
 	 $(CROSS_COMPILE)strip $(DESTDIR)/usr/local/bin/dpdk-*
 	 ln -sf $$build_dir/rte_build_config.h rte_build_config.h

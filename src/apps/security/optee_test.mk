@@ -17,9 +17,9 @@ optee_test: optee_client optee_os
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 $(MAKE) CFG_ARM64=y OPTEE_CLIENT_EXPORT=$(DESTDIR)/usr \
 	         TA_DEV_KIT_DIR=$(SECDIR)/optee_os/out/arm-plat-"$$socfamily"/export-ta_arm64 $(LOG_MUTE)
-	 mkdir -p $(DESTDIR)/usr/lib/optee_armtz
-	 cp $(SECDIR)/optee_test/out/ta/*/*.ta $(DESTDIR)/usr/lib/optee_armtz
-	 cp $(SECDIR)/optee_test/out/xtest/xtest $(DESTDIR)/usr/bin
+	 mkdir -p $(DESTDIR)/usr/lib/optee_armtz $(DESTDIR)/usr/bin
+	 cp -f $(SECDIR)/optee_test/out/ta/*/*.ta $(DESTDIR)/usr/lib/optee_armtz
+	 cp -f $(SECDIR)/optee_test/out/xtest/xtest $(DESTDIR)/usr/bin
 	 mkdir -p $(DESTDIR)/usr/lib/tee-supplicant/plugins
-	 cp $(SECDIR)/optee_test/out/supp_plugin/*.plugin $(DESTDIR)/usr/lib/tee-supplicant/plugins/
+	 cp -f $(SECDIR)/optee_test/out/supp_plugin/*.plugin $(DESTDIR)/usr/lib/tee-supplicant/plugins/
 	 $(call fbprint_d,"optee_test")

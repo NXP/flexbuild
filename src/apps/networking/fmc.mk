@@ -13,7 +13,7 @@ fmc: fmlib
 	 $(call patch_apply,eth_config,apps/networking)
 	 if [ ! -d $(DESTDIR)/etc/fmc/config ]; then
 	     mkdir -p $(DESTDIR)/etc/fmc/config
-	     cp -rf $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config
+	     cp -af $(NETDIR)/eth_config/private $(NETDIR)/eth_config/shared_mac $(DESTDIR)/etc/fmc/config
 	 fi
 	 xmlhdr=$(RFSDIR)/usr/include/libxml2
 	 $(call fbprint_b,"fmc")

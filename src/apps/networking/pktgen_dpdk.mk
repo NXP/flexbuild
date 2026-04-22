@@ -18,7 +18,8 @@ pktgen_dpdk: dpdk
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 sed -i 's/-march=armv8-a+crc+crypto/-march=armv8-a/g' meson.cross
-	 sudo cp -ra $(DESTDIR)/usr/lib/librte* $(RFSDIR)/usr/lib/
+	 mkdir -p $(RFSDIR)/usr/lib
+	 cp -af $(DESTDIR)/usr/lib/librte* $(RFSDIR)/usr/lib/
 	 build_dir=build_$(DISTROTYPE)_$(ARCH)
 	 meson setup $$build_dir \
 		-Dc_args="-DRTE_FORCE_INTRINSICS -I$(DESTDIR)/usr/include -Wno-error=mismatched-dealloc \
@@ -28,5 +29,6 @@ pktgen_dpdk: dpdk
 		--prefix=$(DESTDIR)/usr --buildtype=release \
 		--cross-file meson.cross $(LOG_MUTE)
 	 DESTDIR=$(DESTDIR) ninja -C $$build_dir $(LOG_MUTE)
+	 mkdir -p ${DESTDIR}/usr/bin
 	 install -m 755 $$build_dir/app/pktgen Pktgen.lua ${DESTDIR}/usr/bin
 	 $(call fbprint_d,"pktgen_dpdk")

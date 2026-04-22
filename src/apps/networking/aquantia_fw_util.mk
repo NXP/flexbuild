@@ -10,5 +10,6 @@ aquantia_fw_util:
 	 $(call fbprint_b,"aquantia_fw_util")
 	 cd $(NETDIR)/aquantia_fw_util
 	 $(MAKE) $(LOG_MUTE)
+	 mkdir -p $(DESTDIR)/usr/local/bin
 	 cp -f aq-firmware-tool $(DESTDIR)/usr/local/bin
 	 $(call fbprint_d,"aquantia_fw_util")

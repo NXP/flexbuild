@@ -13,5 +13,5 @@ perf:
 		-L$(RFSDIR)/usr/lib/aarch64-linux-gnu" \
 		$(LOG_MUTE)
 	mkdir -p $(DESTDIR)/usr/bin/
-	cp $(KOUTDIR)/tools/perf/perf $(DESTDIR)/usr/bin/
+	cp -f $(KOUTDIR)/tools/perf/perf $(DESTDIR)/usr/bin/
 	$(call fbprint_d,"kernel tools/perf")

@@ -34,5 +34,5 @@ mcore_demo:
 		mv $${_NAME}-* $${_NAME}
 	fi
 	mkdir -p $(DESTDIR)/lib/firmware
-	cp -Prf ./$${_NAME}/$${_SOC}* $(DESTDIR)/lib/firmware
+	cp -af ./$${_NAME}/$${_SOC}* $(DESTDIR)/lib/firmware
 	$(call fbprint_d,"mcore_demo")

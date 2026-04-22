@@ -7,8 +7,8 @@ ovs_dpdk: dpdk
 	@$(call download_repo,ovs_dpdk,apps/networking)
 	 $(call patch_apply,ovs_dpdk,apps/networking)
 	 if [ ! -f $(RFSDIR)/usr/include/rte_config.h ]; then
-		sudo cp -Pf $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/
-		sudo cp -rf $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/
+		cp -af $(DESTDIR)/usr/include/rte_*.h $(RFSDIR)/usr/include/
+		cp -af $(DESTDIR)/usr/include/generic $(RFSDIR)/usr/include/
 	 fi
 	 $(call fbprint_b,"ovs_dpdk")
 	 cd $(NETDIR)/ovs_dpdk

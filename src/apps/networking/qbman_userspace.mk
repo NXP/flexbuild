@@ -13,6 +13,7 @@ qbman_userspace:
 	 export PREFIX=/usr
 	 export ARCH=aarch64
 	 $(MAKE) $(LOG_MUTE)
+	 mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include
 	 cp -f lib_aarch64_static/libqbman.a $(DESTDIR)/usr/lib
 	 cp -f include/*.h $(DESTDIR)/usr/include
 	 $(call fbprint_d,"qbman_userspace")

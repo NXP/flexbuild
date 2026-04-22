@@ -30,7 +30,8 @@ tim_vx: gpu_viv
 		-DTIM_VX_USE_EXTERNAL_OVXLIB=off $(LOG_MUTE)
 	 cmake --build $(MLDIR)/tim_vx/build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE)
 	 $(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so
-	 cp build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so $(DESTDIR)/usr/lib
+	 mkdir -p $(DESTDIR)/usr/lib
+	 cp -f build_$(DISTROTYPE)_$(ARCH)/src/tim/libtim-vx.so $(DESTDIR)/usr/lib
 	 install -d $(DESTDIR)/usr/include/tim
-	 cp -rf $(MLDIR)/tim_vx/include/tim/{transform,vx} $(DESTDIR)/usr/include/tim
+	 cp -af $(MLDIR)/tim_vx/include/tim/{transform,vx} $(DESTDIR)/usr/include/tim
 	 $(call fbprint_d,"tim_vx")

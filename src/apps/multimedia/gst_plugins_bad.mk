@@ -23,15 +23,16 @@ gst_plugins_bad: gst_plugins_base
 	 $(call fbprint_b,"gst_plugins_bad")
 	 rm -rf build_$(DISTROTYPE)_$(ARCH)
 	 if [ -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so ]; then
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1}
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so}
-	     sudo rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}
+	     rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstbase-1.0.so,libgstbase-1.0.so.0,libgbm.so,libgbm.so.1}
+	     rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstallocators-1.0.so}
+	     rm -f $(RFSDIR)/lib/aarch64-linux-gnu/{libgstvideo-1.0.so,libgstvideo-1.0.so.0,libgstaudio-1.0.so.0}
 	 fi
-	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib
-	 sudo cp -rf $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/
-	 sudo cp -rf $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include
-	 sudo cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/
-	 sudo cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/
+	 mkdir -p $(RFSDIR)/usr/include $(RFSDIR)/usr/lib/gstreamer-1.0
+	 cp -af $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib
+	 cp -af $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/
+	 cp -af $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include
+	 cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/
+	 cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-O2 -pipe -g -feliminate-unused-debug-types \
 			  -I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/lib/gstreamer-1.0/include \

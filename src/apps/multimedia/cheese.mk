@@ -19,8 +19,9 @@ cheese: clutter_gst gst_plugins_bad
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 $(call fbprint_b,"cheese")
-	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstallocators-1.0.so.0
-	 sudo cp -rf $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include
+	 rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libgstallocators-1.0.so.0
+	 mkdir -p $(RFSDIR)/usr/include
+	 cp -af $(DESTDIR)/usr/include/cogl $(RFSDIR)/usr/include
 	 rm -rf build_$(DISTROTYPE)_$(ARCH)
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		-Dc_args="-I$(DESTDIR)/usr/include/gstreamer-1.0 -I$(DESTDIR)/usr/include \

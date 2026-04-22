@@ -16,7 +16,7 @@ sof_zephyr:
 	fi
 	cd $(MMDIR)/sof_zephyr
 	mkdir -p $(DESTDIR)/lib/firmware/imx
-	cp -Prf sof* $(DESTDIR)/lib/firmware/imx
+	cp -af sof* $(DESTDIR)/lib/firmware/imx
 	if [ "$(CONFIG_SOC_IMX95)" = "y" ]; then
 		rm -f $(DESTDIR)/lib/firmware/imx/sof
 		ln -sf sof-zephyr-gcc $(DESTDIR)/lib/firmware/imx/sof

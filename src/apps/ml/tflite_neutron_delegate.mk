@@ -16,7 +16,7 @@ tflite_neutron_delegate: tflite neutron
 	export CFLAGS="-O2 -pipe -g -fPIC -feliminate-unused-debug-types -I$(DESTDIR)/usr/include"
 	export CMAKE_TLS_VERIFY=0
 	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
-	mkdir -p $(RFSDIR)/usr/include/neutron
+	mkdir -p $(RFSDIR)/usr/include/neutron $(RFSDIR)/usr/lib/
 	cp -f $(DESTDIR)/usr/include/neutron/* $(RFSDIR)/usr/include/neutron
 	cp -f $(DESTDIR)/usr/lib/libNeutronDriver* $(RFSDIR)/usr/lib/
 	cd $(MLDIR)/tflite_neutron_delegate

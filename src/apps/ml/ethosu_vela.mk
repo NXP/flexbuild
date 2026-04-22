@@ -18,7 +18,7 @@ ethosu_vela:
 	 cd $(MLDIR)/ethosu_vela
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -I$(RFSDIR)/usr/include/python3.13"
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu"
-	 mkdir -p $(MLDIR)/ethosu_vela/build/dist
+	 mkdir -p $(MLDIR)/ethosu_vela/build/dist $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR) $(DESTDIR)/usr/bin/
 	 NO_FETCH_BUILD=1 ARCH=arm64 \
 	 STAGING_INCDIR=$(RFSDIR)/usr/include \
 	 STAGING_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu \

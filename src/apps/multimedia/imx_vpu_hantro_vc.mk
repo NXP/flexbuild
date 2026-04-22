@@ -15,6 +15,7 @@ imx_vpu_hantro_vc:
 		mv $(basename $(notdir $(repo_vpu_hantro_vc_bin_url))) imx_vpu_hantro_vc
 	fi
 	$(call fbprint_b,"imx_vpu_hantro_vc")
-	cp -Prf $(MMDIR)/imx_vpu_hantro_vc/usr $(DESTDIR)/
-	cp -Prf $(MMDIR)/imx_vpu_hantro_vc/unit_tests $(DESTDIR)
+	mkdir -p $(DESTDIR)
+	cp -af $(MMDIR)/imx_vpu_hantro_vc/usr $(DESTDIR)/
+	cp -af $(MMDIR)/imx_vpu_hantro_vc/unit_tests $(DESTDIR)/
 	$(call fbprint_d,"imx_vpu_hantro_vc")

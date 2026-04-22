@@ -23,6 +23,7 @@ libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 rm -rf build
 	 export PATH=/usr/lib/qt6/libexec:$(PATH)
+	 mkdir -p $(RFSDIR)/usr/lib
 	 install -m 644 $(DESTDIR)/usr/lib/libgstbase-1.0* $(RFSDIR)/usr/lib/
 	 install -m 644 $(DESTDIR)/usr/lib/libgstallocators-1.0* $(RFSDIR)/usr/lib/
 	 install -m 644 $(DESTDIR)/usr/lib/libEGL.so.* $(RFSDIR)/usr/lib/
@@ -34,7 +35,7 @@ libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 	 fi
 	 if [ -d "$(DESTDIR)/usr/include/libpisp" ]; then
 		mkdir -p "$(RFSDIR)/usr/include/libpisp"
-		cp -r "$(DESTDIR)/usr/include/libpisp/." "$(RFSDIR)/usr/include/libpisp/"
+		cp -af "$(DESTDIR)/usr/include/libpisp/." "$(RFSDIR)/usr/include/libpisp/"
 		install -m 644 $(DESTDIR)/usr/lib/libpisp.so* "$(RFSDIR)/usr/lib"
 	 fi
 	 meson setup build \

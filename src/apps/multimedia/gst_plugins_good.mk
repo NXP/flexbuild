@@ -12,7 +12,7 @@ gst_plugins_good: gst_plugins_base libdrm
 	 rm -rf build_$(DISTROTYPE)_$(ARCH)
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
-	 mkdir -p $(RFSDIR)/usr/include/gstreamer-1.0
+	 mkdir -p $(RFSDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/lib/
 	 rsync -a $(DESTDIR)/usr/include/gstreamer-1.0/ $(RFSDIR)/usr/include/gstreamer-1.0/
 	 rsync -a --inplace $(DESTDIR)/usr/lib/libgsttag-1.0.so* $(RFSDIR)/usr/lib/
 	 $(call fbprint_b,"gst_plugins_good")

@@ -9,6 +9,7 @@ ssat:
 	 $(call patch_apply,ssat,apps/ml)
 	 $(call fbprint_b,"ssat")
 	 cd $(MLDIR)/ssat
+	 mkdir -p $(DESTDIR)/usr/bin
 	 install -p -m 0755 ssat.sh $(DESTDIR)/usr/bin/
 	 install -p -m 0644 ssat-api.sh $(DESTDIR)/usr/bin/
 	 ln -sf ssat.sh $(DESTDIR)/usr/bin/ssat

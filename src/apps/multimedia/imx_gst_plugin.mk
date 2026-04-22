@@ -38,8 +38,9 @@ imx_gst_plugin: $(DEP_GST_PLUGIN) imx_lib libdrm imx_parser gst_plugins_bad imx_
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 sed -i "s/libfslaudiocodec', required: false/libfslaudiocodec', required: true/"  plugins/meson.build
 	 if [ ! -f $(RFSDIR)/usr/include/imx-mm/audio-codec/fsl_unia.h ]; then
-	     sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include
+	     cp -af $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include
 	 fi
+	 mkdir -p $(RFSDIR)/usr/lib
 	 cp -af $(DESTDIR)/usr/lib/libgstaudio-1.0.so* $(RFSDIR)/usr/lib/
 	 cp -af $(DESTDIR)/usr/lib/libgstpbutils-1.0.so* $(RFSDIR)/usr/lib/
 	 $(call fbprint_b,"imx_gst_plugin")

@@ -12,6 +12,7 @@ neutron:
 	install -d $(DESTDIR)/lib/firmware
 	install -m 0644 imx95/firmware/* $(DESTDIR)/lib/firmware
 	install -d $(DESTDIR)/usr/include/neutron
-	cp -f imx95/include/* $(DESTDIR)/usr/include/neutron
-	cp --no-preserve=ownership -d -f imx95/library/* $(DESTDIR)/usr/lib/
+	mkdir -p $(DESTDIR)/usr/lib
+	cp -af imx95/include/* $(DESTDIR)/usr/include/neutron
+	cp --no-preserve=ownership -af imx95/library/* $(DESTDIR)/usr/lib/
 	$(call fbprint_d,"neutron")

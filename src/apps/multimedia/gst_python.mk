@@ -19,11 +19,11 @@ gst_python: gstreamer gst_plugins_bad
 	export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
 	mkdir -p $(RFSDIR)/usr/lib
-	cp -a $(DESTDIR)/usr/lib/libgstbase-1.0.so* \
+	cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so* \
 		$(DESTDIR)/usr/lib/libgstanalytics-1.0.so* \
 		$(RFSDIR)/usr/lib/
 	mkdir -p $(RFSDIR)/usr/include/gstreamer-1.0/gst/analytics/
-	cp -a $(DESTDIR)/usr/include/gstreamer-1.0/gst/analytics/* \
+	cp -af $(DESTDIR)/usr/include/gstreamer-1.0/gst/analytics/* \
          $(RFSDIR)/usr/include/gstreamer-1.0/gst/analytics/
 	meson setup build \
 		-Dtests=disabled \
@@ -35,6 +35,7 @@ gst_python: gstreamer gst_plugins_bad
 		--libdir=lib \
 		--wrap-mode=nodownload $(LOG_MUTE)
 	ninja -j1 -C build install -v $(LOG_MUTE)
+	mkdir -p $(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides
 	mv $(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst_analytics.cpython-313-x86_64-linux-gnu.so \
 		$(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst_analytics.cpython-313-aarch64-linux-gnu.so
 	mv $(DESTDIR)/usr/lib/python3/dist-packages/gi/overrides/_gi_gst.cpython-313-x86_64-linux-gnu.so \

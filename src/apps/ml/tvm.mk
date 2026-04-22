@@ -20,7 +20,7 @@ tvm:
 #tvm: tim_vx
 	 @$(call download_repo,tvm,apps/ml,submod)
 	 $(call patch_apply,tvm,apps/ml)
-	 sudo cp $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib
+	 cp -f $(DESTDIR)/usr/lib/libtim-vx.so $(RFSDIR)/usr/lib
 	 $(call fbprint_b,"tvm")
 	 cd $(MLDIR)/tvm
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
@@ -46,6 +46,6 @@ tvm:
 	 chmod 755 $(DESTDIR)/usr/lib/libtvm*.so
 	 install -d $(DESTDIR)/usr/bin/tvm/examples $(DESTDIR)/usr/lib/pkgconfig $(DESTDIR)/usr/include/dlpack
 	 install -m 0644 $(FBDIR)/src/system/pkgconfig/tvm_runtime.pc $(DESTDIR)/usr/lib/pkgconfig/tvm_runtime.pc
-	 cp ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples
-	 cp ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/
+	 cp -f ../tests/python/contrib/test_vsi_npu/label_image.py $(DESTDIR)/usr/bin/tvm/examples
+	 cp -f ../3rdparty/dlpack/include/dlpack/dlpack.h $(DESTDIR)/usr/include/dlpack/
 	 $(call fbprint_d,"tvm")

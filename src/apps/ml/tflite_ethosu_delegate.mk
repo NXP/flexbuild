@@ -53,6 +53,7 @@ tflite_ethosu_delegate: tflite ethosu_driver_stack
 		-DPython_LIBRARY=$(RFSDIR)/usr/lib/aarch64-linux-gnu/libpython3.13.so $(LOG_MUTE)
 	$(MAKE) -C build_$(DISTROTYPE)_$(ARCH) ethosu_delegate $(LOG_MUTE)
 	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so
+	mkdir -p $(DESTDIR)/usr/lib
 	install -m 0644 build_$(DISTROTYPE)_$(ARCH)/libethosu_delegate.so $(DESTDIR)/usr/lib
 	rm -f /lib/ld-linux-aarch64.so.1
 	$(call fbprint_d,"tflite_ethosu_delegate")

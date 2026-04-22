@@ -22,7 +22,8 @@ imx_vpu_hantro: $(KHEADER_FILE)
 	sed -i 's/dma-buf.h/dma-buf-imx.h/' decoder_sw/software/linux/dwl/dwl_linux.c \
 	     h1_encoder/software/linux_reference/ewl/ewl_x280_common.c
 	ln -sf dma-buf.h $(DESTDIR)/usr/include/linux/dma-buf-imx.h
-	sudo cp -rf $(DESTDIR)/usr/include/linux $(RFSDIR)/usr/include/
+	mkdir -p $(RFSDIR)/usr/include
+	cp -af $(DESTDIR)/usr/include/linux $(RFSDIR)/usr/include/
 	DEST_DIR=$(DESTDIR) CROSS_COMPILE=aarch64-linux-gnu- \
 	PLATFORM=IMX8MM ARCH="-march=armv8-a+crc+crypto" SDKTARGETSYSROOT=$(RFSDIR) \
 	$(MAKE) all -j1 $(LOG_MUTE)

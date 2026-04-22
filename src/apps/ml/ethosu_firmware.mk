@@ -11,5 +11,6 @@ ethosu_firmware:
 	 $(call patch_apply,ethosu_firmware,apps/ml)
 	 $(call fbprint_b,"ethosu_firmware")
 	 cd $(MLDIR)/ethosu_firmware
+	 mkdir -p $(DESTDIR)/lib/firmware
 	 cp -f ethosu_firmware $(DESTDIR)/lib/firmware
 	 $(call fbprint_d,"ethosu_firmware")

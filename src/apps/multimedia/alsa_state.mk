@@ -8,7 +8,7 @@
 
 alsa_state:
 	@$(call fbprint_b,"alsa_state")
-	 install -d $(DESTDIR)/var/lib/alsa
+	 install -d $(DESTDIR)/var/lib/alsa $(DESTDIR)/etc
 	 install -m 0644 $(FBDIR)/src/system/alsa_state/asound.state $(DESTDIR)/var/lib/alsa
 	 install -m 0644 $(FBDIR)/src/system/alsa_state/asound.conf $(DESTDIR)/etc
 	 $(call fbprint_d,"alsa_state")

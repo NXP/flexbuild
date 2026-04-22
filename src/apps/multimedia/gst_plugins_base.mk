@@ -33,13 +33,14 @@ gst_plugins_base: $(DEP_GSTBASE) libdrm gstreamer alsa_lib wayland_protocols $(K
 	 fi
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
+	 mkdir -p $(RFSDIR)/usr/include $(RFSDIR)/usr/share/ $(RFSDIR)/usr/lib/
 	 if [ ! -f $(RFSDIR)/usr/include/gstreamer-1.0/gst/gstbytearrayinterface.h ]; then
-	     sudo cp -Prf $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include
+	     cp -af $(DESTDIR)/usr/include/gstreamer-1.0 $(RFSDIR)/usr/include
 	 fi
 	 $(call fbprint_b,"gst_plugins_base")
-	 sudo cp -rf $(DESTDIR)/usr/share/{pkgconfig,wayland-protocols} $(RFSDIR)/usr/share/
-	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0}
-	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstallocators-1.0.so.0,libgstreamer-1.0.so.0,libdrm.so.2}
+	 cp -af $(DESTDIR)/usr/share/{pkgconfig,wayland-protocols} $(RFSDIR)/usr/share/
+	 rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstbase-1.0.so.0,libgstaudio-1.0.so.0,libgstvideo-1.0.so.0,libgsttag-1.0.so.0,libgstpbutils-1.0.so.0}
+	 rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libgstallocators-1.0.so.0,libgstreamer-1.0.so.0,libdrm.so.2}
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
 	 export GI_SCANNER_DISABLE_CACHE=1

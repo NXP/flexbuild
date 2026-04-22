@@ -7,8 +7,8 @@
 imx_alsa_plugin: alsa_lib imx_sw_pdm
 	@$(call download_repo,imx_alsa_plugin,apps/multimedia)
 	 $(call patch_apply,imx_alsa_plugin,apps/multimedia)
-	 sudo cp -rf $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include
-	 sudo ln -sf libasound.so.2 $(RFSDIR)/usr/lib/aarch64-linux-gnu/libasound.so
+	 cp -af $(DESTDIR)/usr/include/imx-mm $(RFSDIR)/usr/include
+	 ln -sf libasound.so.2 $(RFSDIR)/usr/lib/aarch64-linux-gnu/libasound.so
 	 $(call fbprint_b,"imx_alsa_plugin")
 	 cd $(MMDIR)/imx_alsa_plugin
 	 sed -i 's/imx\///' asrc/asrc_pair.h asrc/asrc_pair.c

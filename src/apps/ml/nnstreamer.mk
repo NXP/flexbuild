@@ -12,7 +12,7 @@ nnstreamer: gst_plugins_base tflite nnstreamer_edge
 	 $(call patch_apply,nnstreamer,apps/ml)
 	 cd $(MLDIR)/nnstreamer
 	 rm -rf build_debian_arm64
-	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig
+	 mkdir -p $(DESTDIR)/usr/lib/pkgconfig $(RFSDIR)/usr/lib
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 $(call fbprint_b,"nnstreamer")

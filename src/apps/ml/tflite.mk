@@ -69,11 +69,12 @@ tflite: flatbuffers
 	 install -d $(DESTDIR)/usr/include/tensorflow/core/platform
 	 install -d $(DESTDIR)/usr/include/tsl/platform
 	 install -d $(DESTDIR)/usr/lib/python3/dist-packages
+	 install -d $(DESTDIR)/usr/lib/pkgconfig
 	 cd $(MLDIR)/tflite/tensorflow/lite
-	 find . -name "*.h" | xargs -I {} cp {} $(DESTDIR)/usr/include/tensorflow/lite
-	 cp $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public
+	 find . -name "*.h" | xargs -I {} cp -af {} $(DESTDIR)/usr/include/tensorflow/lite
+	 cp -af $(MLDIR)/tflite/tensorflow/core/public/version.h $(DESTDIR)/usr/include/tensorflow/core/public
 	 rsync -avz $(MLDIR)/tflite/tensorflow/* $(DESTDIR)/usr/include/tensorflow/ $(LOG_MUTE)
-	 cp $(FBDIR)/src/system/pkgconfig/tensorflow2-lite.pc $(DESTDIR)/usr/lib/pkgconfig
+	 cp -af $(FBDIR)/src/system/pkgconfig/tensorflow2-lite.pc $(DESTDIR)/usr/lib/pkgconfig
 	 $(call fbprint_n,"install examples")
 	 install -d $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
 	 cd $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)
@@ -84,11 +85,11 @@ tflite: flatbuffers
 	 install -m 0555 tools/evaluation/{coco_object_detection_run_eval,imagenet_image_classification_run_eval,inference_diff_run_eval} \
 		 $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
 	 $(call fbprint_n,"install label_image data")
-	 cp $(MLDIR)/tflite/tensorflow/lite/examples/label_image/testdata/grace_hopper.bmp $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
-	 cp $(MLDIR)/tflite/tensorflow/lite/java/ovic/src/testdata/labels.txt $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
+	 cp -af $(MLDIR)/tflite/tensorflow/lite/examples/label_image/testdata/grace_hopper.bmp $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
+	 cp -af $(MLDIR)/tflite/tensorflow/lite/java/ovic/src/testdata/labels.txt $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
 	 $(call fbprint_n,"install mobilenet tflite file python example and pip package")
-	 cp $(MLDIR)/tflite/mobilenet_*.tflite $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
-	 cp $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
+	 cp -af $(MLDIR)/tflite/mobilenet_*.tflite $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
+	 cp -af $(MLDIR)/tflite/tensorflow/lite/examples/python/label_image.py $(DESTDIR)/usr/bin/$(TFLITE_VERSION)/examples
 	 pip3 install --ignore-installed --disable-pip-version-check -vvv --platform linux_aarch64 -t $(DESTDIR)/usr/lib/python3/dist-packages \
 		--no-cache-dir --upgrade --no-deps $(MLDIR)/tflite/build_$(DISTROTYPE)_$(ARCH)/tflite_pip/dist/tflite_runtime-*.whl $(LOG_MUTE)
 	 $(call fbprint_d,"tflite")

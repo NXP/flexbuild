@@ -13,7 +13,7 @@ imx_vpuwrap: imx_vpu_hantro imx_vpu_hantro_vc
 	 cd $(MMDIR)/imx_vpuwrap
 	 export CFLAGS="-I$(DESTDIR)/usr/include -I$(DESTDIR)/usr/include/hantro_dec -I$(DESTDIR)/usr/include/hantro_enc"
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -Wl,-O2"
-	 if [ ! -f /usr/bin/libtool ]; then sudo ln -s libtoolize /usr/bin/libtool; fi
+	 if [ ! -f /usr/bin/libtool ]; then ln -s libtoolize /usr/bin/libtool; fi
 	 ./autogen.sh --prefix=/usr --host=aarch64-linux-gnu --with-sysroot=$(RFSDIR) $(LOG_MUTE)
 	 sed -e 's/^am__append_3/#am__append_3/' -e 's/^am__append_5/#am__append_5/' \
 	     -e 's/^am__append_8/#am__append_8/' -e 's/^am__objects_3/#am__objects_3/' \

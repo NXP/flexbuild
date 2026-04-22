@@ -53,8 +53,9 @@ tflite_vx_delegate: tflite tim_vx
 		-DTFLITE_LIB_LOC=$(DESTDIR)/usr/lib/libtensorflow-lite.so $(LOG_MUTE)
 	$(MAKE) -C build_$(DISTROTYPE)_$(ARCH) vx_delegate $(LOG_MUTE)
 	$(CROSS_COMPILE)strip build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so
+	mkdir -p $(DESTDIR)/usr/lib
 	cp -f build_$(DISTROTYPE)_$(ARCH)/libvx_delegate.so $(DESTDIR)/usr/lib
 	install -d $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate
-	cp --parents vsi_npu_custom_op.h op_map.h utils.h delegate_main.h examples/util.h \
+	cp --parents -f vsi_npu_custom_op.h op_map.h utils.h delegate_main.h examples/util.h \
 	   $(DESTDIR)/usr/include/tensorflow-lite-vx-delegate
 	$(call fbprint_d,"tflite_vx_delegate")

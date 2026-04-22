@@ -17,7 +17,7 @@ basler_camera:
 	     mv basler-camera-* basler_camera && rm -f basler_camera.bin
 	 fi
 	 cd basler_camera
-	 install -d $(DESTDIR)/opt/imx8-isp/bin
+	 install -d $(DESTDIR)/opt/imx8-isp/bin $(DESTDIR)/usr/lib/
 	 cp -rfv ./opt/imx8-isp/bin/* $(DESTDIR)/opt/imx8-isp/bin
 	 cp -rfv ./usr/lib/* $(DESTDIR)/usr/lib/
 	 $(call fbprint_d,"basler_camera")

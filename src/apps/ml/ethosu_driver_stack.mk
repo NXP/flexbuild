@@ -33,6 +33,6 @@ ethosu_driver_stack: flatbuffers
 	 python3 setup.py bdist_wheel --verbose --dist-dir build_$(DISTROTYPE)_$(ARCH)/dist build_ext \
 		 --library-dirs build_$(DISTROTYPE)_$(ARCH)/driver_library $(LOG_MUTE)
 	 mkdir -p $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu
-	 cp build/lib.linux-*-cpython*/ethosu/interpreter.cpython-*-linux-gnu.so $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu
+	 cp -f build/lib.linux-*-cpython*/ethosu/interpreter.cpython-*-linux-gnu.so $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu
 	 rename -f "s/x86_64/aarch64/" $(DESTDIR)/$(PYTHON_SITEPACKAGES_DIR)/ethosu/*.so
 	 $(call fbprint_d,"ethosu_driver_stack")

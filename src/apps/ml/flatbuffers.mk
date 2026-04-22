@@ -26,7 +26,7 @@ flatbuffers:
 	 \
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"
-	 mkdir -p build_$(DISTROTYPE)_$(ARCH)
+	 mkdir -p build_$(DISTROTYPE)_$(ARCH) $(RFSDIR)/usr/lib
 	 cmake  -S $(MLDIR)/flatbuffers \
 		-B $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH) \
 		-DCMAKE_CXX_FLAGS="-I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include" \
@@ -34,5 +34,5 @@ flatbuffers:
 		-DFLATBUFFERS_BUILD_SHAREDLIB=ON $(LOG_MUTE)
 	 cmake --build $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH) --target all $(LOG_MUTE)
 	 cmake --install build_$(DISTROTYPE)_$(ARCH) --prefix /usr $(LOG_MUTE)
-	 cp -rf $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH)/libflatbuffers* $(RFSDIR)/usr/lib
+	 cp -af $(MLDIR)/flatbuffers/build_$(DISTROTYPE)_$(ARCH)/libflatbuffers* $(RFSDIR)/usr/lib
 	 $(call fbprint_d,"flatbuffers")

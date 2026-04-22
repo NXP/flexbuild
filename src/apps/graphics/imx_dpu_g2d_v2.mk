@@ -18,6 +18,7 @@ imx_dpu_g2d_v2: libdrm
 	fi
 	$(call fbprint_b,"imx_dpu_g2d_v2")
 	cd imx_dpu_g2d_v2
-	cp -Pf g2d/usr/lib/*.so* $(DESTDIR)/usr/lib/
-	cp -Pr g2d/usr/include/* $(DESTDIR)/usr/include/
+	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include
+	cp -af g2d/usr/lib/*.so* $(DESTDIR)/usr/lib/
+	cp -af g2d/usr/include/* $(DESTDIR)/usr/include/
 	$(call fbprint_d,"imx_dpu_g2d_v2")

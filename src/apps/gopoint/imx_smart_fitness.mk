@@ -14,9 +14,10 @@ imx_smart_fitness: nnstreamer
 	@$(call download_repo,imx_smart_fitness,apps/gopoint)
 	 $(call patch_apply,imx_smart_fitness,apps/gopoint)
 	 $(call fbprint_b,"imx_smart_fitness")
-	 cp -rf $(DESTDIR)/usr/include/nnstreamer $(RFSDIR)/usr/include
-	 cp -rfa $(DESTDIR)/usr/lib/pkgconfig/gstreamer-* $(RFSDIR)/usr/lib/pkgconfig
-	 cp -rfa $(DESTDIR)/usr/lib/libgst* $(RFSDIR)/usr/lib
+	 mkdir -p $(RFSDIR)/usr/include/ $(RFSDIR)/usr/lib/pkgconfig/ $(RFSDIR)/usr/lib/
+	 cp -af $(DESTDIR)/usr/include/nnstreamer $(RFSDIR)/usr/include/
+	 cp -af $(DESTDIR)/usr/lib/pkgconfig/gstreamer-* $(RFSDIR)/usr/lib/pkgconfig/
+	 cp -af $(DESTDIR)/usr/lib/libgst* $(RFSDIR)/usr/lib/
 	 cd $(GPDIR)/imx_smart_fitness
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR)"

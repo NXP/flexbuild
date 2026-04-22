@@ -17,5 +17,6 @@ imx_gpu_g2d: libdrm
 	fi
 	$(call fbprint_b,"imx_gpu_g2d")
 	cd imx_gpu_g2d
+	mkdir -p $(DESTDIR)
 	cp -af g2d/usr "$(DESTDIR)/"
 	$(call fbprint_d,"imx_gpu_g2d")

@@ -45,13 +45,13 @@ imx_nnstreamer_examples: gstreamer tflite gst_plugins_good
 	 install -d 0755 $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose_estimation
 	 install -d 0755 $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose_face
 	 install -d 0755 $(DESTDIR)/$(IMX_NNSTREANER_DIR)/semantic_segmentation
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/object-detection/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/object_detection/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/pose-estimation/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose_estimation/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/classification/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/mixed-demos/example_classification_and_detection_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification_detection/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/mixed-demos/example_double_classification_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/dual_classification/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/face-processing/example_face_detection_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/face_detection/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/face-processing/example_emotion_classification_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/emotion_detection/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/mixed-demos/example_face_and_pose_detection_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose_face/
-	 cp -rf build_$(DISTROTYPE)_$(ARCH)/semantic-segmentation/example_segmentation_deeplab_v3_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/semantic_segmentation/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/object-detection/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/object_detection/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/pose-estimation/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose_estimation/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/classification/* $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/mixed-demos/example_classification_and_detection_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/classification_detection/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/mixed-demos/example_double_classification_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/dual_classification/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/face-processing/example_face_detection_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/face_detection/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/face-processing/example_emotion_classification_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/emotion_detection/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/mixed-demos/example_face_and_pose_detection_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/pose_face/
+	 cp -af build_$(DISTROTYPE)_$(ARCH)/semantic-segmentation/example_segmentation_deeplab_v3_tflite $(DESTDIR)/$(IMX_NNSTREANER_DIR)/semantic_segmentation/
 	 $(call fbprint_d,"imx_nnstreamer_examples")

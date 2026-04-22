@@ -16,9 +16,10 @@ imx_ebike_vit:
 	 fi
 	 if [ ! -f lvgl/.codedone ]; then
 		git submodule update --init --recursive && touch lvgl/.codedone
-		cp -fr wayland-client/* lv_drivers/wayland/
+		mkdir -p lv_drivers/wayland
+		cp -af wayland-client/* lv_drivers/wayland/
 	 fi
 	 $(MAKE) clean $(LOG_MUTE) && $(MAKE) $(LOG_MUTE)
 	 install -d -m 755 $(DESTDIR)$(EBIKE_DIR)
-	 cp -rf ebike-vit-deploy/* $(DESTDIR)$(EBIKE_DIR)
+	 cp -af ebike-vit-deploy/* $(DESTDIR)$(EBIKE_DIR)/
 	 $(call fbprint_d,"imx_ebike_vit")

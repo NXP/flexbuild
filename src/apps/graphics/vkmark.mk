@@ -16,9 +16,10 @@ vkmark: vulkan_headers
 	 [ `hostname` = fbdebian ] && export PKG_CONFIG_SYSROOT_DIR="" || true
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
-	 sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libvulkan.so
-	 sudo cp -fa $(DESTDIR)/usr/lib/{libvulkan*.so*,libSPIRV_viv.so,libGLSLC.so} $(RFSDIR)/usr/lib
-	 sudo cp -fr $(DESTDIR)/usr/include/vulkan $(RFSDIR)/usr/include/
+	 rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/libvulkan.so
+	 mkdir -p $(RFSDIR)/usr/lib $(RFSDIR)/usr/include/
+	 cp -af $(DESTDIR)/usr/lib/{libvulkan*.so*,libSPIRV_viv.so,libGLSLC.so} $(RFSDIR)/usr/lib
+	 cp -af $(DESTDIR)/usr/include/vulkan $(RFSDIR)/usr/include/
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \
 		--cross-file=meson.cross \
 		--prefix=/usr \

@@ -25,7 +25,7 @@ gtec_demo_framework: $(DEP_GTEC)
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib"
 	 export CXX="$(CROSS_COMPILE)g++ --sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib"
 	 export FEATURES="ConsoleHost,EarlyAccess,EGL,GoogleUnitTest,Lib_NlohmannJson,Lib_pugixml,Test_RequireUserInputToExit,WindowHost,G2D,OpenGLES2,OpenCV4,Vulkan1.2,OpenGLES3.2,OpenCL1.2,OpenVX1.2"
-	 mv $(RFSDIR)/usr/bin/wayland-scanner $(RFSDIR)/usr/bin/wayland-scanner.bak
+	 [ -f $(RFSDIR)/usr/bin/wayland-scanner ] && mv $(RFSDIR)/usr/bin/wayland-scanner $(RFSDIR)/usr/bin/wayland-scanner.bak || true
 	 ln -sf /usr/bin/wayland-scanner $(RFSDIR)/usr/bin/wayland-scanner
 	 cd $(GPDIR)/gtec_demo_framework
 	 source ./prepare.sh && export DESTDIR=''
@@ -36,9 +36,9 @@ gtec_demo_framework: $(DEP_GTEC)
 	 for demoapp in Bloom Blur EightLayerBlend FractalShader LineBuilder101 ModelLoaderBasics S03_Transform S04_Projection S06_Texturing S07_EnvMapping S08_EnvMappingRefraction ; do
 		cd $(GPDIR)/gtec_demo_framework/DemoApps/GLES2/$${demoapp}
 		FslBuild.py --BuildThreads $(JOBS) --platform yocto --Variants [config=Release,FSL_GLES_NAME=vivante,WindowSystem=Wayland] --UseExtensions [$(EXT_GTEC)] --UseFeatures [$${FEATURES}] $(LOG_MUTE)
-		mkdir -p $(DESTDIR)/opt/imx-gpu-sdk/GLES2/$${demoapp}___Wayland/Content
+		mkdir -p $(DESTDIR)/$(GPNT_GPU_DESTDIR)/$${demoapp}___Wayland/Content
 		cp -arf $(GPNT_GPU_SOURDIR)/$${demoapp}___Wayland/Content/* $(DESTDIR)/$(GPNT_GPU_DESTDIR)/$${demoapp}___Wayland/Content/
 		cp -arf $(GPNT_GPU_SOURDIR)/$${demoapp}___Wayland/GLES2.$${demoapp}___Wayland $(DESTDIR)/$(GPNT_GPU_DESTDIR)/$${demoapp}___Wayland/
 	 done
-	 mv $(RFSDIR)/usr/bin/wayland-scanner.bak $(RFSDIR)/usr/bin/wayland-scanner
+	 [ -f $(RFSDIR)/usr/bin/wayland-scanner.bak ] && mv $(RFSDIR)/usr/bin/wayland-scanner.bak $(RFSDIR)/usr/bin/wayland-scanner || true
 	 $(call fbprint_d,"gtec_demo_framework")

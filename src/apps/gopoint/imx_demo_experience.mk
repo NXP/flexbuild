@@ -24,6 +24,7 @@ imx_demo_experience:
 	     -e '/-spec linux-aarch64-gnu-g++/d' -i Makefile
 	 $(MAKE) $(LOG_MUTE)
 	 $(MAKE) install $(LOG_MUTE)
+	 mkdir -p $(DESTDIR)/usr/bin
 	 mv $(DESTDIR)/opt/demoexperience/bin/demoexperience $(DESTDIR)/usr/bin/
 	 rm -rf $(DESTDIR)/opt/demoexperience
 	 ln -sf demoexperience $(DESTDIR)/usr/bin/gopoint

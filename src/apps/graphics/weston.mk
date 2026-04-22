@@ -35,7 +35,8 @@ weston: $(DEP_WESTON) libdrm wayland_protocols
 	 $(call fbprint_b,"weston")
 	 cd $(GRAPHICSDIR)/weston
 	 rm -rf build_$(DISTROTYPE)_$(ARCH)
-	 cp -rf $(DESTDIR)/usr/include/libdrm/drm_fourcc.h $(RFSDIR)/usr/include/libdrm/
+	 mkdir -p $(RFSDIR)/usr/include/libdrm
+	 cp -af $(DESTDIR)/usr/include/libdrm/drm_fourcc.h $(RFSDIR)/usr/include/libdrm/
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
 	 sed 's%@STAGING_DIR@%$(FBDIR)%g' $(FBDIR)/src/system/meson.native > meson.native
@@ -78,7 +79,7 @@ weston: $(DEP_WESTON) libdrm wayland_protocols
 	 mkdir -p $(DESTDIR)/usr/share/applications $(DESTDIR)/usr/share/icons/hicolor/48x48/apps $(DESTDIR)/lib/systemd/system
 	 mkdir -p $(DESTDIR)/etc/systemd/system/sockets.target.wants
 	 mkdir -p $(DESTDIR)/etc/pam.d/
-	 cp $(FBDIR)/src/system/weston/weston.ini $(DESTDIR)/etc/xdg/weston/weston.ini
+	 cp -f $(FBDIR)/src/system/weston/weston.ini $(DESTDIR)/etc/xdg/weston/weston.ini
 	 install -m 644 $(FBDIR)/src/system/weston/weston $(DESTDIR)/etc/default/weston
 	 install -m 644 $(FBDIR)/src/system/weston/weston.service $(DESTDIR)/lib/systemd/system/
 	 install -m 644 $(FBDIR)/src/system/weston/weston-autologin $(DESTDIR)/etc/pam.d/

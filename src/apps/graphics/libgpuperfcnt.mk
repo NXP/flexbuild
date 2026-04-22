@@ -16,5 +16,6 @@ libgpuperfcnt:
 		mv $(basename $(notdir $(repo_libgpuperfcnt_bin_url))) libgpuperfcnt
 	fi
 	$(call fbprint_b,"libgpuperfcnt")
-	cp -Prf libgpuperfcnt/usr $(DESTDIR)
+	mkdir -p $(DESTDIR)
+	cp -af libgpuperfcnt/usr $(DESTDIR)/
 	$(call fbprint_d,"libgpuperfcnt")

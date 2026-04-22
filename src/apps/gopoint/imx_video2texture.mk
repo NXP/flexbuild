@@ -21,7 +21,8 @@ imx_video2texture:
 	cd $(GPDIR)/imx_video2texture
 	rm -rf build && mkdir -p build && cd build
 	ln -sf /usr/aarch64-linux-gnu/lib/ld-linux-aarch64.so.1 /lib/ld-linux-aarch64.so.1
-	cp $(DESTDIR)/usr/include/gstimxcommon.h $(RFSDIR)/usr/include
+	mkdir -p $(RFSDIR)/usr/include/
+	cp -f $(DESTDIR)/usr/include/gstimxcommon.h $(RFSDIR)/usr/include
 	cmake .. -G 'Ninja' -DCMAKE_MAKE_PROGRAM=ninja \
 		-DCMAKE_INSTALL_PREFIX=/usr \
 		-DCMAKE_INSTALL_LIBDIR:PATH=lib \

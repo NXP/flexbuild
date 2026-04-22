@@ -8,7 +8,6 @@
 IMX_VOICE_PLAYER_DIR = $(GPNT_APPS_FOLDER)/scripts/multimedia/imx-voiceplayer
 
 imx_voiceplayer: imx_voiceui
-ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	@$(call download_repo,imx_voiceplayer,apps/gopoint)
 	 $(call patch_apply,imx_voiceplayer,apps/gopoint)
 	 $(call fbprint_b,"imx_voiceplayer")
@@ -23,7 +22,7 @@ ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 make $(LOG_MUTE)
 	 install -d -m 755 $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)
 	 install $(GPDIR)/imx_voiceplayer/app/build/VoicePlayer $(DESTDIR)/$(IMX_VOICE_PLAYER_DIR)/
-	 cp -fp $(GPDIR)/imx_voiceplayer/scripts/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR}/
+	 cp -af $(GPDIR)/imx_voiceplayer/scripts/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR}/
 	 ####  BUILD APP COMPONENTS####
 	 cd $(GPDIR)/imx_voiceplayer
 	 rm -rf msgq/build && mkdir -p msgq/build && cd msgq/build
@@ -34,6 +33,5 @@ ifeq ($(CONFIG_IMX_VOICEPLAYER),y)
 	 cd $(GPDIR)/imx_voiceplayer/voiceAction
 	 rm -rf build && make $(LOG_MUTE)
 	 install -m 0755 build/btp $(DESTDIR)/${IMX_VOICE_PLAYER_DIR}
-	 cp -rf bridgeVoiceUI/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR}
+	 cp -af bridgeVoiceUI/* $(DESTDIR)/${IMX_VOICE_PLAYER_DIR}
 	 $(call fbprint_d,"imx_voiceplayer")
-endif

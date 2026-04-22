@@ -19,10 +19,10 @@ imx_ele: imx_secure_enclave
 		 git apply $(FBDIR)/patch/imx_ele/*.patch && touch .patchdone
 	 fi
 	 cd $(GPDIR)/imx_ele
-	 cp -rf protocols/ lv_drivers/wayland/
+	 cp -af protocols/ lv_drivers/wayland/
 	 $(MAKE) clean && $(MAKE) $(LOG_MUTE)
 	 install -d -m 755 $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/security/ele
 	 $(CROSS_COMPILE)strip $(GPDIR)/imx_ele/bin/eledemo
-	 cp -rf $(GPDIR)/imx_ele/bin/eledemo $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/security/ele
-	 cp -rf $(GPDIR)/imx_ele/misc/script/run.sh $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/security/ele
+	 cp -af $(GPDIR)/imx_ele/bin/eledemo $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/security/ele
+	 cp -af $(GPDIR)/imx_ele/misc/script/run.sh $(DESTDIR)/$(GPNT_APPS_FOLDER)/scripts/security/ele
 	 $(call fbprint_d,"imx_ele")

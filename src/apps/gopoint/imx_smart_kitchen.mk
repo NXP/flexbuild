@@ -23,9 +23,9 @@ imx_smart_kitchen:
 		 git am $(FBDIR)/patch/imx_smart_kitchen/0001-Update-lv_anim_set_exec_cb-with-correct-function-typ.patch $(LOG_MUTE)
 		 touch .patchdone
 	 fi
-	 cp -r wayland-client/* lv_drivers/wayland/
+	 cp -af wayland-client/* lv_drivers/wayland/
 	 rm -rf smart-kitchen-deploy
 	 $(MAKE) $(LOG_MUTE)
 	 install -d -m 755 $(DESTDIR)$(SMART_KITCHEN_DIR)
-	 cp -rf smart-kitchen-deploy/* $(DESTDIR)$(SMART_KITCHEN_DIR)
+	 cp -af smart-kitchen-deploy/* $(DESTDIR)$(SMART_KITCHEN_DIR)
 	 $(call fbprint_d,"imx_smart_kitchen")

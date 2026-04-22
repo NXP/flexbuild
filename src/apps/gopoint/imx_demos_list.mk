@@ -13,7 +13,6 @@ imx_demos_list:
 	 $(call patch_apply,imx_demos_list,apps/gopoint)
 	 $(call fbprint_b,"imx_demos_list")
 	 cd $(GPDIR)/imx_demos_list
-	 mkdir -p $(DESTDIR)/$(GPNT_APPS_FOLDER)
-	 cp -r * $(DESTDIR)/$(GPNT_APPS_FOLDER)
-	 chmod 777 $(DESTDIR)/$(GPNT_APPS_FOLDER)
+	 install -d -m 777 $(DESTDIR)/$(GPNT_APPS_FOLDER)
+	 cp -af * $(DESTDIR)/$(GPNT_APPS_FOLDER)/
 	 $(call fbprint_d,"imx_demos_list")

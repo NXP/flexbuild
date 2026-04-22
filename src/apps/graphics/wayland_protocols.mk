@@ -22,6 +22,7 @@ wayland_protocols:
 		--cross-file meson.cross $(LOG_MUTE)
 	DESTDIR=$(RFSDIR) ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	DESTDIR=$(DESTDIR) ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
+	mkdir -p $(RFSDIR)/usr/share/pkgconfig/
 	cp -af $(DESTDIR)/usr/share/pkgconfig/wayland-protocols.pc $(RFSDIR)/usr/share/pkgconfig/
 	cp -af $(DESTDIR)/usr/share/wayland-protocols $(RFSDIR)/usr/share/
 	$(call fbprint_d,"wayland_protocols")

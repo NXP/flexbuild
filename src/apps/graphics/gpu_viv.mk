@@ -15,12 +15,13 @@ gpu_viv:
 	fi
 	$(call fbprint_b,"gpu_viv ")
 	cd $(GRAPHICSDIR)/gpu_viv
-	cp -rfa gpu-core/* $(DESTDIR)
-	cp -rfa gpu-core/* $(RFSDIR)
+	mkdir -p $(DESTDIR)/ $(RFSDIR)/
+	cp -fa gpu-core/* $(DESTDIR)/
+	cp -fa gpu-core/* $(RFSDIR)/
 	ln -sf libvulkan_VSI.so $(DESTDIR)/usr/lib/libvulkan.so.1
 	ln -sf libvulkan.so.1 $(DESTDIR)/usr/lib/libvulkan.so
 	rm -f $(DESTDIR)/usr/lib/libGL.so*
-	sudo rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libGLESv2.so,libGLESv2.so.2,libgbm.so.1,libvulkan.so,libvulkan.so.1,libEGL.so,libEGL.so.1}
-	if [ -d gpu-tools ]; then cp -rfa gpu-tools/gmem-info/usr $(DESTDIR); fi
-	if [ -d gpu-demos ]; then cp -rf gpu-demos/opt $(DESTDIR); fi
+	rm -f $(RFSDIR)/usr/lib/aarch64-linux-gnu/{libGLESv2.so,libGLESv2.so.2,libgbm.so.1,libvulkan.so,libvulkan.so.1,libEGL.so,libEGL.so.1}
+	if [ -d gpu-tools ]; then cp -af gpu-tools/gmem-info/usr $(DESTDIR)/; fi
+	if [ -d gpu-demos ]; then cp -af gpu-demos/opt $(DESTDIR)/; fi
 	$(call fbprint_d,"gpu_viv")

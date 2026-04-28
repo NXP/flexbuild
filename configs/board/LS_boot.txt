@@ -8,11 +8,9 @@ fi
 env exists image || setenv image Image
 env exists devpart_boot || setenv devpart_boot 1
 env exists devpart_root || setenv devpart_root 2
-env exists devtype || setenv devtype mmc
-env exists devnum || setenv devnum 0
 
 part uuid ${devtype} ${devnum}:${devpart_root} partuuidr
-setenv bootargs "${console} root=PARTUUID=${partuuidr} rw rootwait ${extra_bootargs} ${othbootargs}"
+setenv bootargs "console=${console} root=PARTUUID=${partuuidr} rw rootwait ${extra_bootargs} ${othbootargs}"
 setenv secureboot_validate "load ${devtype} ${devnum}:${devpart_boot} ${kernelheader_addr_r} /secboot_hdrs/${board}/hdr_linux.out; load ${devtype} ${devnum}:${devpart_boot} ${fdtheader_addr_r} /secboot_hdrs/${board}/hdr_dtb.out; esbc_validate ${kernelheader_addr_r}; esbc_validate ${fdtheader_addr_r}"
 
 if load ${devtype} ${devnum}:${devpart_boot} ${fdt_addr_r} ${fdtfile}; then

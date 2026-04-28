@@ -1,0 +1,78 @@
+From 73d0f0ff20bd77d5c8a14dc295a5a6028252a689 Mon Sep 17 00:00:00 2001
+From: nxa22691 <andy.tang@nxp.com>
+Date: Thu, 23 Apr 2026 12:24:25 +0900
+Subject: [PATCH] config: rename the boot script to boot.scr
+
+Signed-off-by: Andy Tang <andy.tang@nxp.com>
+---
+ include/configs/ls1028ardb.h     | 2 +-
+ include/configs/ls1043a_common.h | 2 +-
+ include/configs/ls1046a_common.h | 6 +++---
+ include/configs/lx2160ardb.h     | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/include/configs/ls1028ardb.h b/include/configs/ls1028ardb.h
+index 005667d20b6..31fd6ae12f2 100644
+--- a/include/configs/ls1028ardb.h
++++ b/include/configs/ls1028ardb.h
+@@ -78,7 +78,7 @@
+ 	"kernelhdr_size_sd=0x20\0"		\
+ 	"console=ttyS0,115200\0"                \
+ 	BOOTENV					\
+-	"boot_scripts=ls1028ardb_boot.scr\0"    \
++	"boot_scripts=boot.scr\0"    \
+ 	"boot_script_hdr=hdr_ls1028ardb_bs.out\0"	\
+ 	"scan_dev_for_boot_part="               \
+ 		"part list ${devtype} ${devnum} devplist; "   \
+diff --git a/include/configs/ls1043a_common.h b/include/configs/ls1043a_common.h
+index d82502d628e..4ac3550490b 100644
+--- a/include/configs/ls1043a_common.h
++++ b/include/configs/ls1043a_common.h
+@@ -113,7 +113,7 @@
+ 	"console=ttyS0,115200\0"		\
+ 	"boot_os=y\0"				\
+ 	BOOTENV					\
+-	"boot_scripts=ls1043ardb_boot.scr\0"	\
++	"boot_scripts=boot.scr\0"	\
+ 	"boot_script_hdr=hdr_ls1043ardb_bs.out\0"	\
+ 	"scan_dev_for_boot_part="		\
+ 		"part list ${devtype} ${devnum} devplist; "	\
+diff --git a/include/configs/ls1046a_common.h b/include/configs/ls1046a_common.h
+index 8666aff0f33..434693c17d4 100644
+--- a/include/configs/ls1046a_common.h
++++ b/include/configs/ls1046a_common.h
+@@ -70,15 +70,15 @@
+ 
+ #if defined(CONFIG_TARGET_LS1046AFRWY)
+ #define LS1046A_BOOT_SRC_AND_HDR\
+-	"boot_scripts=ls1046afrwy_boot.scr\0"	\
++	"boot_scripts=boot.scr\0"	\
+ 	"boot_script_hdr=hdr_ls1046afrwy_bs.out\0"
+ #elif defined(CONFIG_TARGET_LS1046AQDS)
+ #define LS1046A_BOOT_SRC_AND_HDR\
+-	"boot_scripts=ls1046aqds_boot.scr\0"	\
++	"boot_scripts=boot.scr\0"	\
+ 	"boot_script_hdr=hdr_ls1046aqds_bs.out\0"
+ #else
+ #define LS1046A_BOOT_SRC_AND_HDR\
+-	"boot_scripts=ls1046ardb_boot.scr\0"	\
++	"boot_scripts=boot.scr\0"	\
+ 	"boot_script_hdr=hdr_ls1046ardb_bs.out\0"
+ #endif
+ #ifndef SPL_NO_MISC
+diff --git a/include/configs/lx2160ardb.h b/include/configs/lx2160ardb.h
+index 9d065d02bc5..7f88ecea3eb 100644
+--- a/include/configs/lx2160ardb.h
++++ b/include/configs/lx2160ardb.h
+@@ -33,7 +33,7 @@
+ /* Initial environment variables */
+ #define CFG_EXTRA_ENV_SETTINGS		\
+ 	EXTRA_ENV_SETTINGS			\
+-	"boot_scripts=lx2160ardb_boot.scr\0"	\
++	"boot_scripts=boot.scr\0"	\
+ 	"boot_script_hdr=hdr_lx2160ardb_bs.out\0"	\
+ 	"BOARD=lx2160ardb\0"			\
+ 	"xspi_bootcmd=echo Trying load from flexspi..;"		\
+-- 
+2.34.1
+

@@ -7,7 +7,7 @@ http_proxy  ?=
 https_proxy ?=
 no_proxy    ?=
 
-IMAGE := fbdebian:13
+IMAGE_TAG ?= fbdebian:13
 
 build:
 	@set -e; \
@@ -24,7 +24,7 @@ build:
 		ARGS+=" --build-arg no_proxy=$(no_proxy) --build-arg NO_PROXY=$(no_proxy)"; \
 	fi; \
 
-	#echo "docker build -t $(IMAGE) --network host $$ARGS ."; \
-	#docker build -t $(IMAGE) --network host .
-	#docker build -t $(IMAGE) --network host $$ARGS .
-	docker build --add-host fbdebian:127.0.0.1 -t $(IMAGE) --network host $$ARGS .
+	#echo "docker build -t $(IMAGE_TAG) --network host $$ARGS ."; \
+	#docker build -t $(IMAGE_TAG) --network host .
+	#docker build -t $(IMAGE_TAG) --network host $$ARGS .
+	docker build --add-host fbdebian:127.0.0.1 -t $(IMAGE_TAG) --network host $$ARGS .

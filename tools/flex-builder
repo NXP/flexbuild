@@ -65,7 +65,7 @@ check_http_request() {
     if [ $retcode != 000 -a ${retcode:0:1} != 2 -a ${retcode:0:1} != 3 ]; then
         fbprint_e "ERROR: HTTP returned $retcode, failed to access $1"
         fbprint_e "Please check your network to ensure $1 is accessable via HTTP from this machine"
-        fbprint_e "Please check HTTP proxy settings if it is needed in your environment" && exit
+        fbprint_e "Please check HTTP proxy settings if it is needed in your environment" && exit 1
     fi
     [ $retcode != 200 -a $retcode != 000 ] && fbprint_e "The requested URL $1 returned error $retcode" && exit 1 || true
 }
@@ -86,7 +86,7 @@ pack_distro_rfs() {
     if [ "$RFS_BASE" = "y" ]; then
         RFSDIR=${FBOUTDIR}/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64
     fi
-    [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit; }
+    [ -f $RFSDIR/etc/buildinfo ] || { fbprint_e "$RFSDIR is incomplete"; exit 1; }
     [ $DISTROTYPE = ubuntu -o $DISTROTYPE = debian ] && rfs_umount "$RFSDIR"
 
     local rname=${RFSDIR##*/}
@@ -142,18 +142,18 @@ merge_apps() {
 }
 
 
-
 flexbuild_launch_docker() {
     if ! which docker 1>/dev/null 2>&1; then
-        fbprint_e "Ensure docker is installed properly on the host machine!"; exit
+        fbprint_e "Ensure docker is installed properly on the host machine!"; exit 1
     fi
     if ! docker ps  1>/dev/null 2>&1; then
-        fbprint_e "Ensure you can run 'docker ps' if you are in a docker group"; exit
+        fbprint_e "Ensure you can run 'docker ps' if you are in a docker group"; exit 1
     fi
 
-	docker_hash=$(md5sum "$FBDIR/docker/debian/Dockerfile" | cut -c1-8)
-	imagename="fbdebian:${DEBIAN_VERSION}-${docker_hash}"
-	containername="$(whoami)_fbdebian_${DEBIAN_VERSION}_${docker_hash}"
+    docker_hash=$(md5sum "$FBDIR/docker/debian/Dockerfile" | cut -c1-8)
+    fbdir_hash=$(echo "$FBDIR" | md5sum | cut -c1-8)
+    imagename="fbdebian:${DEBIAN_VERSION}-${docker_hash}"
+    containername="$(whoami)_fbdebian_${DEBIAN_VERSION}_${docker_hash}_${fbdir_hash}"
 
     # check if container exists and get its status (running / exited / not found)
     status=$(docker container inspect -f '{{.State.Status}}' "$containername" 2>/dev/null || true)
@@ -169,15 +169,15 @@ flexbuild_launch_docker() {
         docker run -it --hostname fbdebian --name="$containername" --privileged --net=host \
             --add-host fbdebian:127.0.0.1 \
             -v "$HOME":"$HOME" -v "$FBDIR":"$FBDIR" -v /lib/modules:/lib/modules -v /dev:/dev \
-            -v /etc/localtime:/etc/localtime:ro -w "$FBDIR" "fbdebian:${DEBIAN_VERSION}" /bin/bash
+            -v /etc/localtime:/etc/localtime:ro -w "$FBDIR" "$imagename" /bin/bash
     elif [ "$status" = "exited" ]; then
-        docker start -ai "$containername"
+		docker start "$containername" >/dev/null
+		docker attach "$containername"
     else
         # running -> open an interactive shell in a new session, or attach if you prefer
         docker exec -it "$containername" /bin/bash
     fi
 }
-
 
 check_host_dependent_pkg() {
 	fbprint_n "Prepare the build environment on host "

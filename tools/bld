@@ -98,10 +98,8 @@ check_and_setup_config() {
         fbprint_e "  You specified machine:  $machine"
         fbprint_e ""
         fbprint_n "Options:"
-        fbprint_n "  1. Run 'make ${machine}_defconfig' to reconfigure for $machine"
-        fbprint_n "  2. Run 'make distclean' to clean everything and start fresh"
-        fbprint_n "  3. Run 'make menuconfig' to manually configure"
-        fbprint_n "  4. Use 'bld <command> -m $current_machine' to build for the configured machine"
+        fbprint_n "  1. Run 'make ${machine}_defconfig' to reconfigure for $machine, then start again"
+        fbprint_n "  2. Use 'bld <command> -m $current_machine' to run for the configured machine"
         exit 1
     fi
 

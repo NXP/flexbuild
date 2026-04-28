@@ -11,16 +11,6 @@ config FLEXBUILD_VERSION
 	help
 	  Flexbuild version string
 
-config ARM
-	bool
-	help
-	  Define the arm32 architecture
-
-config ARM64
-	bool
-	help
-	  Define the arm64 architecture
-
 choice
 	prompt "Target Platform"
 	default SOC_IMX93FRDM
@@ -139,7 +129,7 @@ config KEEP_GIT
 
 config OPTEE
 	bool "Enable OPTEE feature"
-	default y
+	default n
 	help
 	  Use Open Portable Trusted Execution Environment(OPTEE)
 	  designed to run secure code alongside a normal operating system

@@ -28,6 +28,7 @@ kernel-menuconfig linux-menuconfig:
 linux $(KERNEL_IMAGE):
 	@$(MAKE) dl-kernel
 	mkdir -p $(KTGT_DIR)
+	[ ! -e $(FBOUTDIR)/linux/kernel ] && ln -sf linux $(FBOUTDIR)/linux/kernel || true
 	$(MAKE) all -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	$(MAKE) zinstall INSTALL_PATH=$(KTGT_DIR) -C $(KERNEL_PATH) O=$(KOUTDIR) $(LOG_MUTE)
 	cp -f $(KOUTDIR)/arch/arm64/boot/Image* $(KTGT_DIR)

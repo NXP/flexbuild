@@ -21,7 +21,7 @@ DEBIAN_VERSION := 13
 
 LOG_LEVEL ?= 2
 
-NO_CONFIG_FIXED := menuconfig help docker config
+NO_CONFIG_FIXED := menuconfig help docker config distclean clean-linux clean-bsp clean-apps clean-boot clean-rfs
 CURRENT_GOALS := $(or $(MAKECMDGOALS),help)
 FIXED_MATCH     := $(filter $(NO_CONFIG_FIXED),$(CURRENT_GOALS))
 DEFCONFIG_MATCH := $(filter %_defconfig,$(CURRENT_GOALS))
@@ -110,9 +110,8 @@ include $(FBDIR)/include/download_repo.mk
 include $(FBDIR)/include/patch_apply.mk
 
 $(shell mkdir -p $(PKGDIR) $(FBOUTDIR))
-$(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
+$(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images,boot} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
 $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics})
-$(shell [ ! -e $(FBOUTDIR)/linux/kernel ] && ln -sf linux $(FBOUTDIR)/linux/kernel || true)
 
 # ============================================================================
 # Main build target - builds based on configuration
@@ -275,19 +274,19 @@ include $(FBDIR)/include/func.mk
 # ============================================================================
 
 # Declare all clean targets as phony
-.PHONY: clean clean-linux clean-kernel clean-bsp clean-boot clean-apps clean-rfs distclean
+.PHONY: clean-linux clean-kernel clean-bsp clean-boot clean-apps clean-rfs distclean
 
 clean-linux clean-kernel:
-	@rm -rf $(FBOUTDIR)/linux
+	@rm -rf $(FBOUTDIR)/linux/*
 
 clean-bsp:
-	@rm -rf $(FBOUTDIR)/bsp
+	@rm -rf $(FBOUTDIR)/bsp/*
 	@rm -rf $(PKGDIR)/bsp/atf/build
 	@if [ -d $(PKGDIR)/bsp/rcw ]; then
-		$(MAKE) clean -C $(PKGDIR)/bsp/rcw 2>/dev/null
+		$(MAKE) clean -C $(PKGDIR)/bsp/rcw &>/dev/null
 	fi
 	@if [ -d $(PKGDIR)/bsp/mc_utils/config ]; then
-		$(MAKE) clean -C $(PKGDIR)/bsp/mc_utils/config
+		$(MAKE) clean -C $(PKGDIR)/bsp/mc_utils/config &>/dev/null
 	fi
 
 clean-apps:
@@ -317,16 +316,12 @@ clean-rfs:
 	@rm -rf $(RFSDIR)
 	@rm -rf $(FBOUTDIR)/images/$(notdir $(RFSDIR))*
 
-clean:
-	@$(MAKE) clean-bsp
-	@$(MAKE) clean-linux
-	@$(MAKE) clean-apps
-
 distclean:
-	@rm -rf $(FBOUTDIR)/*
-	@rm -rf $(PKGDIR)/*
+	@rm -rf $(FBOUTDIR)/*/*
+	@rm -rf $(PKGDIR)/bsp/* $(PKGDIR)/linux/* $(PKGDIR)/apps/*/*
 	@rm -rf $(FBDIR)/logs/* $(FBDIR)/logs/.*
 	@rm -rf $(FBDIR)/dl/*
+	@rm -f $(FBDIR)/.config
 
 clean-config:
 	@rm -f $(FBDIR)/.config

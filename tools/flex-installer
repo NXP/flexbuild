@@ -22,25 +22,26 @@ DEFAULT_RAW_PARTITION_SIZE_MB=256
 DEFAULT_DISTRO_SVR_URL=https://www.nxp.com/lgfiles/sdk/$FIVERSION
 MAX_PRIMARY_PARTITIONS=4  # Maximum number of primary partitions in MBR partition table
 # Cleanup function for signal handling
+#
 cleanup_on_exit() {
     local exit_code=$?
-    [ $exit_code -ne 0 ] && print_w "\nCleaning up resources"
+    [ $exit_code -ne 0 ] && print_w "\nCleaning up resources, please be patient" || true
     if [ -n "$devpartname" ]; then
         # Unmount all partitions
-        mntlist=$(cat /proc/mounts 2>/dev/null | grep /dev/${devpartname} | cut -d' ' -f1 | tr '\n' ' ' || true)
+        mntlist=$(lsblk -ln -o MOUNTPOINT /dev/${devpartname}* 2>/dev/null | grep -v "^$" || true)
 
         for mntp in $mntlist; do
-            sudo fuser -k $mntp &>/dev/null || true
-			sleep 1
-            sudo umount $mntp &>/dev/null || true
-            # print_w "Unmounted $mntp"
+            sudo fuser -k -m $mntp &>/dev/null || true
+			sleep 0.5
+            sudo umount -l "$mntp" &>/dev/null || true
         done
+
+        sudo udevadm settle &>/dev/null || true
 
         # Clean up loop device if used
         if [[ "$devname" =~ ^loop[0-9]+$ ]] && [ -n "$devname" ]; then
-            if sudo losetup -l | grep -q "/dev/$devname"; then
+            if sudo losetup -a | grep -q "/dev/$devname"; then
                 sudo losetup -d /dev/$devname &>/dev/null || true
-                # print_w "Detached loop device /dev/$devname"
             fi
         fi
     fi
@@ -52,22 +53,19 @@ cleanup_on_exit() {
 
     # Remove mount point directories and mntdir itself
     if [ -n "$mntdir" ] && [ -d "$mntdir" ]; then
-        for mntpoint in $mntdir/*; do
-            if [ -d "$mntpoint" ]; then
-                sudo umount "$mntpoint" &>/dev/null || true
-                sudo rmdir "$mntpoint" &>/dev/null || true
-                # print_w "Removed mount point $mntpoint"
-            fi
+        mount | grep "$mntdir" | cut -d' ' -f3 | sort -r | while read -r sub_mnt; do
+            sudo umount -l "$sub_mnt" &>/dev/null || true
         done
-        # Remove the main mntdir
-        rm -rf "$mntdir" &>/dev/null || true
-        # print_w "Removed temporary mount directory $mntdir"
+        sudo rm -rf "$mntdir" &>/dev/null || true
     fi
 
     if [ $exit_code -ne 0 ]; then
         print_e "\nOperation interrupted or failed. Cleanup completed."
     fi
 
+    if [ "$intinyrfs" = "y" ]; then
+        echo "$OLD_PRINTK" | sudo tee /proc/sys/kernel/printk > /dev/null
+    fi
     exit $exit_code
 }
 
@@ -232,16 +230,20 @@ get_device_name_on_host() {
 
 
 umount_device() {
-    mntlist=$(cat /proc/mounts | grep /dev/${devpartname} | cut -d' ' -f1 | tr '\n' ' ')
+    local mntlist=$(grep "^/dev/${devpartname}" /proc/mounts | cut -d' ' -f1 | sort -u | tr '\n' ' ' || true)
 
     for mntp in $mntlist; do
-	if [ $intinyrfs = y -a `pwd` = "$rootpartition" ]; then
-	    continue
-	else
-	    sudo fuser -k $mntp &>/dev/null || true
-	    sudo umount $mntp || true
-	fi
+        if [ "$intinyrfs" = "y" ] && [ "$(pwd)" = "$rootpartition" ]; then
+            continue
+        else
+            if ! sudo umount "$mntp" &>/dev/null; then
+                sudo fuser -k -m "$mntp" &>/dev/null || true
+                sleep 0.2
+                sudo umount -l "$mntp" &>/dev/null || true
+            fi
+        fi
     done
+    sudo udevadm settle &>/dev/null || true
 }
 
 
@@ -254,6 +256,7 @@ mount_device() {
 	    sudo mount /dev/${devpartname}$i $mntdir/${devpartname}$i 1>/dev/null 2>&1 || true
 	fi
     done
+    sudo udevadm settle &>/dev/null || true
 }
 
 
@@ -275,9 +278,9 @@ program_firmware_to_sd() {
 	offset=4
     fi
 
-    echo "Program $1"
+    echo "Installing $1"
     sudo dd if="$1" of="$2" bs=1k seek="$offset" status=none conv=fsync
-    print_d "Program $1 to $2 with offset ${offset}K"
+    print_d "Install $1 to $2 with offset ${offset}K"
 }
 
 
@@ -549,10 +552,10 @@ check_running_rfs() {
 
 check_distro_in_disk() {
     if [ -b $backupdev ] && ! mount | grep -q $backuppartition; then
-	sudo mount $backupdev $backuppartition || true
+	sudo mount $backupdev $backuppartition &>/dev/null || true
     fi
     if [ -b $rootdev ] && ! mount | grep -q $rootpartition; then
-	sudo mount $rootdev $rootpartition || true
+	sudo mount $rootdev $rootpartition &>/dev/null || true
     fi
     for tdir in $backuppartition $rootpartition; do
 	if [ -d $tdir/var/lib ]; then
@@ -622,8 +625,12 @@ check_http_request() {
 
 
 download_distro() {
+    if [ "$intinyrfs" = "y" ]; then
+        temp_dir=$(mktemp -d ./flex-installer.XXXXXX)
+    else
+        temp_dir=$(mktemp -d /tmp/flex-installer.XXXXXX)
+    fi
 
-    temp_dir=$(mktemp -d)
     check_http_request $bootimg_url
 
     local original_dir=$(pwd)
@@ -761,7 +768,15 @@ do
 shift
 done
 
-mntdir=$(mktemp -d /tmp/flex-installer.XXXXXX)
+
+[ -f /etc/issue ] && [[ `cat /etc/issue | grep NXP | grep tiny` ]] && intinyrfs=y || intinyrfs=n
+if [ "$intinyrfs" = "y" ]; then
+	mntdir=$(mktemp -d ./flex-installer.XXXXXX)
+    OLD_PRINTK=$(cat /proc/sys/kernel/printk)
+    sudo dmesg -n 1
+else
+	mntdir=$(mktemp -d /tmp/flex-installer.XXXXXX)
+fi
 if [ $? -ne 0 ] || [ -z "$mntdir" ]; then
     print_e "Failed to create temporary mount directory"
     exit 1
@@ -787,8 +802,6 @@ fi
 if [ -z "$mediadevice" ] && [ $instruction = install -o $instruction = auto -o $instruction = pf ]; then
     print_e "Please specify '-d <device>'"; exit 1
 fi
-
-[ -f /etc/issue ] && [[ `cat /etc/issue | grep NXP | grep tiny` ]] && intinyrfs=y || intinyrfs=n
 
 if [ $instruction = mkwic ]; then
     if [ -n "$mediadevice" ]; then
@@ -823,8 +836,6 @@ fi
 if [ -z "$diskpartlist" ]; then
     [ "${devname:0:4}" = loop -o $disksize -le 16 ] && diskpartition=$DEFAULT_LOOP_DEVICE_PARTITION || \
     diskpartition=$DEFAULT_DISK_PARTITION
-    [ $instruction = auto -o $instruction = pf ] && [ $disksize -le 16 ] && \
-    print_w "The capacity of /dev/$devname is only $disksize GB, using partitions: $DEFAULT_LOOP_DEVICE_PARTITION"
 else
    diskpartition=$diskpartlist
 fi
@@ -898,7 +909,7 @@ check_required_cmd
 
 if [ $instruction = auto ]; then
     check_network_access
-    [ $intinyrfs = y ] && cd $rootpartition
+    #[ $intinyrfs = y ] && cd $rootpartition
     download_distro
     check_images_format
     [ -z "$machine" ] && { print_e "Please specify '-m <machine>' for installation"; exit 1; }

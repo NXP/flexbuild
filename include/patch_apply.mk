@@ -2,11 +2,18 @@
 #
 # Copyright 2025-2026 NXP
 #
+# Public interface with lock protection
+# $(1)=pkg_name, $(2)=app_dir $(3)=patchpattern
+#
+define patch_apply
+	mkdir -p $(FBDIR)/dl $(FBDIR)/logs && \
+	flock $(FBDIR)/logs/.patch.$(1).lock -c '$(subst ','\'',$(call _patch_apply,$(1),$(2),$(3)))'
+endef
 
 #
 # $(1)=pkg_name, $(2)=app_dir $(3)=patchpattern
 #
-define patch_apply
+define _patch_apply
 	targetdir=$(PKGDIR)/$(2)/$(1) && \
 	patchdir=$(FBDIR)/patch/$(1) && \
 	patchpattern=$(or $(3),*.patch) && \

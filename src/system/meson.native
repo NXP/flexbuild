@@ -10,6 +10,18 @@ readelf = 'readelf'
 objcopy = 'objcopy'
 pkg-config = '@STAGING_DIR@/src/system/pkg-config-native'
 
+rcc = '/usr/lib/qt6/libexec/rcc'
+moc = '/usr/lib/qt6/libexec/moc'
+uic = '/usr/lib/qt6/libexec/uic'
+qtpaths = '/usr/lib/qt6/bin/qtpaths6'
+qmlcachegen = '/usr/lib/qt6/libexec/qmlcachegen'
+qt6.rcc = '/usr/lib/qt6/libexec/rcc'
+qt6.moc = '/usr/lib/qt6/libexec/moc'
+qt6.uic = '/usr/lib/qt6/libexec/uic'
+qt6.qtpaths = '/usr/lib/qt6/bin/qtpaths6'
+qt6.qmlcachegen = '/usr/lib/qt6/libexec/qmlcachegen'
+lrelease = '/usr/bin/lrelease'
+python = '/usr/bin/python3'
 
 [built-in options]
 c_args = []

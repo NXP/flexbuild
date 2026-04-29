@@ -7,6 +7,18 @@ ld = ['@TARGET_CROSS@ld', '--sysroot=@STAGING_DIR@']
 pkg-config = '/usr/bin/pkg-config'
 glib-compile-schemas = '/usr/bin/glib-compile-schemas'
 glib-compile-resources = '/usr/bin/glib-compile-resources'
+
+rcc = '/usr/lib/qt6/libexec/rcc'
+moc = '/usr/lib/qt6/libexec/moc'
+uic = '/usr/lib/qt6/libexec/uic'
+qmlcachegen = '/usr/lib/qt6/libexec/qmlcachegen'
+lrelease = '/usr/bin/lrelease'
+
+qt6.rcc = '/usr/lib/qt6/libexec/rcc'
+qt6.moc = '/usr/lib/qt6/libexec/moc'
+qt6.uic = '/usr/lib/qt6/libexec/uic'
+qt6.qtpaths = '/usr/lib/qt6/bin/qtpaths6'
+qt6.qmlcachegen = '/usr/lib/qt6/libexec/qmlcachegen'
 #g-ir-scanner = '/usr/bin/g-ir-scanner'
 
 # g-ir-scanner = '/usr/bin/g-ir-scanner'

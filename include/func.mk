@@ -41,7 +41,7 @@ docker:
 		echo "ERROR: Already inside a Docker container!" >&2; \
 		exit 1; \
 	fi
-	@$(BLD) docker || [ $$? -eq 130 ]
+	@$(BLD) docker || true
 
 rfs $(RFS_FILE):
 	@/bin/bash -e $(FBDIR)/tools/distro_debian

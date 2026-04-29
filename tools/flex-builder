@@ -82,6 +82,22 @@ get_prebuilt_initrd() {
     fi
 }
 
+rfs_umount() {
+	for mnt in dev/pts dev sys/kernel/security sys  proc; do
+		 if mountpoint -q "$1/$mnt"; then
+			 if ! umount "$1/$mnt"; then
+				 sleep 2
+				 umount -f "$1/$mnt" || true
+				 log_mute echo umount $1/$mnt failed
+			 else
+				 log_mute echo umont $mnt successfully
+			 fi
+		 else
+			 log_mute echo $mnt is not mounted.
+		 fi
+	done
+}
+
 pack_distro_rfs() {
     if [ "$RFS_BASE" = "y" ]; then
         RFSDIR=${FBOUTDIR}/rfs/rootfs_${DISTRIB_VERSION}_debian_base_arm64

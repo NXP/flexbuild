@@ -21,7 +21,7 @@ DEBIAN_VERSION := 13
 
 LOG_LEVEL ?= 2
 
-NO_CONFIG_FIXED := menuconfig help docker config distclean clean-linux clean-bsp clean-apps clean-boot clean-rfs
+NO_CONFIG_FIXED := menuconfig help docker config distclean
 CURRENT_GOALS := $(or $(MAKECMDGOALS),help)
 FIXED_MATCH     := $(filter $(NO_CONFIG_FIXED),$(CURRENT_GOALS))
 DEFCONFIG_MATCH := $(filter %_defconfig,$(CURRENT_GOALS))
@@ -154,6 +154,7 @@ menuconfig:
 	fi && \
 	$(PYTHON) -m menuconfig && \
 	$(PYTHON) tools/kconfig_hooks.py && \
+	$(MAKE) parse-sdk-config && \
 	$(MAKE) host-dep
 
 .PHONY: %_defconfig
@@ -167,6 +168,7 @@ menuconfig:
 	echo "==> Generating defconfig for $$BOARD" && \
 	$(PYTHON) tools/gen_defconfig.py Kconfig $$BOARD && \
 	$(PYTHON) tools/kconfig_hooks.py && \
+	$(MAKE) parse-sdk-config && \
 	$(MAKE) host-dep
 
 .PHONY: config
@@ -190,7 +192,20 @@ config:
 	echo "==> Generating .config from $(CONFIG)" && \
 	$(PYTHON) tools/gen_config_from_file.py Kconfig $(CONFIG) && \
 	$(PYTHON) tools/kconfig_hooks.py && \
+	$(MAKE) parse-sdk-config && \
 	$(MAKE) host-dep
+
+# Create a new target for SDK configuration parsing
+.PHONY: parse-sdk-config
+parse-sdk-config:
+	@CUSTOM_CONFIG=$$(echo '$(CONFIG_CUSTOM_SDK_CONFIG)' | sed 's/"//g' | xargs); \
+	if [ -n "$$CUSTOM_CONFIG" ]; then \
+		SDK_YML=$(FBDIR)/configs/$$CUSTOM_CONFIG; \
+	else \
+		SDK_YML=$(FBDIR)/configs/sdk.yml; \
+	fi; \
+	$(PYTHON) $(FBDIR)/tools/parse_yaml.py $$SDK_YML $(FBDIR)/configs/.sdk.cfg && \
+	chmod 666 $(FBDIR)/configs/.sdk.cfg
 
 # Help target
 .PHONY: help
@@ -253,15 +268,7 @@ ifneq ($(wildcard .config),)
 
 include configs/board/$(MACHINE).conf
 
-CUSTOM_CONFIG := $(subst ",,$(strip $(CONFIG_CUSTOM_SDK_CONFIG)))
-SDK_YML := $(if $(CUSTOM_CONFIG),\
-                $(FBDIR)/configs/$(CUSTOM_CONFIG),\
-                $(FBDIR)/configs/sdk.yml)
-$(shell python3 $(FBDIR)/tools/parse_yaml.py $(SDK_YML) $(FBDIR)/configs/.sdk.cfg)
-$(shell chmod 666 $(FBDIR)/configs/.sdk.cfg)
-
-include $(FBDIR)/configs/.sdk.cfg
-
+-include $(FBDIR)/configs/.sdk.cfg
 
 include $(FBDIR)/src/Makefile
 

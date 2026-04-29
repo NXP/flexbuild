@@ -116,9 +116,9 @@ def verify_hash(file_path: str, expected_hash: str) -> None:
 
 def check_gitmodules(extracted_dir: str) -> None:
     """Check for .gitmodules file existence"""
-    for root, _, files in os.walk(extracted_dir):
-        if '.gitmodules' in files:
-            raise DownloadError("Repository contains submodules (not supported)")
+    gitmodules_path = os.path.join(extracted_dir, '.gitmodules')
+    if os.path.exists(gitmodules_path):
+        raise DownloadError("Repository contains submodules (not supported)")
 
 def create_output_filename(subdir: str, version: str) -> str:
     """Generate standardized output filename: subdir_version.tar.gz"""

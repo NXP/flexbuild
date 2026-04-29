@@ -1,7 +1,7 @@
-From 73d0f0ff20bd77d5c8a14dc295a5a6028252a689 Mon Sep 17 00:00:00 2001
-From: nxa22691 <andy.tang@nxp.com>
-Date: Thu, 23 Apr 2026 12:24:25 +0900
-Subject: [PATCH] config: rename the boot script to boot.scr
+From 40a8e7d0b736ae0432ff2baab96019be9fe186a1 Mon Sep 17 00:00:00 2001
+From: Yuantian Tang <andy.tang@nxp.com>
+Date: Tue, 28 Apr 2026 22:30:59 -0700
+Subject: [PATCH 6/7] config: rename the boot script to boot.scr
 
 Signed-off-by: Andy Tang <andy.tang@nxp.com>
 ---
@@ -12,12 +12,12 @@ Signed-off-by: Andy Tang <andy.tang@nxp.com>
  4 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/include/configs/ls1028ardb.h b/include/configs/ls1028ardb.h
-index 005667d20b6..31fd6ae12f2 100644
+index 2764b473930..49211d210cd 100644
 --- a/include/configs/ls1028ardb.h
 +++ b/include/configs/ls1028ardb.h
-@@ -78,7 +78,7 @@
+@@ -81,7 +81,7 @@
  	"kernelhdr_size_sd=0x20\0"		\
- 	"console=ttyS0,115200\0"                \
+ 	"console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500\0"			\
  	BOOTENV					\
 -	"boot_scripts=ls1028ardb_boot.scr\0"    \
 +	"boot_scripts=boot.scr\0"    \
@@ -25,11 +25,11 @@ index 005667d20b6..31fd6ae12f2 100644
  	"scan_dev_for_boot_part="               \
  		"part list ${devtype} ${devnum} devplist; "   \
 diff --git a/include/configs/ls1043a_common.h b/include/configs/ls1043a_common.h
-index d82502d628e..4ac3550490b 100644
+index b042fb999a9..4cc8ff1c57b 100644
 --- a/include/configs/ls1043a_common.h
 +++ b/include/configs/ls1043a_common.h
 @@ -113,7 +113,7 @@
- 	"console=ttyS0,115200\0"		\
+ 	"console=ttyS0,115200 earlycon=uart8250,mmio,0x21c0500\0"		\
  	"boot_os=y\0"				\
  	BOOTENV					\
 -	"boot_scripts=ls1043ardb_boot.scr\0"	\
@@ -38,7 +38,7 @@ index d82502d628e..4ac3550490b 100644
  	"scan_dev_for_boot_part="		\
  		"part list ${devtype} ${devnum} devplist; "	\
 diff --git a/include/configs/ls1046a_common.h b/include/configs/ls1046a_common.h
-index 8666aff0f33..434693c17d4 100644
+index 50b78e22cf4..7a9c3999eec 100644
 --- a/include/configs/ls1046a_common.h
 +++ b/include/configs/ls1046a_common.h
 @@ -70,15 +70,15 @@
@@ -61,12 +61,12 @@ index 8666aff0f33..434693c17d4 100644
  #endif
  #ifndef SPL_NO_MISC
 diff --git a/include/configs/lx2160ardb.h b/include/configs/lx2160ardb.h
-index 9d065d02bc5..7f88ecea3eb 100644
+index 9918a5a4304..aeb0f0aa089 100644
 --- a/include/configs/lx2160ardb.h
 +++ b/include/configs/lx2160ardb.h
-@@ -33,7 +33,7 @@
- /* Initial environment variables */
- #define CFG_EXTRA_ENV_SETTINGS		\
+@@ -37,7 +37,7 @@
+ 	"image=Image\0"				\
+ 	"extra_bootargs=pci=pcie_bus_perf\0"	\
  	EXTRA_ENV_SETTINGS			\
 -	"boot_scripts=lx2160ardb_boot.scr\0"	\
 +	"boot_scripts=boot.scr\0"	\
@@ -74,5 +74,5 @@ index 9d065d02bc5..7f88ecea3eb 100644
  	"BOARD=lx2160ardb\0"			\
  	"xspi_bootcmd=echo Trying load from flexspi..;"		\
 -- 
-2.34.1
+2.43.0
 

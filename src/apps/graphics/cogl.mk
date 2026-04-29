@@ -40,6 +40,7 @@ cogl: $(DEP_COGL) libdrm wayland_protocols
 	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)"
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR)
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig
+	 export NOCONFIGURE=1
 	 $(COGL_SRCDIR)/autogen.sh --prefix=/usr --host=aarch64-linux-gnu $(LOG_MUTE)
 	 $(COGL_SRCDIR)/configure \
 	 	--host=aarch64-linux-gnu \
@@ -63,6 +64,7 @@ cogl: $(DEP_COGL) libdrm wayland_protocols
 		--enable-gl \
 		--enable-wayland-egl-server \
 		--enable-nls $(LOG_MUTE)
+	 sync
 	 $(MAKE) $(LOG_MUTE)
 	 $(MAKE) install $(LOG_MUTE)
 	 $(call fbprint_d,"cogl")

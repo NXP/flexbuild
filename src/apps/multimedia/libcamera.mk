@@ -27,6 +27,7 @@ libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 	 install -m 644 $(DESTDIR)/usr/lib/libgstbase-1.0* $(RFSDIR)/usr/lib/
 	 install -m 644 $(DESTDIR)/usr/lib/libgstallocators-1.0* $(RFSDIR)/usr/lib/
 	 install -m 644 $(DESTDIR)/usr/lib/libEGL.so.* $(RFSDIR)/usr/lib/
+	 cp -a $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/
 	 if [ "$(CONFIG_SOC_IMX8)" = "y" ]; then
 		install -m 644 $(DESTDIR)/usr/lib/libGAL.so* $(RFSDIR)/usr/lib/
 		install -m 644 $(DESTDIR)/usr/lib/libdrm.so* $(RFSDIR)/usr/lib/
@@ -40,7 +41,7 @@ libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 	 fi
 	 meson setup build \
 		--prefix=/usr --buildtype=release \
-		--cross-file meson.cross \
+		--cross-file=meson.cross \
 		-Dpipelines=imx8-isi,mali-c55,simple,uvcvideo,nxp/neo \
 		-Dv4l2=enabled \
 		-Dcam=enabled \

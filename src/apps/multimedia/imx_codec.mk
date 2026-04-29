@@ -18,6 +18,7 @@ imx_codec:
 	fi
 	$(call fbprint_b,"imx_codec")
 	cd imx_codec
+	rm -rf $(DESTDIR)/usr/share/imx-mm/*-codec/build $(DESTDIR)/usr/lib/imx-mm/video-codec
 	./configure CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)" \
 	   --enable-armv8 \
 	   --disable-static \

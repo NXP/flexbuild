@@ -12,8 +12,7 @@ FBDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 BLD := $(FBDIR)/tools/flex-builder
 FINST := $(FBDIR)/tools/flex-installer
 PYTHON := python3
-DISTRO_SVR_URL := http://sun.ap.freescale.net/images/debian
-#DISTRO_SVR_URL := https://www.nxp.com/lgfiles/sdk
+DISTRO_SVR_URL := https://www.nxp.com/lgfiles/sdk
 DESTARCH := arm64
 DISTRIB_NAME := "NXP Debian Linux SDK"
 DEBIAN_CODENAME := trixie
@@ -21,28 +20,29 @@ DEBIAN_VERSION := 13
 
 LOG_LEVEL ?= 2
 
-NO_CONFIG_FIXED := menuconfig help docker config distclean
-CURRENT_GOALS := $(or $(MAKECMDGOALS),help)
-FIXED_MATCH     := $(filter $(NO_CONFIG_FIXED),$(CURRENT_GOALS))
-DEFCONFIG_MATCH := $(filter %_defconfig,$(CURRENT_GOALS))
-NEED_CONFIG_GOALS := $(filter-out $(FIXED_MATCH) $(DEFCONFIG_MATCH), $(CURRENT_GOALS))
-IS_DOCKER := $(wildcard /.dockerenv)
-ifneq ($(NEED_CONFIG_GOALS),)
+NO_CONFIG_FIXED   := menuconfig help docker list config distclean %_defconfig clean-%
+CURRENT_GOALS     := $(or $(MAKECMDGOALS),help)
+IS_DOCKER         := $(wildcard /.dockerenv)
+
+# Only the docker and help targets can be run inside Docker
+ifneq ($(filter-out docker help list,$(CURRENT_GOALS)),)
     ifeq ($(IS_DOCKER),)
+        $(info ERROR: Must be run inside a Docker container!)
+        $(info Please run 'make docker' first.)
         $(info )
-        $(info =====================================================)
-        $(info NOT in Docker environment. Please run 'make docker')
-        $(info =====================================================)
-        $(info )
-        $(error Build stopped: outside of Docker)
+        $(error Build stopped)
     endif
+endif
+
+# Only the clean-%, distclean, config, menuconfig, and %_defconfig targets
+# can be run without a .config file
+NEED_CONFIG_GOALS := $(filter-out $(NO_CONFIG_FIXED), $(CURRENT_GOALS))
+ifneq ($(NEED_CONFIG_GOALS),)
     ifeq ($(wildcard $(FBDIR)/.config),)
+        $(info ERROR: .config not found!)
+        $(info Please run 'make menuconfig' or '<machine>_defconfig' first.)
         $(info )
-        $(info =========================================================================)
-        $(info .config not found. Please run 'make menuconfig' or '<machine>_defconfig')
-        $(info =========================================================================)
-        $(info )
-        $(error Build stopped: missing .config)
+        $(error Build stopped)
     endif
 endif
 
@@ -110,7 +110,7 @@ include $(FBDIR)/include/download_repo.mk
 include $(FBDIR)/include/patch_apply.mk
 
 $(shell mkdir -p $(PKGDIR) $(FBOUTDIR))
-$(shell mkdir -p $(FBOUTDIR)/{bsp,linux,rfs,images,boot} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
+$(shell mkdir -p $(FBOUTDIR)/{apps,bsp,linux,rfs,images,boot} $(PKGDIR)/{linux,bsp} $(FBDIR)/{logs,dl})
 $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security,utils,ml,robotics})
 
 # ============================================================================
@@ -147,24 +147,14 @@ all-log:
 # MENUCONFIG_STYLE can be: default, aquatic, monochrome
 .PHONY: menuconfig
 menuconfig:
-	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
-		echo "ERROR: must be run inside a Docker container!" >&2; \
-		echo "       Please run "make docker" first"; \
-		exit 1; \
-	fi && \
-	$(PYTHON) -m menuconfig && \
+	@$(PYTHON) -m menuconfig && \
 	$(PYTHON) tools/kconfig_hooks.py && \
 	$(MAKE) parse-sdk-config && \
 	$(MAKE) host-dep
 
 .PHONY: %_defconfig
 %_defconfig:
-	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
-		echo "ERROR: must be run inside a Docker container!" >&2; \
-		echo "       Please run 'make docker' first"; \
-		exit 1; \
-	fi && \
-	BOARD=$(@:_defconfig=) && \
+	@BOARD=$(@:_defconfig=) && \
 	echo "==> Generating defconfig for $$BOARD" && \
 	$(PYTHON) tools/gen_defconfig.py Kconfig $$BOARD && \
 	$(PYTHON) tools/kconfig_hooks.py && \
@@ -173,12 +163,7 @@ menuconfig:
 
 .PHONY: config
 config:
-	@if ! [ -f /.dockerenv ] && ! grep -q docker /proc/1/cgroup 2>/dev/null; then \
-		echo "ERROR: must be run inside a Docker container!" >&2; \
-		echo "       Please run 'make docker' first"; \
-		exit 1; \
-	fi && \
-	if [ -z "$(CONFIG)" ]; then \
+	@if [ -z "$(CONFIG)" ]; then \
 		echo "ERROR: <CONFIG> parameter is required!" >&2; \
 		echo "" >&2; \
 		echo "Usage: make config CONFIG=<config-file>" >&2; \
@@ -253,8 +238,8 @@ help:
 	@echo ""
 	@echo ""
 	@echo "==================================================================="
-	@echo "Machine:                   $(MACHINE)"
-	@echo "Version:                   $(DISTRIB_VERSION)"
+	@echo "Current machine:           $(MACHINE)"
+	@echo "LSDK Version:              $(DISTRIB_VERSION)"
 	@echo "==================================================================="
 	@echo ""
 	@echo ""

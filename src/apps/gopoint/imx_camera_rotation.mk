@@ -44,6 +44,9 @@ imx_camera_rotation: libdrm $(DEP_CAMROTATION)
 		-B build_debian_arm64 \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D CMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-D QT_HOST_PATH=/usr \
+		-D Qt6Core_Config_EXECUTABLE_MOC=/usr/lib/qt6/libexec/moc \
+		-D Qt6Core_Config_EXECUTABLE_RCC=/usr/lib/qt6/libexec/rcc \
 		-D CMAKE_SYSROOT="$(RFSDIR)" $(LOG_MUTE)
 	cmake --build build_debian_arm64 $(LOG_MUTE)
 	rm -f /lib/ld-linux-aarch64.so.1

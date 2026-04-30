@@ -21,6 +21,7 @@ libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 	 cd $(MMDIR)/libcamera
 	 sed -e 's%@TARGET_CROSS@%$(CROSS_COMPILE)%g' -e 's%@STAGING_DIR@%$(RFSDIR)%g' \
 	     -e 's%@DESTDIR@%$(DESTDIR)%g' $(FBDIR)/src/system/meson.cross > meson.cross
+	 sed 's%@STAGING_DIR@%$(FBDIR)%g' $(FBDIR)/src/system/meson.native > meson.native
 	 rm -rf build
 	 export PATH=/usr/lib/qt6/libexec:$(PATH)
 	 mkdir -p $(RFSDIR)/usr/lib
@@ -39,9 +40,14 @@ libcamera: libdrm gstreamer gst_plugins_base $(DEP_LIBCAM)
 		cp -af "$(DESTDIR)/usr/include/libpisp/." "$(RFSDIR)/usr/include/libpisp/"
 		install -m 644 $(DESTDIR)/usr/lib/libpisp.so* "$(RFSDIR)/usr/lib"
 	 fi
+	 PKG_CONFIG_SYSROOT_DIR="" \
+	 LD_LIBRARY_PATH="" \
+	 PKG_CONFIG_Qt6Core_libexecdir=/usr/lib/qt6/libexec \
+	 PKG_CONFIG_Qt6Core_host_bins=/usr/lib/qt6/libexec \
 	 meson setup build \
 		--prefix=/usr --buildtype=release \
 		--cross-file=meson.cross \
+		--native-file=meson.native \
 		-Dpipelines=imx8-isi,mali-c55,simple,uvcvideo,nxp/neo \
 		-Dv4l2=enabled \
 		-Dcam=enabled \

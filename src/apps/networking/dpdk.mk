@@ -11,8 +11,8 @@
 # DPDK_EXAMPLES = all
 # DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool,link_status_interrupt,multi_process/symmetric_mp,multi_process/simple_mp,ipsec-secgw,qos_sched,multi_process/client_server_mp/mp_server,multi_process/client_server_mp/mp_client,l3fwd-power,l2fwd-event,l2fwd-crypto,bond"
 
-DPDK_EXAMPLES = "l2fwd,l3fwd,ip_fragmentation,ip_reassembly,qdma_demo,ethtool,ipsec-secgw,l2fwd-crypto"
-DPDK_APPS = pdump,test-pmd,proc-info,test-crypto-perf
+DPDK_EXAMPLES = "l2fwd,l3fwd,ipsec-secgw,l2fwd-crypto,l2fwd-event,ip_fragmentation,ip_reassembly,link_status_interrupt,qdma_demo,ethtool,pkt_split_app,multi_process/symmetric_mp,multi_process/simple_mp"
+DPDK_APPS = pdump,proc-info,test,test-crypto-perf,test-pmd
 
 dpdk:
 	 @$(call download_repo,dpdk,apps/networking)

@@ -18,7 +18,7 @@ Table-1: The unified 64MB layout of SD composite firmware for iMX platforms
 
 
 
-Table-2: The unified 64MB memory layout of SD/NOR/QSPI/XSPI media on all QorIQ platforms
+Table-2: The unified 64MB memory layout of SD/NOR/QSPI/XSPI media on Layerscape platforms
 +-----------------------------+---------|--------------|-----------------+
 |Firmware Definition          | MaxSize | Flash Offset | SD Start Block# |
 |-----------------------------|---------|--------------|-----------------|
@@ -61,7 +61,7 @@ Table-2: The unified 64MB memory layout of SD/NOR/QSPI/XSPI media on all QorIQ p
 
 
 
-Table-3: The unified 2MB memory layout for Layerscape (e.g. on LS1012AFRWY platform)
+Table-3: The unified 2MB memory layout for Layerscape
 +-----------------------+---------+---------------------------+----------+
 | Firmware Definition   | MaxSize | Location                  |SD Block# |
 |-----------------------|---------|---------------------------|----------|
@@ -83,13 +83,13 @@ Table-3: The unified 2MB memory layout for Layerscape (e.g. on LS1012AFRWY platf
 
 
 Table-4: The default partitions of SD/USB/SATA storage media installed by flex-installer
-+---------------+--------------------+-------------------+-------------------+-----------------------+
-|  Region 1     |      Region 2      |     Region 3      |      Region 4     |      Region 5         |
-|   4K(LS)      |       (RAW)        |   (Partition-1)   | (Partition-2 EXT4)| (Partition-3 EXT4)    |
-|1K/32K/33K(iMX)|      256 MiB       |    512 MiB Boot   |    8 GiB Backup   |Primary RFS, remaining |
-+---------------+--------------------+-------------------+-------------------+-----------------------+
-| MBR/GPT       | bootloader         | kernel & dtb      | backup partition  |    Debian-based RFS   |
-|               | env and firmware   | distro boot scr   | or                | or Yocto-based RFS    |
-|               | sdk_linux.itb      | secure boot header| second distro     | or Buildroot-based RFS|
-+---------------+--------------------+-------------------+-------------------+-----------------------+
++---------------+--------------------+-------------------+-----------------------+
+|  Region 1     |      Region 2      |     Region 3      |      Region 4         |
+|   4K(LS)      |       (RAW)        |   (Partition-1)   | (Partition-2 EXT4)    |
+|1K/32K/33K(iMX)|      256 MiB       |    512 MiB Boot   |Primary RFS, remaining |
++---------------+--------------------+-------------------+-----------------------+
+| MBR/GPT       | bootloader         | kernel & dtb      |    Debian-based RFS   |
+|               | env and firmware   | distro boot scr   |                       |
+|               | sdk_linux.itb      | secure boot header|                       |
++---------------+--------------------+-------------------+-----------------------+
 User can customize the partitions by command "flex-installer -i pf -p <partition_list> -d <device>"

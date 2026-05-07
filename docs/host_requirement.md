@@ -1,6 +1,5 @@
 ## Host system requirement
-- Ubuntu LTS (e.g. 22.04, 20.04) or any other distro on which Docker is running (Refer to docs/FAQ-docker-setup.md)
-- Debian 12 host
+- Ubuntu LTS (e.g. 22.04, 24.04) or any other distro on which Docker is running (Refer to docs/FAQ-docker-setup.md)
 
 
 For root users, there is no limitation for the build.

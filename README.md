@@ -1,40 +1,25 @@
 ## FlexBuild Overview
 ---------------------
-FlexBuild is a component-oriented lightweight build system and integration platform with
-capabilities of flexible, ease-to-use, scalable system build and distro deployment.
+FlexBuild is an easy-to-use, lightweight build tool for compiling and deploying Debian-based 
+Linux systems on NXP platforms.
 
-Users can use flexbuild to easily build Debian-based RootFS, linux kernel, BSP
-components and miscellaneous userspace applications (e.g. graphics, multimedia,
-networking, connectivity, security, AI/ML, robotics, etc) against Debian-based library
-dependencies to streamline the system build with efficient CI/CD.
+It provides a streamlined workflow to build complete Debian systems, including the Linux kernel, 
+BSP components, and various userspace applications (graphics, multimedia, networking, security, 
+AI/ML, etc.). FlexBuild simplifies the entire build process with efficient CI/CD integration.
 
-With flex-installer, users also can easily install various distro to target storage
-device (SD/eMMC card or USB/SATA disk) on target board or on host machine.
+With the included flex-installer utility, you can easily deploy the built Debian system to 
+target storage devices (SD/eMMC card or USB/SATA disk) on NXP boards or host machines.
 
-
-## Build Environment
---------------------
-- Cross-build in Debian Docker container hosted on x86 Ubuntu or any other distro for arm64 target
-- Cross-build on x86 host machine running Debian 13 for arm64 target
-- Native-build on ARM board running Debian for arm64 target
 
 ## Host system requirement
-- Docker hosted on Ubuntu LTS host (e.g. 22.04, 24.04) or other any distro
-  Refer to [docker-setup](docs/FAQ-docker-setup.md)
-  User can run 'bld docker' to create a Debian docker and build it in docker.
-- Debian 12 host
-  Refer to [host_requirement](docs/host_requirement.md)
-
-
-## Supported distro for target arm64
-------------------------------------------
-- Debian-based userland
+- Ubuntu LTS host (22.04, 24.04) with docker installed.
 
 
 ## Supported platforms
 ----------------------
 - __iMX platform__:  
-imx8mmevk, imx8mpevk, imx8mpfrdm, imx93evk, imx93frdm, imx91evk, imx91frdm, imx91sfrdm, imx95evk, imx95frdm
+imx8mmevk, imx8mpevk, imx8mpfrdm, imx8qmmek, imx91evk, imx91frdm, imx91sfrdm, imx93evk,
+imx93frdm, imx95-15x15-frdm, imx95-15x15-evk, imx95-19x19-frdm-pro, imx95-19x19-evk
 
 - __Layerscape platform__:  
 ls1028ardb, ls1043ardb, ls1046ardb, lx2160ardb
@@ -43,51 +28,40 @@ ls1028ardb, ls1043ardb, ls1046ardb, lx2160ardb
 ## Flexbuild Usage
 ------------------
 
+Build all images in 3 steps:
 ```
 $ cd flexbuild
-$ . setup.env  (in host environment)
-$ bld docker   (create or attach to docker)
-$ . setup.env  (in docker environment)
-$ bld host-dep (install host dependent packages)
-
-Usage: bld -m <machine>
-   or  bld <target> [ <option> ]
+$ make docker                                    # Step 1: Create or attach to Docker build container
+$ make menuconfig (or make <machine>_defconfig)  # Step 2: Select target machine and applications (if needed)
+$ make all                                       # Step 3: Build all required images (bootloader + kernel  + rootfs)
 ```
 
-Most used example with automated build:
+Most used examples with separate command:
 ```
-Most used example with automated build:
- bld -m imx8mpevk                # automatically build BSP + kernel + NXP-specific components + Debian RootFS for imx8mpevk platform
- bld -m lx2160ardb               # same as above, for lx2160ardb platform
-```
+$ make bsp             # Generate BSP composite firmware (primarily for Layerscape platforms)
+$ make flash.bin       # Generate flash.bin composite firmware (for iMX platforms)
+$ make atf             # Compile ARM Trusted Firmware (ATF) image for SD boot
+$ make boot            # Generate boot partition tarball (kernel, DTB, distro boot script)
+$ make linux           # Compile Linux kernel
+$ make uboot           # Compile U-Boot bootloader
 
-Most used example with separate command:
-```
- bld bsp -m <machine>             # generate BSP composite firmware (including atf/u-boot/kernel/dtb/peripheral-firmware/initramfs) for <machine>
- bld atf -m <machine> -b sd      # compile atf image for SD boot on <machine>
- bld boot -m <machine>           # generate boot partition tarball (including kernel,dtb,modules,distro bootscript) for <machine>
- bld linux -m <machine>          # compile linux kernel for <machine>
+$ make apps            # Compile NXP-specific components with runtime dependencies
+$ make merge-apps      # Merge compiled NXP components into rootfs
+$ make rfs             # Generate Debian-based root filesystem
+$ make packrfs         # Pack and compress rootfs as rootfs_<distro_version>_debian_<machine>_arm64.tar.zst
 
- bld apps -m <machine>           # compile NXP-specific components against the runtime dependencies for <machine>
- bld merge-apps -m <machine>     # merge NXP-specific components into <machine> Debian rootfs
+$ make clean-bsp       # Clean BSP components (U-Boot/ATF/firmware)
+$ make clean-linux     # Clean Linux kernel build artifacts
+$ make clean-apps      # Clean NXP application components
+$ make clean-rfs       # Clean Debian root filesystem
 
- bld rfs -m <machine>            # generate Debian-based rootfs for <machine>
- bld packrfs -m <machine>        # pack and compress target rootfs as rootfs_<distro_version>_debian_<machine>_arm64.tar.zst
-
- bld clean-bsp                   # clean obsolete BSP (u-boot/atf/firmware) images
- bld clean-linux                 # clean obsolete linux image
- bld clean-apps -m <machine>     # clean the obsolete <machine>-specific apps components binary images
- bld clean -m <machine>          # equal to "bld clean bsp" + "bld clean linux" + "bld clean-apps -m <machine>"
- bld clean-rfs -m <machine>      # clean target debian-based rootfs for <machine>
-
- bld docker                      # create or attach docker container to build in docker
- bld list                        # list enabled machines and supported various components
- bld host-dep                    # automatically install the depended deb packages on host
+$ make docker          # Create or attach to Docker build container
+$ make list            # List all supported machines
+$ make help            # Display detailed help information
 ```
 
 ## More info
 ------------
-Please refer to https://nxp.com/nxpdebian for more information about NXP Debian Linux SDK Distribution.
-[Debian Linux SDK User's Guide]((https://docs.nxp.com/bundle/UG10155).
+Please refer to [NXP Debian Linux SDK Distribution](https://www.nxp.com/nxpdebian) for more information.
 
-[flexbuild_usage](docs/flexbuild_usage.md), [build_and_deploy_distro](docs/build_and_deploy_distro.md), [nxp_linux_sdk](docs/nxp_linux_sdk.md) for detailed information.
+The detailed user guide is available at [Debian Linux SDK User's Guide](https://www.nxp.com/docs/en/user-guide/UG10155.pdf).

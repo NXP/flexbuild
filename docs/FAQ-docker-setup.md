@@ -1,6 +1,6 @@
 Q1: How to install Docker on Ubuntu host?
 
-A1: To install Docker on Ubuntu Jammy 22.04, Ubuntu Focal 20.04 or other distro
+A1: To install Docker on Ubuntu 22.04, Ubuntu 24.04 or other distro
 1. Run the commands below
 ```
    sudo apt install docker.io
@@ -54,7 +54,7 @@ A2: This problem may be caused in various cases, users can try the methods below
 
     Method 3: add dns 8.8.8.8
               a. add "nameserver 8.8.8.8" in /etc/resolvconf/resolv.conf.d/head
-	      b. update DNS as below
+              b. update DNS as below
                  sudo resolvconf -u
 
     Method 4: search IP address for registry-1.docker.io

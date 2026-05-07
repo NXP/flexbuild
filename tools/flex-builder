@@ -7,9 +7,6 @@
 # Author: Shengzhou Liu <shengzhou.liu@nxp.com>
 #
 
-[ -n "$FBDEBUG" ] && set -xe || set -e
-[ -n "$MKDEBUG" ] && SHFLAGS="-ex -o pipefail -c" || SHFLAGS="-c "
-
 source "${FBDIR}/include/console.sh"
 
 generate_linux_itb() {
@@ -86,7 +83,7 @@ check_http_request() {
     fi
 
     if [[ "$retcode" =~ ^[23][0-9]{2}$ ]]; then
-        return 0  # 2xx 或 3xx，成功
+        return 0
     fi
 
     case "$retcode" in

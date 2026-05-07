@@ -6,8 +6,7 @@
 
 
 # Enable pipefail to ensure pipeline errors are captured
-set -o pipefail
-[ -n "$FBDEBUG" ] && set -xe || set -e
+
 source "${FBDIR}/include/console.sh"
 
 rfs_umount() {

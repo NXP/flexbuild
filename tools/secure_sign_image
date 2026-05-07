@@ -6,12 +6,10 @@
 
 # signing images for secure boot
 
-[ -n "$FBDEBUG" ] && set -xe || set -e
 source "${FBDIR}/include/console.sh"
 
 secure_sign_image() {
     # $1: <machine>,  $2: <boottype>
-    set -e -o pipefail
 
     dequote() { printf '%s' "$1" | tr -d '"' | tr -d "'"; }
     local machine="${1:?machine argument is required}"
@@ -97,5 +95,7 @@ secure_sign_image() {
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    # Enable debug trace if LOG_LEVEL is set to 0
+    [[ "${LOG_LEVEL}" == "0" ]] && set -x
     secure_sign_image "$@"
 fi

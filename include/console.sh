@@ -7,6 +7,9 @@
 # logging and output utilities
 #
 
+[ -n "$FBDEBUG" ] && set -xe || set -e
+[ -n "$MKDEBUG" ] && SHFLAGS="-ex -o pipefail -c" || SHFLAGS="-c "
+
 # Color definitions
 red='\e[0;41m'
 RED='\e[1;31m'

@@ -2,8 +2,6 @@
 # Copyright 2017-2023, 2026 NXP
 # SPDX-License-Identifier: BSD-3-Clause
 # Enable pipefail to ensure pipeline errors are captured
-set -o pipefail
-[ -n "$FBDEBUG" ] && set -xe || set -e
 
 source "${FBDIR}/include/console.sh"
 

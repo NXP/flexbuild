@@ -19,11 +19,9 @@
 #
 # Can be called independently from the Makefile
 #
-[ -n "$FBDEBUG" ] && set -xe || set -e
 source "${FBDIR}/include/console.sh"
 
 create_composite_firmware() {
-    set -e -o pipefail
     if [ "$CONFIG_PLATFORM_LS" = "y" ]; then
         . $FBDIR/configs/board/common/layerscape_memorylayout.cfg
     else
@@ -116,5 +114,7 @@ create_composite_firmware() {
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    # Enable debug trace if LOG_LEVEL is set to 0
+    [[ "${LOG_LEVEL}" == "0" ]] && set -x
     create_composite_firmware "$@"
 fi

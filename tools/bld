@@ -7,7 +7,7 @@
 # Wrapper script for backward compatibility with old flex-builder interface
 # Now using Makefile-based build system
 
-set -e
+
 
 source "${FBDIR}/include/console.sh"
 

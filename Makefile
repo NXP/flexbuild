@@ -121,23 +121,23 @@ $(shell mkdir -p $(PKGDIR)/apps/{gopoint,multimedia,graphics,networking,security
 .PHONY: all
 all:
 	@start_time=$$(date +%s)
-	@echo -e "Building for $(MACHINE)"
-	@$(MAKE) rfs
-	@$(MAKE) linux
-	@$(MAKE) linux-headers
-	@$(MAKE) apps
-	@if [ "$(CONFIG_PLATFORM_IMX)" = "y" ]; then \
-		$(MAKE) flash.bin; \
-	else \
-		$(MAKE) bsp; \
+	echo -e "Building for $(MACHINE)"
+	$(MAKE) rfs
+	$(MAKE) linux
+	$(MAKE) linux-headers
+	$(MAKE) apps
+	if [ "$(CONFIG_PLATFORM_IMX)" = "y" ]; then
+		$(MAKE) flash.bin
+	else
+		$(MAKE) bsp
 	fi
-	@$(MAKE) boot
-	@$(MAKE) merge-apps
-	@$(MAKE) packrfs
-	@end_time=$$(date +%s)
-	@duration=$$((end_time - start_time))
-	@echo -e "$(GREEN)Build complete!$(NC)"
-	@echo "Total build time: $$(($$duration / 60))m $$(($$duration % 60))s"
+	$(MAKE) boot
+	$(MAKE) merge-apps
+	$(MAKE) packrfs
+	end_time=$$(date +%s)
+	duration=$$((end_time - start_time))
+	echo -e "$(GREEN)Build complete!$(NC)"
+	echo "Total build time: $$(($$duration / 60))m $$(($$duration % 60))s"
 
 LOG_FILE=$(FBDIR)/logs/build_$(MACHINE)_$(shell date +%Y%m%d_%H%M%S).log
 all-log:
@@ -147,49 +147,49 @@ all-log:
 # MENUCONFIG_STYLE can be: default, aquatic, monochrome
 .PHONY: menuconfig
 menuconfig:
-	@$(PYTHON) -m menuconfig && \
-	$(PYTHON) tools/kconfig_hooks.py && \
-	$(MAKE) parse-sdk-config && \
+	@$(PYTHON) -m menuconfig
+	$(PYTHON) tools/kconfig_hooks.py
+	$(MAKE) parse-sdk-config
 	$(MAKE) host-dep
 
 .PHONY: %_defconfig
 %_defconfig:
-	@BOARD=$(@:_defconfig=) && \
-	echo "==> Generating defconfig for $$BOARD" && \
-	$(PYTHON) tools/gen_defconfig.py Kconfig $$BOARD && \
-	$(PYTHON) tools/kconfig_hooks.py && \
-	$(MAKE) parse-sdk-config && \
+	@BOARD=$(@:_defconfig=)
+	echo "==> Generating defconfig for $$BOARD"
+	$(PYTHON) tools/gen_defconfig.py Kconfig $$BOARD
+	$(PYTHON) tools/kconfig_hooks.py
+	$(MAKE) parse-sdk-config
 	$(MAKE) host-dep
 
 .PHONY: config
 config:
-	@if [ -z "$(CONFIG)" ]; then \
-		echo "ERROR: <CONFIG> parameter is required!" >&2; \
-		echo "" >&2; \
-		echo "Usage: make config CONFIG=<config-file>" >&2; \
-		exit 1; \
-	fi && \
-	if [ ! -f "$(CONFIG)" ]; then \
-		echo "ERROR: CONFIG file not found: $(CONFIG)" >&2; \
-		echo "" >&2; \
-		exit 1; \
-	fi && \
-	echo "==> Generating .config from $(CONFIG)" && \
-	$(PYTHON) tools/gen_config_from_file.py Kconfig $(CONFIG) && \
-	$(PYTHON) tools/kconfig_hooks.py && \
-	$(MAKE) parse-sdk-config && \
+	@if [ -z "$(CONFIG)" ]; then
+		echo "ERROR: <CONFIG> parameter is required!" >&2
+		echo "" >&2
+		echo "Usage: make config CONFIG=<config-file>" >&2
+		exit 1
+	fi
+	if [ ! -f "$(CONFIG)" ]; then
+		echo "ERROR: CONFIG file not found: $(CONFIG)" >&2
+		echo "" >&2
+		exit 1
+	fi
+	echo "==> Generating .config from $(CONFIG)"
+	$(PYTHON) tools/gen_config_from_file.py Kconfig $(CONFIG)
+	$(PYTHON) tools/kconfig_hooks.py
+	$(MAKE) parse-sdk-config
 	$(MAKE) host-dep
 
 # Create a new target for SDK configuration parsing
 .PHONY: parse-sdk-config
 parse-sdk-config:
-	@CUSTOM_CONFIG=$$(echo '$(CONFIG_CUSTOM_SDK_CONFIG)' | sed 's/"//g' | xargs); \
-	if [ -n "$$CUSTOM_CONFIG" ]; then \
-		SDK_YML=$(FBDIR)/configs/$$CUSTOM_CONFIG; \
-	else \
-		SDK_YML=$(FBDIR)/configs/sdk.yml; \
-	fi; \
-	$(PYTHON) $(FBDIR)/tools/parse_yaml.py $$SDK_YML $(FBDIR)/configs/.sdk.cfg && \
+	@CUSTOM_CONFIG=$$(echo '$(CONFIG_CUSTOM_SDK_CONFIG)' | sed 's/"//g' | xargs)
+	if [ -n "$$CUSTOM_CONFIG" ]; then
+		SDK_YML=$(FBDIR)/configs/$$CUSTOM_CONFIG
+	else
+		SDK_YML=$(FBDIR)/configs/sdk.yml
+	fi
+	$(PYTHON) $(FBDIR)/tools/parse_yaml.py $$SDK_YML $(FBDIR)/configs/.sdk.cfg
 	chmod 666 $(FBDIR)/configs/.sdk.cfg
 
 # Help target
@@ -324,11 +324,11 @@ clean-config:
 
 .PHONY: list
 list:
-	@for conf in configs/board/*.conf; do \
-		if [ -f "$$conf" ]; then \
-			. "$$conf"; \
-			echo "  - $$machine"; \
-		fi; \
+	@for conf in configs/board/*.conf; do
+		if [ -f "$$conf" ]; then
+			. "$$conf"
+			echo "  - $$machine"
+		fi
 	done
 
 .PHONY: show-enabled-apps

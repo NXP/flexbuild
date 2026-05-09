@@ -103,7 +103,7 @@ endef
 # $1=package_name $2=dir $3= {submod: clone submodules, git: keep .git info, other: download .tar.gz only}
 #
 define download_repo
-	@_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG))
+	_VER=$(or $(repo_$(1)_ver),$(DEFAULT_REPO_TAG))
 	mkdir -p $(FBDIR)/dl $(FBDIR)/logs
 	flock $(FBDIR)/logs/.$(1)_$${_VER}.tar.gz.flock -c '$(subst ','\'',$(call _download_repo_logic,$(1),$(2),$(3)))'
 endef
@@ -112,7 +112,7 @@ endef
 # $1=package_name $2=dir
 #
 define clone_repo
-	@if [ -d $(PKGDIR)/$(2)/$(1) ]; then
+	if [ -d $(PKGDIR)/$(2)/$(1) ]; then
 		echo "[INFO] Target already exists" $(LOG_MUTE)
 	else
 		echo "[INFO] Clone $(1) "
@@ -161,6 +161,6 @@ endef
 # $1=package_link_name $2=package_target_name
 #
 define dl_by_wget
-	@mkdir -p $(FBDIR)/dl $(FBDIR)/logs
+	mkdir -p $(FBDIR)/dl $(FBDIR)/logs
 	flock "$(FBDIR)/logs/.$(2).flock" -c '$(subst ','\'',$(call _dl_by_wget_logic,$(1),$(2)))'
 endef

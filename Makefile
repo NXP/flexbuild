@@ -125,6 +125,7 @@ all:
 	$(MAKE) rfs
 	$(MAKE) linux
 	$(MAKE) linux-headers
+	$(MAKE) linux-modules
 	$(MAKE) apps
 	if [ "$(CONFIG_PLATFORM_IMX)" = "y" ]; then
 		$(MAKE) flash.bin

@@ -65,3 +65,4 @@ $ make help            # Display detailed help information
 Please refer to [NXP Debian Linux SDK Distribution](https://www.nxp.com/nxpdebian) for more information.
 
 The detailed user guide is available at [Debian Linux SDK User's Guide](https://www.nxp.com/docs/en/user-guide/UG10155.pdf).
+

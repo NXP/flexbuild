@@ -5,7 +5,9 @@ SUITE=trixie
 ARCH=arm64
 ROOTDIR=${1:-/tmp/rootfs}
 KEYRING="/usr/share/keyrings/debian-archive-keyring.gpg"
-MIRRORS=( http://deb.debian.org/debian)
+
+DEBIAN_MIRRORS="${DEBIAN_MIRRORS:-http://deb.debian.org/debian}"
+IFS=' ' read -r -a MIRRORS <<< "$DEBIAN_MIRRORS"
 
 DEFAULT_PACKAGES=(
   init udev sudo vim apt file zstd parted fdisk dosfstools iputils-ping isc-dhcp-client
@@ -22,6 +24,7 @@ if [ $# -gt 1 ]; then
   EXTRA_PACKAGES=("${@:2}")
   PACKAGES+=("${EXTRA_PACKAGES[@]}")
 fi
+PACKAGES=($(printf '%s\n' "${PACKAGES[@]}" | awk '!seen[$0]++'))
 
 #echo "Packages to install: $(IFS=,; echo "${PACKAGES[*]}")"
 
@@ -36,11 +39,11 @@ mmdebstrap \
   --aptopt='Acquire::http::Pipeline-Depth=200' \
   --aptopt='Acquire::http::Timeout=30' \
   --aptopt='Acquire::https::Timeout=30' \
-  --aptopt='Acquire::http::Proxy="http://127.0.0.1:3142"' \
   --aptopt='Acquire::Languages="none"' \
   --aptopt='APT::Get::Assume-Yes=true' \
   --aptopt='APT::Acquire::Retries=5' \
   --aptopt='DPkg::Options::=--force-confnew' \
+  --aptopt='DPkg::Options::=--force-unsafe-io' \
   --aptopt='Dpkg::Progress-Fancy=1' \
   --skip=download/bytecode \
   --variant=standard \

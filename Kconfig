@@ -142,6 +142,24 @@ config SECURE_BOOT
 	  Enable security feature that ensures only trusted software is
 	  loaded during the device's startup process.
 
+config DEBIAN_MIRRORS
+	string "Debian package mirrors"
+	default "http://deb.debian.org/debian"
+	help
+	  Specify Debian package repository mirrors, separated by spaces.
+	  Multiple mirrors can be provided for redundancy.
+	  Examples:
+	    Single mirror:
+	      http://deb.debian.org/debian
+
+	    Multiple mirrors (China):
+	      http://mirrors.tuna.tsinghua.edu.cn/debian http://mirrors.aliyun.com/debian
+
+	    Multiple mirrors (Global):
+	      http://deb.debian.org/debian http://ftp.debian.org/debian
+
+	  Default: http://deb.debian.org/debian (official CDN, recommended)
+
 config LINUX_EXTRA_CONFIG
 	string "Extra linux kernel configuration"
 	help

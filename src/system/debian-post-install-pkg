@@ -102,7 +102,9 @@ main() {
     show_one_line sudo apt-get update -y
 
     case "$board_id" in
-        imx95*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx95evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
+        imx95*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx95-15x15-evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
+        imx8q*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx8qmmek.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
+        imx8m*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx8mpevk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
         imx8*)  NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx8mpevk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}" "${gnome_pkgs[@]}");;
         imx93*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx93evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}");;
         imx91*) NXPAPPSPKG=nxp_apps_debian_"${DISTRVER}"_imx91evk.deb; PKGS=("${ls_pkgs[@]}" "${imx_pkgs[@]}");;

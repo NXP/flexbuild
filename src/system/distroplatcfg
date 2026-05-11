@@ -104,7 +104,7 @@ case "${board_id}" in
         ;;
     imx93*)
         safe_run ln -sf libg2d-pxp.so.2.4.0 /usr/lib/libg2d.so.2
-        if [ -f /usr/lib/libg2d-pxp.so.2.4.0 ]; then
+        if [ -f /usr/lib/libg2d-viv.so.2.4.0 ]; then
             safe_run rm -f /usr/lib/libg2d-viv.so.2.4.0
         fi
         safe_run rm -rf /etc/systemd/system/display-manager.service

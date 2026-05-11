@@ -419,9 +419,16 @@ flex_install_distro() {
         [ -f $bootpartition/buildinfo ] && echo Cleaning the existing data in $bootdev && \
         sudo rm -rf $bootpartition/*
         echo Installing $bootimg_n to $bootdev
+
+        # Resolve symbolic link to real path
+        local bootimg_real=$bootimg_n
+        if [ -L "$bootimg_n" ]; then
+            bootimg_real=$(readlink -f "$bootimg_n")
+        fi
+
         [ $bootimgtype = dir ] && sudo cp -rfp $bootimg_n/* $bootpartition
-        [ $bootimgtype = tgz ] && sudo tar xfm $bootimg_n -C $bootpartition
-        [ "$bootimgtype" = "zst" ] && zstd -dc "$bootimg_n" | sudo tar xf - -C "$bootpartition"
+        [ $bootimgtype = tgz ] && sudo tar xfm $bootimg_real -C $bootpartition
+        [ "$bootimgtype" = "zst" ] && zstd -dc "$bootimg_real" | sudo tar xf - -C "$bootpartition"
 
         prefix_to_keep=""
         case "$machine" in
@@ -451,11 +458,18 @@ flex_install_distro() {
 	if mount | grep -q "$rootdev on / type"; then
 	    print_w "Can't install rootfs image to the running root filesystem" && exit
 	fi
+
+	# Resolve symbolic link to real path
+	local rootfsimg_real=$rootfsimg_n
+	if [ -L "$rootfsimg_n" ]; then
+	    rootfsimg_real=$(readlink -f "$rootfsimg_n")
+	fi
+
 	case $rfsimgtype in
 	    dir)  sudo cp -rfp $rootfsimg_n/* $rootpartition;;
-	    tgz)  sudo tar xfm $rootfsimg_n -C $rootpartition;;
-        zst)  zstd -dc "$rootfsimg_n" | sudo tar xfm - -C "$rootpartition" ;;
-	ext|wic)  sudo dd if=$rootfsimg_n of=$rootdev bs=4M status=none conv=fsync && sync;;
+	    tgz)  sudo tar xfm $rootfsimg_real -C $rootpartition;;
+        zst)  zstd -dc "$rootfsimg_real" | sudo tar xfm - -C "$rootpartition" ;;
+	ext|wic)  sudo dd if=$rootfsimg_real of=$rootdev bs=4M status=none conv=fsync && sync;;
 	cpio.gz)  mv $rootfsimg_n $rootpartition && cd $rootpartition && \
 		  gunzip $rootfsimg_n && cpio -idm < ${rootfsimg_n::-3} && cd -;;
 	    *)    echo format $rfsimgtype is not supported; exit

@@ -123,7 +123,7 @@ config MM_IMX_GST_PLUGIN
 	default y
 	depends on (MM_GSTREAMER && MM_GST_PLUGINS_BAD && MM_IMX_CODEC && MM_IMX_PARSER && MM_IMX_LIB && GFX_LIBDRM) && \
 	           (!SOC_IMX8M || (MM_IMX_VPUWRAP && MM_IMX_VPU_HANTRO_VC && GFX_IMX_GPU_G2D)) &&  \
-	           (!(SOC_IMX91 || SOC_IMX93) && GFX_IMX_PXP_G2D) && \
+	           (!(SOC_IMX91 || SOC_IMX93) || GFX_IMX_PXP_G2D) && \
 	           (!SOC_IMX95 || GFX_IMX_DPU_G2D_V2) && \
 	           (!SOC_IMX8QM || GFX_IMX_DPU_G2D_V1)
 	help

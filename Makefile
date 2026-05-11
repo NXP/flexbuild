@@ -270,54 +270,54 @@ include $(FBDIR)/include/func.mk
 .PHONY: clean-linux clean-kernel clean-bsp clean-boot clean-apps clean-rfs distclean
 
 clean-linux clean-kernel:
-	@rm -rf $(FBOUTDIR)/linux/*
+	@find "$(FBOUTDIR)/linux" -mindepth 1 -delete 2>/dev/null || true
 
 clean-bsp:
-	@rm -rf $(FBOUTDIR)/bsp/*
-	@rm -rf $(PKGDIR)/bsp/atf/build
-	@if [ -d $(PKGDIR)/bsp/rcw ]; then
-		$(MAKE) clean -C $(PKGDIR)/bsp/rcw &>/dev/null
+	@find "$(FBOUTDIR)/bsp" -mindepth 1 -delete 2>/dev/null || true
+	@rm -rf "$(PKGDIR)/bsp/atf/build"
+	@if [ -d "$(PKGDIR)/bsp/rcw" ]; then \
+		$(MAKE) clean -C "$(PKGDIR)/bsp/rcw" >/dev/null; \
 	fi
-	@if [ -d $(PKGDIR)/bsp/mc_utils/config ]; then
-		$(MAKE) clean -C $(PKGDIR)/bsp/mc_utils/config &>/dev/null
+	@if [ -d "$(PKGDIR)/bsp/mc_utils/config" ]; then \
+		$(MAKE) clean -C "$(PKGDIR)/bsp/mc_utils/config" >/dev/null; \
 	fi
 
 clean-apps:
-	@rm -rf $(DESTDIR)
-	@if [ -d $(PKGDIR)/apps/networking/fmc/source ]; then
-		$(MAKE) clean -C $(PKGDIR)/apps/networking/fmc/source
+	@rm -rf "$(DESTDIR)"
+	@if [ -d "$(PKGDIR)/apps/networking/fmc/source" ]; then \
+		$(MAKE) clean -C "$(PKGDIR)/apps/networking/fmc/source"; \
 	fi
-	@if [ -d $(PKGDIR)/apps/security/optee_os ]; then
-		$(MAKE) clean -C $(PKGDIR)/apps/security/optee_os ARCH=arm
+	@if [ -d "$(PKGDIR)/apps/security/optee_os" ]; then \
+		$(MAKE) clean -C "$(PKGDIR)/apps/security/optee_os" ARCH=arm; \
 	fi
-	@if [ -d $(PKGDIR)/apps/security/optee_client ]; then
-		rm -rf $(PKGDIR)/apps/security/optee_client/out
+	@rm -rf "$(PKGDIR)/apps/security/optee_client/out"
+	@if [ -d "$(PKGDIR)/apps/security/keyctl_caam" ]; then \
+		$(MAKE) clean -C "$(PKGDIR)/apps/security/keyctl_caam"; \
 	fi
-	@if [ -d $(PKGDIR)/apps/security/keyctl_caam ]; then
-		$(MAKE) clean -C $(PKGDIR)/apps/security/keyctl_caam
+	@if [ -d "$(PKGDIR)/apps/security/libpkcs11" ]; then \
+		$(MAKE) clean -C "$(PKGDIR)/apps/security/libpkcs11"; \
 	fi
-	@if [ -d $(PKGDIR)/apps/security/libpkcs11 ]; then
-		$(MAKE) clean -C $(PKGDIR)/apps/security/libpkcs11
-	fi
-	@rm -rf $(PKGDIR)/apps/security/optee_test/out
-	@find $(PKGDIR)/apps -name build_debian_arm64 | xargs rm -rf
+	@rm -rf "$(PKGDIR)/apps/security/optee_test/out"
+	@find "$(PKGDIR)/apps" -name build_debian_arm64 -exec rm -rf {} +
 
 clean-boot:
-	@rm -rf $(FBOUTDIR)/image/boot_*
+	@rm -rf "$(FBOUTDIR)/image"/boot_*
 
 clean-rfs:
-	@rm -rf $(RFSDIR)
-	@rm -rf $(FBOUTDIR)/images/$(notdir $(RFSDIR))*
+	@rm -rf "$(RFSDIR)"
+	@rm -rf "$(FBOUTDIR)/images/$(notdir $(RFSDIR))"*
 
 distclean:
-	@rm -rf $(FBOUTDIR)/*/*
-	@rm -rf $(PKGDIR)/bsp/* $(PKGDIR)/linux/* $(PKGDIR)/apps/*/*
-	@rm -rf $(FBDIR)/logs/* $(FBDIR)/logs/.*
-	@rm -rf $(FBDIR)/dl/*
-	@rm -f $(FBDIR)/.config
+	@[ -d "$(FBOUTDIR)" ] && find "$(FBOUTDIR)" -mindepth 2 -delete || true
+	@[ -d "$(PKGDIR)/bsp" ]   && find "$(PKGDIR)/bsp"   -mindepth 1 -delete || true
+	@[ -d "$(PKGDIR)/linux" ] && find "$(PKGDIR)/linux" -mindepth 1 -delete || true
+	@[ -d "$(PKGDIR)/apps" ]  && find "$(PKGDIR)/apps"  -mindepth 2 -delete || true
+	@[ -d "$(FBDIR)/logs" ]   && find "$(FBDIR)/logs"   -mindepth 1 -delete || true
+	@[ -d "$(FBDIR)/dl" ]     && find "$(FBDIR)/dl"     -mindepth 1 -delete || true
+	@rm -f "$(FBDIR)/.config"
 
 clean-config:
-	@rm -f $(FBDIR)/.config
+	@rm -f "$(FBDIR)/.config"
 
 # ============================================================================
 # Helper targets

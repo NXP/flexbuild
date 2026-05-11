@@ -166,15 +166,15 @@ if [[ -n "$DEPRECATED_OPTS" ]]; then
 fi
 
 # Commands that don't require -m parameter
-NO_MACHINE_CMDS="docker list help clean-config distclean"
-
+NO_MACHINE_CMDS="menuconfig help docker list clean-config distclean"
 # Check if command requires machine parameter
 if [[ -z "$COMMAND" ]]; then
     echo "No command specified, build everything for default machine (if configured)"
-	COMMAND="all"
+    COMMAND="all"
 fi
 
-if [[ ! " $NO_MACHINE_CMDS " =~ " $COMMAND " ]]; then
+# Check if command is in NO_MACHINE_CMDS or ends with _defconfig
+if [[ ! " $NO_MACHINE_CMDS " =~ " $COMMAND " ]] && [[ ! "$COMMAND" =~ _defconfig$ ]]; then
     if [[ -z "$MACHINE" ]]; then
         fbprint_e "Error: Command '$COMMAND' requires -m <machine> parameter"
         echo ""

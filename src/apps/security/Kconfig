@@ -54,7 +54,7 @@ config SEC_KEYCTL_CAAM
 
 config SEC_LIBPKCS11
 	bool "PKCS#11 cryptographic library"
-	default n
+	default y
 	depends on PLATFORM_LS && OPTEE && SEC_SECURE_OBJ && SEC_OPENSSL
 	help
 	  PKCS#11 Cryptographic Token Interface library

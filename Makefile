@@ -271,10 +271,10 @@ include $(FBDIR)/include/func.mk
 .PHONY: clean-linux clean-kernel clean-bsp clean-boot clean-apps clean-rfs distclean
 
 clean-linux clean-kernel:
-	@find "$(FBOUTDIR)/linux" -mindepth 1 -delete 2>/dev/null || true
+	@[ -d "$(FBOUTDIR)/linux" ]  && shopt -s dotglob && rm -rf "$(FBOUTDIR)"/linux/* 2>/dev/null || true
 
 clean-bsp:
-	@find "$(FBOUTDIR)/bsp" -mindepth 1 -delete 2>/dev/null || true
+	@[ -d "$(FBOUTDIR)/bsp" ]  && shopt -s dotglob && rm -rf "$(FBOUTDIR)"/bsp/* 2>/dev/null || true
 	@rm -rf "$(PKGDIR)/bsp/atf/build"
 	@if [ -d "$(PKGDIR)/bsp/rcw" ]; then \
 		$(MAKE) clean -C "$(PKGDIR)/bsp/rcw" >/dev/null; \
@@ -308,13 +308,14 @@ clean-rfs:
 	@rm -rf "$(RFSDIR)"
 	@rm -rf "$(FBOUTDIR)/images/$(notdir $(RFSDIR))"*
 
+.NOTPARALLEL: distclean
 distclean:
-	@[ -d "$(FBOUTDIR)" ] && find "$(FBOUTDIR)" -mindepth 2 -delete || true
-	@[ -d "$(PKGDIR)/bsp" ]   && find "$(PKGDIR)/bsp"   -mindepth 1 -delete || true
-	@[ -d "$(PKGDIR)/linux" ] && find "$(PKGDIR)/linux" -mindepth 1 -delete || true
-	@[ -d "$(PKGDIR)/apps" ]  && find "$(PKGDIR)/apps"  -mindepth 2 -delete || true
-	@[ -d "$(FBDIR)/logs" ]   && find "$(FBDIR)/logs"   -mindepth 1 -delete || true
-	@[ -d "$(FBDIR)/dl" ]     && find "$(FBDIR)/dl"     -mindepth 1 -delete || true
+	@[ -d "$(FBOUTDIR)" ]     && shopt -s dotglob && rm -rf "$(FBOUTDIR)"/*/* 2>/dev/null || true
+	@[ -d "$(PKGDIR)/apps" ]  && shopt -s dotglob && rm -rf "$(PKGDIR)/apps"/*/* 2>/dev/null || true
+	@[ -d "$(PKGDIR)/bsp" ]   && shopt -s dotglob && rm -rf "$(PKGDIR)/bsp"/* 2>/dev/null || true
+	@[ -d "$(PKGDIR)/linux" ] && shopt -s dotglob && rm -rf "$(PKGDIR)/linux"/* 2>/dev/null || true
+	@[ -d "$(FBDIR)/logs" ]   && shopt -s dotglob && rm -rf "$(FBDIR)/logs"/* 2>/dev/null || true
+	@[ -d "$(FBDIR)/dl" ]     && shopt -s dotglob && rm -rf "$(FBDIR)/dl"/* 2>/dev/null || true
 	@rm -f "$(FBDIR)/.config"
 
 clean-config:

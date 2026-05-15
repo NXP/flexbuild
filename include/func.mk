@@ -27,7 +27,8 @@ packapp packapps:
 itb mklinux: $(KERNEL_IMAGE)
 	@$(BLD) itb
 
-boot: $(KERNEL_IMAGE) distroscr
+BOOT_DEPS += $(if $(filter y,$(CONFIG_PLATFORM_LS)),$(if $(filter y,$(CONFIG_SECURE_BOOT)),bsp))
+boot: $(KERNEL_IMAGE) distroscr $(BOOT_DEPS)
 	@/bin/bash -e $(FBDIR)/tools/create_bootpartition
 
 merge-apps:

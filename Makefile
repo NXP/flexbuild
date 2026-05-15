@@ -302,7 +302,8 @@ clean-apps:
 	@find "$(PKGDIR)/apps" -name build_debian_arm64 -exec rm -rf {} +
 
 clean-boot:
-	@rm -rf "$(FBOUTDIR)/image"/boot_*
+	@rm -rf "$(FBOUTDIR)/images"/boot_*
+	@rm -f "$(FBOUTDIR)"/boot/*
 
 clean-rfs:
 	@rm -rf "$(RFSDIR)"

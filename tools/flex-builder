@@ -47,6 +47,8 @@ build_bootscr() {
 
     mkdir -p "$(dirname "$OUT_PATH")"
 
+    # SOURCE_DATE_EPOCH=$(date -d "2026-01-01 00:00:00 UTC" +%s)
+    export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-1767225600}"
     log_mute mkimage -A arm64 -O linux -T script -C none -a 0 -e 0 -n "boot.scr" -d "$CONF_FILE" "$OUT_PATH"
 
     if [ $? -eq 0 ]; then

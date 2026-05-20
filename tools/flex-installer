@@ -91,7 +91,7 @@ OPTION:
  -B, --bootpart     Specify boot partition number to override default (default boot partition is the first)
  -R, --rootpart     Specify root partition number to override default (default root partition is the last)
  -d, --device	    Device name of the target SD/USB/SATA storage drive in Linux
- -p, --partition    Customize configurable partitions of target disk, default is "-P 2P=512M:-1" if not specified
+ -p, --partition    Customize configurable partitions of target disk, default is "-p 2P=512M:-1" if not specified
  -f, --firmware	    The composite firmware image to be programmed into SD card
  -F, --force        Force partition and format target disk regardless of the existing data in disk
  -m, --machine	    Target machine name to specify the name of composite firmware for automatical deployment
@@ -327,6 +327,8 @@ check_device_partitions() {
 
     mount_device
 }
+
+
 partition_format_disk() {
     if [ -n "$rootdev" ] && mount | grep -q "$rootdev on / type"; then
 	print_w "The target /dev/$devname can't be the running device in which $rootdev is running as rootfs"
@@ -334,6 +336,7 @@ partition_format_disk() {
     fi
     print_n "Partitioning /dev/$devname"
 
+	sudo dd if=/dev/zero of=/dev/$devname bs=1M count=$DEFAULT_RAW_PARTITION_SIZE_MB conv=fsync status=none
     [ -z "$force_opt" -a ${devname:0:4} != loop -a $instruction != pf -a $instruction != mkwic ] && [ $actual_pnum -ge 3 ] && check_distro_in_disk
 
     optimal_io_size=$(sudo cat /sys/block/$devname/queue/optimal_io_size)
@@ -872,8 +875,8 @@ rootpartition=$mntdir/${devpartname}${rootpartnum}
 backuppartition=$mntdir/${devpartname}${backuppartnum}
 
 if [ $instruction = pf ]; then
-    partition_format_disk $diskpartition
-    umount_device
+	partition_format_disk $diskpartition
+	umount_device
 	sudo partprobe /dev/$devname 2>/dev/null || true
 	sudo udevadm settle
 	sync
@@ -997,7 +1000,7 @@ elif [ $instruction = mkwic ]; then
     print_n "Creating ${wic_image} with size ${DEFAULT_SDCARD_IMG_SIZE_MB}MB, waiting"
     # Create WIC image file
     rm -f ${wic_image}
-    dd if=/dev/zero of=${wic_image} bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB
+    dd if=/dev/zero of=${wic_image} bs=1M count=$DEFAULT_SDCARD_IMG_SIZE_MB conv=fsync status=none
     # Clean up existing loop devices
     loopdev=$(sudo losetup -j ${wic_image} | cut -d' ' -f1)
     if [ -n "$loopdev" ]; then
@@ -1037,7 +1040,8 @@ elif [ $instruction = mkwic ]; then
     print_n "Created ${wic_image_zst} successfully\n"
     # ls -lh ${wic_image_zst}
     print_n "Run the following command to burn ${wic_image_zst} to SD card:"
-    print_n "zstd -d ${wic_image_zst} && sudo dd if=${wic_image} of=/dev/<dev> bs=1M conv=fsync status=progress\n"
+	echo "$ zstd -d ${wic_image_zst} && sudo dd if=${wic_image} of=/dev/<dev> bs=1M conv=fsync status=progress"
+	echo ""
 elif [ $instruction = backup ]; then
     mount_device
     [ -z "$backupdir" ] && backupdir=$backuppartition; mkdir -p $backupdir; timestamp=$(date +%Y%m%d%H%M)

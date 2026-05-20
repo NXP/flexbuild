@@ -29,8 +29,7 @@ gst_plugins_bad: gst_plugins_base
 	 fi
 	 mkdir -p $(RFSDIR)/usr/include $(RFSDIR)/usr/lib/gstreamer-1.0
 	 cp -af $(DESTDIR)/usr/lib/gstreamer-1.0 $(RFSDIR)/usr/lib
-	 cp -af $(DESTDIR)/usr/lib/gstreamer-1.0/include $(RFSDIR)/usr/lib/gstreamer-1.0/
-	 cp -af $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include
+	 cp -af --remove-destination  $(DESTDIR)/usr/include/{libdrm,gstreamer-1.0} $(RFSDIR)/usr/include
 	 cp -af $(DESTDIR)/usr/lib/libgstbase-1.0.so.0* $(RFSDIR)/usr/lib/
 	 cp -af $(DESTDIR)/usr/lib/libgstreamer-1.0.so* $(RFSDIR)/usr/lib/
 	 meson setup build_$(DISTROTYPE)_$(ARCH) \

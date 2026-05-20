@@ -2,104 +2,86 @@
 
 config SOC_IMX8MPEVK
 	bool "i.MX 8M Plus EVK Board"
-	select ARCH_ARM64
 	help
 	  imx8mpevk board
 
 config SOC_IMX8MPFRDM
 	bool "FRDM-IMX8MPLUS Board"
-	select ARCH_ARM64
 	help
 	  imx8mpfrdm board
 
 config SOC_IMX8MMEVK
 	bool "i.MX 8M Mini EVK Board"
-	select ARCH_ARM64
 	help
 	  imx8mmevk board
 
 config SOC_IMX8QMMEK
 	bool "i.MX 8QuadMax MEK Board"
-	select ARCH_ARM64
 	help
 	  imx8qmmek board
 
 config SOC_IMX91EVK
 	bool "i.MX 91 EVK board (11x11 A1 silicon)"
-	select ARCH_ARM64
 	help
 	  imx91evk board
 
 config SOC_IMX91FRDM
 	bool "FRDM-IMX91 board (11x11 A1 silicon)"
-	select ARCH_ARM64
 	help
 	  imx91frdm board
 
 config SOC_IMX91SFRDM
 	bool "FRDM-IMX91S board (11x11 A1 silicon)"
-	select ARCH_ARM64
 	help
 	  imx91sfrdm board
 
 config SOC_IMX93EVK
 	bool "i.MX 93 EVK board (11x11 A2 silicon)"
-	select ARCH_ARM64
 	help
 	  imx93evk board
 
 config SOC_IMX93FRDM
 	bool "FRDM-IMX93 Board (11x11 A2 silicon)"
-	select ARCH_ARM64
 	help
 	  imx93frdm board
 
 config SOC_IMX95_15X15_EVK
 	bool "i.MX 95 15x15 EVK Board (B0 silicon revision)"
-	select ARCH_ARM64
 	help
 	  imx95-15x15-evk board
 
 config SOC_IMX95_15X15_FRDM
 	bool "FRDM-IMX95 board (15x15 B0 silicon revision)"
-	select ARCH_ARM64
 	help
 	  imx95-15x15-frdm board
 
 config SOC_IMX95_19X19_EVK
 	bool "i.MX 95 19x19 EVK Board (B0 silicon revision)"
-	select ARCH_ARM64
 	help
 	  imx95-19x19-evk board
 
 config SOC_IMX95_19X19_FRDM_PRO
 	bool "FRDM-PRO-IMX95 board (19x19 B0 silicon revision)"
-	select ARCH_ARM64
 	help
 	  imx95-19x19-frdm-pro board
 
 config SOC_LS1028ARDB
 	bool "ls1028ardb board"
-	select ARCH_ARM64
 	help
 	  ls1028ardb dual core processor board with tsn
 
 config SOC_LS1043ARDB
 	bool "ls1043ardb board"
-	select ARCH_ARM64
 	help
 	  ls1043ardb quad core processor board
 
 config SOC_LS1046ARDB
 	bool "ls1046ardb board"
-	select ARCH_ARM64
 	help
 	  ls1046ardb quad core processor board
 
-
 config SOC_LX2160ARDB
 	bool "lx2160ardb board"
-	select ARCH_ARM64
 	help
 	  lx2160ardb sixteen core processor board
 

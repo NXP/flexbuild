@@ -2,15 +2,6 @@
 
 mainmenu "Flexbuild Configuration LSDK System"
 
-
-# ============================================================================
-# Target Configuration Categories
-# ============================================================================
-config FLEXBUILD_VERSION
-	string
-	help
-	  Flexbuild version string
-
 choice
 	prompt "Target Platform"
 	default SOC_IMX93FRDM

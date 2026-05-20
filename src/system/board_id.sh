@@ -26,14 +26,14 @@ get_board_id() {
 	    *"i.MX8ULP EVK"*)         board_id="imx8ulpevk" ;;
 	    *"i.MX91 11X11 EVK"*)     board_id="imx91evk" ;;
 	    "FRDM-IMX91")             board_id="imx91frdm" ;;
-        *"FRDM-IMX91S")           board_id="imx91sfrdm" ;;
+	    *"FRDM-IMX91S")           board_id="imx91sfrdm" ;;
 	    *"i.MX93 11X11 EVK"*)     board_id="imx93evk" ;;
 	    *"FRDM-IMX93"*)           board_id="imx93frdm" ;;
-	    *"i.MX95 19x19"*)         board_id="imx95-19x19-evk" ;;
+	    *"i.MX95 19X19"*)         board_id="imx95-19x19-evk" ;;
 	    *"i.MX95 15X15"*)         board_id="imx95-15x15-evk" ;;
 	    *"FRDM-IMX95-PRO"*)       board_id="imx95-19x19-frdm-pro" ;;
 	    *"FRDM-IMX95")            board_id="imx95-15x15-frdm" ;;
-	    
+
 	    # FSL QorIQ series
 	    *"LS1012A FRWY"*)         board_id="ls1012afrwy" ;;
 	    *"LS1012A QDS"*)          board_id="ls1012aqds" ;;
@@ -52,7 +52,7 @@ get_board_id() {
 	    *"LX2160ARDB"*)           board_id="lx2160ardb" ;;
 	    *"LX2160AQDS"*)           board_id="lx2160aqds" ;;
 	    *"LX2162AQDS"*)           board_id="lx2162aqds" ;;
-	    
+
 	    # Default processing rules (smart conversion)
 	    *)
 		    local normalized=$(echo "$machine_content" | tr '[:upper:]' '[:lower:]' | tr -d ' .-')

@@ -1,4 +1,4 @@
-From 80232a34db9ee8f4e2e458f05212ab2d11770e09 Mon Sep 17 00:00:00 2001
+From 3afff068631e9fabba75cdafdc4a4326c3aa642f Mon Sep 17 00:00:00 2001
 From: Yuantian Tang <andy.tang@nxp.com>
 Date: Mon, 17 Nov 2025 22:30:48 -0800
 Subject: [PATCH] Enable bootflow advanced feature
@@ -6,8 +6,8 @@ Subject: [PATCH] Enable bootflow advanced feature
 Signed-off-by: Andy Tang <andy.tang@nxp.com>
 ---
  arch/arm/mach-imx/imx8/Kconfig | 2 ++
- include/configs/imx8qm_mek.h   | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ include/configs/imx8qm_mek.h   | 4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/mach-imx/imx8/Kconfig b/arch/arm/mach-imx/imx8/Kconfig
 index f274b7819b2..686dec84853 100644
@@ -23,10 +23,19 @@ index f274b7819b2..686dec84853 100644
  
  config IMX8QXP
 diff --git a/include/configs/imx8qm_mek.h b/include/configs/imx8qm_mek.h
-index 30d8685d19b..5ebc5c07159 100644
+index 30d8685d19b..a1facaf1869 100644
 --- a/include/configs/imx8qm_mek.h
 +++ b/include/configs/imx8qm_mek.h
-@@ -90,7 +90,7 @@
+@@ -83,6 +83,8 @@
+ 	"cntr_addr=0x98000000\0"			\
+ 	"cntr_file=os_cntr_signed.bin\0" \
+ 	"boot_fdt=try\0" \
++	"fdtfile=imx8qm-mek.dtb\0" \
++	"fdt_addr_r=0x83000000\0" \
+ 	FDT_FILE \
+ 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
+ 	"mmcpart=1\0" \
+@@ -90,7 +92,7 @@
  	"mmcautodetect=yes\0" \
  	"mmcargs=setenv bootargs console=${console},${baudrate} earlycon root=${mmcroot} " \
  		"cpufreq.default_governor=SCHEDUTIL\0" \
@@ -36,5 +45,5 @@ index 30d8685d19b..5ebc5c07159 100644
  		"source\0" \
  	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 -- 
-2.34.1
+2.43.0
 

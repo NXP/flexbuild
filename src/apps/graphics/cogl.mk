@@ -36,7 +36,8 @@ cogl: $(DEP_COGL) libdrm wayland_protocols
 		-march=armv8-a+crc+crypto -mbranch-protection=standard -O2 \
 		-fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat \
 		-Wformat-security -Werror=format-security -Wno-error=maybe-uninitialized \
-		-I$(DESTDIR)/usr/include/libdrm -I$(DESTDIR)/usr/include -I$(RFSDIR)/usr/include"
+		-Wno-error=deprecated-declarations -Wno-deprecated-declarations \
+		-I$(DESTDIR)/usr/include/libdrm -I$(RFSDIR)/usr/include"
 	 export LDFLAGS="--sysroot=$(RFSDIR) -L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib/aarch64-linux-gnu $(DEP_COGL_LDFLAGS)"
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR)
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig

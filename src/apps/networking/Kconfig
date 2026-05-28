@@ -73,13 +73,13 @@ config NET_GPP_AIOPTOOL
 	help
 	  General Purpose Processor tool for AIOP programming
 
-#config NET_OVS_DPDK
-#	bool "Open vSwitch with DPDK"
-#	default y
-#	depends on PLATFORM_LS
-#	depends on NET_DPDK
-#	help
-#	  Open vSwitch accelerated with DPDK
+config NET_OVS_DPDK
+	bool "Open vSwitch with DPDK"
+	default y
+	depends on PLATFORM_LS
+	depends on NET_DPDK
+	help
+	  Open vSwitch accelerated with DPDK
 
 config NET_PKTGEN_DPDK
 	bool "Pktgen for DPDK"

@@ -155,6 +155,7 @@ repo:
 
   ovs_dpdk:
     url:  https://github.com/nxp-qoriq/ovs-dpdk.git
+    ver:  branch-3.7-qoriq
 
   pktgen_dpdk:
     url:  https://github.com/pktgen/pktgen-dpdk.git

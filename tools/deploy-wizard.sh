@@ -30,8 +30,9 @@ BACK_TITLE="flex-installer cmd Usage Wizard, Press Back/ESC to go back."
 LSDK_VERSION=""
 BOARD=""
 DEVICE=""
+DPLVERSION="lsdk2606"
 FLEX_INSTALLER_PATH="./flex-installer"
-WGET_FLEXINSTALLER="https://www.nxp.com/lgfiles/sdk/lsdk2606/flex-installer"
+WGET_FLEXINSTALLER="https://www.nxp.com/lgfiles/sdk/$DPLVERSION/flex-installer"
 EXTERNAL_URL="https://www.nxp.com/lgfiles/sdk/"
 LINK="$EXTERNAL_URL"
 
@@ -89,42 +90,67 @@ get_board_notes() {
 
 # Check if flex-installer exists and has correct version
 check_flex_installer() {
+    local need_download=0
+    local backup_needed=0
+
     # Check if flex-installer exists
     if [ ! -f "$FLEX_INSTALLER_PATH" ]; then
-        whiptail --title "Error" --msgbox \
-            "flex-installer not found in current directory.\n\nDownload the 2606 version of flex-installer? " \
-            12 60
-	if curl -I --connect-timeout 5 IMEOUT "$EXTERNAL_URL" >/dev/null 2>&1; then
-            wget "$WGET_FLEXINSTALLER"
-	else
-	    echo "Cannot link to resources. Please check your network connection"
-	fi
-        return 1
+        need_download=1
+    else
+        # Make it executable
+        chmod +x "$FLEX_INSTALLER_PATH"
+
+        # Get version info
+        VERSION_OUTPUT=$("$FLEX_INSTALLER_PATH" -v 2>&1)
+        if [ $? -ne 0 ]; then
+            whiptail --title "Error" --msgbox \
+                "Failed to execute flex-installer.\n\nWill backup current file and download the latest version." \
+                12 70
+            backup_needed=1
+            need_download=1
+        else
+            # Extract last string and last 4 digits for version comparison
+            LAST_STRING=$(echo "$VERSION_OUTPUT" | awk '{print $NF}')
+            VERSION_NUM=$(echo "$LAST_STRING" | grep -oE '[0-9]+')
+
+            # Compare version (minimum required: lsdk2606 = 2606)
+            if [ "$VERSION_NUM" -lt 2606 ]; then
+                whiptail --title "Warning" --msgbox \
+                    "flex-installer version is outdated.\n\nCurrent version: $VERSION_NUM\nMinimum required: lsdk2606\n\nWill backup current file and download the latest version." \
+                    14 70
+                backup_needed=1
+                need_download=1
+            fi
+        fi
     fi
 
-    # Make it executable
-    chmod +x "$FLEX_INSTALLER_PATH"
-
-    # Get version info
-    VERSION_OUTPUT=$("$FLEX_INSTALLER_PATH" -v 2>&1)
-    if [ $? -ne 0 ]; then
-        whiptail --title "Error" --msgbox \
-            "Failed to execute flex-installer.\n\nDownload the latest
-		    version:\nwget http://www.nxp.com/lgfiles/sdk/lsdk2606/flex-installer" \
-            14 70
-        return 1
+    # Backup old file if needed
+    if [ $backup_needed -eq 1 ]; then
+        BACKUP_PATH="${FLEX_INSTALLER_PATH}.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$FLEX_INSTALLER_PATH" "$BACKUP_PATH"
+        echo "Old flex-installer backed up to: $BACKUP_PATH"
     fi
 
-    # Extract last string and last 4 digits for version comparison
-    LAST_STRING=$(echo "$VERSION_OUTPUT" | awk '{print $NF}')
-    VERSION_NUM=$(echo "$LAST_STRING" | grep -oE '[0-9]+')
+    # Download if needed
+    if [ $need_download -eq 1 ]; then
+        whiptail --title "Download" --msgbox \
+            "Downloading the $DPLVERSION version of flex-installer..." \
+            10 60
 
-    # Compare version (minimum required: lsdk2606 = 2606)
-    if [ "$VERSION_NUM" -lt 2606 ]; then
-        whiptail --title "Error" --msgbox \
-            "flex-installer version is outdated.\n\nCurrent version: $VERSION_NUM\nMinimum required: lsdk2606\n\nDownload the latest version:\nwget http://www.nxp.com/lgfiles/sdk/lsdk2606/flex-installer" \
-            16 70
-        return 1
+        if curl -I --connect-timeout 5 "$EXTERNAL_URL" >/dev/null 2>&1; then
+            if wget "$WGET_FLEXINSTALLER"; then
+                chmod +x "$FLEX_INSTALLER_PATH"
+                whiptail --title "Success" --msgbox \
+                    "flex-installer downloaded successfully." \
+                    8 50
+            else
+                echo "Failed to download flex-installer"
+                return 1
+            fi
+        else
+            echo "Cannot link to resources. Please check your network connection"
+            return 1
+        fi
     fi
 
     return 0
@@ -134,11 +160,6 @@ storage_device_detection() {
     local devcount=0
 
     while IFS= read -r line; do
-        # Skip if line contains /dev/sda or boot
-        if echo "$line" | grep -qE "(/dev/sda|boot|nvme|scsi|sas|virtio|pcie|ata)"; then
-            continue
-        fi
-
         # Only process disk devices
         if echo "$line" | grep -q "disk"; then
             devcount=$((devcount + 1))
@@ -147,7 +168,7 @@ storage_device_detection() {
 
     if [ $devcount -eq 0 ]; then
         whiptail --title "Error" --msgbox \
-            "\`lsblk\` command failed to find sutiable storage device.\n\nPlease ensure the target SD card is inserted for image burning." \
+            "\`lsblk\` command failed to find suitable storage device.\n\nPlease ensure the target SD card is inserted for image burning." \
             12 60
         return 2 # return error
     fi
@@ -178,10 +199,10 @@ step_sdk_version() {
         --cancel-button "Back" \
 	--menu "Select NXP Debian Linux SDK release version(Different versions support different board types.):" \
         14 60 4 \
-        "lsdk2412" ": Debian12, Kernel version lf-6.6.36" \
-        "lsdk2506" ": Debian12, Kernel version lf-6.6.52" \
-        "lsdk2512" ": Debian13, Kernel version lf-6.12.20" \
         "lsdk2606" ": Debian13, Kernel version lf-6.12.49" \
+        "lsdk2512" ": Debian13, Kernel version lf-6.12.20" \
+        "lsdk2506" ": Debian12, Kernel version lf-6.6.52" \
+        "lsdk2412" ": Debian12, Kernel version lf-6.6.36" \
         3>&1 1>&2 2>&3
     ); then
         LSDK_VERSION="$choice"
@@ -228,10 +249,6 @@ step_device_selection() {
     local menu_items=()
 
     while IFS= read -r line; do
-        # Skip if line contains /dev/sda or boot
-        if echo "$line" | grep -qE "(/dev/sda|boot|nvme|scsi|sas|virtio|pcie|ata)"; then
-            continue
-        fi
 
         # Only process disk devices
         if echo "$line" | grep -q "disk"; then
@@ -316,10 +333,6 @@ The target disk will be forcibly formatted by first cmd. Proceed with caution.\n
             STEP=0
             return
         fi
-
-        whiptail --title "End" --msgbox \
-            "The wizard has ended. Check the log for details.\n\nFlashed information:\n- SDK: $LSDK_VERSION\n- Board: $BOARD\n- Device: $DEVICE" \
-            14 60
 
         STEP=0
     else

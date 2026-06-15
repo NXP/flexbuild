@@ -407,7 +407,7 @@ License File:                license/bsd-3-clause.txt
 Package Category:            BSP
 Type of Content:             source
 Description and comments:    Data Plane Development Kit
-Release Location:            https://github.com/nxp-qoriq/dpdk -b 25.11-lf-rel
+Release Location:            https://github.com/nxp-qoriq/dpdk -b 25.11-qoriq
 Origin:                      NXP (BSD-3-Clause)
                              DPDK - Intel Corporation (BSD-3-Clause) - https://github.com/DPDK/dpdk
                              KNI Linux Device driver - Intel Corporation (GPL-2.0) Separate component of DPDK
@@ -416,16 +416,16 @@ Origin:                      NXP (BSD-3-Clause)
 
 --------------------------------------------
 
-Package:                     dpdk-extras.git
-Version:                     git
-Outgoing License:            GPL-2.0
+Package:                     ovs-dpdk.git
+Version:                     3.7
+Outgoing License:            Apache-2.0
 License File:                LICENSE
-Package Category:            BSP
+Package Category:            Networking
 Type of Content:             source
-Description and comments:    Kernel module for dpdk
-Release Location:            https://github.com/nxp-qoriq/dpdk-extras -b lf-6.12.49-2.2.0
-Origin:                      NXP (GPL-2.0 or BSD-3-Clause)
-                             DPDK-kmods (GPL-2.0) - http://git.dpdk.org/dpdk-kmods/
+Description and comments:    Open vSwitch DPDK
+Release Location:            https://github.com/nxp-qoriq/ovs-dpdk.git -b branch-3.7-qoriq
+Origin:                      NXP (Apache-2.0)
+                             ovs-dpdk - https://www.openvswitch.org/download/
 
 --------------------------------------------
 Graphics Packages

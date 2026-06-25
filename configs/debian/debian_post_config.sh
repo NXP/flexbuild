@@ -89,7 +89,6 @@ COGL_DRIVER=gles2
 CLUTTER_DRIVER=gles2
 QT_QPA_PLATFORM=wayland
 GDK_GL=gles
-QT_QUICK_BACKEND=software
 EOT
 
 grep -q 'WAYLAND_DISPLAY' /root/.bashrc || \

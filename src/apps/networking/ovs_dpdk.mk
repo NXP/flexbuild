@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
+#ovs_dpdk:
 ovs_dpdk: dpdk
 	@$(call download_repo,ovs_dpdk,apps/networking)
 	 $(call patch_apply,ovs_dpdk,apps/networking)
@@ -13,8 +14,12 @@ ovs_dpdk: dpdk
 	 $(call fbprint_b,"ovs_dpdk")
 	 cd $(NETDIR)/ovs_dpdk
 	 export CC="$(CROSS_COMPILE)gcc --sysroot=$(RFSDIR)"
+	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR)
+	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig
 	 export LDFLAGS="-L$(DESTDIR)/usr/lib -L$(RFSDIR)/usr/lib -L$(RFSDIR)/lib/aarch64-linux-gnu"
-	 export LIBS="$(shell PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig $(CROSS)pkg-config --libs libdpdk)"
+	 export LIBS="$(shell PKG_CONFIG_SYSROOT_DIR=$(RFSDIR) \
+		PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig \
+		pkg-config --libs libdpdk)"
 	 export ovs_cv_groff=no
 	 ./boot.sh $(LOG_MUTE)
 	 ./configure --prefix=/usr \

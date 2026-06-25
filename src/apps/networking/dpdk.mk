@@ -14,11 +14,11 @@
 DPDK_EXAMPLES = "l2fwd,l3fwd,ipsec-secgw,l2fwd-crypto,l2fwd-event,ip_fragmentation,ip_reassembly,link_status_interrupt,qdma_demo,ethtool,pkt_split_app,multi_process/symmetric_mp,multi_process/simple_mp"
 DPDK_APPS = pdump,proc-info,test,test-crypto-perf,test-pmd
 
-dpdk:
+dpdk: openssl
 	 @$(call download_repo,dpdk,apps/networking)
 	 $(call patch_apply,dpdk,apps/networking)
 	 $(call fbprint_b,"dpdk")
-	 export PKG_CONFIG_PATH=$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/share/pkgconfig
+	 export PKG_CONFIG_PATH=$(DESTDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig:$(RFSDIR)/usr/share/pkgconfig
 	 export PKG_CONFIG_SYSROOT_DIR=$(RFSDIR)
 	 export PKG_CONFIG_LIBDIR=$(RFSDIR)/usr/lib/aarch64-linux-gnu/pkgconfig:$(RFSDIR)/usr/lib/pkgconfig
 	 export LIBRARY_PATH="$(RFSDIR)/usr/lib/aarch64-linux-gnu:$(RFSDIR)/usr/lib:$$LIBRARY_PATH"

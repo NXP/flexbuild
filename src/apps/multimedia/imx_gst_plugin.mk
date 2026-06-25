@@ -55,4 +55,5 @@ imx_gst_plugin: $(DEP_GST_PLUGIN) imx_lib libdrm imx_parser gst_plugins_bad imx_
 	      -Dplatform=$(_GST_PLUGIN_PLAT) $(LOG_MUTE)
 	 ninja -C build_$(DISTROTYPE)_$(ARCH) install $(LOG_MUTE)
 	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/beep_registry_1.0.arm.cf
+	 sed -i 's|$(RFSDIR)||g' $(DESTDIR)/usr/share/aiur_registry_1.0.arm.cf
 	 $(call fbprint_d,"imx_gst_plugin")

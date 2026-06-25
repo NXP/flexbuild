@@ -11,7 +11,7 @@
 # run ./benchmark_model --external_delegate_path=<patch_to_libvx_delegate.so> --graph=<tflite_model.tflite>
 
 
-TFLITE_VERSION = tensorflow-lite-2.18.0
+TFLITE_VERSION = tensorflow-lite-2.19.0
 TFLITE_BUILD_DIR = "$(MLDIR)"/tflite/build_debian_arm64
 
 tflite: flatbuffers
@@ -50,6 +50,8 @@ tflite: flatbuffers
 		-DTFLITE_HOST_TOOLS_DIR=/usr/bin \
 		-DFETCHCONTENT_FULLY_DISCONNECTED=OFF \
 		-DTFLITE_EVAL_TOOLS=on \
+		-DTFLITE_ENABLE_OPENCL=ON \
+		-DTFLITE_ENABLE_GPU=ON \
 		-DTFLITE_BUILD_SHARED_LIB=on \
 		-DTFLITE_ENABLE_NNAPI=off \
 		-DTFLITE_ENABLE_NNAPI_VERBOSE_VALIDATION=on \

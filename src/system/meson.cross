@@ -35,7 +35,7 @@ cpp_link_args = ['-Wl,-O1', '-Wl,--hash-style=gnu', '-Wl,--as-needed']
 [properties]
 needs_exe_wrapper = true
 sys_root = '@STAGING_DIR@'
-pkg_config_libdir = '@DESTDIR@/usr/lib/pkg-config:@STAGING_DIR@/usr/lib/pkg-config:@STAGING_DIR@/usr/lib/aarch64-linux-gnu/pkg-config:@STAGING_DIR@/usr/share/pkg-config'
+pkg_config_libdir = '@DESTDIR@/usr/lib/pkgconfig:@STAGING_DIR@/usr/lib/pkgconfig:@STAGING_DIR@/usr/lib/aarch64-linux-gnu/pkgconfig:@STAGING_DIR@/usr/share/pkgconfig'
 pkg_config_sysroot = '@STAGING_DIR@'
 
 [host_machine]

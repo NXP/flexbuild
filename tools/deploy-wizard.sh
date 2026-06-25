@@ -51,7 +51,7 @@ check_whiptail() {
 
 # Declare compatibility associative array
 declare -A COMPAT=(
-    ["lsdk2412"]="imx8mpevk imx8mmevk imx93evk imx93frdm imx91frdm ls1028ardb ls1043ardb ls1046ardb lx2160ardb"
+#    ["lsdk2412"]="imx8mpevk imx8mmevk imx93evk imx93frdm imx91frdm ls1028ardb ls1043ardb ls1046ardb lx2160ardb"
     ["lsdk2506"]="imx8mpevk imx8mpfrdm imx8mmevk imx93evk imx93frdm imx91evk imx91frdm ls1028ardb ls1043ardb ls1046ardb lx2160ardb"
     ["lsdk2512"]="imx8mmevk imx8mpevk imx8mpfrdm imx8qmmek imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95evk imx95frdm ls1028ardb ls1043ardb ls1046ardb lx2160ardb"
     ["lsdk2606"]="imx8mmevk imx8mpevk imx8mpfrdm imx8qmmek imx91evk imx91frdm imx91sfrdm imx93evk imx93frdm imx95-15x15-frdm imx95-15x15-evk imx95-19x19-frdm-pro imx95-19x19-evk ls1028ardb ls1043ardb ls1046ardb lx2160ardb"
